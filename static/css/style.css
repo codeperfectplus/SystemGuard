@@ -1,62 +1,82 @@
-/* General Body Styles */
+/* General Styles */
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f0f2f5;
+    font-family: 'Arial', sans-serif;
     color: #333;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
+    background-color: #f8f9fa;
 }
 
-/* Header Styles */
 .header {
-    background: linear-gradient(45deg, #00b4d8, #48cae4);
-    color: #fff;
-    padding: 60px 0;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .header h1 {
-    font-size: 3rem;
-    font-weight: 700;
+    margin: 0;
+    font-size: 2.5rem;
 }
 
-/* Card Styles */
+/* Navbar Styles */
+.navbar {
+    background-color: #007bff; /* Bright blue background color */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: #1a1414; /* White text color */
+}
+
+.navbar-nav .nav-link {
+    color: #000000; /* White text color */
+}
+
+.navbar-nav .nav-link:hover {
+    color: #f8f9fa; /* Light text color on hover */
+    background-color: #0056b3; /* Darker blue background on hover */
+    border-radius: 0.25rem;
+}
+
+.navbar-toggler {
+    border-color: #ffffff; /* White border for toggler */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4 6h16M4 12h16M4 18h16'/%3E%3C/svg%3E");
+}
+
 .card {
-    background: linear-gradient(135deg, #ffffff, #e0e0e0);
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 150px; /* Ensures consistent card height */
 }
 
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center-aligns the content */
 }
 
 .card-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #00b4d8;
+    font-size: 1.25rem; /* Adjusts font size for titles */
 }
 
 .card-text {
-    font-size: 1.25rem;
-    color: #495057;
+    font-size: 1.125rem; /* Adjusts font size for text */
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 2.5rem;
-    }
+.btn-primary {
+    margin-top: 1rem; /* Adds space above buttons */
+}
 
-    .card {
-        margin-bottom: 20px;
+/* Responsive Styles */
+@media (max-width: 767.98px) {
+    .navbar-nav .nav-link {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
     }
 }
+
 
 /* Battery Card Styles */
 .battery-card {
