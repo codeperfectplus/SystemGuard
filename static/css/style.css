@@ -1,37 +1,96 @@
+/* General Body Styles */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
     color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
 }
 
-header {
-    background: linear-gradient(135deg, #007bff, #00d2ff);
+/* Header Styles */
+.header {
+    background: linear-gradient(45deg, #00b4d8, #48cae4);
     color: #fff;
-    padding: 20px;
-    border-bottom: 2px solid #0056b3;
+    padding: 60px 0;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+/* Card Styles */
 .card {
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #e0e0e0;
 }
 
 .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .card-title {
-    font-size: 1.25rem;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #00b4d8;
 }
 
 .card-text {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+    color: #495057;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
-    .card {
-        margin-bottom: 1rem;
+    .header h1 {
+        font-size: 2.5rem;
     }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+/* Battery Card Styles */
+.battery-card {
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    color: #333;
+}
+
+.battery-card[data-battery="100"] {
+    background: linear-gradient(135deg, #76c7c0, #4caf50);
+}
+
+.battery-card[data-battery="75"] {
+    background: linear-gradient(135deg, #76c7c0, #ffeb3b);
+}
+
+.battery-card[data-battery="50"] {
+    background: linear-gradient(135deg, #fbc02d, #ff9800);
+}
+
+.battery-card[data-battery="25"] {
+    background: linear-gradient(135deg, #ff7043, #f44336);
+}
+
+.battery-card[data-battery="0"] {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+/* The hover effect still applies */
+.battery-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: #fff;
 }
