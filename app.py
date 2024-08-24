@@ -1,21 +1,43 @@
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 import os
 import psutil
 import datetime
+import subprocess
 
 app = Flask(__name__)
 
-def get_established_connections():
-    connection = psutil.net_connections()
-    ipv4_dict = {}
-    ipv6_dict = {}
+# Configure the SQLite database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///speedtest_results.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    for conn in connection:
+# Initialize the database
+db = SQLAlchemy(app)
+
+# Define the model for storing speed test results
+class SpeedTestResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    download_speed = db.Column(db.String(50))
+    upload_speed = db.Column(db.String(50))
+    ping = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
+
+def get_established_connections():
+    connections = psutil.net_connections()
+    ipv4_dict = set()
+    ipv6_dict = set()
+
+    for conn in connections:
         if conn.status == 'ESTABLISHED':
             if '.' in conn.laddr.ip:
-                ipv4_dict = conn.laddr.ip
+                ipv4_dict.add(conn.laddr.ip)
             elif ':' in conn.laddr.ip:
-                ipv6_dict = conn.laddr.ip
+                ipv6_dict.add(conn.laddr.ip)
+
+    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')][0]
 
     return ipv4_dict, ipv6_dict
 
@@ -31,9 +53,9 @@ def change_up_time_format(uptime):
 def get_system_info():
     info = {
         'username': os.getlogin(),
-        'cpu_percent': psutil.cpu_percent(interval=1),
-        'memory_percent': psutil.virtual_memory().percent,
-        'disk_usage': psutil.disk_usage('/').percent,
+        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
+        'memory_percent': round(psutil.virtual_memory().percent, 2),
+        'disk_usage': round(psutil.disk_usage('/').percent, 2),
         'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
         'cpu_core': psutil.cpu_count(),
         'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
@@ -41,13 +63,67 @@ def get_system_info():
         'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
-        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time()))
+        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
+        'ipv4_connections': get_established_connections()[0],
+        'ipv6_connections': get_established_connections()[1]
     }
-
-    ipv4_conn, ipv6_conn = get_established_connections()
-    info['ipv4_connections'] = ipv4_conn
-    info['ipv6_connections'] = ipv6_conn
     return info
+
+def run_speedtest():
+    try:
+        # Run the speedtest and capture the output
+        result = subprocess.run(['speedtest-cli'], capture_output=True, text=True, check=True)
+        
+        # Extract relevant information from the output
+        output_lines = result.stdout.splitlines()
+        download_speed = None
+        upload_speed = None
+        ping = None
+        
+        for line in output_lines:
+            if "Download:" in line:
+                download_speed = line.split("Download: ")[1]
+            elif "Upload:" in line:
+                upload_speed = line.split("Upload: ")[1]
+            elif "Ping:" in line:
+                ping = line.split("Ping: ")[1]
+        
+        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping}
+    
+    except subprocess.CalledProcessError as e:
+        print(f"Speedtest failed with error: {e.stderr}")
+        return None
+    
+    except Exception as e:
+        print(f"Error occurred while running speed test: {e}")
+        return None
+
+@app.route('/speedtest')
+def speedtest():
+    # Check if the database has three or more entries in the last hour
+    one_hour_ago = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > one_hour_ago).all()
+
+    if len(recent_results) < 3:
+        # Run a new speed test and store the result
+        speedtest_result = run_speedtest()
+        if speedtest_result:
+            new_result = SpeedTestResult(
+                download_speed=speedtest_result['download_speed'],
+                upload_speed=speedtest_result['upload_speed'],
+                ping=speedtest_result['ping']
+            )
+            db.session.add(new_result)
+            db.session.commit()
+            return render_template('speedtest_result.html', speedtest_result=speedtest_result, source="Actual Test")
+    else:
+        # Retrieve the latest result from the database
+        latest_result = recent_results[-1]
+        next_test_time = one_hour_ago + datetime.timedelta(hours=1)
+        return render_template('speedtest_result.html', 
+                               speedtest_result=latest_result, 
+                               source="Database", 
+                               next_test_time=next_test_time)
 
 @app.route('/')
 def dashboard():
@@ -56,7 +132,6 @@ def dashboard():
 
 @app.route('/cpu_usage')
 def cpu_usage():
-    # Detailed CPU usage stats
     cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
     return render_template('cpu_usage.html', cpu_usage=cpu_usage)
 
@@ -90,10 +165,11 @@ def network_stats():
 
 @app.route('/system_health')
 def system_health():
-    # Reuse system_info function for summary
     system_info = get_system_info()
     return render_template('system_health.html', system_info=system_info)
 
-
 if __name__ == '__main__':
+    # Create the database tables if they don't exist
+    with app.app_context():
+        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
