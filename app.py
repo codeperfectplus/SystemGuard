@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 import psutil
@@ -10,14 +10,10 @@ app = Flask(__name__)
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///speedtest_results.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'secret'
 
 # Initialize the database
 db = SQLAlchemy(app)
-
-# config
-SPEEDTEST_COOLDOWN_IN_HOURS = 1 # in hours
-TIMEZONE = 'Asia/Kolkata'
-NUMBER_OF_SPEEDTESTS = 3
 
 # Define the model for storing speed test results
 class SpeedTestResult(db.Model):
@@ -30,14 +26,22 @@ class SpeedTestResult(db.Model):
     def __repr__(self):
         return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
 
-# class DashoardSettings(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     speedtest_cooldown = db.Column(db.Integer)
-#     timezone = db.Column(db.String(50))
-#     number_of_speedtests = db.Column(db.Integer)
+class DashoardSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    speedtest_cooldown = db.Column(db.Integer, default=1)
+    number_of_speedtests = db.Column(db.Integer, default=1)
+    timezone = db.Column(db.String(50), default='Asia/Kolkata')
 
-#     def __repr__(self):
-#         return f'<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>'
+    def __repr__(self):
+        return f'<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>'
+
+# initialize the database
+with app.app_context():
+    db.create_all()
+    settings = DashoardSettings.query.first()
+    if not settings:
+        db.session.add(DashoardSettings())
+        db.session.commit()
 
 def change_up_time_format(uptime):
     uptime_seconds = uptime.total_seconds()
@@ -73,8 +77,14 @@ def run_speedtest():
         error = {"status": "Error", "message": str(e)}
         return error
 
+def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
+    return value.strftime(format)
+
 @app.route('/speedtest')
 def speedtest():
+    settings = DashoardSettings.query.first()
+    SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
+    NUMBER_OF_SPEEDTESTS = settings.number_of_speedtests
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
     recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
 
@@ -94,11 +104,13 @@ def speedtest():
             return render_template('speedtest_result.html', speedtest_result=speedtest_result, source="Actual Test")
     else:
         latest_result = recent_results[-1]
-        next_test_time = latest_result.timestamp + datetime.timedelta(hours=1)
+        next_test_time = latest_result.timestamp + datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
+        remaining_time_for_next_test = round((next_test_time - datetime.datetime.now()).total_seconds() / 60)
         return render_template('speedtest_result.html', 
                                speedtest_result=latest_result, 
                                source="Database", 
-                               next_test_time=next_test_time)
+                               next_test_time=next_test_time,
+                               remaining_time_for_next_test=remaining_time_for_next_test)
 
 def get_system_info():
     print("Getting system information...")
@@ -138,12 +150,13 @@ def get_established_connections():
 
 @app.route('/')
 def dashboard():
+    settings = DashoardSettings.query.first()
+    SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
     system_info = get_system_info()
-
     # Fetch the last speedtest result
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
     recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
-
+    last_timestamp = datetimeformat(recent_results[-1].timestamp) if recent_results else None
     if recent_results:
         # Display the most recent result from the database
         latest_result = recent_results[-1]
@@ -153,7 +166,7 @@ def dashboard():
             'ping': latest_result.ping
         }
         source = "Database"
-        next_test_time = latest_result.timestamp + datetime.timedelta(hours=1)
+        next_test_time = latest_result.timestamp + datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
         show_prompt = False
         remaining_time_for_next_test = round((next_test_time - datetime.datetime.now()).total_seconds() / 60)
     else:
@@ -165,7 +178,8 @@ def dashboard():
 
     return render_template('dashboard.html', system_info=system_info, 
                            speedtest_result=speedtest_result, 
-                           source=source, 
+                           source=source,
+                           last_timestamp=last_timestamp,
                            next_test_time=remaining_time_for_next_test, 
                            show_prompt=show_prompt)
 
@@ -173,6 +187,20 @@ def dashboard():
 def cpu_usage():
     cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
     return render_template('cpu_usage.html', cpu_usage=cpu_usage)
+
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    # Fetch the settings from the database and update them
+    settings = DashoardSettings.query.first()
+    if settings:
+        if request.method == 'POST':
+            settings.speedtest_cooldown = int(request.form['speedtest_cooldown'])
+            settings.number_of_speedtests = int(request.form['number_of_speedtests'])
+            settings.timezone = request.form['timezone']
+            db.session.commit()
+            flash('Settings updated successfully!', 'success')
+        return render_template('settings.html', settings=settings)
 
 @app.route('/memory_usage')
 def memory_usage():

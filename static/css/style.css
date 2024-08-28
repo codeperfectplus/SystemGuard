@@ -18,7 +18,7 @@
     --color-ip: #03e77c; /* Bright blue for IP address */
     --color-cpu-usage: #ffc107; /* Yellow for CPU usage */
     --color-memory: #6f42c1; /* Purple for memory */
-    --color-disk: #6c757d; /* Gray for disk */
+    --color-disk: #6711e9; /* Gray for disk */
     --color-uptime: #17a2b8; /* Cyan for uptime */
     --color-network: #11eeee; /* Bright blue for network */
     --color-speedtest: #c9ef4b; /* Bright blue for speedtest */
@@ -186,11 +186,16 @@ body {
 }
 
 .card-text {
-    font-size: 1.125rem; /* Adjusts font size for text */
+    font-size: 1.5rem; /* Adjusts font size for text */
 }
 
 .btn-primary {
     margin-top: 1rem; /* Adds space above buttons */
+}
+
+.fas {
+    font-size: 1.5rem; /* Adjusts icon size */
+    margin-right: 0.5rem; /* Adds space between icon and text */
 }
 
 /* Responsive Styles */
@@ -259,6 +264,14 @@ body {
     border-radius: 5px; /* Rounded corners */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for depth */
     transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+.cpu-core-bar:hover {
+    background-color: var(--color-cpu); /* Red color on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); /* Slightly larger shadow */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    filter: brightness(1.2); /* Brighten the bar */
+
 }
 
 /* General Card Hover Effect */
@@ -357,4 +370,25 @@ body {
     height: 10px; /* Height of the red effect */
     border-radius: 0 0 10px 10px; /* Match the card's border radius */
     z-index: 1; /* Ensure it's on top of the card content */
+}
+
+footer {
+    background-color: #343a40;
+    color: #adb5bd;
+    padding: 1rem 0;
+    position: relative;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+    position: fixed;
+}
+
+footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #ced4da;
+    text-decoration: underline;
 }

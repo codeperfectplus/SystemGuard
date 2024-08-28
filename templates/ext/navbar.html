@@ -21,6 +21,9 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'system_health' %}active{% endif %}" href="{{ url_for('system_health') }}">System Health</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}">Settings</a>
+            </li>
         </ul>
     </div>
 </nav>

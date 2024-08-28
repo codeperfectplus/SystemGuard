@@ -29,8 +29,8 @@
                             </li>
                             {% if source == "Database" %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <strong>Next Test Time:</strong> 
-                                    <span>{{ next_test_time }}</span>
+                                    <strong>Cooldown time:</strong> 
+                                    <span>{{ remaining_time_for_next_test }} mins</span>
                                 </li>
                             {% endif %}
                         </ul>
