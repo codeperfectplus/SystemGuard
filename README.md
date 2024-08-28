@@ -28,6 +28,11 @@ python app.py
 http://localhost:5000
 ```
 
+## Features
+
+- Monitor the server stats like CPU, Memory, Disk, Network etc.
+- Check the network speed of the server. (Speed test)
+- Rate limit the speed test to avoid the abuse.
 
 ## Why not the docker image?
 
@@ -35,11 +40,9 @@ I have not created the docker image for this project because it requires the acc
 
 
 ## Acknowledgments
-
-- This project uses `speedtest-cli` for performing speed tests. `speedtest-cli` is licensed under the Apache License 2.0. For more details, please refer to its [GitHub repository](https://github.com/sivel/speedtest-cli).
-
-- This project uses `psutil` for getting the system stats. `psutil` is licensed under the BSD 3-Clause "New" or "Revised" License. For more details, please refer to its [GitHub repository](https://github.com/giampaolo/psutil)
-
-- This project uses `flask` for creating the web app. `flask` is licensed under the BSD 3-Clause "New" or "Revised" License. For more details, please refer to its [GitHub repository](https://github.com/pallets/flask)
-
-- This project uses `chart.js` for creating the charts. `chart.js` is licensed under the MIT License. For more details, please refer to its [GitHub repository](https://github.com/chartjs/Chart.js)
+| Project | License | Repository |
+|---------|---------|------------|
+| `speedtest-cli` | Apache License 2.0 | [GitHub repository](https://github.com/sivel/speedtest-cli) |
+| `psutil` | BSD 3-Clause License | [GitHub repository](https://github.com/giampaolo/psutil) |
+| `flask` | BSD 3-Clause License | [GitHub repository](https://github.com/pallets/flask) |
+| `chart.js` | MIT License | [GitHub repository](https://github.com/chartjs/Chart.js) |

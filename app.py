@@ -25,22 +25,6 @@ class SpeedTestResult(db.Model):
     def __repr__(self):
         return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
 
-def get_established_connections():
-    connections = psutil.net_connections()
-    ipv4_dict = set()
-    ipv6_dict = set()
-
-    for conn in connections:
-        if conn.status == 'ESTABLISHED':
-            if '.' in conn.laddr.ip:
-                ipv4_dict.add(conn.laddr.ip)
-            elif ':' in conn.laddr.ip:
-                ipv6_dict.add(conn.laddr.ip)
-
-    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')][0]
-
-    return ipv4_dict, ipv6_dict
-
 def change_up_time_format(uptime):
     uptime_seconds = uptime.total_seconds()
     days = int(uptime_seconds // (24 * 3600))
@@ -50,35 +34,11 @@ def change_up_time_format(uptime):
     minutes = int(uptime_seconds // 60)
     return f"{days} days, {hours} hours, {minutes} minutes"
 
-def get_system_info():
-    info = {
-        'username': os.getlogin(),
-        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
-        'memory_percent': round(psutil.virtual_memory().percent, 2),
-        'disk_usage': round(psutil.disk_usage('/').percent, 2),
-        'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
-        'cpu_core': psutil.cpu_count(),
-        'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
-        'network_sent': round(psutil.net_io_counters().bytes_sent / (1024 ** 2), 2),  # In MB
-        'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
-        'process_count': len(psutil.pids()),
-        'swap_memory': psutil.swap_memory().percent,
-        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
-        'ipv4_connections': get_established_connections()[0],
-        'ipv6_connections': get_established_connections()[1]
-    }
-    return info
-
 def run_speedtest():
     try:
-        # Run the speedtest and capture the output
         result = subprocess.run(['speedtest-cli'], capture_output=True, text=True, check=True)
-        
-        # Extract relevant information from the output
         output_lines = result.stdout.splitlines()
-        download_speed = None
-        upload_speed = None
-        ping = None
+        download_speed, upload_speed, ping = None, None, None
         
         for line in output_lines:
             if "Download:" in line:
@@ -100,12 +60,10 @@ def run_speedtest():
 
 @app.route('/speedtest')
 def speedtest():
-    # Check if the database has three or more entries in the last hour
     one_hour_ago = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
     recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > one_hour_ago).all()
 
     if len(recent_results) < 3:
-        # Run a new speed test and store the result
         speedtest_result = run_speedtest()
         if speedtest_result:
             new_result = SpeedTestResult(
@@ -117,13 +75,47 @@ def speedtest():
             db.session.commit()
             return render_template('speedtest_result.html', speedtest_result=speedtest_result, source="Actual Test")
     else:
-        # Retrieve the latest result from the database
         latest_result = recent_results[-1]
-        next_test_time = one_hour_ago + datetime.timedelta(hours=1)
+        next_test_time = latest_result.timestamp + datetime.timedelta(hours=1)
         return render_template('speedtest_result.html', 
                                speedtest_result=latest_result, 
                                source="Database", 
                                next_test_time=next_test_time)
+
+def get_system_info():
+    ipv4_dict, ipv6_dict = get_established_connections()
+    info = {
+        'username': os.getlogin(),
+        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
+        'memory_percent': round(psutil.virtual_memory().percent, 2),
+        'disk_usage': round(psutil.disk_usage('/').percent, 2),
+        'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
+        'cpu_core': psutil.cpu_count(),
+        'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
+        'network_sent': round(psutil.net_io_counters().bytes_sent / (1024 ** 2), 2),  # In MB
+        'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
+        'process_count': len(psutil.pids()),
+        'swap_memory': psutil.swap_memory().percent,
+        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
+        'ipv4_connections': ipv4_dict,
+        'ipv6_connections': ipv6_dict
+    }
+    return info
+
+def get_established_connections():
+    connections = psutil.net_connections()
+    ipv4_dict = set()
+    ipv6_dict = set()
+
+    for conn in connections:
+        if conn.status == 'ESTABLISHED':
+            if '.' in conn.laddr.ip:
+                ipv4_dict.add(conn.laddr.ip)
+            elif ':' in conn.laddr.ip:
+                ipv6_dict.add(conn.laddr.ip)
+
+    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
+    return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
 
 @app.route('/')
 def dashboard():
@@ -169,7 +161,6 @@ def system_health():
     return render_template('system_health.html', system_info=system_info)
 
 if __name__ == '__main__':
-    # Create the database tables if they don't exist
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
