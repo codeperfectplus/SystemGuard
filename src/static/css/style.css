@@ -12,17 +12,18 @@
     --color-black: #000000; /* Black for text */
     
     /* card colors */
-    --color-username: #007bff; /* Bright blue for username */
+    --color-username: #469fff; /* Bright blue for username */
     --color-boot: #28a745; /* Green for boot time */
-    --color-cpu: #af13e3; /* Red for CPU */
-    --color-ip: #03e77c; /* Bright blue for IP address */
-    --color-cpu-usage: #ffc107; /* Yellow for CPU usage */
-    --color-memory: #6f42c1; /* Purple for memory */
-    --color-disk: #6711e9; /* Gray for disk */
-    --color-uptime: #042b31; /* Cyan for uptime */
-    --color-network: #20053d; /* Bright blue for network */
-    --color-speedtest: #253003; /* Bright blue for speedtest */
+    --color-cpu: #ac0fea; /* Red for CPU */
+    --color-cpu-usage: #ca11eb; /* Yellow for CPU usage */
+    --color-memory: #ffbf00; /* Purple for memory */
+    --color-disk: #047507; /* Gray for disk */
+    --color-uptime: #f44336; /* Cyan for uptime */
+    --color-network: #08a2a8; /* Bright blue for network */
+    --color-speedtest: #f44336; /* Bright blue for speedtest */
     --color-battery: #007bff; /* Bright blue for battery */
+    --color-connection: #f44336; /* Red for connection */
+    --color-bg-dashboard-memory: #28a745; /* Green for memory card */
 
     /* shadow colors */
     --color-shadow: #f80000; /* Red shadow for username */
@@ -148,6 +149,14 @@ body {
 
 .card.bg-boot {
     background-color: var(--color-boot); /* Green for boot time */
+}
+
+.card.bg-connection {
+    background-color: var(--color-connection); /* Red for connection */
+}
+
+.card.bg-dashboard-memory {
+    background-color: var(--color-bg-dashboard-memory); /* Green for memory card */
 }
 
 .card.bg-cpu-usage {
