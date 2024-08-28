@@ -54,6 +54,9 @@ export FLASK_ENV=development  # or production
 
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
+    # check for the latest version of the code and do a git pull
+    git stash
+    git pull
     echo "Flask app is not running. Starting..." >> "$LOG_FILE"
     flask run --host=0.0.0.0 --port="$FLASK_PORT" &
 else

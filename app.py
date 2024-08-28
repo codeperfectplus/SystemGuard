@@ -14,16 +14,30 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize the database
 db = SQLAlchemy(app)
 
+# config
+SPEEDTEST_COOLDOWN_IN_HOURS = 1 # in hours
+TIMEZONE = 'Asia/Kolkata'
+NUMBER_OF_SPEEDTESTS = 3
+
 # Define the model for storing speed test results
 class SpeedTestResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     download_speed = db.Column(db.String(50))
     upload_speed = db.Column(db.String(50))
     ping = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.now(datetime.UTC))
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now())
 
     def __repr__(self):
         return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
+
+# class DashoardSettings(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     speedtest_cooldown = db.Column(db.Integer)
+#     timezone = db.Column(db.String(50))
+#     number_of_speedtests = db.Column(db.Integer)
+
+#     def __repr__(self):
+#         return f'<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>'
 
 def change_up_time_format(uptime):
     uptime_seconds = uptime.total_seconds()
@@ -48,23 +62,27 @@ def run_speedtest():
             elif "Ping:" in line:
                 ping = line.split("Ping: ")[1]
         
-        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping}
+        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping, 
+                "status": "Success"}
     
     except subprocess.CalledProcessError as e:
-        print(f"Speedtest failed with error: {e.stderr}")
-        return None
+        error = {"status": "Error", "message": e.stderr}
+        return error
     
     except Exception as e:
-        print(f"Error occurred while running speed test: {e}")
-        return None
+        error = {"status": "Error", "message": str(e)}
+        return error
 
 @app.route('/speedtest')
 def speedtest():
-    one_hour_ago = datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1)
-    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > one_hour_ago).all()
+    n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
+    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
 
-    if len(recent_results) < 3:
+    if len(recent_results) < NUMBER_OF_SPEEDTESTS:
         speedtest_result = run_speedtest()
+        if speedtest_result['status'] == "Error":
+            return render_template('error/speedtest_error.html', error=speedtest_result['message'])
+
         if speedtest_result:
             new_result = SpeedTestResult(
                 download_speed=speedtest_result['download_speed'],
@@ -121,7 +139,35 @@ def get_established_connections():
 @app.route('/')
 def dashboard():
     system_info = get_system_info()
-    return render_template('dashboard.html', system_info=system_info)
+
+    # Fetch the last speedtest result
+    n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
+    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
+
+    if recent_results:
+        # Display the most recent result from the database
+        latest_result = recent_results[-1]
+        speedtest_result = {
+            'download_speed': latest_result.download_speed,
+            'upload_speed': latest_result.upload_speed,
+            'ping': latest_result.ping
+        }
+        source = "Database"
+        next_test_time = latest_result.timestamp + datetime.timedelta(hours=1)
+        show_prompt = False
+        remaining_time_for_next_test = round((next_test_time - datetime.datetime.now()).total_seconds() / 60)
+    else:
+        # No recent results, prompt to perform a test
+        speedtest_result = None
+        source = None
+        show_prompt = True
+        remaining_time_for_next_test = None
+
+    return render_template('dashboard.html', system_info=system_info, 
+                           speedtest_result=speedtest_result, 
+                           source=source, 
+                           next_test_time=remaining_time_for_next_test, 
+                           show_prompt=show_prompt)
 
 @app.route('/cpu_usage')
 def cpu_usage():

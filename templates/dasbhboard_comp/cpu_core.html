@@ -1,0 +1,13 @@
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card bg-cpu" data-cpu="{{ system_info['cpu_percent'] }}">
+        <div class="card-body">
+            <h5 class="card-title">CPU Cores <i class="fas fa-microchip"></i></h5>
+            <p class="card-text fs-4">{{ system_info['cpu_core'] }}</p>
+            <div class="cpu-core-visualization">
+                {% for i in range(system_info['cpu_core']) %}
+                <div class="cpu-core-bar"></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
