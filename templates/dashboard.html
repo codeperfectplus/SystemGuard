@@ -6,8 +6,8 @@
 <div class="container mt-4">
     <div class="row">
         <!-- General Information Cards -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+        <div class="col-md-6 mb-4">
+            <div class="card bg-username shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">Username <i class="fas fa-user"></i></h5>
                     <p class="card-text fs-4">{{ system_info['username'] }}</p>
@@ -15,8 +15,17 @@
             </div>
         </div>
 
+        <div class="col-md-6 mb-4">
+            <div class="card bg-boot shadow-sm border-0 rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title">Boot Time <i class="fas fa-clock"></i></h5>
+                    <p class="card-text fs-4">{{ system_info['boot_time'] }}</p>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-ipv4 shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">IPV4 Connections <i class="fas fa-network-wired"></i></h5>
                     <p class="card-text fs-4">{{ system_info['ipv4_connections'] }}</p>
@@ -25,16 +34,7 @@
         </div>
 
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
-                <div class="card-body">
-                    <h5 class="card-title">Battery Percentage <i class="fas fa-battery-three-quarters"></i></h5>
-                    <p class="card-text fs-4">{{ system_info['battery_percent'] }}%</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-cpu shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">CPU Cores <i class="fas fa-microchip"></i></h5>
                     <p class="card-text fs-4">{{ system_info['cpu_core'] }}</p>
@@ -43,17 +43,16 @@
         </div>
 
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card battery-card shadow-sm border-0 rounded-3">
                 <div class="card-body">
-                    <h5 class="card-title">Boot Time <i class="fas fa-clock"></i></h5>
-                    <p class="card-text fs-4">{{ system_info['boot_time'] }}</p>
+                    <h5 class="card-title">Battery Percentage <i class="fas fa-battery-three-quarters"></i></h5>
+                    <p class="card-text fs-4">{{ system_info['battery_percent'] }}%</p>
                 </div>
             </div>
         </div>
 
-        <!-- Performance Metrics Cards -->
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-cpu-usage shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">CPU Usage <i class="fas fa-microchip"></i></h5>
                     <p class="card-text fs-4">{{ system_info['cpu_percent'] }}%</p>
@@ -63,7 +62,7 @@
         </div>
 
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-memory shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">Memory Usage <i class="fas fa-memory"></i></h5>
                     <p class="card-text fs-4">{{ system_info['memory_percent'] }}%</p>
@@ -73,7 +72,7 @@
         </div>
 
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-disk shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">Disk Usage <i class="fas fa-hdd"></i></h5>
                     <p class="card-text fs-4">{{ system_info['disk_usage'] }}%</p>
@@ -83,7 +82,7 @@
         </div>
 
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+            <div class="card bg-uptime shadow-sm border-0 rounded-3">
                 <div class="card-body">
                     <h5 class="card-title">System Uptime <i class="fas fa-clock"></i></h5>
                     <p class="card-text fs-4">{{ system_info['uptime'] }}</p>
@@ -92,22 +91,29 @@
             </div>
         </div>
 
-        <!-- Network Statistics Card (Last Row) -->
-        <div class="col-md-12 mb-4">
-            <div class="card shadow-sm border-0 rounded-3">
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-network shadow-sm border-0 rounded-3">
                 <div class="card-body text-center">
                     <h5 class="card-title">Network Statistics <i class="fas fa-network-wired"></i></h5>
                     <p class="card-text fs-4">Sent: {{ system_info['network_sent'] }} MB</p>
-                    <p class="card-text fs-4">Received: {{ system_info['network_received'] }} MB</p>
                     <a href="{{ url_for('network_stats') }}" class="btn btn-primary">View Details</a>
                 </div>
             </div>
         </div>
-
-        <!-- Speed Test Button -->
+        
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card bg-speedtest shadow-sm border-0 rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title">Perform Speed Test <i class="fas fa-clock"></i></h5>
+                    <p class="card-text fs-4">Test your serve/system speed</p>
+                    <a href="{{ url_for('speedtest') }}" class="btn btn-primary">Run Speed Test</a>
+                </div>
+            </div>
+        </div>
+<!-- 
         <div class="col-md-12 mb-4 text-center">
             <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-lg">Run Speed Test</a>
-        </div>
+        </div> -->
     </div>
 </div>
 {% endblock %}

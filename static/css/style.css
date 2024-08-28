@@ -2,7 +2,6 @@
 body {
     font-family: 'Arial', sans-serif;
     color: #333;
-    background-image: url('/static/images/background.jpg');
     background-size: cover; /* Ensure the image covers the entire background */
     background-repeat: no-repeat; /* Prevent the image from repeating */
     background-position: center center; /* Center the image */
@@ -79,10 +78,60 @@ body {
     }
 }
 
-
+/* General Card Styles */
 .card {
     min-height: 150px; /* Ensures consistent card height */
+    background-size: cover; /* Ensure the image covers the entire card */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+    background-position: center center; /* Center the image */
+    color: #fff; /* Adjust text color for better contrast */
+    border: none; /* Remove default border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
 }
+
+/* Specific Background Colors */
+.card.bg-username {
+    background-color: #007bff; /* Bright blue for user-related info */
+}
+
+.card.bg-ipv4 {
+    background-color: #ff5722; /* Warm orange for network info */
+}
+
+.card.bg-cpu {
+    background-color: #f44336; /* Red for CPU-related info */
+}
+
+.card.bg-boot {
+    background-color: #9c27b0; /* Purple for boot time */
+}
+
+.card.bg-cpu-usage {
+    background-color: #ff9800; /* Orange for CPU usage */
+}
+
+.card.bg-memory {
+    background-color: #3f51b5; /* Deep blue for memory usage */
+}
+
+.card.bg-disk {
+    background-color: #607d8b; /* Blue-gray for disk usage */
+}
+
+.card.bg-uptime {
+    background-color: #8bc34a; /* Light green for uptime */
+}
+
+.card.bg-network {
+    background-color: #00bcd4; /* Teal for network statistics */
+}
+
+.card.bg-speedtest {
+    background-color: #ff9800; /* Orange for CPU usage */
+}
+
 
 .card-body {
     display: flex;
@@ -111,7 +160,6 @@ body {
     }
 }
 
-
 /* Battery Card Styles */
 .battery-card {
     background: linear-gradient(135deg, #ffffff, #e0e0e0);
@@ -119,7 +167,7 @@ body {
     border: none;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    color: #333;
+    color: #fff;
 }
 
 .battery-card[data-battery="100"] {
@@ -140,6 +188,7 @@ body {
 
 .battery-card[data-battery="0"] {
     background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: #fff;
 }
 
 /* The hover effect still applies */
