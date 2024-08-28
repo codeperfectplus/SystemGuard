@@ -1,60 +1,15 @@
-from flask import Flask, render_template, request, flash
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, flash
 import os
 import psutil
 import datetime
 import subprocess
-
-app = Flask(__name__)
-
-# Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///speedtest_results.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret'
-
-# Initialize the database
-db = SQLAlchemy(app)
-
-# Define the model for storing speed test results
-class SpeedTestResult(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    download_speed = db.Column(db.String(50))
-    upload_speed = db.Column(db.String(50))
-    ping = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.now())
-
-    def __repr__(self):
-        return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
-
-class DashoardSettings(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    speedtest_cooldown = db.Column(db.Integer, default=1)
-    number_of_speedtests = db.Column(db.Integer, default=1)
-    timezone = db.Column(db.String(50), default='Asia/Kolkata')
-
-    def __repr__(self):
-        return f'<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>'
-
-class SystemInfo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50))
-    cpu_percent = db.Column(db.Float)
-    memory_percent = db.Column(db.Float)
-    disk_usage = db.Column(db.Float)
-    battery_percent = db.Column(db.Float)
-    cpu_core = db.Column(db.Integer)
-    boot_time = db.Column(db.String(50))
-    network_sent = db.Column(db.Float)
-    network_received = db.Column(db.Float)
-    process_count = db.Column(db.Integer)
-    swap_memory = db.Column(db.Float)
-    uptime = db.Column(db.String(50))
-    ipv4_connections = db.Column(db.String(50))
-    dashboard_memory_usage = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.now())
-
-    def __repr__(self):
-        return f'<SystemInfo {self.username}, {self.cpu_percent}, {self.memory_percent}, {self.disk_usage}, {self.battery_percent}, {self.cpu_core}, {self.boot_time}, {self.network_sent}, {self.network_received}, {self.process_count}, {self.swap_memory}, {self.uptime}, {self.ipv4_connections}, {self.ipv6_connections}, {self.dashboard_memory_usage}>'
+from src.config import app, db
+from src.models import SpeedTestResult, DashoardSettings, SystemInfo
+from src.utils import (
+    datetimeformat, 
+    run_speedtest,
+    get_system_info
+)
 
 # initialize the database
 with app.app_context():
@@ -64,100 +19,11 @@ with app.app_context():
         db.session.add(DashoardSettings())
         db.session.commit()
 
-def change_up_time_format(uptime):
-    uptime_seconds = uptime.total_seconds()
-    days = int(uptime_seconds // (24 * 3600))
-    uptime_seconds %= (24 * 3600)
-    hours = int(uptime_seconds // 3600)
-    uptime_seconds %= 3600
-    minutes = int(uptime_seconds // 60)
-    return f"{days} days, {hours} hours, {minutes} minutes"
-
-def run_speedtest():
-    try:
-        result = subprocess.run(['speedtest-cli'], capture_output=True, text=True, check=True)
-        output_lines = result.stdout.splitlines()
-        download_speed, upload_speed, ping = None, None, None
-        
-        for line in output_lines:
-            if "Download:" in line:
-                download_speed = line.split("Download: ")[1]
-            elif "Upload:" in line:
-                upload_speed = line.split("Upload: ")[1]
-            elif "Ping:" in line:
-                ping = line.split("Ping: ")[1]
-        
-        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping, 
-                "status": "Success"}
-    
-    except subprocess.CalledProcessError as e:
-        error = {"status": "Error", "message": e.stderr}
-        return error
-    
-    except Exception as e:
-        error = {"status": "Error", "message": str(e)}
-        return error
-
-def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
-    return value.strftime(format)
-
-
-def get_flask_memory_usage():
-    """
-    Returns the memory usage of the current Flask application in MB.
-    """
-    pid = os.getpid()
-    process = psutil.Process(pid)
-    memory_info = process.memory_info()
-    memory_in_mb = memory_info.rss / (1024 ** 2)
-    return f"{round(memory_in_mb)} MB"
-
-def get_system_info():
-    print("Getting system information...")
-    ipv4_dict, ipv6_dict = get_established_connections()
-    info = {
-        'username': os.getlogin(),
-        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
-        'memory_percent': round(psutil.virtual_memory().percent, 2),
-        'disk_usage': round(psutil.disk_usage('/').percent, 2),
-        'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
-        'cpu_core': psutil.cpu_count(),
-        'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
-        'network_sent': round(psutil.net_io_counters().bytes_sent / (1024 ** 2), 2),  # In MB
-        'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
-        'process_count': len(psutil.pids()),
-        'swap_memory': psutil.swap_memory().percent,
-        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
-        'ipv4_connections': ipv4_dict,
-        'dashboard_memory_usage': get_flask_memory_usage(),
-        'timestamp': datetime.datetime.now()
-    }
-    with app.app_context():
-        db.session.add(SystemInfo(**info))
-        db.session.commit()
-    return info
-
-def get_established_connections():
-    connections = psutil.net_connections()
-    ipv4_dict = set()
-    ipv6_dict = set()
-
-    for conn in connections:
-        if conn.status == 'ESTABLISHED':
-            if '.' in conn.laddr.ip:
-                ipv4_dict.add(conn.laddr.ip)
-            elif ':' in conn.laddr.ip:
-                ipv6_dict.add(conn.laddr.ip)
-
-    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
-    return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
-
 @app.route('/')
 def dashboard():
-    results = {}
     settings = DashoardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
-    system_info = get_system_info()
+    system_info = get_system_info(SystemInfo=SystemInfo)
     
     # Fetch the last speedtest result
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
@@ -270,7 +136,7 @@ def network_stats():
 
 @app.route('/system_health')
 def system_health():
-    system_info = get_system_info()
+    system_info = get_system_info(SystemInfo=SystemInfo)
     return render_template('system_health.html', system_info=system_info)
 
 if __name__ == '__main__':
