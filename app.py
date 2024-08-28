@@ -20,7 +20,7 @@ class SpeedTestResult(db.Model):
     download_speed = db.Column(db.String(50))
     upload_speed = db.Column(db.String(50))
     ping = db.Column(db.String(50))
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now(datetime.UTC))
 
     def __repr__(self):
         return f'<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>'
@@ -60,7 +60,7 @@ def run_speedtest():
 
 @app.route('/speedtest')
 def speedtest():
-    one_hour_ago = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+    one_hour_ago = datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1)
     recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > one_hour_ago).all()
 
     if len(recent_results) < 3:
@@ -83,6 +83,7 @@ def speedtest():
                                next_test_time=next_test_time)
 
 def get_system_info():
+    print("Getting system information...")
     ipv4_dict, ipv6_dict = get_established_connections()
     info = {
         'username': os.getlogin(),
