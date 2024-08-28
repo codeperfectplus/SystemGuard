@@ -19,9 +19,9 @@
     --color-cpu-usage: #ffc107; /* Yellow for CPU usage */
     --color-memory: #6f42c1; /* Purple for memory */
     --color-disk: #6711e9; /* Gray for disk */
-    --color-uptime: #17a2b8; /* Cyan for uptime */
-    --color-network: #11eeee; /* Bright blue for network */
-    --color-speedtest: #c9ef4b; /* Bright blue for speedtest */
+    --color-uptime: #042b31; /* Cyan for uptime */
+    --color-network: #20053d; /* Bright blue for network */
+    --color-speedtest: #253003; /* Bright blue for speedtest */
     --color-battery: #007bff; /* Bright blue for battery */
 
     /* shadow colors */
@@ -37,7 +37,7 @@
 
 /* General Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Default font stack */
     color: #333;
     background-size: cover; /* Ensure the image covers the entire background */
     background-repeat: no-repeat; /* Prevent the image from repeating */

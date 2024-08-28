@@ -35,6 +35,27 @@ class DashoardSettings(db.Model):
     def __repr__(self):
         return f'<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>'
 
+class SystemInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50))
+    cpu_percent = db.Column(db.Float)
+    memory_percent = db.Column(db.Float)
+    disk_usage = db.Column(db.Float)
+    battery_percent = db.Column(db.Float)
+    cpu_core = db.Column(db.Integer)
+    boot_time = db.Column(db.String(50))
+    network_sent = db.Column(db.Float)
+    network_received = db.Column(db.Float)
+    process_count = db.Column(db.Integer)
+    swap_memory = db.Column(db.Float)
+    uptime = db.Column(db.String(50))
+    ipv4_connections = db.Column(db.String(50))
+    dashboard_memory_usage = db.Column(db.String(50))
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.now())
+
+    def __repr__(self):
+        return f'<SystemInfo {self.username}, {self.cpu_percent}, {self.memory_percent}, {self.disk_usage}, {self.battery_percent}, {self.cpu_core}, {self.boot_time}, {self.network_sent}, {self.network_received}, {self.process_count}, {self.swap_memory}, {self.uptime}, {self.ipv4_connections}, {self.ipv6_connections}, {self.dashboard_memory_usage}>'
+
 # initialize the database
 with app.app_context():
     db.create_all()
@@ -80,6 +101,108 @@ def run_speedtest():
 def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
     return value.strftime(format)
 
+
+def get_flask_memory_usage():
+    """
+    Returns the memory usage of the current Flask application in MB.
+    """
+    pid = os.getpid()
+    process = psutil.Process(pid)
+    memory_info = process.memory_info()
+    memory_in_mb = memory_info.rss / (1024 ** 2)
+    return f"{round(memory_in_mb)} MB"
+
+def get_system_info():
+    print("Getting system information...")
+    ipv4_dict, ipv6_dict = get_established_connections()
+    info = {
+        'username': os.getlogin(),
+        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
+        'memory_percent': round(psutil.virtual_memory().percent, 2),
+        'disk_usage': round(psutil.disk_usage('/').percent, 2),
+        'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
+        'cpu_core': psutil.cpu_count(),
+        'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
+        'network_sent': round(psutil.net_io_counters().bytes_sent / (1024 ** 2), 2),  # In MB
+        'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
+        'process_count': len(psutil.pids()),
+        'swap_memory': psutil.swap_memory().percent,
+        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
+        'ipv4_connections': ipv4_dict,
+        'dashboard_memory_usage': get_flask_memory_usage(),
+        'timestamp': datetime.datetime.now()
+    }
+    with app.app_context():
+        db.session.add(SystemInfo(**info))
+        db.session.commit()
+    return info
+
+def get_established_connections():
+    connections = psutil.net_connections()
+    ipv4_dict = set()
+    ipv6_dict = set()
+
+    for conn in connections:
+        if conn.status == 'ESTABLISHED':
+            if '.' in conn.laddr.ip:
+                ipv4_dict.add(conn.laddr.ip)
+            elif ':' in conn.laddr.ip:
+                ipv6_dict.add(conn.laddr.ip)
+
+    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
+    return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
+
+@app.route('/')
+def dashboard():
+    results = {}
+    settings = DashoardSettings.query.first()
+    SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
+    system_info = get_system_info()
+    
+    # Fetch the last speedtest result
+    n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
+    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
+    last_timestamp = datetimeformat(recent_results[-1].timestamp) if recent_results else None
+
+    if recent_results:
+        # Display the most recent result from the database
+        latest_result = recent_results[-1]
+        speedtest_result = {
+            'download_speed': latest_result.download_speed,
+            'upload_speed': latest_result.upload_speed,
+            'ping': latest_result.ping
+        }
+        source = "Database"
+        next_test_time = latest_result.timestamp + datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
+        show_prompt = False
+        remaining_time_for_next_test = round((next_test_time - datetime.datetime.now()).total_seconds() / 60)
+    else:
+        # No recent results, prompt to perform a test
+        speedtest_result = None
+        source = None
+        show_prompt = True
+        remaining_time_for_next_test = None
+    
+    return render_template('dashboard.html', system_info=system_info, 
+                           speedtest_result=speedtest_result, 
+                           source=source,
+                           last_timestamp=last_timestamp,
+                           next_test_time=remaining_time_for_next_test, 
+                           show_prompt=show_prompt)
+
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    # Fetch the settings from the database and update them
+    settings = DashoardSettings.query.first()
+    if settings:
+        if request.method == 'POST':
+            settings.speedtest_cooldown = int(request.form['speedtest_cooldown'])
+            settings.number_of_speedtests = int(request.form['number_of_speedtests'])
+            settings.timezone = request.form['timezone']
+            db.session.commit()
+            flash('Settings updated successfully!', 'success')
+        return render_template('settings.html', settings=settings)
+
 @app.route('/speedtest')
 def speedtest():
     settings = DashoardSettings.query.first()
@@ -112,95 +235,10 @@ def speedtest():
                                next_test_time=next_test_time,
                                remaining_time_for_next_test=remaining_time_for_next_test)
 
-def get_system_info():
-    print("Getting system information...")
-    ipv4_dict, ipv6_dict = get_established_connections()
-    info = {
-        'username': os.getlogin(),
-        'cpu_percent': round(psutil.cpu_percent(interval=1), 2),
-        'memory_percent': round(psutil.virtual_memory().percent, 2),
-        'disk_usage': round(psutil.disk_usage('/').percent, 2),
-        'battery_percent': round(psutil.sensors_battery().percent) if psutil.sensors_battery() else "N/A",
-        'cpu_core': psutil.cpu_count(),
-        'boot_time': datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
-        'network_sent': round(psutil.net_io_counters().bytes_sent / (1024 ** 2), 2),  # In MB
-        'network_received': round(psutil.net_io_counters().bytes_recv / (1024 ** 2), 2),  # In MB
-        'process_count': len(psutil.pids()),
-        'swap_memory': psutil.swap_memory().percent,
-        'uptime': change_up_time_format(datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.boot_time())),
-        'ipv4_connections': ipv4_dict,
-        'ipv6_connections': ipv6_dict
-    }
-    return info
-
-def get_established_connections():
-    connections = psutil.net_connections()
-    ipv4_dict = set()
-    ipv6_dict = set()
-
-    for conn in connections:
-        if conn.status == 'ESTABLISHED':
-            if '.' in conn.laddr.ip:
-                ipv4_dict.add(conn.laddr.ip)
-            elif ':' in conn.laddr.ip:
-                ipv6_dict.add(conn.laddr.ip)
-
-    ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
-    return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
-
-@app.route('/')
-def dashboard():
-    settings = DashoardSettings.query.first()
-    SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
-    system_info = get_system_info()
-    # Fetch the last speedtest result
-    n_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
-    recent_results = SpeedTestResult.query.filter(SpeedTestResult.timestamp > n_hour_ago).all()
-    last_timestamp = datetimeformat(recent_results[-1].timestamp) if recent_results else None
-    if recent_results:
-        # Display the most recent result from the database
-        latest_result = recent_results[-1]
-        speedtest_result = {
-            'download_speed': latest_result.download_speed,
-            'upload_speed': latest_result.upload_speed,
-            'ping': latest_result.ping
-        }
-        source = "Database"
-        next_test_time = latest_result.timestamp + datetime.timedelta(hours=SPEEDTEST_COOLDOWN_IN_HOURS)
-        show_prompt = False
-        remaining_time_for_next_test = round((next_test_time - datetime.datetime.now()).total_seconds() / 60)
-    else:
-        # No recent results, prompt to perform a test
-        speedtest_result = None
-        source = None
-        show_prompt = True
-        remaining_time_for_next_test = None
-
-    return render_template('dashboard.html', system_info=system_info, 
-                           speedtest_result=speedtest_result, 
-                           source=source,
-                           last_timestamp=last_timestamp,
-                           next_test_time=remaining_time_for_next_test, 
-                           show_prompt=show_prompt)
-
 @app.route('/cpu_usage')
 def cpu_usage():
     cpu_usage = psutil.cpu_percent(interval=1, percpu=True)
     return render_template('cpu_usage.html', cpu_usage=cpu_usage)
-
-
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
-    # Fetch the settings from the database and update them
-    settings = DashoardSettings.query.first()
-    if settings:
-        if request.method == 'POST':
-            settings.speedtest_cooldown = int(request.form['speedtest_cooldown'])
-            settings.number_of_speedtests = int(request.form['number_of_speedtests'])
-            settings.timezone = request.form['timezone']
-            db.session.commit()
-            flash('Settings updated successfully!', 'success')
-        return render_template('settings.html', settings=settings)
 
 @app.route('/memory_usage')
 def memory_usage():
