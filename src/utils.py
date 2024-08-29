@@ -45,7 +45,7 @@ def get_established_connections():
     # ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
     # return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
     ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0]
-    ipv6 = list(ipv6_set)[0]
+    ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
 
     return ipv4, ipv6
 
