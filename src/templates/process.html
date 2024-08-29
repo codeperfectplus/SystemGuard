@@ -1,1 +1,46 @@
-{% extends 'base.html' %}{% block title %}CPU Usage Details{% endblock %}{% block extra_head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/process.css')}}">{% endblock %}{% block content %}<div class="container"><h1>Top Processes by Memory Usage</h1><form method="post" class="form-control"><label for="number">Number of Processes:</label><input type="number" id="number" name="number" min="1" value="{{ number}}"><button type="submit">Show</button></form><table><thead><tr><th>Process Name</th><th>CPU Usage (%)</th><th>Memory Usage (%)</th></tr></thead><tbody>{% for process in processes %} <tr><td>{{ process[0]}}</td><td>{{ process[1]}}</td><td>{{ process[2]}}</td></tr>{% endfor %} </tbody></table></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}CPU Usage Details{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/process.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Top Processes by Memory Usage</h1>
+    
+    <!-- Display flash messages -->
+    {% include 'ext/message.html' %}
+    
+    <form method="post" class="form-control">
+        <label for="number">Number of Processes:</label>
+        <input type="number" id="number" name="number" min="1" value="{{ number }}">
+        <button type="submit">Show</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Process Name</th>
+                <th>CPU Usage (%)</th>
+                <th>Memory Usage (%)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for process in processes %}
+            <tr>
+                <td>{{ process[0] }}</td>
+                <td>{{ process[1] }}</td>
+                <td>{{ process[2] }}</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="kill_pid" value="{{ process[3] }}">
+                        <input type="hidden" name="process_name" value="{{ process[0] }}">
+                        <button type="submit">Kill</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
