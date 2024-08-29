@@ -10,12 +10,12 @@
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'cpu_usage' %}active{% endif %}" href="{{ url_for('cpu_usage') }}">
-                    <i class="fas fa-microchip mr-1"></i> CPU Usage
+                    <i class="fas fa-microchip mr-1"></i> CPU Info
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'memory_usage' %}active{% endif %}" href="{{ url_for('memory_usage') }}">
-                    <i class="fas fa-memory mr-1"></i> Memory Usage
+                    <i class="fas fa-memory mr-1"></i> Memory Info
                 </a>
             </li>
             <li class="nav-item">

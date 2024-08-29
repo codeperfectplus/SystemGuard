@@ -1,6 +1,6 @@
 /* Primary Colors */
 :root {
-    --color-primary: #007bff; /* Bright blue for primary elements */
+    --color-primary: #7ea0c4; /* Bright blue for primary elements */
     --color-secondary: #6c757d; /* Gray for secondary elements */
     --color-success: #28a745; /* Green for success */
     --color-danger: #dc3545; /* Red for danger */
@@ -12,15 +12,15 @@
     --color-black: #000000; /* Black for text */
     
     /* card colors */
-    --color-username: #469fff; /* Bright blue for username */
+    --color-username: #28a745; /* Bright blue for username */
     --color-boot: #28a745; /* Green for boot time */
     --color-cpu: #ac0fea; /* Red for CPU */
     --color-cpu-usage: #ca11eb; /* Yellow for CPU usage */
-    --color-memory: #ffbf00; /* Purple for memory */
-    --color-disk: #047507; /* Gray for disk */
+    --color-memory: #28a745; /* Purple for memory */
+    --color-disk: #28a745; /* Gray for disk */
     --color-uptime: #f44336; /* Cyan for uptime */
-    --color-network: #08a2a8; /* Bright blue for network */
-    --color-speedtest: #f44336; /* Bright blue for speedtest */
+    --color-network: #f44336; /* Bright blue for network */
+    --color-speedtest: #08a2a8; /* Bright blue for speedtest */
     --color-battery: #007bff; /* Bright blue for battery */
     --color-connection: #f44336; /* Red for connection */
     --color-bg-dashboard-memory: #28a745; /* Green for memory card */
