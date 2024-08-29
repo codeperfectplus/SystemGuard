@@ -1,14 +1,14 @@
 from flask import render_template, request, flash, blueprints
 
 from src.config import app, db
-from src.models import DashoardSettings
+from src.models import DashboardSettings
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     # Fetch the settings from the database and update them
-    settings = DashoardSettings.query.first()
+    settings = DashboardSettings.query.first()
     if settings:
         if request.method == "POST":
             settings.speedtest_cooldown = int(request.form["speedtest_cooldown"])

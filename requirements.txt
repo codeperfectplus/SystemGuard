@@ -3,3 +3,4 @@ psutil==5.9.5
 gunicorn
 speetest-cli
 flask-sqlalchemy
+flask-login

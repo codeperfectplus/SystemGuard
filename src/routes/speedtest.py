@@ -2,14 +2,14 @@ import datetime
 from flask import render_template, blueprints
 
 from src.config import app, db
-from src.models import DashoardSettings, SpeedTestResult
+from src.models import DashboardSettings, SpeedTestResult
 from src.utils import run_speedtest
 
 speedtest_bp = blueprints.Blueprint("speedtest", __name__)
 
 @app.route("/speedtest")
 def speedtest():
-    settings = DashoardSettings.query.first()
+    settings = DashboardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
     NUMBER_OF_SPEEDTESTS = settings.number_of_speedtests
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(

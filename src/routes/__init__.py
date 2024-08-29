@@ -7,3 +7,4 @@ from src.routes.settings import settings_bp
 from src.routes.speedtest import speedtest_bp
 from src.routes.system_health import system_health_bp
 from src.routes.process import process_bp
+from src.routes.auth import auth_bp

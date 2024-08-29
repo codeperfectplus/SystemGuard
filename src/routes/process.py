@@ -1,5 +1,6 @@
 import os
 from flask import request, render_template, blueprints, redirect, url_for, flash
+from flask_login import login_required, current_user
 
 from src.config import app
 from src.utils import get_top_processes
@@ -7,7 +8,12 @@ from src.utils import get_top_processes
 process_bp = blueprints.Blueprint("process", __name__)
 
 @app.route("/process", methods=["GET", "POST"])
+@login_required
 def process():
+    if current_user.user_level != "admin":
+        flash("You do not have permission to view this page.", "danger")
+        return redirect(url_for("dashboard"))
+
     number_of_processes = 5  # Default number
 
     if request.method == "POST":
