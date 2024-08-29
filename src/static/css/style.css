@@ -248,7 +248,7 @@ body {
 
 /* The hover effect still applies */
 .battery-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-10px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     color: #fff;
 }
@@ -285,7 +285,7 @@ body {
 
 /* General Card Hover Effect */
 .card:hover {
-    transform: translateY(-8px); /* Slight lift effect */
+    transform: translateY(-10px); /* Slight lift effect */
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
@@ -294,80 +294,89 @@ body {
 
 /* User-related info */
 .card.bg-username:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
-
-/* Network info */
-.card.bg-ipv4:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
-
-/* CPU-related info */
-.card.bg-cpu:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-username);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Boot time */
 .card.bg-boot:hover {
-    transform: translateY(-8px); /* Slight lift effect */
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-boot);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Memory Use */
+.card.bg-dashboard-memory:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-bg-dashboard-memory);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Network info */
+.card.bg-connection:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-connection);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* CPU-related info */
+.card.bg-cpu:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-cpu);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Battery Card Styles */
+.battery-card:hover {
+    transform: translateY(-10px); /* Slight lift effect */
     box-shadow: 0 10px 20px var(--color-shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* CPU usage */
 .card.bg-cpu-usage:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-cpu-usage);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Memory usage */
 .card.bg-memory:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-memory);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Disk usage */
 .card.bg-disk:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-disk);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Uptime */
 .card.bg-uptime:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-uptime);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Network statistics */
 .card.bg-network:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-network);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
 /* Speedtest */
 .card.bg-speedtest:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-speedtest);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
 
-/* Battery Card Styles */
-.battery-card:hover {
-    transform: translateY(-8px); /* Slight lift effect */
-    box-shadow: 0 10px 20px var(--color-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
+
 
 /* Card Red Bottom Effect */
 .card::before {
