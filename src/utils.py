@@ -1,8 +1,10 @@
 import os
-import psutil
 import datetime
 import subprocess
+import psutil
+
 from src.config import app, db
+from src.models import SystemInfo
 
 def format_uptime(uptime_seconds):
     """Convert uptime from seconds to a human-readable format."""
@@ -44,6 +46,7 @@ def get_established_connections():
     return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
 
 def run_speedtest():
+    """ Run a speed test using speedtest-cli. """
     try:
         result = subprocess.run(['speedtest-cli'], capture_output=True, text=True, check=True)
         output_lines = result.stdout.splitlines()
@@ -69,11 +72,12 @@ def run_speedtest():
         return error
 
 
-def get_system_info(SystemInfo):
+def get_system_info():
+    """ Get system information and store it in the database. """
     print("Getting system information...")
     
     # Gathering system information
-    ipv4_dict, ipv6_dict = get_established_connections()
+    ipv4_dict, _ = get_established_connections()
     boot_time = datetime.datetime.fromtimestamp(psutil.boot_time())
     uptime = format_uptime(datetime.datetime.now() - boot_time)
     battery_info = psutil.sensors_battery()
