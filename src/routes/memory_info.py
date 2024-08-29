@@ -10,7 +10,7 @@ memory_info_bp = blueprints.Blueprint("memory_usage", __name__)
 @app.route("/memory_usage")
 def memory_usage():
     total_swap, used_swap, free_swap = swap_memory_info()
-    memory_info = {
+    system_info = {
         "memory_percent": psutil.virtual_memory().percent,
         "memory_available": round(
             psutil.virtual_memory().available / (1024**3), 2
@@ -20,4 +20,4 @@ def memory_usage():
         "used_swap": round(used_swap / (1024**3), 2),  # In GB
         "free_swap": round(free_swap / (1024**3), 2),  # In GB
     }
-    return render_template("memory_info.html", memory_info=memory_info)
+    return render_template("memory_info.html", system_info=system_info)

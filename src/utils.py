@@ -99,6 +99,15 @@ def get_cpu_temp():
     critical_temp = temp.critical
     return current_temp, high_temp, critical_temp
 
+def get_top_processes(number=5):
+    """Get the top processes by memory usage."""
+    processes = [
+        (p.info['name'], p.info['cpu_percent'], round(p.info['memory_percent'], 2))
+        for p in sorted(psutil.process_iter(['name', 'cpu_percent', 'memory_percent']), 
+                        key=lambda p: p.info['memory_percent'], reverse=True)[:number]
+    ]
+    return processes
+
 def get_system_info():
     """ Get system information and store it in the database. """
     print("Getting system information...")

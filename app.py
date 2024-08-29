@@ -10,9 +10,10 @@ def register_routes():
     app.register_blueprint(routes.memory_usage_bp)
     app.register_blueprint(routes.network_stats_bp)
     app.register_blueprint(routes.speedtest_bp)
+    app.register_blueprint(routes.process_bp)
 
 
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
