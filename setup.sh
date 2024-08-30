@@ -9,7 +9,7 @@
 DOWNLOAD_DIR="/tmp"
 EXTRACT_DIR="/home/$USER/.systemguard"
 
-# Prompt the user to enter the version of SystemGuard to install
+Prompt the user to enter the version of SystemGuard to install
 echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
 read VERSION
 
@@ -73,9 +73,9 @@ unzip -q $DOWNLOAD_DIR/systemguard.zip -d $EXTRACT_DIR
 rm $DOWNLOAD_DIR/systemguard.zip
 echo "Extraction completed."
 
-# Navigate to the extracted SystemGuard directory
+Navigate to the extracted SystemGuard directory
 echo "Navigating to the SystemGuard setup directory..."
-cd $EXTRACT_DIR/SystemGuard-*/
+cd $EXTRACT_DIR/SystemGuard-*/src/scripts
 
 # Check if the cronjob.sh script exists in the extracted content
 if [ ! -f "cronjob.sh" ]; then

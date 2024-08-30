@@ -4,39 +4,14 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 ## Installation 
 
-### For running once 
-
-1. Clone the repository:
-
 ```bash
-git clone https://github.com/codeperfectplus/SystemDashboard.git
+bash setup.sh
 ```
+It will install the SystemGuard app and its dependencies. The app will be available at `http://localhost:5050`.
 
-2. Install the dependencies:
+## Dependencies(must be installed)
 
-```bash
-pip install -r requirements.txt
-```
-
-3. Run the app:
-
-```bash
-python app.py
-```
-
-4. Open the app in your browser:
-
-```bash
-http://localhost:5000
-```
-
-### For cronjob
-
-Task will be added to cronjob to run the script every minute and app will be stay active on port 5050 even after closing the terminal and rebooting the system.
-
-```bash
-bash cronjob.sh
-```
+- Anaconda3/Miniconda3
 
 ## Features
 
