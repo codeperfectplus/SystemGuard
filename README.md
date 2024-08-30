@@ -5,7 +5,7 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 ## Installation 
 
 ```bash
-wget https://github.com/codeperfectplus/SystemGuard/blob/main/setup.sh
+wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/main/setup.sh
 chmod +x setup.sh
 ./setup.sh
 ```
