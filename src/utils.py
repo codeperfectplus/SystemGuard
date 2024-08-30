@@ -122,7 +122,7 @@ def get_system_info():
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
     net_io = psutil.net_io_counters()
-
+    current_server_time = datetime.datetime.now()
     # Prepare system information dictionary
     info = {
         'username': os.getlogin(),
@@ -142,6 +142,7 @@ def get_system_info():
         'timestamp': datetime.datetime.now(),
         'cpu_frequency': get_cpu_frequency(),
         'current_temp': get_cpu_temp()[0],
+        'current_server_time': datetimeformat(current_server_time),
     }
 
     # # Adding system info to the database

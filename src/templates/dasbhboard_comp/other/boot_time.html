@@ -1,1 +1,35 @@
-<div class="col-md-6 col-lg-4 mb-4"><div class="card bg-boot"><div class="card-body"><h5 class="card-title">Boot Time <i class="fas fa-clock"></i></h5><p class="card-text fs-4">{{ system_info['boot_time']}}</p></div></div></div>
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card bg-boot">
+        <div class="card-body">
+            <h5 class="card-title">Server Time <i class="fas fa-clock"></i></h5>
+            <p class="card-text fs-4" id="server-time">{{ system_info['current_server_time'] }}</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Function to format time in HH:MM:SS
+function formatTime(hours, minutes, seconds) {
+    return [
+        hours.toString().padStart(2, '0'),
+        minutes.toString().padStart(2, '0'),
+        seconds.toString().padStart(2, '0')
+    ].join(':');
+}
+
+// Initialize the time from the server
+let serverTime = new Date('{{ system_info["current_server_time"] }}');
+let timeElement = document.getElementById('server-time');
+
+// Update the time every second
+setInterval(() => {
+    // Increment the server time by 1 second
+    serverTime.setSeconds(serverTime.getSeconds() + 1);
+    // Update the displayed time
+    timeElement.textContent = formatTime(
+        serverTime.getHours(),
+        serverTime.getMinutes(),
+        serverTime.getSeconds()
+    );
+}, 1000);
+</script>

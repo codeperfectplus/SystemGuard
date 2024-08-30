@@ -2,7 +2,9 @@
 
 System Dashboard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
-## Installation
+## Installation 
+
+### For running once 
 
 1. Clone the repository:
 
@@ -28,6 +30,14 @@ python app.py
 http://localhost:5000
 ```
 
+### For cronjob
+
+Task will be added to cronjob to run the script every minute and app will be stay active on port 5050 even after closing the terminal and rebooting the system.
+
+```bash
+bash cronjob.sh
+```
+
 ## Features
 
 - Monitor server stats like CPU, Memory, Disk, and Network.
@@ -38,23 +48,23 @@ http://localhost:5000
 
 ### HomePage
 
-![HomePage](/static/images/dashboard.png)
+![HomePage](/src/static/images/dashboard.png)
 
 ### CPU Stats
 
-![CPU Stats](/static/images/cpu.png)
+![CPU Stats](/src/static/images/cpu.png)
 
 ### Memory Stats
 
-![Memory Stats](/static/images/memory.png)
+![Memory Stats](/src/static/images/memory.png)
 
 ### Disk Stats
 
-![Disk Stats](/static/images/disk.png)
+![Disk Stats](/src/static/images/disk.png)
 
 ### Speed Test
 
-![Speed Test](/static/images/speedtest.png)
+![Speed Test](/src/static/images/speedtest.png)
 
 ## Why not use a Docker image?
 
