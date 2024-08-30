@@ -7,10 +7,11 @@ log_message() {
 
 # Determine the directory where this script is located
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
-
+# root directory of the project is two levels up
+PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 # Define variables for paths relative to the script's directory
-FLASK_APP_PATH="${FLASK_APP_PATH:-$SCRIPT_DIR/app.py}"
-REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$SCRIPT_DIR/requirements.txt}"
+FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
+REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5050}"
 LOG_FILE="/home/$(whoami)/logs/systemdashboard_flask.log"
 USERNAME="$(whoami)"
@@ -48,7 +49,7 @@ fi
 source "$CONDA_SETUP_SCRIPT"
 
 # Define Conda environment name
-CONDA_ENV_NAME="dashboard"
+CONDA_ENV_NAME="dashboar"
 
 echo "Conda environment name: $CONDA_ENV_NAME"
 echo $CONDA_EXECUTABLE
@@ -75,7 +76,7 @@ export FLASK_ENV=development  # or production
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     # git pull in FLASK_APP_PATH directory
     current_dir=$(pwd)
-    cd "$SCRIPT_DIR"
+    cd "$PROJECT_DIR"
     if ! git pull; then
         log_message "Failed to pull updates from Git repository."
         cd "$current_dir"
