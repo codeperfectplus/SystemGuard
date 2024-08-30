@@ -7,9 +7,7 @@ log_message() {
 
 # Determine the directory where this script is located
 SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
-# root directory of the project is two levels up
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
-# Define variables for paths relative to the script's directory
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5000}"

@@ -9,9 +9,15 @@
 DOWNLOAD_DIR="/tmp"
 EXTRACT_DIR="/home/$USER/.systemguard"
 
-Prompt the user to enter the version of SystemGuard to install
 echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
 read VERSION
+echo "Warning: This script will remove any existing installation of SystemGuard. Continue? (y/n)"
+read CONFIRM
+
+if [ "$CONFIRM" != "y" ]; then
+    echo "Installation aborted."
+    exit 0
+fi
 
 # If the user enters "latest", fetch the latest version number from GitHub
 if [ "$VERSION" == "latest" ]; then
