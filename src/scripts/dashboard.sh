@@ -12,7 +12,7 @@ PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 # Define variables for paths relative to the script's directory
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
-FLASK_PORT="${FLASK_PORT:-5050}"
+FLASK_PORT="${FLASK_PORT:-5000}"
 LOG_FILE="/home/$(whoami)/logs/systemdashboard_flask.log"
 USERNAME="$(whoami)"
 
@@ -24,7 +24,6 @@ mkdir -p "$LOG_DIR"
 CONDA_PATHS=("/home/$USERNAME/miniconda3" "/home/$USERNAME/anaconda3")
 CONDA_FOUND=false
 
-# Find which Conda is installed and set $CONDA_EXECUTABLE
 for CONDA_PATH in "${CONDA_PATHS[@]}"; do
     if [ -d "$CONDA_PATH" ]; then
         CONDA_FOUND=true
@@ -52,14 +51,13 @@ source "$CONDA_SETUP_SCRIPT"
 CONDA_ENV_NAME="dashboar"
 
 echo "Conda environment name: $CONDA_ENV_NAME"
-echo $CONDA_EXECUTABLE
+
 # Check if the Conda environment exists and create it if not
 if ! conda info --envs | awk '{print $1}' | grep -q "^$CONDA_ENV_NAME$"; then
     log_message "Conda environment '$CONDA_ENV_NAME' not found. Creating it..."
     conda create -n "$CONDA_ENV_NAME" python=3.10 -y
 
     log_message "Activating Conda environment '$CONDA_ENV_NAME' and installing requirements."
-    # Use `conda run` to execute commands in the environment
     conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
 else
     log_message "Activating existing Conda environment '$CONDA_ENV_NAME'."
@@ -74,17 +72,31 @@ export FLASK_ENV=development  # or production
 
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
-    # git pull in FLASK_APP_PATH directory
-    current_dir=$(pwd)
-    cd "$PROJECT_DIR"
-    git init
-    git remote add origin https://github.com/codeperfectplus/SystemGuard.git
-    if ! git pull; then
-        log_message "Failed to pull updates from Git repository."
-        cd "$current_dir"
-        exit 1
-    fi
-    cd "$current_dir"
+    log_message "Flask app is not running. Checking repository and starting it..."
+
+    # # Navigate to project directory
+    # current_dir=$(pwd)
+    # cd "$PROJECT_DIR" || exit
+
+    # # Initialize git and pull updates
+    # if [ ! -d ".git" ]; then
+    #     git init
+    # fi
+    # git remote remove origin 2>/dev/null
+    # git remote add origin https://github.com/codeperfectplus/SystemGuard.git
+    
+    # # Apply stashed changes if any
+    # if git stash list | grep -q 'stash@{0}'; then
+    #     log_message "Applying stashed changes..."
+    #     git stash pop
+    # fi
+    # # Fetch and pull the latest changes from the main branch
+    # if ! git pull origin main; then
+    #     log_message "Failed to pull updates from Git repository."
+    #     cd "$current_dir" || exit
+    # fi
+    
+    # cd "$current_dir" || exit
 
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command
