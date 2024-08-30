@@ -10,7 +10,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
-FLASK_PORT="${FLASK_PORT:-5000}"
+FLASK_PORT="${FLASK_PORT:-5050}"
 LOG_FILE="/home/$(whoami)/logs/systemdashboard_flask.log"
 USERNAME="$(whoami)"
 
