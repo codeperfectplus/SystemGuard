@@ -77,6 +77,8 @@ if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     # git pull in FLASK_APP_PATH directory
     current_dir=$(pwd)
     cd "$PROJECT_DIR"
+    git init
+    git remote add origin https://github.com/codeperfectplus/SystemGuard.git
     if ! git pull; then
         log_message "Failed to pull updates from Git repository."
         cd "$current_dir"
