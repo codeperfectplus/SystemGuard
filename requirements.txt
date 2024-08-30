@@ -1,6 +1,6 @@
 Flask==2.3.3
 psutil==5.9.5
 gunicorn
-speetest-cli
 flask-sqlalchemy
 flask-login
+flask-session
