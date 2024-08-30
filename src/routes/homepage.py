@@ -2,7 +2,7 @@ import datetime
 from flask import render_template, blueprints
 
 from src.config import app
-from src.models import SpeedTestResult, DashboardSettings
+from src.models import SpeedTestResult, DashboardSettings, SystemInfo
 from src.utils import datetimeformat, get_system_info
 
 homepage_bp = blueprints.Blueprint("homepage", __name__)

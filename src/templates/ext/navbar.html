@@ -54,6 +54,11 @@
                     <i class="fas fa-sign-out-alt mr-1"></i>Logout
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-user-alt mr-1"></i>{{current_user.username}}
+                </a>
+            </li>
             {% else %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" 

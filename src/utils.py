@@ -90,7 +90,7 @@ def get_cpu_core_count():
     return psutil.cpu_count(logical=True)
 
 def cpu_usage_percent():
-    return round(psutil.cpu_percent(interval=1), 2)
+    return psutil.cpu_percent(interval=1)
 
 def get_cpu_temp():
     temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
@@ -99,7 +99,6 @@ def get_cpu_temp():
     critical_temp = temp.critical
     return current_temp, high_temp, critical_temp
 
-import psutil
 
 def get_top_processes(number=5):
     """Get the top processes by memory usage."""

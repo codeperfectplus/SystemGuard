@@ -48,6 +48,8 @@ class SystemInfo(db.Model):
     ipv4_connections = db.Column(db.String(50))
     dashboard_memory_usage = db.Column(db.String(50))
     timestamp = db.Column(db.DateTime, default=datetime.datetime.now())
+    cpu_frequency = db.Column(db.String(50))
+    current_temp = db.Column(db.String(50))
 
     def __repr__(self):
         return f"<SystemInfo {self.username}, {self.cpu_percent}, {self.memory_percent}, {self.disk_usage}, {self.battery_percent}, {self.cpu_core}, {self.boot_time}, {self.network_sent}, {self.network_received}, {self.process_count}, {self.swap_memory}, {self.uptime}, {self.ipv4_connections}, {self.ipv6_connections}, {self.dashboard_memory_usage}>"

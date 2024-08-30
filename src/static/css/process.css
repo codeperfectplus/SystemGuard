@@ -1,71 +1,105 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Roboto', sans-serif; /* Use a modern font */
+    background-color: #f8f9fa; /* Light gray background for contrast */
     margin: 0;
     padding: 0;
+    color: #212529; /* Dark gray text for readability */
 }
 
 .container {
-    width: 80%;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 1200px; /* Limit the maximum width */
+    margin: 40px auto; /* Increased margin for spacing */
+    padding: 30px; /* More padding for content */
+    background-color: #ffffff; /* White background for content */
+    border-radius: 10px; /* Slightly rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 h1 {
-    color: #333;
+    color: #343a40; /* Darker shade for the heading */
     text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700; /* Bolder font */
 }
 
 .form-control {
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* Consistent spacing */
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 10px; /* Modern spacing with gap */
 }
 
 label {
-    margin-right: 10px;
+    font-weight: 500; /* Medium font weight for labels */
 }
 
 input[type="number"] {
-    width: 60px;
-    padding: 5px;
-    margin-right: 10px;
+    width: 80px; /* Slightly wider input */
+    padding: 8px;
+    border: 1px solid #ced4da; /* Light border */
+    border-radius: 5px;
+    transition: border-color 0.3s; /* Smooth transition on focus */
+}
+
+input[type="number"]:focus {
+    border-color: #007bff; /* Blue border on focus */
+    outline: none;
 }
 
 button {
-    padding: 5px 15px;
-    background-color: #007bff;
-    color: white;
+    padding: 8px 20px;
+    background-color: #007bff; /* Primary color */
+    color: #ffffff; /* White text */
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Lift effect */
 }
-
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    font-size: 0.9rem;
 }
 
 th, td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
     text-align: left;
 }
 
 th {
-    background-color: #007bff;
-    color: white;
+    background-color: #0056b3; /* Darker blue for better contrast */
+    color: #ffffff; /* White text for visibility */
+    font-weight: 600; /* Slightly bolder text */
+    text-transform: uppercase; /* Uppercase for a modern touch */
+    position: sticky; /* Sticky header for better navigation */
+    top: 0;
+    padding: 15px 10px; /* More padding for a balanced look */
+    letter-spacing: 0.5px; /* Slight letter spacing for readability */
 }
 
 tr:hover {
-    background-color: #f1f1f1;
+    background-color: #f1f3f5; /* Light gray on row hover */
+}
+
+td button {
+    background-color: #dc3545;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+td button:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.name {
+    color: #ffffff; /* White text for visibility */
 }

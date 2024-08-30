@@ -6,22 +6,23 @@
 {% block content %}
 <div class="container">
     <h1>Top Processes by Memory Usage</h1>
-    
+
     <!-- Display flash messages -->
     {% include 'ext/message.html' %}
-    
+
     <form method="post" class="form-control">
         <label for="number">Number of Processes:</label>
         <input type="number" id="number" name="number" min="1" value="{{ number }}">
         <button type="submit">Show</button>
     </form>
-    
-    <table>
+
+    <table class="table">
         <thead>
             <tr>
-                <th>Process Name</th>
-                <th>CPU Usage (%)</th>
-                <th>Memory Usage (%)</th>
+                <th><a href="{{ url_for('process', sort='name', order=toggle_order) }}">Process Name</a></th>
+                <th><a href="{{ url_for('process', sort='cpu', order=toggle_order) }}">CPU Usage (%)</a></th>
+                <th><a href="{{ url_for('process', sort='memory', order=toggle_order) }}">Memory Usage (%)</a></th>
+                <th>Process ID</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -31,6 +32,7 @@
                 <td>{{ process[0] }}</td>
                 <td>{{ process[1] }}</td>
                 <td>{{ process[2] }}</td>
+                <td>{{ process[3] }}</td>
                 <td>
                     <form method="post">
                         <input type="hidden" name="kill_pid" value="{{ process[3] }}">
