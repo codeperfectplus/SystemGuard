@@ -12,7 +12,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
 FLASK_APP_PATH="${FLASK_APP_PATH:-$SCRIPT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$SCRIPT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5050}"
-LOG_FILE="${SCRIPT_DIR}/my_script.log"
+LOG_FILE="/home/$(whoami)/logs/systemdashboard_flask.log"
 USERNAME="$(whoami)"
 
 # Check for Miniconda3 and Anaconda3
