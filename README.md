@@ -1,6 +1,6 @@
-# SystemDashboard
+# SystemGuard
 
-System Dashboard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
+System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
 ## Installation 
 
@@ -43,6 +43,9 @@ bash cronjob.sh
 - Monitor server stats like CPU, Memory, Disk, and Network.
 - Check the network speed of the server using a speed test.
 - Rate limit the speed test to prevent abuse.
+- Kill the process that is consuming the most CPU.
+- Real-time monitoring of server stats.
+- Responsive design that works on mobile, tablet, and desktop.
 
 ## Product Screenshots
 
