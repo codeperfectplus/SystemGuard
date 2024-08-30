@@ -155,7 +155,7 @@ install() {
 
     # Install the executable
     log "Installing executable to /usr/local/bin/systemguard-installer..."
-    cp "$(basename "$0")" "$EXECUTABLE"
+    # cp "$(basename "$0")" "$EXECUTABLE"
     log "SystemGuard version $VERSION installed successfully!"
 }
 
