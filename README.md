@@ -1,8 +1,8 @@
-# SystemGuard
+# SystemGuard 💂
 
 System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
-## Installation 
+## Installation 🛠️
 
 ```bash
 wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/main/setup.sh
@@ -40,7 +40,7 @@ It will install the SystemGuard app and its dependencies in the crontab and it w
 
 - Anaconda3/Miniconda3
 
-## Features
+## Features 🚀
 
 - Monitor server stats like CPU, Memory, Disk, and Network.
 - Check the network speed of the server using a speed test.
@@ -52,7 +52,7 @@ It will install the SystemGuard app and its dependencies in the crontab and it w
 - Easy download and installation using a bash script.
 
 
-## Product Screenshots
+## Product Screenshots 📸
 
 ### HomePage
 

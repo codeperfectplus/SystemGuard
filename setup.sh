@@ -22,7 +22,7 @@ get_user_home() {
 # Set paths relative to the correct user's home directory
 USER_HOME=$(get_user_home)
 DOWNLOAD_DIR="/tmp"
-EXTRACT_DIR="$USER_HOME/.systemguard"
+EXTRACT_DIR="$USER_HOME/.systemguard/"
 LOG_DIR="$HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
 BACKUP_DIR="$USER_HOME/.systemguard_backup"
@@ -99,7 +99,6 @@ install_executable() {
     # CURRENT_SCRIPT=$(realpath "$0")
     cd $EXTRACT_DIR/SystemGuard-*/
     CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT  
-    echo "Current script: $CURRENT_SCRIPT"
     # Verify that the script exists before attempting to copy
     if [ -f "$CURRENT_SCRIPT" ]; then
         log "Installing executable to /usr/local/bin/systemguard-installer..."
@@ -139,12 +138,12 @@ install() {
     log "Installing SystemGuard version $VERSION..."
     
     # Download the SystemGuard zip file
-    wget -q $ZIP_URL -O $DOWNLOAD_DIR/systemguard.zip
-    if [ $? -ne 0 ]; then
+    log "Downloading SystemGuard version $VERSION from $ZIP_URL..."
+    if ! wget -q "$ZIP_URL" -O "$DOWNLOAD_DIR/systemguard.zip"; then
         log "Error: Failed to download SystemGuard version $VERSION. Please check the version number and try again."
         exit 1
     fi
-    log "Download completed."
+    log "Download completed successfully."
 
     # Backup existing configurations
     backup_configs
