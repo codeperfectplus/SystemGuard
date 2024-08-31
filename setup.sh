@@ -21,6 +21,7 @@ get_user_home() {
 
 # Set paths relative to the correct user's home directory
 USER_HOME=$(get_user_home)
+USER_NAME=$(echo $USER_HOME | awk -F'/' '{print $3}')
 DOWNLOAD_DIR="/tmp"
 EXTRACT_DIR="$USER_HOME/.systemguard/"
 LOG_DIR="$HOME/logs"
@@ -274,3 +275,8 @@ case $ACTION in
     load_test) load_test ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
+
+
+# this script ran with sudo command so all the files have root permission 
+# remove the root permission from the files to the user 
+chown -R $USER_NAME:$USER_NAME $EXTRACT_DIR
