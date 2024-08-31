@@ -23,7 +23,7 @@ get_user_home() {
 USER_HOME=$(get_user_home)
 USER_NAME=$(echo $USER_HOME | awk -F'/' '{print $3}')
 DOWNLOAD_DIR="/tmp"
-EXTRACT_DIR="$USER_HOME/.systemguard/"
+EXTRACT_DIR="$USER_HOME/.systemguard"
 LOG_DIR="$HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
 BACKUP_DIR="$USER_HOME/.systemguard_backup"
@@ -31,6 +31,7 @@ EXECUTABLE="/usr/local/bin/systemguard-installer"
 LOCUST_FILE="$EXTRACT_DIR/SystemGuard-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
+ISSUE_URL="https://github.com/codeperfectplus/SystemGuard/issues"
 
 # Create necessary directories
 mkdir -p "$LOG_DIR"
@@ -40,6 +41,48 @@ mkdir -p "$BACKUP_DIR"
 log() {
     local message="$1"
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
+}
+
+# Function to add a cron job with error handling
+add_cron_job() {
+    # Define log directory and cron job command
+    local USER_NAME=$(whoami)
+    local log_dir="/home/$USER_NAME/logs"
+    local cron_job="* * * * * /bin/bash $(find $EXTRACT_DIR -name dashboard.sh) >> $log_dir/systemguard_cron.log 2>&1"
+
+    # Create log directory with error handling
+    mkdir -p "$log_dir"
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to create log directory: $log_dir"
+        exit 1
+    fi
+
+    # Verify user retrieval
+    if [ -z "$USER_NAME" ]; then
+        echo "Error: Unable to retrieve current username."
+        exit 1
+    fi
+
+    # Add cron job to crontab with error handling
+    # Temporarily store current crontab to avoid overwriting on error
+    temp_cron=$(mktemp)
+    crontab -l 2>/dev/null > "$temp_cron"
+    if [ $? -ne 0 ] && [ ! -s "$temp_cron" ]; then
+        echo "Error: Unable to list current crontab or it's empty."
+        rm "$temp_cron"
+        exit 1
+    fi
+    
+    echo "$cron_job" >> "$temp_cron"
+    crontab "$temp_cron"
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to add the cron job to the crontab."
+        rm "$temp_cron"
+        exit 1
+    fi
+
+    rm "$temp_cron"
+    echo "Cron job added successfully: $cron_job"
 }
 
 # Backup function for existing configurations
@@ -157,7 +200,7 @@ install() {
 
     # Clean up previous cron jobs related to SystemGuard
     log "Cleaning up previous cron jobs related to SystemGuard..."
-    CRON_PATTERN=".systemguard/SystemGuard-.*/dashboard.sh"
+    CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
     if crontab -l | grep -q "$CRON_PATTERN"; then
         crontab -l | grep -v "$CRON_PATTERN" | crontab -
         log "Old cron jobs removed."
@@ -175,19 +218,14 @@ install() {
     rm $DOWNLOAD_DIR/systemguard.zip
     log "Extraction completed."
 
-    # Navigate to the setup directory and execute setup script
-    log "Navigating to the SystemGuard setup directory..."
-    cd $EXTRACT_DIR/SystemGuard-*/src/scripts
-    if [ ! -f "cronjob.sh" ]; then
-        log "Error: cronjob.sh not found in the extracted directory. Please verify the contents."
+    log "Preparing cronjob script..."
+    add_cron_job
+    # check if the cronjob added successfully or not
+    if ! crontab -l | grep -q "$CRON_PATTERN"; then
+        log "Error: Failed to add the cron job to the crontab."
+        log "Installation failed... Report this issue to the SystemGuard maintainers at $ISSUE_URL."
         exit 1
     fi
-
-    # Make cronjob.sh executable and run it
-    log "Preparing cronjob script..."
-    chmod +x cronjob.sh
-    log "Executing the cronjob setup..."
-    ./cronjob.sh
 
     # Install the executable
     install_executable

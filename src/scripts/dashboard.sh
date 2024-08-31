@@ -72,30 +72,6 @@ export FLASK_ENV=development  # or production
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     log_message "Flask app is not running. Checking repository and starting it..."
 
-    # # Navigate to project directory
-    # current_dir=$(pwd)
-    # cd "$PROJECT_DIR" || exit
-
-    # # Initialize git and pull updates
-    # if [ ! -d ".git" ]; then
-    #     git init
-    # fi
-    # git remote remove origin 2>/dev/null
-    # git remote add origin https://github.com/codeperfectplus/SystemGuard.git
-    
-    # # Apply stashed changes if any
-    # if git stash list | grep -q 'stash@{0}'; then
-    #     log_message "Applying stashed changes..."
-    #     git stash pop
-    # fi
-    # # Fetch and pull the latest changes from the main branch
-    # if ! git pull origin main; then
-    #     log_message "Failed to pull updates from Git repository."
-    #     cd "$current_dir" || exit
-    # fi
-    
-    # cd "$current_dir" || exit
-
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>> "$LOG_FILE" &
