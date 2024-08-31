@@ -281,16 +281,54 @@ load_test() {
     # locust -f "$LOCUST_FILE" --host="$HOST_URL" --headless -u 10 -r 1 --run-time 1m
 }
 
+# Check if SystemGuard is installed
+check_status() {
+    log "Checking SystemGuard status..."
+    
+    if [ -d "$EXTRACT_DIR" ]; then
+        log "SystemGuard is installed at $EXTRACT_DIR."
+    else
+        log "SystemGuard is not installed."
+    fi
+
+    CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
+    if crontab -l | grep -q "$CRON_PATTERN"; then
+        log "Cron job for SystemGuard is set."
+    else
+        log "No cron job found for SystemGuard."
+    fi
+
+    # Check if any of SystemGuard's services are running (example check for a specific service)
+    if pgrep -f "dashboard.sh" > /dev/null; then
+        log "SystemGuard services are running."
+    else
+        log "SystemGuard services are not running."
+    fi
+}
+
+# Health check by pinging localhost:5005
+health_check() {
+    log "Performing health check on localhost:5005..."
+    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
+        log "Health check successful: $HOST_URL is up and running."
+    else
+        log "Health check failed: $HOST_URL is not responding."
+    fi
+}
+
+
 # Display help
 show_help() {
     echo "SystemGuard Installer"
     echo "Usage: ./installer.sh [options]"
     echo "Options:"
-    echo "  --install      Install SystemGuard"
-    echo "  --uninstall    Uninstall SystemGuard"
-    echo "  --restore      Restore SystemGuard from a backup"
-    echo "  --load-test    Start Locust load testing"
-    echo "  --help         Display this help message"
+    echo "  --install           Install SystemGuard"
+    echo "  --uninstall         Uninstall SystemGuard"
+    echo "  --restore           Restore SystemGuard from a backup"
+    echo "  --load-test         Start Locust load testing"
+    echo "  --status            Check the status of SystemGuard installation"
+    echo "  --health-check      Perform a health check on localhost:5005"
+    echo "  --help              Display this help message"
 }
 
 # Parse command-line options
@@ -300,6 +338,8 @@ for arg in "$@"; do
         --uninstall) ACTION="uninstall" ;;
         --restore) ACTION="restore" ;;
         --load-test) ACTION="load_test" ;;
+        --status) ACTION="check_status" ;;
+        --health-check) ACTION="health_check" ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -311,10 +351,21 @@ case $ACTION in
     uninstall) uninstall ;;
     restore) restore ;;
     load_test) load_test ;;
+    install_latest) install_latest ;;
+    check_status) check_status ;;
+    health_check) health_check ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 
-
 # this script ran with sudo command so all the files have root permission 
 # remove the root permission from the files to the user 
-chown -R $USER_NAME:$USER_NAME $EXTRACT_DIR
+# Function to change ownership of a directory to the user
+change_ownership() {
+    local directory="$1"
+    if [ -d "$directory" ]; then
+        chown -R "$USER_NAME:$USER_NAME" "$directory"
+    fi
+}
+
+# Call the change_ownership function
+change_ownership "$EXTRACT_DIR"
