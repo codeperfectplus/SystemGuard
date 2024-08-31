@@ -2,16 +2,36 @@
 
 # SystemGuard Installer Script
 # ----------------------------
-# This script installs, uninstalls, backs up, and restores SystemGuard by managing its installation, cleanup, and configuration.
+# This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
 
-# Variables
+# Determine the correct user's home directory
+get_user_home() {
+    if [ -n "$SUDO_USER" ]; then
+        # When using sudo, SUDO_USER gives the original user who invoked sudo
+        TARGET_USER="$SUDO_USER"
+    else
+        # If not using sudo, use LOGNAME to find the current user
+        TARGET_USER="$LOGNAME"
+    fi
+    
+    # Get the home directory of the target user
+    USER_HOME=$(eval echo ~$TARGET_USER)
+    echo "$USER_HOME"
+}
+
+# Set paths relative to the correct user's home directory
+USER_HOME=$(get_user_home)
 DOWNLOAD_DIR="/tmp"
-EXTRACT_DIR="/home/$USER/.systemguard"
+EXTRACT_DIR="$USER_HOME/.systemguard"
 LOG_DIR="$HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
-BACKUP_DIR="/home/$USER/.systemguard_backup"
+BACKUP_DIR="$USER_HOME/.systemguard_backup"
 EXECUTABLE="/usr/local/bin/systemguard-installer"
+LOCUST_FILE="$EXTRACT_DIR/SystemGuard-*/src/scripts/locustfile.py"
+HOST_URL="http://localhost:5050"
+INSTALLER_SCRIPT='setup.sh'
 
+echo "User: $(whoami)"
 # Create necessary directories
 mkdir -p "$LOG_DIR"
 mkdir -p "$BACKUP_DIR"
@@ -70,6 +90,23 @@ restore() {
     else
         log "No backups found to restore."
         echo "No backups found in $BACKUP_DIR."
+    fi
+}
+
+# Function to install the script as an executable
+install_executable() {
+    # Use $0 to get the full path of the currently running script
+    # CURRENT_SCRIPT=$(realpath "$0")
+    cd $EXTRACT_DIR/SystemGuard-*/
+    CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT  
+    echo "Current script: $CURRENT_SCRIPT"
+    # Verify that the script exists before attempting to copy
+    if [ -f "$CURRENT_SCRIPT" ]; then
+        log "Installing executable to /usr/local/bin/systemguard-installer..."
+        cp "$CURRENT_SCRIPT" "$EXECUTABLE"
+        log "Executable installed successfully."
+    else
+        log "Error: Script file not found. Cannot copy to /usr/local/bin."
     fi
 }
 
@@ -155,7 +192,7 @@ install() {
 
     # Install the executable
     log "Installing executable to /usr/local/bin/systemguard-installer..."
-    # cp "$(basename "$0")" "$EXECUTABLE"
+    install_executable
     log "SystemGuard version $VERSION installed successfully!"
 }
 
@@ -190,6 +227,24 @@ uninstall() {
     fi
 }
 
+# Load test function to start Locust server
+load_test() {
+    log "Starting Locust server for load testing..."
+    
+    # Check if Locust is installed
+    if ! command -v locust &> /dev/null
+    then
+        log "Locust is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Start Locust server
+    log "Starting Locust server..."
+    locust -f "$LOCUST_FILE" --host="$HOST_URL"
+    # Optionally, you can pass additional Locust flags here if needed
+    # locust -f "$LOCUST_FILE" --host="$HOST_URL" --headless -u 10 -r 1 --run-time 1m
+}
+
 # Display help
 show_help() {
     echo "SystemGuard Installer"
@@ -198,6 +253,7 @@ show_help() {
     echo "  --install      Install SystemGuard"
     echo "  --uninstall    Uninstall SystemGuard"
     echo "  --restore      Restore SystemGuard from a backup"
+    echo "  --load-test    Start Locust load testing"
     echo "  --help         Display this help message"
 }
 
@@ -207,6 +263,7 @@ for arg in "$@"; do
         --install) ACTION="install" ;;
         --uninstall) ACTION="uninstall" ;;
         --restore) ACTION="restore" ;;
+        --load-test) ACTION="load_test" ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -217,5 +274,6 @@ case $ACTION in
     install) install ;;
     uninstall) uninstall ;;
     restore) restore ;;
+    load_test) load_test ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac

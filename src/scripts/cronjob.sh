@@ -4,7 +4,7 @@
 username=$(whoami)
 log_dir="/home/$username/logs"
 mkdir -p "$log_dir"
-CRON_JOB="* * * * * /bin/bash $(pwd)/dashboard.sh >> $log_dir/systemdashboard_cron.log 2>&1"
+CRON_JOB="* * * * * /bin/bash $(pwd)/dashboard.sh >> $log_dir/systemguard_cron.log 2>&1"
 
 echo "Total cron jobs before: $(crontab -l | grep -v '^#' | wc -l)"
 
