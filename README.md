@@ -40,6 +40,11 @@ It will install the SystemGuard app and its dependencies in the crontab and it w
 
 - Anaconda3/Miniconda3
 
+```bash
+# install miniconda3 if not installed already
+chmod +x src/scripts/install_miniconda.sh && ./src/scripts/install_miniconda.sh
+```
+
 ## Features 🚀
 
 - Monitor server stats like CPU, Memory, Disk, and Network.

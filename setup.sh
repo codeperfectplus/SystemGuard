@@ -320,8 +320,8 @@ check_status() {
         log "No cron job found for SystemGuard."
     fi
 
-    # Check if any of SystemGuard's services are running (example check for a specific service)
-    if pgrep -f "dashboard.sh" > /dev/null; then
+    log "Performing health check on localhost:5005..."
+    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
         log "SystemGuard services are running."
     else
         log "SystemGuard services are not running."
