@@ -45,44 +45,59 @@ log() {
 
 # Function to add a cron job with error handling
 add_cron_job() {
+
     # Define log directory and cron job command
-    local USER_NAME=$(whoami)
-    local log_dir="/home/$USER_NAME/logs"
-    local cron_job="* * * * * /bin/bash $(find $EXTRACT_DIR -name dashboard.sh) >> $log_dir/systemguard_cron.log 2>&1"
+    local log_dir="$USER_HOME/logs"
+    local script_path=$(find "$EXTRACT_DIR" -name dashboard.sh)
+    local cron_job="* * * * * /bin/bash $script_path >> $log_dir/systemguard_cron.log 2>&1"
 
     # Create log directory with error handling
     mkdir -p "$log_dir"
     if [ $? -ne 0 ]; then
-        echo "Error: Failed to create log directory: $log_dir"
+        log "Error: Failed to create log directory: $log_dir"
         exit 1
     fi
 
-    # Verify user retrieval
-    if [ -z "$USER_NAME" ]; then
-        echo "Error: Unable to retrieve current username."
-        exit 1
+    # Check if running with sudo
+    if [ "$EUID" -eq 0 ]; then
+        # Running as root, modify the crontab for the target user
+        local crontab_cmd="crontab -u $USER_NAME"
+    else
+        # Running as a regular user, modify current user's crontab
+        local crontab_cmd="crontab"
     fi
 
-    # Add cron job to crontab with error handling
     # Temporarily store current crontab to avoid overwriting on error
-    temp_cron=$(mktemp)
-    crontab -l 2>/dev/null > "$temp_cron"
-    if [ $? -ne 0 ] && [ ! -s "$temp_cron" ]; then
-        echo "Error: Unable to list current crontab or it's empty."
+    local temp_cron=$(mktemp)
+    if [ $? -ne 0 ]; then
+        log "Error: Failed to create temporary file for crontab."
+        exit 1
+    fi
+
+    # List the current crontab
+    if ! crontab -l 2>/dev/null > "$temp_cron"; then
+        log "Error: Unable to list current crontab."
         rm "$temp_cron"
         exit 1
     fi
-    
+
+    # Ensure the cron job does not already exist
+    if grep -Fxq "$cron_job" "$temp_cron"; then
+        log "Cron job already exists: $cron_job"
+        rm "$temp_cron"
+        exit 0
+    fi
+
+    # Add the new cron job
     echo "$cron_job" >> "$temp_cron"
-    crontab "$temp_cron"
-    if [ $? -ne 0 ]; then
-        echo "Error: Failed to add the cron job to the crontab."
+    if ! $crontab_cmd "$temp_cron"; then
+        log "Error: Failed to add the cron job to crontab."
         rm "$temp_cron"
         exit 1
     fi
 
     rm "$temp_cron"
-    echo "Cron job added successfully: $cron_job"
+    log "Cron job added successfully: $cron_job"
 }
 
 # Backup function for existing configurations
@@ -217,15 +232,8 @@ install() {
     unzip -q $DOWNLOAD_DIR/systemguard.zip -d $EXTRACT_DIR
     rm $DOWNLOAD_DIR/systemguard.zip
     log "Extraction completed."
-
     log "Preparing cronjob script..."
     add_cron_job
-    # check if the cronjob added successfully or not
-    if ! crontab -l | grep -q "$CRON_PATTERN"; then
-        log "Error: Failed to add the cron job to the crontab."
-        log "Installation failed... Report this issue to the SystemGuard maintainers at $ISSUE_URL."
-        exit 1
-    fi
 
     # Install the executable
     install_executable
@@ -237,13 +245,15 @@ uninstall() {
     log "Uninstalling SystemGuard..."
     
     # Remove cron jobs related to SystemGuard
-    log "Cleaning up cron jobs related to SystemGuard..."
-    CRON_PATTERN=".systemguard/SystemGuard-.*/dashboard.sh"
-    if crontab -l | grep -q "$CRON_PATTERN"; then
-        crontab -l | grep -v "$CRON_PATTERN" | crontab -
+    CRON_PATTERN="\.systemguard/SystemGuard-.*\/dashboard\.sh"
+
+    # List current crontab entries and filter out the pattern
+    if crontab -l | grep -E -q "$CRON_PATTERN"; then
+        # Remove matching cron jobs
+        crontab -l | grep -E -v "$CRON_PATTERN" | crontab -
         log "Cron jobs removed."
     else
-        log "No cron jobs found."
+        log "No cron jobs found matching the pattern."
     fi
 
     # Remove the SystemGuard installation directory
