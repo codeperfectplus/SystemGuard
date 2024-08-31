@@ -32,6 +32,7 @@ LOCUST_FILE="$EXTRACT_DIR/SystemGuard-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
 ISSUE_URL="https://github.com/codeperfectplus/SystemGuard/issues"
+CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
 
 # Create necessary directories
 mkdir -p "$LOG_DIR"
@@ -42,6 +43,14 @@ log() {
     local message="$1"
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
 }
+
+# Check if running with sudo
+if [ "$EUID" -eq 0 ]; then
+    crontab_cmd="crontab -u $USER_NAME"
+else
+    crontab_cmd="crontab"
+fi
+
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -58,14 +67,6 @@ add_cron_job() {
         exit 1
     fi
 
-    # Check if running with sudo
-    if [ "$EUID" -eq 0 ]; then
-        # Running as root, modify the crontab for the target user
-        local crontab_cmd="crontab -u $USER_NAME"
-    else
-        # Running as a regular user, modify current user's crontab
-        local crontab_cmd="crontab"
-    fi
 
     # Temporarily store current crontab to avoid overwriting on error
     local temp_cron=$(mktemp)
@@ -75,7 +76,7 @@ add_cron_job() {
     fi
 
     # List the current crontab
-    if ! crontab -l 2>/dev/null > "$temp_cron"; then
+    if ! $crontab_cmd -l 2>/dev/null > "$temp_cron"; then
         log "Error: Unable to list current crontab."
         rm "$temp_cron"
         exit 1
@@ -215,9 +216,8 @@ install() {
 
     # Clean up previous cron jobs related to SystemGuard
     log "Cleaning up previous cron jobs related to SystemGuard..."
-    CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
-    if crontab -l | grep -q "$CRON_PATTERN"; then
-        crontab -l | grep -v "$CRON_PATTERN" | crontab -
+    if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+        $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
     else
         log "No previous cron jobs found."
@@ -235,6 +235,14 @@ install() {
     log "Preparing cronjob script..."
     add_cron_job
 
+    # check if the cron job is added successfully
+    if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+        log "Cron job added successfully."
+    else
+        log "Error: Failed to add the cron job."
+        exit 1
+    fi
+
     # Install the executable
     install_executable
     log "SystemGuard version $VERSION installed successfully!"
@@ -245,15 +253,19 @@ uninstall() {
     log "Uninstalling SystemGuard..."
     
     # Remove cron jobs related to SystemGuard
-    CRON_PATTERN="\.systemguard/SystemGuard-.*\/dashboard\.sh"
+    # cronjob 
 
-    # List current crontab entries and filter out the pattern
-    if crontab -l | grep -E -q "$CRON_PATTERN"; then
-        # Remove matching cron jobs
-        crontab -l | grep -E -v "$CRON_PATTERN" | crontab -
+    if $crontab_cmd -l 2>/dev/null | grep -E "$CRON_PATTERN" > /dev/null; then
+        echo "Are you sure you want to remove all cron jobs related to SystemGuard? (y/n)"
+        read CONFIRM
+        if [ "$CONFIRM" != "y" ]; then
+            log "Uninstallation aborted by user."
+            exit 0
+        fi
+        $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Cron jobs removed."
     else
-        log "No cron jobs found matching the pattern."
+        log "No cron jobs found."
     fi
 
     # Remove the SystemGuard installation directory
@@ -301,8 +313,8 @@ check_status() {
         log "SystemGuard is not installed."
     fi
 
-    CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
-    if crontab -l | grep -q "$CRON_PATTERN"; then
+    
+    if $crontab_cmd '-l' | grep -q "$CRON_PATTERN"; then
         log "Cron job for SystemGuard is set."
     else
         log "No cron job found for SystemGuard."
