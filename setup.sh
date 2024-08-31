@@ -31,7 +31,6 @@ LOCUST_FILE="$EXTRACT_DIR/SystemGuard-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
 
-echo "User: $(whoami)"
 # Create necessary directories
 mkdir -p "$LOG_DIR"
 mkdir -p "$BACKUP_DIR"
@@ -190,7 +189,6 @@ install() {
     ./cronjob.sh
 
     # Install the executable
-    log "Installing executable to /usr/local/bin/systemguard-installer..."
     install_executable
     log "SystemGuard version $VERSION installed successfully!"
 }
