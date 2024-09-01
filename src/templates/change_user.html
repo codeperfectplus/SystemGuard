@@ -13,13 +13,23 @@
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" value="{{ user.username }}" required>
         </div>
-        
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+
         <div class="form-group">
             <label for="user_level">User Level:</label>
             <select id="user_level" name="user_level" required>
                 <option value="user" {% if user.user_level == 'user' %}selected{% endif %}>User</option>
                 <option value="admin" {% if user.user_level == 'admin' %}selected{% endif %}>Admin</option>
             </select>
+        </div>
+
+        <div class="form-group">
+            <label for="receive_email_alerts">Receive Email Alerts:</label>
+            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" {% if user.receive_email_alerts %}checked{% endif %}>
         </div>
 
         <button type="submit" class="btn btn-primary">Update Settings</button>

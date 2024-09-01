@@ -1,13 +1,15 @@
 import datetime
 from flask import render_template, blueprints
-
+from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import DashboardSettings, SpeedTestResult
 from src.utils import run_speedtest
+from src.scripts.email_me import send_email
 
 speedtest_bp = blueprints.Blueprint("speedtest", __name__)
 
 @app.route("/speedtest")
+@login_required
 def speedtest():
     settings = DashboardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
@@ -34,6 +36,10 @@ def speedtest():
             )
             db.session.add(new_result)
             db.session.commit()
+            receiver_email = current_user.email
+            subject = "Speedtest Result"
+            body = f"Download Speed: {speedtest_result['download_speed']} \nUpload Speed: {speedtest_result['upload_speed']} \nPing: {speedtest_result['ping']} "
+            send_email(receiver_email, subject, body)
             return render_template(
                 "speedtest_result.html",
                 speedtest_result=speedtest_result,

@@ -86,6 +86,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     user_level = db.Column(db.String(50), nullable=False, default='user')
+    receive_email_alerts = db.Column(db.Boolean, default=True)
 
 
 class EmailPassword(db.Model):
@@ -108,7 +109,8 @@ with app.app_context():
     # Create admin user if not exists
     if not User.query.filter_by(username='admin').first():
         hashed_password = generate_password_hash('adminpassword')
-        admin_user = User(username='admin', email="codeperfectplus@gmail.com", password=hashed_password, user_level='admin')
+        admin_user = User(username='admin', email="codeperfectplus@gmail.com", password=hashed_password, user_level='admin',
+                          receive_email_alerts=True)
         
         db.session.add(admin_user)
         db.session.commit()
@@ -117,7 +119,7 @@ with app.app_context():
     if not User.query.filter_by(username='user').first():
         hashed_password = generate_password_hash('userpassword')
         user = User(username='user', email="test@mail.com",
-                    password=hashed_password, user_level='user')
+                    password=hashed_password, user_level='user', receive_email_alerts=False)
         
         db.session.add(user)
         db.session.commit()

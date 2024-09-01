@@ -5,13 +5,9 @@
 {% endblock %}
 {% block content %}
 <div class="container">
-    <h2>Send Email</h2>
+    <h2>Send Email to the Admin/All Users</h2>
     {% include 'ext/message.html' %}
     <form method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="receiver_email">Receiver Email:</label>
-            <input type="email" id="receiver_email" name="receiver_email" required>
-        </div>
         <div class="form-group">
             <label for="subject">Subject:</label>
             <input type="text" id="subject" name="subject" required>
@@ -24,6 +20,12 @@
             <label for="attachment">Attachment:</label>
             <input type="file" id="attachment" name="attachment">
         </div>
+        <div class="form-group">
+            <label for="recipient">Recipient:</label>
+            <select id="recipient" name="recipient" required>
+                <option value="admin">Admin</option>
+                <option value="all_users">All Users</option>
+            </select>
         <button type="submit" class="btn btn-primary">Send Email</button>
     </form>
 </div>

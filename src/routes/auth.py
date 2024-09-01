@@ -20,6 +20,24 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+def get_admin_emails_for_email_alerts():
+    with app.app_context():
+        admin_emails = User.query.filter_by(user_level='admin', receive_email_alerts=True).all()
+        print(admin_emails)
+        if not admin_emails:
+            return None
+        return [admin.email for admin in admin_emails]
+    
+def get_all_users_emails(receive_email_alerts=True):
+    with app.app_context():
+        users = User.query.filter_by(receive_email_alerts=receive_email_alerts).all()
+        if not users:
+            return None
+        return [user.email for user in users]
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -28,6 +46,10 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
+            admin_email_address = get_admin_emails_for_email_alerts()
+            if admin_email_address:
+                send_email(admin_email_address, 'Login Alert', f'{user.username} logged in to the system.')
+            
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
     return render_template('login.html')
@@ -50,6 +72,15 @@ def signup():
 
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, password=hashed_password)
+        
+        admin_email_address = get_admin_emails_for_email_alerts()
+        # extends the signup user to send an email to the admin
+        if admin_email_address:
+            send_email(admin_email_address, 'New User Alert', f'{username} has signed up to the system.')
+        
+        # send email to the new user
+        send_email([new_user.email], 'Welcome to the system', f'Hello {new_user.username}, welcome to the system.')
+
         db.session.add(new_user)
         db.session.commit()
         flash('Account created successfully, please log in.')
@@ -90,6 +121,18 @@ def logout():
 #         return f(*args, **kwargs)
 #     return decorated_function
 
+@app.route('/users')
+@login_required
+def view_users():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        return render_template("error/permission_denied.html")
+
+    # Fetch all users from the database
+    users = User.query.all()
+
+    return render_template('view_users.html', users=users)
+
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def change_user_settings(username):
@@ -97,18 +140,36 @@ def change_user_settings(username):
 
     if request.method == 'POST':
         new_username = request.form['username']
+        new_email = request.form['email']
         new_user_level = request.form['user_level']
-        
+        receive_email_alerts = 'receive_email_alerts' in request.form
+
         # Update user details
         user.username = new_username
+        user.email = new_email
         user.user_level = new_user_level
+        user.receive_email_alerts = receive_email_alerts
+
         db.session.commit()
-        
+
         flash('User settings updated successfully!', 'success')
         return redirect(url_for('change_user_settings', username=user.username))
 
     return render_template('change_user.html', user=user)
 
+@app.route('/delete_user/<username>', methods=['POST'])
+@login_required
+def delete_user(username):
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to perform this action.", "danger")
+        return redirect(url_for('view_users'))  # Redirect to the users page
+
+    user = User.query.filter_by(username=username).first_or_404()
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash(f'User {username} has been deleted successfully!', 'success')
+    return redirect(url_for('view_users'))
 
 @app.route("/update-email-password", methods=["GET", "POST"])
 @login_required
@@ -134,17 +195,30 @@ def update_email_password():
 @login_required
 def send_email_page():
     if request.method == "POST":
-        receiver_email = request.form.get("receiver_email")
+ 
+        receiver_email = request.form.get("recipient")
         subject = request.form.get("subject")
         body = request.form.get("body")
         attachment = request.files.get("attachment")
 
+        if not receiver_email or not subject or not body:
+            flash("Please provide recipient, subject, and body.", "danger")
+            return redirect(url_for('send_email_page'))
+        
+        if receiver_email == "all_users":
+            receiver_email = get_all_users_emails()
+        elif receiver_email == "admin_users":
+            receiver_email = get_admin_emails_for_email_alerts()
+
+        if not receiver_email:
+            flash("No users found to send email to.", "danger")
+            return redirect(url_for('send_email_page'))
+        
         # Save attachment if any
         attachment_path = None
         if attachment:
             attachment_path = f"/tmp/{attachment.filename}"
             attachment.save(attachment_path)
-
         try:
             send_email(receiver_email, subject, body, attachment_path)
             flash("Email sent successfully!", "success")

@@ -4,7 +4,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -14,48 +13,49 @@ load_dotenv()
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-
 def send_email(receiver_email, subject, body, attachment_path=None):
-    try:
-        # Create a multipart message
-        msg = MIMEMultipart()
-        msg['From'] = EMAIL_ADDRESS
-        msg['To'] = receiver_email
-        msg['Subject'] = subject
-        # append message to the body
-        append_message = "This is an automated email from the SystemGuru application. Please do not reply to this email."
-        body = body + "\n\n" + append_message
+    if isinstance(receiver_email, str):
+        receiver_email = [receiver_email]  # Convert single address to list
 
-        # Attach the body with the msg instance
-        msg.attach(MIMEText(body, 'plain'))
+    for email in receiver_email:
+        try:
+            # Create a multipart message
+            msg = MIMEMultipart()
+            msg['From'] = EMAIL_ADDRESS
+            msg['To'] = email
+            msg['Subject'] = subject
+            # Append message to the body
+            append_message = "This is an automated email from the SystemGuard application. Please do not reply to this email."
+            full_body = body + "\n\n" + append_message
 
-        # Attach a file if provided
-        if attachment_path:
-            with open(attachment_path, "rb") as attachment:
-                part = MIMEBase("application", "octet-stream")
-                part.set_payload(attachment.read())
-                encoders.encode_base64(part)
-                part.add_header(
-                    "Content-Disposition",
-                    f"attachment; filename= {attachment_path}",
-                )
-                msg.attach(part)
+            # Attach the body with the msg instance
+            msg.attach(MIMEText(full_body, 'plain'))
 
-        # Create an SMTP session
-        server = smtplib.SMTP('smtp.gmail.com', 587)  # Use Gmail's SMTP server
-        server.starttls()  # Enable security
+            # Attach a file if provided
+            if attachment_path:
+                with open(attachment_path, "rb") as attachment:
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(attachment.read())
+                    encoders.encode_base64(part)
+                    part.add_header(
+                        "Content-Disposition",
+                        f"attachment; filename= {os.path.basename(attachment_path)}",
+                    )
+                    msg.attach(part)
 
-        # Login with sender's email and password
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            # Create an SMTP session
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:  # Use Gmail's SMTP server
+                server.starttls()  # Enable security
 
-        # Send the email
-        text = msg.as_string()
-        server.sendmail(EMAIL_ADDRESS, receiver_email, text)
+                # Login with sender's email and password
+                server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-        # Close the SMTP session
-        server.quit()
+                # Send the email
+                text = msg.as_string()
+                server.sendmail(EMAIL_ADDRESS, email, text)
 
-        print(f"Email sent successfully to {receiver_email}")
+            print(f"Email sent successfully to {email}")
 
-    except Exception as e:
-        print(f"Failed to send email. Error: {str(e)}")
+        except Exception as e:
+            print(f"Failed to send email to {email}. Error: {str(e)}")
+
