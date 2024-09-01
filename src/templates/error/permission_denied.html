@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Page not found{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/404.css')}}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% include 'ext/message.html' %}
+    <h1>Permission Denied</h1>
+    <p>Oops! You do not have permission to access this page.</p>
+    <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+</div>
+{% endblock %}

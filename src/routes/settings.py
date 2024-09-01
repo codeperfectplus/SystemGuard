@@ -1,11 +1,18 @@
 from flask import render_template, request, flash, blueprints
 from src.config import app, db
 from src.models import DashboardSettings
+from flask_login import login_required, current_user
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
 @app.route("/settings", methods=["GET", "POST"])
+@login_required
 def settings():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        flash("User level for this account is: " + current_user.user_level, "danger")
+        flash("Please contact your administrator for more information.", "danger")
+        return render_template("error/permission_denied.html")
     # Fetch the settings from the database
     settings = DashboardSettings.query.first()
     if settings:

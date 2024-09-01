@@ -12,10 +12,11 @@ process_bp = blueprints.Blueprint("process", __name__)
 def process():
     settings = DashboardSettings.query.first()
     if not settings.is_process_info_enabled:
-        return render_template("error/404.html")
+        flash("You do not have permission to view this page.", "danger")
+        return render_template("error/permission_denied.html")
     if current_user.user_level != "admin":
         flash("You do not have permission to view this page.", "danger")
-        return redirect(url_for("dashboard"))
+        return render_template("error/permission_denied.html")
 
     # Retrieve number of processes from session or set default
     number_of_processes = session.get('number_of_processes', 50)
@@ -49,4 +50,4 @@ def process():
     elif sort_by == 'name':
         top_processes.sort(key=lambda x: x[0], reverse=(order == 'desc'))
 
-    return render_template("process.html", processes=top_processes, number=number_of_processes, toggle_order=toggle_order)
+    return render_template("info_pages/process.html", processes=top_processes, number=number_of_processes, toggle_order=toggle_order)

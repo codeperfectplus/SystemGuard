@@ -105,6 +105,13 @@ with app.app_context():
         db.session.add(admin_user)
         db.session.commit()
 
+    # create a user if not exists
+    if not User.query.filter_by(username='user').first():
+        hashed_password = generate_password_hash('userpassword')
+        user = User(username='user', password=hashed_password, user_level='user')
+        db.session.add(user)
+        db.session.commit()
+
 # ibject for all templates
 @app.context_processor
 def inject_settings():
