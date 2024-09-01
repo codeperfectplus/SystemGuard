@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes
 from src.models import DashboardSettings
+from src.scripts.email_me import send_email
 
 process_bp = blueprints.Blueprint("process", __name__)
 
@@ -31,6 +32,10 @@ def process():
             try:
                 os.kill(int(pid_to_kill), 9)  # Sends a SIGKILL signal
                 flash(f"Process '{process_name}' (PID {pid_to_kill}) killed successfully.", "success")
+                receiver_email = current_user.email
+                subject = f"Process '{process_name}' (PID {pid_to_kill}) killed successfully."
+                body = f"Process '{process_name}' (PID {pid_to_kill}) was killed successfully by {current_user.username}."
+                send_email(receiver_email, subject, body)
             except Exception as e:
                 flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {e}", "danger")
             return redirect(url_for("process"))  # Refresh the page after killing process

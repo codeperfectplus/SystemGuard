@@ -1,6 +1,6 @@
 import psutil
 from flask import render_template, blueprints, flash
-
+from flask_login import login_required
 from src.config import app
 from src.utils import get_established_connections
 from src.models import DashboardSettings
@@ -8,6 +8,7 @@ from src.models import DashboardSettings
 network_info_bp = blueprints.Blueprint("network_stats", __name__)
 
 @app.route("/network_stats")
+@login_required
 def network_stats():
     settings = DashboardSettings.query.first()
     if not settings.is_network_info_enabled:

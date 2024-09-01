@@ -1,5 +1,6 @@
 import psutil
 from flask import render_template, blueprints, flash
+from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
@@ -9,6 +10,7 @@ memory_info_bp = blueprints.Blueprint("memory_usage", __name__)
 
 
 @app.route("/memory_usage")
+@login_required
 def memory_usage():
     settings = DashboardSettings.query.first()
     if not settings.is_memory_info_enabled:

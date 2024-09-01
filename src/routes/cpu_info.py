@@ -1,6 +1,8 @@
 import psutil
 from flask import render_template, blueprints, flash
 
+from flask_login import login_required
+
 from src.config import app
 from src.utils import get_cpu_core_count, get_cpu_frequency, cpu_usage_percent, get_cpu_temp, get_cached_value
 from src.models import DashboardSettings
@@ -8,6 +10,7 @@ from src.models import DashboardSettings
 cpu_info_bp = blueprints.Blueprint("cpu_usage", __name__)
 
 @app.route("/cpu_usage")
+@login_required
 def cpu_usage():
     settings = DashboardSettings.query.first()
     if not settings.is_cpu_info_enabled:

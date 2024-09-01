@@ -1,21 +1,20 @@
-.login-container {
-    max-width: 400px;
+.change-user-container {
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 50px;
 }
 
-.login-title {
+.page-title {
     font-size: 28px;
     color: #343a40;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-.login-form {
+.change-user-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -24,7 +23,7 @@
 .form-group {
     display: flex;
     flex-direction: column;
-    text-align: left;
+    margin-bottom: 10px;
 }
 
 .form-group label {
@@ -34,56 +33,26 @@
 }
 
 .form-group input[type="text"],
-.form-group input[type="password"] {
+.form-group select {
     padding: 10px;
     border: 1px solid #ced4da;
     border-radius: 4px;
-    background-color: #ffffff;
     font-size: 16px;
     width: 100%;
 }
 
 .btn-primary {
-    padding: 10px;
+    padding: 10px 20px;
     background-color: #007bff;
     color: #ffffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
     text-align: center;
+    transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover {
     background-color: #0056b3;
-}
-
-@media (max-width: 576px) {
-    .login-container {
-        padding: 30px 15px;
-    }
-
-    .login-title {
-        font-size: 24px;
-    }
-
-    .btn-primary {
-        width: 100%;
-    }
-}
-
-.signup-link {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #6c757d;
-}
-
-.signup-link a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.signup-link a:hover {
-    text-decoration: underline;
 }

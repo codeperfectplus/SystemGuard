@@ -1,46 +1,37 @@
-.signup-container {
-    max-width: 400px;
+/* send_email.css */
+.container {
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 50px;
 }
 
-.signup-title {
-    font-size: 24px;
-    color: #343a40;
+h2 {
     margin-bottom: 20px;
-}
-
-.signup-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    color: #343a40;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     margin-bottom: 15px;
 }
 
 .form-group label {
     font-weight: 600;
     color: #495057;
+    display: block;
     margin-bottom: 5px;
 }
 
-.form-group input {
-    padding: 10px;
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     background-color: #ffffff;
     font-size: 16px;
-    width: 100%;
 }
 
 .btn-primary {
@@ -57,19 +48,4 @@
 
 .btn-primary:hover {
     background-color: #0056b3;
-}
-
-.login-link {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #6c757d;
-}
-
-.login-link a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.login-link a:hover {
-    text-decoration: underline;
 }

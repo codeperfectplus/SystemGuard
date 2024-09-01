@@ -1,5 +1,6 @@
 import datetime
-from flask import render_template, blueprints, session
+from flask import render_template, blueprints
+from flask_login import login_required
 
 from src.config import app
 from src.models import SpeedTestResult, DashboardSettings, SystemInfo
@@ -8,6 +9,7 @@ from src.utils import datetimeformat, get_system_info
 homepage_bp = blueprints.Blueprint("homepage", __name__)
 
 @app.route("/")
+@login_required
 def dashboard():
     settings = DashboardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown

@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}Login
-{% endblock %}
+{% block title %}Signup{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css')}}">
 {% endblock %}
 {% block content %}
-<h2>Signup</h2>
-<form method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
-    <label for="confirm_password">Confirm Password:</label>
-    <input type="password" id="confirm_password" name="confirm_password" required><br>
-    <input type="submit" value="Signup">
-</form>
-<p><a href="{{ url_for('login') }}">Already have an account? Login here.</a></p>
+<div class="signup-container">
+    <h2 class="signup-title">Create an Account</h2>
+    <form method="post" class="signup-form">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+    <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+</div>
 {% endblock %}

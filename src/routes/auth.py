@@ -2,9 +2,10 @@ from flask import Flask, render_template, redirect, url_for, request, blueprints
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from src.scripts.email_me import send_email
 
 from src.config import app, db
-from src.models import User
+from src.models import User, EmailPassword
 
 auth_bp = blueprints.Blueprint('auth', __name__)
 
@@ -28,7 +29,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('dashboard'))
-        flash('Invalid username or password')
+        flash('Invalid username or password', 'danger')
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -88,3 +89,68 @@ def logout():
 #             return redirect(url_for('login'))
 #         return f(*args, **kwargs)
 #     return decorated_function
+
+@app.route('/user/<username>', methods=['GET', 'POST'])
+@login_required
+def change_user_settings(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    if request.method == 'POST':
+        new_username = request.form['username']
+        new_user_level = request.form['user_level']
+        
+        # Update user details
+        user.username = new_username
+        user.user_level = new_user_level
+        db.session.commit()
+        
+        flash('User settings updated successfully!', 'success')
+        return redirect(url_for('change_user_settings', username=user.username))
+
+    return render_template('change_user.html', user=user)
+
+
+@app.route("/update-email-password", methods=["GET", "POST"])
+@login_required
+def update_email_password():
+    email_password = EmailPassword.query.first()
+
+    if request.method == "POST":
+        new_email = request.form.get("email")
+        new_password = request.form.get("password")
+
+        if new_email:
+            email_password.email = new_email
+        if new_password:
+            email_password.password = new_password
+
+        db.session.commit()
+        flash("Email and password updated successfully!", "success")
+        return redirect(url_for("update_email_password"))
+
+    return render_template("update_email_password.html", email_password=email_password)
+
+@app.route("/send_email", methods=["GET", "POST"])
+@login_required
+def send_email_page():
+    if request.method == "POST":
+        receiver_email = request.form.get("receiver_email")
+        subject = request.form.get("subject")
+        body = request.form.get("body")
+        attachment = request.files.get("attachment")
+
+        # Save attachment if any
+        attachment_path = None
+        if attachment:
+            attachment_path = f"/tmp/{attachment.filename}"
+            attachment.save(attachment_path)
+
+        try:
+            send_email(receiver_email, subject, body, attachment_path)
+            flash("Email sent successfully!", "success")
+        except Exception as e:
+            flash(f"Failed to send email: {str(e)}", "danger")
+        
+        return redirect(url_for('send_email_page'))
+
+    return render_template("send_email.html")

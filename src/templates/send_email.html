@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Send Email{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/send_email.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Send Email</h2>
+    {% include 'ext/message.html' %}
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="receiver_email">Receiver Email:</label>
+            <input type="email" id="receiver_email" name="receiver_email" required>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required>
+        </div>
+        <div class="form-group">
+            <label for="body">Body:</label>
+            <textarea id="body" name="body" rows="5" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="attachment">Attachment:</label>
+            <input type="file" id="attachment" name="attachment">
+        </div>
+        <button type="submit" class="btn btn-primary">Send Email</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Change User Settings{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/change_user.css') }}">
+{% endblock %}
+{% block content %}
+<div class="change-user-container">
+    <h2 class="page-title">Change User Settings</h2>
+    <form method="post" class="change-user-form">
+        {% include 'ext/message.html' %}
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="user_level">User Level:</label>
+            <select id="user_level" name="user_level" required>
+                <option value="user" {% if user.user_level == 'user' %}selected{% endif %}>User</option>
+                <option value="admin" {% if user.user_level == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Settings</button>
+    </form>
+</div>
+{% endblock %}

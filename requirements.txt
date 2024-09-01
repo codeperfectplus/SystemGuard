@@ -4,3 +4,4 @@ gunicorn
 flask-sqlalchemy
 flask-login
 flask-session
+python-dotenv

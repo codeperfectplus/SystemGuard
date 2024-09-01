@@ -13,22 +13,29 @@ def settings():
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/permission_denied.html")
+
     # Fetch the settings from the database
     settings = DashboardSettings.query.first()
+
     if settings:
         if request.method == "POST":
-            # Update settings from the form inputs
-            settings.speedtest_cooldown = int(request.form["speedtest_cooldown"])
-            settings.number_of_speedtests = int(request.form["number_of_speedtests"])
-            settings.timezone = request.form["timezone"]
+            # Update settings only if the form field is provided, otherwise keep the current value
+            if "speedtest_cooldown" in request.form:
+                settings.speedtest_cooldown = int(request.form["speedtest_cooldown"])
+            if "number_of_speedtests" in request.form:
+                settings.number_of_speedtests = int(request.form["number_of_speedtests"])
+            if "timezone" in request.form:
+                settings.timezone = request.form["timezone"]
+            settings.enable_cache = "enable_cache" in request.form
+
+            # Feature settings
             settings.is_cpu_info_enabled = "is_cpu_info_enabled" in request.form
             settings.is_memory_info_enabled = "is_memory_info_enabled" in request.form
             settings.is_disk_info_enabled = "is_disk_info_enabled" in request.form
             settings.is_network_info_enabled = "is_network_info_enabled" in request.form
             settings.is_process_info_enabled = "is_process_info_enabled" in request.form
-            settings.enable_cache = "enable_cache" in request.form
 
-            # <!-- is_user_card_enabled -->
+            # Card settings
             settings.is_user_card_enabled = "is_user_card_enabled" in request.form
             settings.is_server_card_enabled = "is_server_card_enabled" in request.form
             settings.is_battery_card_enabled = "is_battery_card_enabled" in request.form
@@ -45,5 +52,5 @@ def settings():
             # Commit the changes to the database
             db.session.commit()
             flash("Settings updated successfully!", "success")
-        
+
         return render_template("settings.html", settings=settings)

@@ -18,7 +18,6 @@ class SpeedTestResult(db.Model):
             f"<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>"
         )
 
-
 class DashboardSettings(db.Model):
     __tablename__ = "DashboardSettings"
     id = db.Column(db.Integer, primary_key=True)
@@ -84,8 +83,16 @@ class SystemInfo(db.Model):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     user_level = db.Column(db.String(50), nullable=False, default='user')
+
+
+class EmailPassword(db.Model):
+    __tablename__ = "EmailPassword"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
 
 
 with app.app_context():
@@ -101,14 +108,17 @@ with app.app_context():
     # Create admin user if not exists
     if not User.query.filter_by(username='admin').first():
         hashed_password = generate_password_hash('adminpassword')
-        admin_user = User(username='admin', password=hashed_password, user_level='admin')
+        admin_user = User(username='admin', email="codeperfectplus@gmail.com", password=hashed_password, user_level='admin')
+        
         db.session.add(admin_user)
         db.session.commit()
 
     # create a user if not exists
     if not User.query.filter_by(username='user').first():
         hashed_password = generate_password_hash('userpassword')
-        user = User(username='user', password=hashed_password, user_level='user')
+        user = User(username='user', email="test@mail.com",
+                    password=hashed_password, user_level='user')
+        
         db.session.add(user)
         db.session.commit()
 
