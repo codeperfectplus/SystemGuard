@@ -6,6 +6,8 @@ from email.mime.base import MIMEBase
 from email import encoders
 from dotenv import load_dotenv
 
+from src.config import app
+from src.models import EmailPassword, DashboardSettings
 # Load environment variables from .env file
 load_dotenv()
 
@@ -13,9 +15,32 @@ load_dotenv()
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
+
 def send_email(receiver_email, subject, body, attachment_path=None):
+        
     if isinstance(receiver_email, str):
         receiver_email = [receiver_email]  # Convert single address to list
+
+    with app.app_context():
+        dasboard_settings = DashboardSettings.query.first()
+        if dasboard_settings:
+            enable_alerts = dasboard_settings.enable_alerts
+            if not enable_alerts:
+                print("Email alerts are disabled. Please enable them in the settings.")
+                return {
+                    "message": "Email alerts are disabled. Please enable them in the settings.",
+                    "status": "failed",
+                    "type": "general_settings",
+                }
+        email_password = EmailPassword.query.first()
+        if not email_password:
+            print("Email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
+            return {
+                "message": "Email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.",
+                "status": "failed",
+                "type": "update_email_password",
+            }
+
 
     for email in receiver_email:
         try:
@@ -54,8 +79,14 @@ def send_email(receiver_email, subject, body, attachment_path=None):
                 text = msg.as_string()
                 server.sendmail(EMAIL_ADDRESS, email, text)
 
-            print(f"Email sent successfully to {email}")
+            return {
+                "message": f"Email sent successfully to {email}",
+                "status": "success",
+            }
 
         except Exception as e:
-            print(f"Failed to send email to {email}. Error: {str(e)}")
+            return {
+                "message": f"failed to send email to {email}. Error: {str(e)}",
+                "status": "failed",
+            }
 

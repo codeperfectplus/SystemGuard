@@ -29,6 +29,7 @@ class DashboardSettings(db.Model):
     # general settings
     timezone = db.Column(db.String(50), default="Asia/Kolkata")
     enable_cache = db.Column(db.Boolean, default=True)
+    enable_alerts = db.Column(db.Boolean, default=False)
 
     # page enable/disable
     is_cpu_info_enabled = db.Column(db.Boolean, default=True)
@@ -129,3 +130,4 @@ with app.app_context():
 def inject_settings():
     settings = DashboardSettings.query.first()
     return dict(settings=settings)
+

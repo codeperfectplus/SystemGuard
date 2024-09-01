@@ -23,6 +23,10 @@
             <label for="enable_cache">Enable Caching:</label>
             <input type="checkbox" id="enable_cache" name="enable_cache" {% if settings.enable_cache %}checked{% endif %}>
         </div>
+        <div class="form-group">
+            <label for="enable_alerts">Enable Alerts:</label>
+            <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if settings.enable_alerts %}checked{% endif %}>
+        </div>
 
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>

@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from src.scripts.email_me import send_email
 
 from src.config import app, db
-from src.models import User, EmailPassword
+from src.models import User, EmailPassword, DashboardSettings
 
 auth_bp = blueprints.Blueprint('auth', __name__)
 
@@ -211,8 +211,10 @@ def update_email_password():
 @app.route("/send_email", methods=["GET", "POST"])
 @login_required
 def send_email_page():
+    dasboard_settings = DashboardSettings.query.first()
+    if dasboard_settings:
+        enable_alerts = dasboard_settings.enable_alerts
     if request.method == "POST":
- 
         receiver_email = request.form.get("recipient")
         subject = request.form.get("subject")
         body = request.form.get("body")
@@ -246,11 +248,15 @@ def send_email_page():
             attachment_path = f"/tmp/{attachment.filename}"
             attachment.save(attachment_path)
         try:
-            send_email(receiver_email, subject, body, attachment_path)
-            flash("Email sent successfully!", "success")
+            respone = send_email(receiver_email, subject, body, attachment_path)
+            if respone and respone["status"] == "success":
+                flash(respone['message'], "success")
+            elif respone and respone["status"] == "failed":
+                flash(respone['message'], "danger")
+                return redirect(url_for(respone["type"]))
         except Exception as e:
             flash(f"Failed to send email: {str(e)}", "danger")
         
         return redirect(url_for('send_email_page'))
 
-    return render_template("send_email.html")
+    return render_template("send_email.html", enable_alerts=enable_alerts)

@@ -6,7 +6,9 @@ from flask_login import login_required, current_user
 settings_bp = blueprints.Blueprint("settings", __name__)
 
 
+
 @app.route('/settings/speedtest', methods=['GET', 'POST'])
+@login_required
 def speedtest_settings():
     settings = DashboardSettings.query.first()  # Retrieve settings from DB
     if request.method == 'POST':
@@ -18,17 +20,20 @@ def speedtest_settings():
     return render_template('speedtest_settings.html', settings=settings)
 
 @app.route('/settings/general', methods=['GET', 'POST'])
+@login_required
 def general_settings():
     settings = DashboardSettings.query.first()  # Retrieve settings from DB
     if request.method == 'POST':
         settings.timezone = request.form.get('timezone')
         settings.enable_cache = 'enable_cache' in request.form
+        settings.enable_alerts = 'enable_alerts' in request.form
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))
     return render_template('general_settings.html', settings=settings)
 
 @app.route('/settings/feature-toggles', methods=['GET', 'POST'])
+@login_required
 def feature_toggles():
     settings = DashboardSettings.query.first()  # Retrieve settings from DB
     if request.method == 'POST':
@@ -43,6 +48,7 @@ def feature_toggles():
     return render_template('feature_toggles.html', settings=settings)
 
 @app.route('/settings/card-toggles', methods=['GET', 'POST'])
+@login_required
 def card_toggles():
     settings = DashboardSettings.query.first()  # Retrieve settings from DB
     if request.method == 'POST':
