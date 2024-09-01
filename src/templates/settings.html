@@ -9,59 +9,139 @@
     <form method="POST" class="settings-form">
         {% include 'ext/message.html' %}
         
-        <div class="form-group">
-            <label for="speedtest_cooldown">Speedtest Cooldown (hours):</label>
-            <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ settings.speedtest_cooldown }}" min="1" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="number_of_speedtests">Number of Speedtests Allowed per Hour:</label>
-            <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ settings.number_of_speedtests }}" min="1" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="timezone">Timezone:</label>
-            <select id="timezone" name="timezone">
-                <option value="Asia/Kolkata" {% if settings.timezone == "Asia/Kolkata" %}selected{% endif %}>Asia/Kolkata</option>
-                <option value="America/New_York" {% if settings.timezone == "America/New_York" %}selected{% endif %}>America/New_York</option>
-                <option value="Europe/London" {% if settings.timezone == "Europe/London" %}selected{% endif %}>Europe/London</option>
-            </select>
+        <div class="settings-section">
+            <h2 class="section-title">Speedtest Settings</h2>
+            <div class="form-group">
+                <label for="speedtest_cooldown">Speedtest Cooldown (hours):</label>
+                <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ settings.speedtest_cooldown }}" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="number_of_speedtests">Number of Speedtests Allowed per Hour:</label>
+                <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ settings.number_of_speedtests }}" min="1" required>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="is_cpu_info_enabled">Enable CPU Information:</label>
-            <input type="checkbox" id="is_cpu_info_enabled" name="is_cpu_info_enabled" {% if settings.is_cpu_info_enabled %}checked{% endif %}>
+        <div class="settings-section">
+            <h2 class="section-title">General Settings</h2>
+            <div class="form-group">
+                <label for="timezone">Timezone:</label>
+                <select id="timezone" name="timezone">
+                    <option value="Asia/Kolkata" {% if settings.timezone == "Asia/Kolkata" %}selected{% endif %}>Asia/Kolkata</option>
+                    <option value="America/New_York" {% if settings.timezone == "America/New_York" %}selected{% endif %}>America/New_York</option>
+                    <option value="Europe/London" {% if settings.timezone == "Europe/London" %}selected{% endif %}>Europe/London</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="enable_cache">Enable Caching:</label>
+                <input type="checkbox" id="enable_cache" name="enable_cache" {% if settings.enable_cache %}checked{% endif %}>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="is_memory_info_enabled">Enable Memory Information:</label>
-            <input type="checkbox" id="is_memory_info_enabled" name="is_memory_info_enabled" {% if settings.is_memory_info_enabled %}checked{% endif %}>
-        </div>
-        
-        <div class="form-group">
-            <label for="is_disk_info_enabled">Enable Disk Information:</label>
-            <input type="checkbox" id="is_disk_info_enabled" name="is_disk_info_enabled" {% if settings.is_disk_info_enabled %}checked{% endif %}>
-        </div>
-        
-        <div class="form-group">
-            <label for="is_network_info_enabled">Enable Network Information:</label>
-            <input type="checkbox" id="is_network_info_enabled" name="is_network_info_enabled" {% if settings.is_network_info_enabled %}checked{% endif %}>
+        <div class="settings-section">
+            <h2 class="section-title">Feature Toggles</h2>
+            <div class="form-group">
+                <label for="is_cpu_info_enabled">Enable CPU Information:</label>
+                <input type="checkbox" id="is_cpu_info_enabled" name="is_cpu_info_enabled" {% if settings.is_cpu_info_enabled %}checked{% endif %}>
+            </div>
+
+            <div class="form-group">
+                <label for="is_memory_info_enabled">Enable Memory Information:</label>
+                <input type="checkbox" id="is_memory_info_enabled" name="is_memory_info_enabled" {% if settings.is_memory_info_enabled %}checked{% endif %}>
+            </div>
+            
+            <div class="form-group">
+                <label for="is_disk_info_enabled">Enable Disk Information:</label>
+                <input type="checkbox" id="is_disk_info_enabled" name="is_disk_info_enabled" {% if settings.is_disk_info_enabled %}checked{% endif %}>
+            </div>
+            
+            <div class="form-group">
+                <label for="is_network_info_enabled">Enable Network Information:</label>
+                <input type="checkbox" id="is_network_info_enabled" name="is_network_info_enabled" {% if settings.is_network_info_enabled %}checked{% endif %}>
+            </div>
+
+            <div class="form-group">
+                <label for="is_process_info_enabled">Enable Process Information:</label>
+                <input type="checkbox" id="is_process_info_enabled" name="is_process_info_enabled" {% if settings.is_process_info_enabled %}checked{% endif %}>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="is_speedtest_enabled">Enable Speedtest:</label>
-            <input type="checkbox" id="is_speedtest_enabled" name="is_speedtest_enabled" {% if settings.is_speedtest_enabled %}checked{% endif %}>
-        </div>
-
-        <div class="form-group">
-            <label for="is_process_info_enabled">Process Info Enabled:</label>
-            <input type="checkbox" id="is_process_info_enabled" name="is_process_info_enabled" {% if settings.is_process_info_enabled %}checked{% endif %}>
+        <div class="settings-section">
+            <h2 class="section-title">Card Toggles</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_user_card_enabled">Enable User Card:</label>
+                    <input type="checkbox" id="is_user_card_enabled" name="is_user_card_enabled" {% if settings.is_user_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_server_card_enabled">Enable Server Card:</label>
+                    <input type="checkbox" id="is_server_card_enabled" name="is_server_card_enabled" {% if settings.is_server_card_enabled %}checked{% endif %}>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_battery_card_enabled">Enable Battery Card:</label>
+                    <input type="checkbox" id="is_battery_card_enabled" name="is_battery_card_enabled" {% if settings.is_battery_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_cpu_core_card_enabled">Enable CPU Core Card:</label>
+                    <input type="checkbox" id="is_cpu_core_card_enabled" name="is_cpu_core_card_enabled" {% if settings.is_cpu_core_card_enabled %}checked{% endif %}>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_cpu_usage_card_enabled">Enable CPU Usage Card:</label>
+                    <input type="checkbox" id="is_cpu_usage_card_enabled" name="is_cpu_usage_card_enabled" {% if settings.is_cpu_usage_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_cpu_temp_card_enabled">Enable CPU Temp Card:</label>
+                    <input type="checkbox" id="is_cpu_temp_card_enabled" name="is_cpu_temp_card_enabled" {% if settings.is_cpu_temp_card_enabled %}checked{% endif %}>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_dashboard_memory_card_enabled">Enable Dashboard Memory Card:</label>
+                    <input type="checkbox" id="is_dashboard_memory_card_enabled" name="is_dashboard_memory_card_enabled" {% if settings.is_dashboard_memory_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_memory_usage_card_enabled">Enable Memory Usage Card:</label>
+                    <input type="checkbox" id="is_memory_usage_card_enabled" name="is_memory_usage_card_enabled" {% if settings.is_memory_usage_card_enabled %}checked{% endif %}>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_disk_usage_card_enabled">Enable Disk Usage Card:</label>
+                    <input type="checkbox" id="is_disk_usage_card_enabled" name="is_disk_usage_card_enabled" {% if settings.is_disk_usage_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_system_uptime_card_enabled">Enable System Uptime Card:</label>
+                    <input type="checkbox" id="is_system_uptime_card_enabled" name="is_system_uptime_card_enabled" {% if settings.is_system_uptime_card_enabled %}checked{% endif %}>
+                </div>
+            </div>
+        
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="is_network_statistic_card_enabled">Enable Network Statistic Card:</label>
+                    <input type="checkbox" id="is_network_statistic_card_enabled" name="is_network_statistic_card_enabled" {% if settings.is_network_statistic_card_enabled %}checked{% endif %}>
+                </div>
+        
+                <div class="form-group">
+                    <label for="is_speedtest_enabled">Enable Speedtest Card:</label>
+                    <input type="checkbox" id="is_speedtest_enabled" name="is_speedtest_enabled" {% if settings.is_speedtest_enabled %}checked{% endif %}>
+                </div>
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="enable_cache">Enable Caching:</label>
-            <input type="checkbox" id="enable_cache" name="enable_cache" {% if settings.enable_cache %}checked{% endif %}>
-        </div>
 
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>

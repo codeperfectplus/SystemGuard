@@ -19,8 +19,21 @@ def settings():
             settings.is_disk_info_enabled = "is_disk_info_enabled" in request.form
             settings.is_network_info_enabled = "is_network_info_enabled" in request.form
             settings.is_process_info_enabled = "is_process_info_enabled" in request.form
-            settings.is_speedtest_enabled = "is_speedtest_enabled" in request.form
             settings.enable_cache = "enable_cache" in request.form
+
+            # <!-- is_user_card_enabled -->
+            settings.is_user_card_enabled = "is_user_card_enabled" in request.form
+            settings.is_server_card_enabled = "is_server_card_enabled" in request.form
+            settings.is_battery_card_enabled = "is_battery_card_enabled" in request.form
+            settings.is_cpu_core_card_enabled = "is_cpu_core_card_enabled" in request.form
+            settings.is_cpu_usage_card_enabled = "is_cpu_usage_card_enabled" in request.form
+            settings.is_cpu_temp_card_enabled = "is_cpu_temp_card_enabled" in request.form
+            settings.is_dashboard_memory_card_enabled = "is_dashboard_memory_card_enabled" in request.form
+            settings.is_memory_usage_card_enabled = "is_memory_usage_card_enabled" in request.form
+            settings.is_disk_usage_card_enabled = "is_disk_usage_card_enabled" in request.form
+            settings.is_system_uptime_card_enabled = "is_system_uptime_card_enabled" in request.form
+            settings.is_network_statistic_card_enabled = "is_network_statistic_card_enabled" in request.form
+            settings.is_speedtest_enabled = "is_speedtest_enabled" in request.form
 
             # Commit the changes to the database
             db.session.commit()
