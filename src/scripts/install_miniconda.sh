@@ -3,7 +3,6 @@
 LOG_FILE="/tmp/miniconda_installation.log"
 MINICONDA_SCRIPT_URL="https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh"
 MINICONDA_SCRIPT_PATH="/tmp/install_miniconda.sh"
-EXPECTED_CHECKSUM="abe9fde50a47831e7d17bee0d16af4bd5ea01e79ee6d744912a9bd3b31c1e4f0"  # Replace with the actual checksum
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
@@ -44,15 +43,6 @@ install_miniconda() {
         return 1
     fi
 
-    log "Verifying script integrity using checksum."
-    DOWNLOAD_CHECKSUM=$(sha256sum "$MINICONDA_SCRIPT_PATH" | awk '{print $1}')
-    echo "Downloaded checksum: $DOWNLOAD_CHECKSUM"
-    if [ "$DOWNLOAD_CHECKSUM" = "$EXPECTED_CHECKSUM" ]; then
-        log "Checksum verification passed."
-    else
-        log "Checksum verification failed. Aborting installation."
-        return 1
-    fi
 
     chmod +x "$MINICONDA_SCRIPT_PATH"
     

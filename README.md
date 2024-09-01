@@ -42,7 +42,8 @@ It will install the SystemGuard app and its dependencies in the crontab and it w
 
 ```bash
 # install miniconda3 if not installed already
-chmod +x src/scripts/install_miniconda.sh && ./src/scripts/install_miniconda.sh
+wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
+chmod +x install_miniconda.sh && ./install_miniconda.sh
 ```
 
 ## Features 🚀
