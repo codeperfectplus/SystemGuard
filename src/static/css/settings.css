@@ -5,6 +5,7 @@
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
 }
 
 .settings-title {
@@ -16,7 +17,7 @@
 
 .settings-buttons {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
     margin-bottom: 30px;
 }
@@ -31,12 +32,27 @@
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.settings-buttons .btn i {
+    font-size: 20px;
 }
 
 .settings-buttons .btn:hover {
     background-color: #0056b3;
     transform: scale(1.05);
 }
+
+@media (max-width: 768px) {
+    .settings-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
 
 .settings-form {
     display: flex;

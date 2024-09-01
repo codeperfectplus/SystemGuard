@@ -21,20 +21,35 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-def get_admin_emails_for_email_alerts():
+def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):
     with app.app_context():
-        admin_emails = User.query.filter_by(user_level='admin', receive_email_alerts=True).all()
-        print(admin_emails)
-        if not admin_emails:
-            return None
-        return [admin.email for admin in admin_emails]
-    
-def get_all_users_emails(receive_email_alerts=True):
-    with app.app_context():
-        users = User.query.filter_by(receive_email_alerts=receive_email_alerts).all()
+        # Build query filter based on the presence of `user_level`
+        filters = []
+        if user_level:
+            filters.append(User.user_level == user_level)
+        if not fetch_all_users:
+            filters.append(User.receive_email_alerts == receive_email_alerts)
+        
+        # Query the database with the constructed filters
+        users = User.query.filter(*filters).all()
+        
+        # Check if no users were found
         if not users:
             return None
+
+        # Return list of email addresses
         return [user.email for user in users]
+
+# Get Admin Emails with Alerts Enabled:
+# admin_emails = get_email_addresses(user_level='admin', receive_email_alerts=True)
+# Get All Admin Emails Regardless of Alert Preference:
+# all_admin_emails = get_email_addresses(user_level='admin', fetch_all_users=True)
+
+# Get All Users with Alerts Enabled:
+# all_user_emails = get_email_addresses(receive_email_alerts=True)
+# Get All Users Regardless of Alert Preference:
+# all_users_emails = get_email_addresses(fetch_all_users=True)
+
 
 
 
@@ -46,7 +61,8 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            admin_email_address = get_admin_emails_for_email_alerts()
+            # Get Admin Emails with Alerts Enabled:
+            admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
             if admin_email_address:
                 send_email(admin_email_address, 'Login Alert', f'{user.username} logged in to the system.')
             
@@ -73,7 +89,8 @@ def signup():
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, password=hashed_password)
         
-        admin_email_address = get_admin_emails_for_email_alerts()
+        # Get Admin Emails with Alerts Enabled:
+        admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
         # extends the signup user to send an email to the admin
         if admin_email_address:
             send_email(admin_email_address, 'New User Alert', f'{username} has signed up to the system.')
@@ -199,16 +216,25 @@ def send_email_page():
         receiver_email = request.form.get("recipient")
         subject = request.form.get("subject")
         body = request.form.get("body")
+        priority = request.form.get("priority")
         attachment = request.files.get("attachment")
 
         if not receiver_email or not subject or not body:
             flash("Please provide recipient, subject, and body.", "danger")
             return redirect(url_for('send_email_page'))
         
-        if receiver_email == "all_users":
-            receiver_email = get_all_users_emails()
-        elif receiver_email == "admin_users":
-            receiver_email = get_admin_emails_for_email_alerts()
+        # on high priority, send to all users or admin users even the receive_email_alerts is False
+        if priority == "high" and receiver_email == "all_users":
+            receiver_email = get_email_addresses(fetch_all_users=True)
+        elif priority == "high" and receiver_email == "admin_users":
+            receiver_email = get_email_addresses(user_level='admin', fetch_all_users=True)
+
+        # priority is low, send to users with receive_email_alerts is True
+        if priority == "low" and receiver_email == "all_users":
+            receiver_email = get_email_addresses(receive_email_alerts=True)
+        elif priority == "low" and receiver_email == "admin_users":
+            receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
+
 
         if not receiver_email:
             flash("No users found to send email to.", "danger")
