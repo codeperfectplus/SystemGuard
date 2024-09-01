@@ -1,1 +1,3 @@
+{% if settings.is_network_statistic_card_enabled %}
 <div class="col-md-6 col-lg-6 mb-4"><div class="card bg-network"><div class="card-body text-center"><h5 class="card-title">Network Statistics <i class="fas fa-network-wired"></i></h5><p class="card-text fs-4">D:{{ system_info['network_sent']}} MB / U:{{ system_info['network_received']}} MB</p></div></div></div>
+{% endif %}

@@ -59,62 +59,66 @@ body {
 }
 
 /* Navbar Styles */
+/* Navbar Styles */
 .navbar {
-    background-color: #0056b3; /* Dark blue background */
-    padding: 0.75rem 1rem; /* Increased padding for a more substantial navbar */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-    border-radius: 0.5rem; /* Slightly rounded corners */
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
 }
 
 .navbar-brand {
-    font-size: 1.75rem; /* Slightly larger and bolder for prominence */
-    color: #000000; /* White text color for contrast */
-    font-weight: bold; /* Added weight for emphasis */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
 }
 
-.navbar-nav .nav-link {
-    color: #000000; /* White text color */
-    font-size: 1.125rem; /* Slightly larger font for readability */
-    padding: 0.5rem 1rem; /* More padding for clickable area */
-    transition: color 0.3s ease, background-color 0.3s ease; /* Smooth transition */
+.navbar-nav {
+    display: flex;
+    align-items: center;
 }
 
-.navbar-nav .nav-link:hover {
-    color: #0056b3; /* Blue text on hover */
-    background-color: #f8f9fa; /* Light gray background on hover */
-    border-radius: 0.25rem;
+.nav-item {
+    margin-left: 1rem;
 }
 
-/* Active Page Styling */
-.navbar-nav .nav-link.active {
-    background-color: #003d80; /* Darker blue for the active page */
-    color: #ffffff; /* Keep the text white */
-    border-radius: 0.25rem; /* Match the hover effect */
+.nav-link {
+    color: #495057;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #ffffff;
+    background-color: #007bff;
+    text-decoration: none;
+}
+
+.nav-link i {
+    font-size: 1.2rem;
 }
 
 .navbar-toggler {
-    border: none; /* Remove default border */
-    outline: none; /* Remove focus outline */
-    padding: 0.25rem 0.5rem; /* Smaller padding for a sleek look */
+    border: none;
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M4 6h16M4 12h16M4 18h16'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2)); /* Add subtle shadow */
+    background-image: url('data:image/svg+xml;charset=utf8,...'); /* Include your own icon URL or SVG here */
 }
 
-/* Responsive Styles */
-@media (max-width: 767.98px) {
-    .navbar-nav .nav-link {
-        padding-right: 1rem;
-        padding-left: 1rem;
-        text-align: center; /* Center-align links on smaller screens */
-    }
+/* Add margin-right to space out authentication links */
+.navbar-nav.ml-auto .nav-item {
+    margin-left: 1rem;
+}
 
-    .navbar-brand {
-        font-size: 1.5rem; /* Adjust brand size on smaller screens */
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .navbar-nav {
+        margin-top: 0.5rem;
     }
 }
+/* end of navbar styles */
 
 .btn-primary {
     margin-top: 1rem; /* Adds space above buttons */

@@ -1,3 +1,5 @@
+import os
+
 from locust import HttpUser, TaskSet, task, between
 from locust.exception import StopUser
 
@@ -44,5 +46,4 @@ class WebsiteUser(HttpUser):
     wait_time = between(1, 5)  # Time to wait between tasks
 
 if __name__ == "__main__":
-    import os
-    # os.system("locust -f locustfile.py --host=http://localhost:5000")
+    os.system("locust -f locustfile.py --host=http://localhost:5000")

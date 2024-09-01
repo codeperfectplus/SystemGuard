@@ -1,1 +1,10 @@
-<div class="col-md-6 col-lg-4 mb-4"><div class="card battery-card" data-battery="{{ system_info['battery_percent']}}"><div class="card-body"><h5 class="card-title">Battery Percentage <i class="fas fa-battery-three-quarters"></i></h5><p class="card-text fs-4">{{ system_info['battery_percent']}}%</p></div></div></div>
+{% if settings.is_battery_card_enabled %}
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card battery-card" data-battery="{{ system_info['battery_percent']}}">
+        <div class="card-body">
+            <h5 class="card-title">Battery Percentage <i class="fas fa-battery-three-quarters"></i></h5>
+            <p class="card-text fs-4">{{ system_info['battery_percent']}}%</p>
+        </div>
+    </div>
+</div>
+{% endif %}

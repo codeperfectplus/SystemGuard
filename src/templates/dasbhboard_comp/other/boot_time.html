@@ -1,3 +1,4 @@
+{% if settings.is_server_card_enabled %}
 <div class="col-md-6 col-lg-4 mb-4">
     <div class="card bg-boot">
         <div class="card-body">
@@ -6,15 +7,21 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <script>
 // Function to format time in HH:MM:SS
 function formatTime(hours, minutes, seconds) {
+    let date = new Date();
+    let day = date.getDate().toString().padStart(2, '0');
+    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+    let year = date.getFullYear().toString().padStart(2, '0');
+    let formattedDate = year + '-' + month + '-' + day;
+    let formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
     return [
-        hours.toString().padStart(2, '0'),
-        minutes.toString().padStart(2, '0'),
-        seconds.toString().padStart(2, '0')
-    ].join(':');
+        formattedDate,
+        formattedTime
+    ].join(' ');
 }
 
 // Initialize the time from the server

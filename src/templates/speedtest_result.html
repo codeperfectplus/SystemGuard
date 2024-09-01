@@ -1,1 +1,25 @@
-{% extends 'base.html' %}{% block title %}Speed Test Result{% endblock %}{% block content %}<div class="container mt-5"><div class="row justify-content-center"><div class="col-md-8"><div class="card shadow-sm border-0 rounded-3"><div class="card-body"><h1 class="card-title text-center mb-4">Speed Test Result</h1>{% if speedtest_result %} <ul class="list-group list-group-flush"><li class="list-group-item d-flex justify-content-between align-items-center"><strong>Download Speed:</strong><span>{{ speedtest_result.download_speed}}</span></li><li class="list-group-item d-flex justify-content-between align-items-center"><strong>Upload Speed:</strong><span>{{ speedtest_result.upload_speed}}</span></li><li class="list-group-item d-flex justify-content-between align-items-center"><strong>Ping:</strong><span>{{ speedtest_result.ping}}</span></li><li class="list-group-item d-flex justify-content-between align-items-center"><strong>Source:</strong><span>{{ source}}</span></li>{% if source=="Database" %} <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Cooldown time:</strong><span>{{ remaining_time_for_next_test}} mins</span></li>{% endif %} </ul>{% else %} <div class="alert alert-warning text-center" role="alert">No speed test results available. </div>{% endif %} <div class="text-center mt-4"><a href="{{ url_for('dashboard')}}" class="btn btn-light">Back to Dashboard</a></div></div></div></div></div></div>{% endblock %}
+{% extends 'base.html' %}{% block title %}Speed Test Result{% endblock %}{% block content %}<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">Speed Test Result</h1>{% if speedtest_result %} <ul
+                        class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Download
+                                Speed:</strong><span>{{ speedtest_result.download_speed}}</span></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Upload
+                                Speed:</strong><span>{{ speedtest_result.upload_speed}}</span></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Ping:</strong><span>{{ speedtest_result.ping}}</span></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Source:</strong><span>{{ source}}</span></li>{% if source=="Database" %} <li
+                            class="list-group-item d-flex justify-content-between align-items-center"><strong>Cooldown
+                                time:</strong><span>{{ remaining_time_for_next_test}} mins</span></li>{% endif %}
+                    </ul>{% else %} <div class="alert alert-warning text-center" role="alert">No speed test results
+                        available. </div>{% endif %} <div class="text-center mt-4"><a href="{{ url_for('dashboard')}}"
+                            class="btn btn-light">Back to Dashboard</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>{% endblock %}

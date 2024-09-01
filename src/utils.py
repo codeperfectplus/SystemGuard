@@ -1,10 +1,16 @@
 import os
+import time
 import datetime
 import subprocess
 import psutil
+from pprint import pprint
 
-from src.config import app, db
-from src.models import SystemInfo
+from src.models import DashboardSettings
+
+# Simple in-memory cache for specific data with individual timestamps
+cache = {}
+enable_cahce = True
+CACHE_EXPIRATION = 3600  # Cache expiration time in seconds (1 hour)
 
 def format_uptime(uptime_seconds):
     """Convert uptime from seconds to a human-readable format."""
@@ -16,7 +22,6 @@ def format_uptime(uptime_seconds):
     minutes = int(uptime_seconds // 60)
     return f"{days} days, {hours} hours, {minutes} minutes"
 
-
 def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
     return value.strftime(format)
 
@@ -24,11 +29,15 @@ def get_flask_memory_usage():
     """
     Returns the memory usage of the current Flask application in MB.
     """
-    pid = os.getpid()
-    process = psutil.Process(pid)
-    memory_info = process.memory_info()
-    memory_in_mb = memory_info.rss / (1024 ** 2)
-    return f"{round(memory_in_mb)} MB"
+    try:
+        pid = os.getpid()  # Get the current process ID
+        process = psutil.Process(pid)  # Get the process information using psutil
+        memory_info = process.memory_info()  # Get the memory usage information
+        memory_in_mb = memory_info.rss / (1024 ** 2)  # Convert bytes to MB
+        return round(memory_in_mb)  # Return the memory usage rounded to 2 decimal places
+    except Exception as e:
+        print(f"Error getting memory usage: {e}")
+        return None
 
 def get_established_connections():
     connections = psutil.net_connections()
@@ -42,9 +51,7 @@ def get_established_connections():
             elif ':' in conn.laddr.ip:
                 ipv6_set.add(conn.laddr.ip)
 
-    # ipv4_dict = [ip for ip in ipv4_dict if ip.startswith('192.168')]
-    # return ipv4_dict[0] if ipv4_dict else "N/A", ipv6_dict
-    ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0]
+    ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
     ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
 
     return ipv4, ipv6
@@ -64,27 +71,17 @@ def run_speedtest():
             elif "Ping:" in line:
                 ping = line.split("Ping: ")[1]
 
-        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping,
-                "status": "Success"}
+        return {"download_speed": download_speed, "upload_speed": upload_speed, "ping": ping, "status": "Success"}
 
     except subprocess.CalledProcessError as e:
-        error = {"status": "Error", "message": e.stderr}
-        return error
+        return {"status": "Error", "message": e.stderr}
 
     except Exception as e:
-        error = {"status": "Error", "message": str(e)}
-        return error
+        return {"status": "Error", "message": str(e)}
 
 def get_cpu_frequency():
-    cpu_freq = psutil.cpu_freq().current  # In MHz
-    return round(cpu_freq)
+    return round(psutil.cpu_freq().current)
 
-def swap_memory_info():
-    swap = psutil.swap_memory()
-    swap_total = swap.total
-    swap_used = swap.used
-    swap_percent = swap.percent
-    return swap_total, swap_used, swap_percent
 
 def get_cpu_core_count():
     return psutil.cpu_count(logical=True)
@@ -94,11 +91,7 @@ def cpu_usage_percent():
 
 def get_cpu_temp():
     temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
-    current_temp = temp.current
-    high_temp = temp.high
-    critical_temp = temp.critical
-    return current_temp, high_temp, critical_temp
-
+    return temp.current, temp.high, temp.critical
 
 def get_top_processes(number=5):
     """Get the top processes by memory usage."""
@@ -109,23 +102,102 @@ def get_top_processes(number=5):
     ]
     return processes
 
+def get_disk_free():
+    """Returns the free disk space in GB."""
+    return round(psutil.disk_usage("/").free / (1024**3), 2)
+
+def get_disk_used():
+    """Returns the used disk space in GB."""
+    return round(psutil.disk_usage("/").used / (1024**3), 2)
+
+def get_disk_total():
+    """Returns the total disk space in GB."""
+    return round(psutil.disk_usage("/").total / (1024**3), 2)
+
+def get_disk_usage_percent():
+    """Returns the percentage of disk used."""
+    return psutil.disk_usage("/").percent
+
+
+def get_memory_percent():
+    """Returns the percentage of memory used."""
+    return psutil.virtual_memory().percent
+
+def get_memory_available():
+    """Returns the available memory in GB."""
+    return round(psutil.virtual_memory().available / (1024**3), 2)
+
+
+def get_memory_used():
+    """Returns the used memory in GB."""
+    return round(psutil.virtual_memory().used / (1024**3), 2)
+
+
+def get_memory_used():
+    """Returns the used memory in GB."""
+    return round(psutil.virtual_memory().used / (1024**3), 2)
+
+def get_swap_memory_info():
+    """Returns the total, used, and free swap memory in GB."""
+    swap = psutil.swap_memory()
+    total_swap = swap.total
+    used_swap = swap.used
+    free_swap = total_swap - used_swap  # Calculate free swap memory
+
+    return {
+        "total_swap": round(total_swap / (1024**3), 2),  # In GB
+        "used_swap": round(used_swap / (1024**3), 2),    # In GB
+        "free_swap": round(free_swap / (1024**3), 2),    # In GB
+    }
+
+def get_cached_value(key, fresh_value_func):
+    """ Get a cached value if available and not expired, otherwise get fresh value. """
+    settings = DashboardSettings.query.first()
+    if settings:
+        enable_cahce = settings.enable_cache
+
+    print("Cache enabled:", enable_cahce)
+    
+    current_time = time.time()
+    # if key not in cache, create a new entry
+    if key not in cache:
+        cache[key] = {'value': None, 'timestamp': 0}
+
+    # Check if cache is valid
+    if enable_cahce and cache[key]['value'] is not None and (current_time - cache[key]['timestamp'] < CACHE_EXPIRATION):
+        # print(key, cache[key]['value'])
+        return cache[key]['value']
+
+    # Fetch fresh value
+    print(f"Fetching fresh {key}...")
+    fresh_value = fresh_value_func()
+
+    # Store value in cache
+    cache[key]['value'] = fresh_value
+    cache[key]['timestamp'] = current_time
+
+    return fresh_value
 
 def get_system_info():
-    """ Get system information and store it in the database. """
+    """ Get system information with caching for certain values and fresh data for others. """
     print("Getting system information...")
 
-    # Gathering system information
-    ipv4_dict, _ = get_established_connections()
-    boot_time = datetime.datetime.fromtimestamp(psutil.boot_time())
-    uptime = format_uptime(datetime.datetime.now() - boot_time)
+    # Get cached or fresh values
+    username = get_cached_value('username', os.getlogin)
+    ipv4_dict = get_cached_value('ipv4', lambda: get_established_connections()[0])
+    boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
+    uptime = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
+
+    # Gathering fresh system information
     battery_info = psutil.sensors_battery()
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
     net_io = psutil.net_io_counters()
     current_server_time = datetime.datetime.now()
+
     # Prepare system information dictionary
     info = {
-        'username': os.getlogin(),
+        'username': username,
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
         'disk_usage': round(disk_info.percent, 2),
@@ -145,9 +217,5 @@ def get_system_info():
         'current_server_time': datetimeformat(current_server_time),
     }
 
-    # # Adding system info to the database
-    # with app.app_context():
-    #     db.session.add(SystemInfo(**info))
-    #     db.session.commit()
-
     return info
+

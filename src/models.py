@@ -22,9 +22,36 @@ class SpeedTestResult(db.Model):
 class DashboardSettings(db.Model):
     __tablename__ = "DashboardSettings"
     id = db.Column(db.Integer, primary_key=True)
+    
+    # speedtest setting
     speedtest_cooldown = db.Column(db.Integer, default=1)
     number_of_speedtests = db.Column(db.Integer, default=1)
+
+    # general settings
     timezone = db.Column(db.String(50), default="Asia/Kolkata")
+    enable_cache = db.Column(db.Boolean, default=True)
+
+    # page enable/disable
+    is_cpu_info_enabled = db.Column(db.Boolean, default=True)
+    is_memory_info_enabled = db.Column(db.Boolean, default=True)
+    is_disk_info_enabled = db.Column(db.Boolean, default=True)
+    is_network_info_enabled = db.Column(db.Boolean, default=True)
+    is_process_info_enabled = db.Column(db.Boolean, default=False)
+
+
+    # card enable/disable
+    is_user_card_enabled = db.Column(db.Boolean, default=True)
+    is_server_card_enabled = db.Column(db.Boolean, default=True)
+    is_battery_card_enabled = db.Column(db.Boolean, default=True)
+    is_cpu_core_card_enabled = db.Column(db.Boolean, default=True)
+    is_cpu_usage_card_enabled = db.Column(db.Boolean, default=True)
+    is_cpu_temp_card_enabled = db.Column(db.Boolean, default=True)
+    is_dashboard_memory_card_enabled = db.Column(db.Boolean, default=True)
+    is_memory_usage_card_enabled = db.Column(db.Boolean, default=True)
+    is_disk_usage_card_enabled = db.Column(db.Boolean, default=True)
+    is_system_uptime_card_enabled = db.Column(db.Boolean, default=True)
+    is_network_statistic_card_enabled = db.Column(db.Boolean, default=True)
+    is_speedtest_enabled = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>"
@@ -77,3 +104,9 @@ with app.app_context():
         admin_user = User(username='admin', password=hashed_password, user_level='admin')
         db.session.add(admin_user)
         db.session.commit()
+
+# ibject for all templates
+@app.context_processor
+def inject_settings():
+    settings = DashboardSettings.query.first()
+    return dict(settings=settings)
