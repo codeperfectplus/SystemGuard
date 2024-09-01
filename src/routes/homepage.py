@@ -1,5 +1,5 @@
 import datetime
-from flask import render_template, blueprints
+from flask import render_template, blueprints, session
 
 from src.config import app
 from src.models import SpeedTestResult, DashboardSettings, SystemInfo

@@ -43,7 +43,7 @@ It will install the SystemGuard app and its dependencies in the crontab and it w
 ```bash
 # install miniconda3 if not installed already
 wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
-chmod +x install_miniconda.sh && ./install_miniconda.sh
+chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 ```
 
 ## Features 🚀
@@ -83,6 +83,12 @@ chmod +x install_miniconda.sh && ./install_miniconda.sh
 ## Why not use a Docker image?
 
 A Docker image has not been created for this project because it requires access to the host machine in order to retrieve server stats. Therefore, it is not possible to obtain server stats from within a Docker container.
+
+## Upcoming Features 📅
+
+- Threshold notifications
+- Customizable dashboards
+- Plugin support to make SystemGuard even more powerful.
 
 ## Acknowledgments
 
