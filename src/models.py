@@ -25,6 +25,13 @@ class DashboardSettings(db.Model):
     speedtest_cooldown = db.Column(db.Integer, default=1)
     number_of_speedtests = db.Column(db.Integer, default=1)
     timezone = db.Column(db.String(50), default="Asia/Kolkata")
+    is_cpu_info_enabled = db.Column(db.Boolean, default=True)
+    is_memory_info_enabled = db.Column(db.Boolean, default=True)
+    is_disk_info_enabled = db.Column(db.Boolean, default=True)
+    is_network_info_enabled = db.Column(db.Boolean, default=True)
+    is_process_info_enabled = db.Column(db.Boolean, default=True)
+    is_speedtest_enabled = db.Column(db.Boolean, default=True)
+    enable_cache = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f"<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>"
@@ -77,3 +84,9 @@ with app.app_context():
         admin_user = User(username='admin', password=hashed_password, user_level='admin')
         db.session.add(admin_user)
         db.session.commit()
+
+# ibject for all templates
+@app.context_processor
+def inject_settings():
+    settings = DashboardSettings.query.first()
+    return dict(settings=settings)

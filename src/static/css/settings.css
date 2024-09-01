@@ -1,44 +1,93 @@
-.container {
+.settings-container {
     max-width: 600px;
-    margin: auto;
-    background: white;
+    margin: 0 auto;
     padding: 20px;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+.settings-title {
+    font-size: 28px;
+    color: #343a40;
     margin-bottom: 20px;
-    font-size: 24px;
+    text-align: center;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* Align items vertically in the center */
+    justify-content: space-between; /* Space out label and input */
+    margin-bottom: 10px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 10px; /* Add some space between the label and checkbox */
 }
 
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-.btn {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
+.form-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
     cursor: pointer;
+    margin: 0; /* Remove any default margin */
 }
 
-.btn:hover {
+.form-group input[type="number"],
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #ffffff;
+    font-size: 16px;
+    width: 100%;
+}
+
+@media (max-width: 576px) {
+    .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group label {
+        margin-bottom: 5px;
+    }
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
     background-color: #0056b3;
+}
+
+@media (max-width: 576px) {
+    .settings-container {
+        padding: 15px;
+    }
+
+    .settings-title {
+        font-size: 24px;
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
 }

@@ -5,8 +5,11 @@ import subprocess
 import psutil
 from pprint import pprint
 
+from src.models import DashboardSettings
+
 # Simple in-memory cache for specific data with individual timestamps
 cache = {}
+enable_cahce = True
 CACHE_EXPIRATION = 3600  # Cache expiration time in seconds (1 hour)
 
 def format_uptime(uptime_seconds):
@@ -26,11 +29,15 @@ def get_flask_memory_usage():
     """
     Returns the memory usage of the current Flask application in MB.
     """
-    pid = os.getpid()
-    process = psutil.Process(pid)
-    memory_info = process.memory_info()
-    memory_in_mb = memory_info.rss / (1024 ** 2)
-    return f"{round(memory_in_mb)} MB"
+    try:
+        pid = os.getpid()  # Get the current process ID
+        process = psutil.Process(pid)  # Get the process information using psutil
+        memory_info = process.memory_info()  # Get the memory usage information
+        memory_in_mb = memory_info.rss / (1024 ** 2)  # Convert bytes to MB
+        return round(memory_in_mb)  # Return the memory usage rounded to 2 decimal places
+    except Exception as e:
+        print(f"Error getting memory usage: {e}")
+        return None
 
 def get_established_connections():
     connections = psutil.net_connections()
@@ -145,14 +152,20 @@ def get_swap_memory_info():
 
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. """
+    settings = DashboardSettings.query.first()
+    if settings:
+        enable_cahce = settings.enable_cache
+
+    print("Cache enabled:", enable_cahce)
+    
     current_time = time.time()
     # if key not in cache, create a new entry
     if key not in cache:
         cache[key] = {'value': None, 'timestamp': 0}
 
     # Check if cache is valid
-    if cache[key]['value'] is not None and (current_time - cache[key]['timestamp'] < CACHE_EXPIRATION):
-        print(key, cache[key]['value'])
+    if enable_cahce and cache[key]['value'] is not None and (current_time - cache[key]['timestamp'] < CACHE_EXPIRATION):
+        # print(key, cache[key]['value'])
         return cache[key]['value']
 
     # Fetch fresh value

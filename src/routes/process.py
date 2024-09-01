@@ -3,12 +3,16 @@ from flask import request, render_template, redirect, url_for, flash, session, b
 from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes
+from src.models import DashboardSettings
 
 process_bp = blueprints.Blueprint("process", __name__)
 
 @app.route("/process", methods=["GET", "POST"])
 @login_required
 def process():
+    settings = DashboardSettings.query.first()
+    if not settings.is_process_info_enabled:
+        return render_template("error/404.html")
     if current_user.user_level != "admin":
         flash("You do not have permission to view this page.", "danger")
         return redirect(url_for("dashboard"))

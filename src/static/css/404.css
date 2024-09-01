@@ -1,0 +1,35 @@
+.container {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 30px 50px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 100px;
+    margin: 0;
+    color: #dc3545;
+}
+
+p {
+    font-size: 20px;
+    margin: 20px 0;
+    color: #6c757d;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
