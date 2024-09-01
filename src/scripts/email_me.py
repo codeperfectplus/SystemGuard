@@ -4,43 +4,34 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from dotenv import load_dotenv
-
+from flask import redirect, url_for, flash
 from src.config import app
-from src.models import EmailPassword, DashboardSettings
-# Load environment variables from .env file
-load_dotenv()
+from src.models import SmptEamilPasswordConfig, DashboardSettings
 
-# Get email credentials from .env
-EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-
-
-def send_email(receiver_email, subject, body, attachment_path=None):
+def send_email(receiver_email, subject, body, attachment_path=None, is_html=False):
         
     if isinstance(receiver_email, str):
         receiver_email = [receiver_email]  # Convert single address to list
 
     with app.app_context():
-        dasboard_settings = DashboardSettings.query.first()
-        if dasboard_settings:
-            enable_alerts = dasboard_settings.enable_alerts
+        dashboard_settings = DashboardSettings.query.first()
+        if dashboard_settings:
+            enable_alerts = dashboard_settings.enable_alerts
             if not enable_alerts:
                 print("Email alerts are disabled. Please enable them in the settings.")
-                return {
-                    "message": "Email alerts are disabled. Please enable them in the settings.",
-                    "status": "failed",
-                    "type": "general_settings",
-                }
-        email_password = EmailPassword.query.first()
+                flash("Email alerts are disabled. Please enable them in the settings.", "danger")
+                return redirect(url_for('general_settings'))
+   
+        email_password = SmptEamilPasswordConfig.query.first()
         if not email_password:
-            print("Email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
-            return {
-                "message": "Email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.",
-                "status": "failed",
-                "type": "update_email_password",
-            }
+            print("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
+            flash("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.", "danger")
+            return redirect(url_for('update_smpt_email_password'))
 
+    EMAIL_ADDRESS = email_password.email
+    EMAIL_PASSWORD = email_password.password
+
+    print(f"Sending email to {receiver_email}")
 
     for email in receiver_email:
         try:
@@ -48,13 +39,18 @@ def send_email(receiver_email, subject, body, attachment_path=None):
             msg = MIMEMultipart()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = email
-            msg['Subject'] = subject
+            msg['Subject'] = "SystemGuard Alert:" + subject
             # Append message to the body
             append_message = "This is an automated email from the SystemGuard application. Please do not reply to this email."
-            full_body = body + "\n\n" + append_message
-
-            # Attach the body with the msg instance
-            msg.attach(MIMEText(full_body, 'plain'))
+            
+            if is_html:
+                # If the email is HTML, append the message in HTML format
+                full_body = body + f"<p>{append_message}</p>"
+                msg.attach(MIMEText(full_body, 'html'))
+            else:
+                # If the email is plain text, append the message in plain text format
+                full_body = body + "\n\n" + append_message
+                msg.attach(MIMEText(full_body, 'plain'))
 
             # Attach a file if provided
             if attachment_path:
@@ -86,7 +82,6 @@ def send_email(receiver_email, subject, body, attachment_path=None):
 
         except Exception as e:
             return {
-                "message": f"failed to send email to {email}. Error: {str(e)}",
+                "message": f"Failed to send email to {email}. Error: {str(e)}",
                 "status": "failed",
             }
-

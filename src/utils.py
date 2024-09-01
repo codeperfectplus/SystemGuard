@@ -150,6 +150,11 @@ def get_swap_memory_info():
         "free_swap": round(free_swap / (1024**3), 2),    # In GB
     }
 
+def read_html_file(file_path):
+    """Read the contents of an HTML file and return as a string."""
+    with open(file_path, 'r') as file:
+        return file.read()
+
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. """
     settings = DashboardSettings.query.first()

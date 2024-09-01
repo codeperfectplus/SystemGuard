@@ -13,13 +13,10 @@
         <a href="{{ url_for('view_users') }}" class="btn btn-primary">
             <i class="fas fa-users"></i> All Users
         </a>
-        <a href="{{ url_for('update_email_password') }}" class="btn btn-primary">
-            <i class="fas fa-key"></i> Update Email Password
+        <a href="{{ url_for('update_smpt_email_password') }}" class="btn btn-primary">
+            <i class="fas fa-key"></i> Update Email Config
         </a>
-        <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
-            <i class="fas fa-envelope"></i> Send Email
-        </a>
-    </div>
+    </div>    
 
     <div class="settings-buttons">
         <a href="{{ url_for('speedtest_settings') }}" class="btn btn-primary">
@@ -28,12 +25,25 @@
         <a href="{{ url_for('general_settings') }}" class="btn btn-primary">
             <i class="fas fa-cogs"></i> General Settings
         </a>
+    </div>
+
+    <div class="settings-buttons">
         <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary">
             <i class="fas fa-toggle-on"></i> Feature Toggles
         </a>
         <a href="{{ url_for('card_toggles') }}" class="btn btn-primary">
-            <i class="fas fa-th"></i> Card Toggles
+            <i class="fas fa-toggle-on"></i> Card Toggles
         </a>
     </div>
+
+    <div class="settings-buttons">
+        <a href="{{ url_for('terminal') }}" class="btn btn-primary">
+            <i class="fas fa-tachometer-alt"></i> Terminal
+        </a>
+        <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
+            <i class="fas fa-envelope"></i> Send Email
+        </a>
+    </div>
+
 </div>
 {% endblock %}

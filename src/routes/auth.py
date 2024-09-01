@@ -2,10 +2,16 @@ from flask import Flask, render_template, redirect, url_for, request, blueprints
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+
+
+from flask import Flask, render_template, request, jsonify
+import subprocess
+
 from src.scripts.email_me import send_email
 
 from src.config import app, db
-from src.models import User, EmailPassword, DashboardSettings
+from src.models import User, SmptEamilPasswordConfig, DashboardSettings
+from src.utils import read_html_file
 
 auth_bp = blueprints.Blueprint('auth', __name__)
 
@@ -64,7 +70,8 @@ def login():
             # Get Admin Emails with Alerts Enabled:
             admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
             if admin_email_address:
-                send_email(admin_email_address, 'Login Alert', f'{user.username} logged in to the system.')
+                login_body = read_html_file("src/templates/email_templates/login.html")
+                send_email(admin_email_address, 'Login Alert', login_body, is_html=True)
             
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
@@ -114,29 +121,12 @@ def protected():
 
 @app.route('/logout')
 def logout():
+    receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)
+    if receiver_email:
+        logout_body = read_html_file("src/templates/email_templates/logout.html")
+        send_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
     logout_user()
     return redirect(url_for('login'))
-
-
-# def admin_required(f):
-#     """Decorator to ensure the current user is an admin."""
-#     @wraps(f)
-#     def decorated_function(*args, **kwargs):
-#         if not current_user.is_authenticated or current_user.user_level != 'admin':
-#             flash('Access denied. Admins only.')
-#             return redirect(url_for('login'))
-#         return f(*args, **kwargs)
-#     return decorated_function
-
-# def user_required(f):
-#     """Decorator to ensure the current user is a regular user."""
-#     @wraps(f)
-#     def decorated_function(*args, **kwargs):
-#         if not current_user.is_authenticated or current_user.user_level != 'user':
-#             flash('Access denied. Users only.')
-#             return redirect(url_for('login'))
-#         return f(*args, **kwargs)
-#     return decorated_function
 
 @app.route('/users')
 @login_required
@@ -190,28 +180,36 @@ def delete_user(username):
 
 @app.route("/update-email-password", methods=["GET", "POST"])
 @login_required
-def update_email_password():
-    email_password = EmailPassword.query.first()
+def update_smpt_email_password():
+    smtp_config = SmptEamilPasswordConfig.query.first()
 
     if request.method == "POST":
         new_email = request.form.get("email")
         new_password = request.form.get("password")
 
-        if new_email:
-            email_password.email = new_email
-        if new_password:
-            email_password.password = new_password
-
+        if not new_email or not new_password:
+            flash("Please provide email and password.", "danger")
+            return redirect(url_for("update_smpt_email_password"))
+        
+        
+        if not smtp_config:
+            smtp_config = SmptEamilPasswordConfig(email=new_email, password=new_password)
+            db.session.add(smtp_config)
+        else:
+            smtp_config.email = new_email
+            smtp_config.password = new_password        
+        
         db.session.commit()
         flash("Email and password updated successfully!", "success")
-        return redirect(url_for("update_email_password"))
+        return redirect(url_for("update_smpt_email_password"))
 
-    return render_template("update_email_password.html", email_password=email_password)
+    return render_template("update_smpt_email_password.html", smtp_config=smtp_config)
 
 @app.route("/send_email", methods=["GET", "POST"])
 @login_required
 def send_email_page():
     dasboard_settings = DashboardSettings.query.first()
+    receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
     if dasboard_settings:
         enable_alerts = dasboard_settings.enable_alerts
     if request.method == "POST":
@@ -225,18 +223,24 @@ def send_email_page():
             flash("Please provide recipient, subject, and body.", "danger")
             return redirect(url_for('send_email_page'))
         
+        print("Priority:", priority)
+        print("receiver_email:", receiver_email)
+
         # on high priority, send to all users or admin users even the receive_email_alerts is False
         if priority == "high" and receiver_email == "all_users":
+            print("Sending to all users")
             receiver_email = get_email_addresses(fetch_all_users=True)
         elif priority == "high" and receiver_email == "admin_users":
+            print("Sending to admin users")
             receiver_email = get_email_addresses(user_level='admin', fetch_all_users=True)
 
         # priority is low, send to users with receive_email_alerts is True
         if priority == "low" and receiver_email == "all_users":
+            print("Sending to all users with receive_email_alerts=True")
             receiver_email = get_email_addresses(receive_email_alerts=True)
         elif priority == "low" and receiver_email == "admin_users":
-            receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
-
+            print("Sending to admin users with receive_email_alerts=True")
+            receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)
 
         if not receiver_email:
             flash("No users found to send email to.", "danger")
@@ -248,15 +252,34 @@ def send_email_page():
             attachment_path = f"/tmp/{attachment.filename}"
             attachment.save(attachment_path)
         try:
-            respone = send_email(receiver_email, subject, body, attachment_path)
-            if respone and respone["status"] == "success":
-                flash(respone['message'], "success")
-            elif respone and respone["status"] == "failed":
-                flash(respone['message'], "danger")
-                return redirect(url_for(respone["type"]))
+            respose = send_email(receiver_email, subject, body, attachment_path)
+            print(respose)
+            if respose and respose.get("status") == "success":
+                flash(respose.get("message"), "success")
         except Exception as e:
             flash(f"Failed to send email: {str(e)}", "danger")
         
         return redirect(url_for('send_email_page'))
 
     return render_template("send_email.html", enable_alerts=enable_alerts)
+
+@app.route('/terminal', methods=['GET', 'POST'])
+@login_required
+def terminal():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        return render_template("error/permission_denied.html")
+    if request.method == 'POST':
+        command = request.form.get('command')
+        if command:
+            try:
+                # Run the command and capture the output
+                output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, universal_newlines=True)
+            except subprocess.CalledProcessError as e:
+                # If the command fails, capture the error output
+                output = e.output
+            return jsonify(output=output)
+    return render_template('terminal.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
