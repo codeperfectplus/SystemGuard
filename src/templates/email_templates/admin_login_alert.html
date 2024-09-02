@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logout Notification</title>
+    <title>User Login Alert</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
 
         .email-container {
@@ -23,7 +23,7 @@
         }
 
         .header {
-            background-color: #4CAF50;
+            background-color: #ff9800;
             color: white;
             padding: 10px;
             border-radius: 8px 8px 0 0;
@@ -37,7 +37,7 @@
 
         .content {
             padding: 20px;
-            text-align: center;
+            text-align: left;
         }
 
         .content h2 {
@@ -49,6 +49,7 @@
             font-size: 16px;
             color: #666666;
             line-height: 1.5;
+            margin: 10px 0;
         }
 
         .footer {
@@ -59,23 +60,8 @@
         }
 
         .footer a {
-            color: #4CAF50;
+            color: #ff9800;
             text-decoration: none;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #4CAF50;
-            border-radius: 4px;
-            text-decoration: none;
-            margin-top: 20px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
@@ -83,18 +69,19 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>SystemGuard Notification</h1>
+            <h1>SystemGuard Admin Alert</h1>
         </div>
         <div class="content">
-            <h2>You have been logged out</h2>
-            <p>Hello, {{username}}!</p>
-            <p>This is to inform you that your session has ended, and you have been logged out of the SystemGuard
-                application. If this was not you, please contact the system administrator immediately.</p>
-            <a href="{{login}}" class="button">Log in Again</a>
+            <h2>User Login Detected</h2>
+            <p>Hello Admin,</p>
+            <p>This is to notify you that the following user has logged into the SystemGuard application:</p>
+            <p><strong>Username:</strong> {{ username }}</p>
+            <p><strong>Login Time:</strong> {{ login_time }}</p>
+            <p>If this activity is suspicious, please take the necessary action immediately.</p>
         </div>
         <div class="footer">
-            <p>If you have any questions, feel free to <a href="mailto:support@systemguard.com">contact us</a>.</p>
             <p>Thank you for using SystemGuard!</p>
+            <p>If you have any questions, feel free to <a href="mailto:support@systemguard.com">contact us</a>.</p>
         </div>
     </div>
 </body>

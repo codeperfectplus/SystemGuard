@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask, render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -11,7 +12,7 @@ from src.scripts.email_me import send_email
 
 from src.config import app, db
 from src.models import User, SmptEamilPasswordConfig, DashboardSettings
-from src.utils import read_html_file
+from src.utils import render_template_from_file
 
 auth_bp = blueprints.Blueprint('auth', __name__)
 
@@ -67,15 +68,34 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
-            # Get Admin Emails with Alerts Enabled:
+            receiver_email = current_user.email
             admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
+            # if receiver_email in admin_email_address don't send email to the admin
+            # log in alert to admin
+
             if admin_email_address:
-                login_body = read_html_file("src/templates/email_templates/login.html")
-                send_email(admin_email_address, 'Login Alert', login_body, is_html=True)
-            
+                context = {"username": current_user.username, "login_time": datetime.datetime.now()}
+                login_body = render_template_from_file("src/templates/email_templates/admin_login_alert.html", **context)
+                # send_email(admin_email_address, 'Login Alert', login_body, is_html=True)
+
+            # log in alert to user
+            if receiver_email:
+                context = {"username": current_user.username, "login_time": datetime.datetime.now()}
+                login_body = render_template_from_file("src/templates/email_templates/login.html", **context)
+                # send_email(receiver_email, 'Login Alert', login_body, is_html=True)
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
     return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    receiver_email = current_user.email
+    if receiver_email:
+        context = {"username": current_user.username}
+        logout_body = render_template_from_file("src/templates/email_templates/logout.html", **context)
+        # send_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -118,15 +138,6 @@ def protected():
     if current_user.user_level == 'admin':
         return f'Hello, Admin {current_user.username}! This is a protected page.'
     return f'Hello, {current_user.username}! This is a protected page.'
-
-@app.route('/logout')
-def logout():
-    receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)
-    if receiver_email:
-        logout_body = read_html_file("src/templates/email_templates/logout.html")
-        send_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
-    logout_user()
-    return redirect(url_for('login'))
 
 @app.route('/users')
 @login_required

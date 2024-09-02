@@ -63,7 +63,7 @@ def card_toggles():
         settings.is_disk_usage_card_enabled = 'is_disk_usage_card_enabled' in request.form
         settings.is_system_uptime_card_enabled = 'is_system_uptime_card_enabled' in request.form
         settings.is_network_statistic_card_enabled = 'is_network_statistic_card_enabled' in request.form
-        settings.is_network_usage_card_enabled = 'is_network_usage_card_enabled' in request.form
+        settings.is_speedtest_enabled = 'is_speedtest_enabled' in request.form
         db.session.commit()
         flash('Card toggles updated successfully!', 'success')
         return redirect(url_for('card_toggles'))

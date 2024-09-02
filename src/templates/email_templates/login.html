@@ -49,8 +49,7 @@
         </div>
         <div class="alert-body">
             Hello {{ username }},<br><br>
-            We noticed a login to your account on {{ login_time }} from the IP address {{ ip_address }}.<br><br>
-            If this was not you, please reset your password immediately.
+            We noticed a login to your account on {{ login_time }}, This is a Notification that your account was accessed.
         </div>
         <div class="alert-footer">
             <a href="{{ url_for('reset_password') }}">Reset Password</a>

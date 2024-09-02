@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logout Notification</title>
+    <title>Speed Test Results</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
 
         .email-container {
@@ -51,6 +51,12 @@
             line-height: 1.5;
         }
 
+        .result {
+            font-size: 18px;
+            color: #333333;
+            margin: 10px 0;
+        }
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -62,39 +68,23 @@
             color: #4CAF50;
             text-decoration: none;
         }
-
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            background-color: #4CAF50;
-            border-radius: 4px;
-            text-decoration: none;
-            margin-top: 20px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
     </style>
 </head>
 
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>SystemGuard Notification</h1>
+            <h1>Speed Test Results</h1>
         </div>
         <div class="content">
-            <h2>You have been logged out</h2>
-            <p>Hello, {{username}}!</p>
-            <p>This is to inform you that your session has ended, and you have been logged out of the SystemGuard
-                application. If this was not you, please contact the system administrator immediately.</p>
-            <a href="{{login}}" class="button">Log in Again</a>
+            <h2>Here are your latest speed test results:</h2>
+            <p class="result">Download Speed: {{ speedtest_result['download_speed'] }}</p>
+            <p class="result">Upload Speed: {{ speedtest_result['upload_speed'] }}</p>
+            <p class="result">Ping: {{ speedtest_result['ping'] }}</p>
         </div>
         <div class="footer">
-            <p>If you have any questions, feel free to <a href="mailto:support@systemguard.com">contact us</a>.</p>
             <p>Thank you for using SystemGuard!</p>
+            <p>If you have any questions, feel free to <a href="mailto:support@systemguard.com">contact us</a>.</p>
         </div>
     </div>
 </body>
