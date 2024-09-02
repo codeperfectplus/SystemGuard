@@ -1,7 +1,10 @@
+import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
 from src.config import app, db
-from src.models import DashboardSettings
+from src.models import DashboardSettings, User
 from flask_login import login_required, current_user
+from src.utils import render_template_from_file
+from src.scripts.email_me import send_email
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
@@ -27,6 +30,17 @@ def general_settings():
         settings.timezone = request.form.get('timezone')
         settings.enable_cache = 'enable_cache' in request.form
         settings.enable_alerts = 'enable_alerts' in request.form
+        admin_emails = [user.email for user in User.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
+        if admin_emails:
+            subject = "SystemGuard Server Started"
+            context = {
+                "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "notifications_enabled": settings.enable_alerts,
+                "current_user": current_user.username
+            }
+            html_body = render_template_from_file("src/templates/email_templates/notification_alert.html", **context)
+            print("Notification enabled:", settings.enable_alerts)
+            send_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))

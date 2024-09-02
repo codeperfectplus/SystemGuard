@@ -4,14 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Notification</title>
+    <title>Notification Settings Changed</title>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
         .alert-container {
             max-width: 600px;
             margin: 50px auto;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
             border: 1px solid #ced4da;
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -45,11 +52,21 @@
 <body>
     <div class="alert-container">
         <div class="alert-header">
-            <i class="fas fa-info-circle"></i> Login Notification
+            <i class="fas fa-bell"></i> Notification Settings Changed
         </div>
         <div class="alert-body">
-            Hello {{ username }},<br><br>
-            We noticed a login to your account on {{ login_time }}, This is a Notification that your account was accessed.
+            Hello, <br><br>
+            Your notification settings have been updated. <br><br>
+            {% if notifications_enabled %}
+                You will now receive alerts for updates and changes.
+            {% else %}
+                You will no longer receive alerts.
+            {% endif %} <br><br>
+            The changes were made by {{ current_user }} on {{ current_time }}.
+        </div>
+        <div class="alert-footer">
+            <p>For any questions or if you need assistance, please <a href="mailto:codeperfectplus@gmail.com">contact us</a>.</p>
+            <p>Thank you for using SystemGuard!</p>
         </div>
     </div>
 </body>

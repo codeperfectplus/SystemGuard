@@ -6,6 +6,7 @@
 {% block content %}
 <div class="view-users-container">
     <h2 class="page-title">All Users</h2>
+    <a href="{{ url_for('add_user') }}" class="btn btn-add-user">Add New User</a>
     <table class="user-table">
         <thead>
             <tr>

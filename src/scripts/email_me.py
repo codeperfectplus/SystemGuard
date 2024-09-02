@@ -8,20 +8,23 @@ from flask import redirect, url_for, flash
 from src.config import app
 from src.models import SmptEamilPasswordConfig, DashboardSettings
 
-def send_email(receiver_email, subject, body, attachment_path=None, is_html=False):
+system_name = os.uname().sysname
+
+def send_email(receiver_email, subject, body, attachment_path=None, is_html=False, bypass_alerts=False):
         
     if isinstance(receiver_email, str):
         receiver_email = [receiver_email]  # Convert single address to list
 
     with app.app_context():
-        dashboard_settings = DashboardSettings.query.first()
-        if dashboard_settings:
-            enable_alerts = dashboard_settings.enable_alerts
-            if not enable_alerts:
-                print("Email alerts are disabled. Please enable them in the settings.")
-                flash("Email alerts are disabled. Please enable them in the settings.", "danger")
-                return redirect(url_for('general_settings'))
-   
+        if not bypass_alerts:
+            dashboard_settings = DashboardSettings.query.first()
+            if dashboard_settings:
+                enable_alerts = dashboard_settings.enable_alerts
+                if not enable_alerts:
+                    print("Email alerts are disabled. Please enable them in the settings.")
+                    flash("Email alerts are disabled. Please enable them in the settings.", "danger")
+                    return redirect(url_for('general_settings'))
+    
         email_password = SmptEamilPasswordConfig.query.first()
         if not email_password:
             print("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
@@ -35,11 +38,12 @@ def send_email(receiver_email, subject, body, attachment_path=None, is_html=Fals
 
     for email in receiver_email:
         try:
+            server_name = os.uname().nodename
             # Create a multipart message
             msg = MIMEMultipart()
             msg['From'] = EMAIL_ADDRESS
             msg['To'] = email
-            msg['Subject'] = "SystemGuard Alert:" + subject
+            msg['Subject'] = "SystemGuard Alert from " + system_name + " (" + server_name + "): " + subject
             # Append message to the body
             append_message = "This is an automated email from the SystemGuard application. Please do not reply to this email."
             

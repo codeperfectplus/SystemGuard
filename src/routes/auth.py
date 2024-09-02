@@ -292,5 +292,30 @@ def terminal():
             return jsonify(output=output)
     return render_template('terminal.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/add_user', methods=['GET', 'POST'])
+def add_user():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        user_level = request.form.get('user_level', 'user')
+        receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on'
+
+        # Check if user already exists
+        if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
+            flash('Username or email already exists.', 'danger')
+            return redirect(url_for('add_user'))
+
+        new_user = User(
+            username=username,
+            email=email,
+            password=generate_password_hash(password),
+            user_level=user_level,
+            receive_email_alerts=receive_email_alerts
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('User created successfully!', 'success')
+        return redirect(url_for('view_users'))
+
+    return render_template('add_user.html')
