@@ -10,7 +10,7 @@ from src.models import SmptEamilPasswordConfig, DashboardSettings
 
 system_name = os.uname().sysname
 
-def send_email(receiver_email, subject, body, attachment_path=None, is_html=False, bypass_alerts=False):
+def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html=False, bypass_alerts=False):
         
     if isinstance(receiver_email, str):
         receiver_email = [receiver_email]  # Convert single address to list

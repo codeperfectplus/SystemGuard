@@ -1,58 +1,55 @@
 .signup-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa;
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
     border-radius: 8px;
+    padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 50px;
 }
 
 .signup-title {
     font-size: 24px;
-    color: #343a40;
+    font-weight: bold;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .signup-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     margin-bottom: 15px;
 }
 
 .form-group label {
-    font-weight: 600;
-    color: #495057;
+    display: block;
+    font-weight: bold;
     margin-bottom: 5px;
 }
 
-.form-group input {
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    background-color: #ffffff;
-    font-size: 16px;
+.form-group input,
+.form-group select {
     width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-group input[type="checkbox"] {
+    width: auto;
 }
 
 .btn-primary {
-    padding: 10px 20px;
     background-color: #007bff;
     color: #ffffff;
+    padding: 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
     text-align: center;
-    transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -60,9 +57,8 @@
 }
 
 .login-link {
+    text-align: center;
     margin-top: 20px;
-    font-size: 14px;
-    color: #6c757d;
 }
 
 .login-link a {

@@ -3,7 +3,7 @@ from src.config import app
 from src import routes
 from src.utils import render_template_from_file, get_flask_memory_usage, cpu_usage_percent, get_memory_percent
 from src.models import User
-from src.scripts.email_me import send_email
+from src.scripts.email_me import send_smpt_email
 
 def register_routes():
     app.register_blueprint(routes.homepage_bp)
@@ -31,7 +31,7 @@ def server_up_email():
 
             }
             html_body = render_template_from_file("src/templates/email_templates/server_up.html", **context)
-            # send_email(admin_emails, subject, html_body, is_html=True)
+            # send_smpt_email(admin_emails, subject, html_body, is_html=True)
             print("Server up email sent to", admin_emails)
 
 

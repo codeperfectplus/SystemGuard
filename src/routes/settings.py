@@ -4,7 +4,7 @@ from src.config import app, db
 from src.models import DashboardSettings, User
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file
-from src.scripts.email_me import send_email
+from src.scripts.email_me import send_smpt_email
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
@@ -40,7 +40,7 @@ def general_settings():
             }
             html_body = render_template_from_file("src/templates/email_templates/notification_alert.html", **context)
             print("Notification enabled:", settings.enable_alerts)
-            send_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
+            send_smpt_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))

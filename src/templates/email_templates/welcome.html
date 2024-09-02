@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333333;
+            background-color: #f7f7f7;
+            padding: 20px;
+            margin: 0;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .email-body {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777777;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            Welcome to the Server!
+        </div>
+        <div class="email-body">
+            <p>Hello {{ username }},</p>
+            <p>Thank you for signing up on our server. Your account has been successfully created with the following details:</p>
+            <p><strong>Username:</strong> {{ username }}</p>
+            <p><strong>Email:</strong> {{ email }}</p>
+            <p><strong>User Level:</strong> User</p>
+            <p>If you require additional permissions or need admin access, please contact the server administrator.</p>
+            <p>We are excited to have you with us!</p>
+            <p>Best regards,</p>
+            <p>The Server Team</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated email, please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>

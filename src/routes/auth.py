@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, jsonify
 import subprocess
 
-from src.scripts.email_me import send_email
+from src.scripts.email_me import send_smpt_email
 
 from src.config import app, db
 from src.models import User, SmptEamilPasswordConfig, DashboardSettings
@@ -74,15 +74,18 @@ def login():
             # log in alert to admin
 
             if admin_email_address:
-                context = {"username": current_user.username, "login_time": datetime.datetime.now()}
-                login_body = render_template_from_file("src/templates/email_templates/admin_login_alert.html", **context)
-                # send_email(admin_email_address, 'Login Alert', login_body, is_html=True)
+                if receiver_email in admin_email_address:
+                    admin_email_address.remove(receiver_email)
+                if admin_email_address:
+                    context = {"username": current_user.username, "login_time": datetime.datetime.now()}
+                    login_body = render_template_from_file("src/templates/email_templates/admin_login_alert.html", **context)
+                    send_smpt_email(admin_email_address, 'Login Alert', login_body, is_html=True)
 
             # log in alert to user
             if receiver_email:
                 context = {"username": current_user.username, "login_time": datetime.datetime.now()}
                 login_body = render_template_from_file("src/templates/email_templates/login.html", **context)
-                # send_email(receiver_email, 'Login Alert', login_body, is_html=True)
+                send_smpt_email(receiver_email, 'Login Alert', login_body, is_html=True)
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
     return render_template('login.html')
@@ -93,7 +96,7 @@ def logout():
     if receiver_email:
         context = {"username": current_user.username}
         logout_body = render_template_from_file("src/templates/email_templates/logout.html", **context)
-        # send_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
+        send_smpt_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
     logout_user()
     return redirect(url_for('login'))
 
@@ -101,8 +104,11 @@ def logout():
 def signup():
     if request.method == 'POST':
         username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+        user_level = request.form.get('user_level', 'user')  # Default to 'user' if not provided
+        receive_email_alerts = 'receive_email_alerts' in request.form  # Checkbox is either checked or not
 
         if password != confirm_password:
             flash('Passwords do not match')
@@ -114,16 +120,29 @@ def signup():
             return redirect(url_for('signup'))
 
         hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
+        new_user = User(username=username, email=email, password=hashed_password, user_level=user_level, receive_email_alerts=receive_email_alerts)
         
         # Get Admin Emails with Alerts Enabled:
         admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
-        # extends the signup user to send an email to the admin
         if admin_email_address:
-            send_email(admin_email_address, 'New User Alert', f'{username} has signed up to the system.')
-        
-        # send email to the new user
-        send_email([new_user.email], 'Welcome to the system', f'Hello {new_user.username}, welcome to the system.')
+            subject = "New User Alert"
+            context = {
+                "username": new_user.username,
+                "email": new_user.email,
+                "signup_time": datetime.datetime.now(),
+                "user_level": new_user.user_level
+            }
+            html_body = render_template_from_file("src/templates/email_templates/new_user_alert.html", **context)
+            send_smpt_email(admin_email_address, subject, html_body, is_html=True)
+            
+        # Send email to the new user
+        subject = "Welcome to the systemGuard"  
+        context = {
+            "username": new_user.username,
+            "email": new_user.email,
+        }
+        html_body = render_template_from_file("src/templates/email_templates/welcome.html", **context)
+        send_smpt_email(email, subject, html_body, is_html=True)
 
         db.session.add(new_user)
         db.session.commit()
@@ -263,7 +282,7 @@ def send_email_page():
             attachment_path = f"/tmp/{attachment.filename}"
             attachment.save(attachment_path)
         try:
-            respose = send_email(receiver_email, subject, body, attachment_path)
+            respose = send_smpt_email(receiver_email, subject, body, attachment_path)
             print(respose)
             if respose and respose.get("status") == "success":
                 flash(respose.get("message"), "success")
@@ -293,7 +312,11 @@ def terminal():
     return render_template('terminal.html')
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@login_required
 def add_user():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        return render_template("error/permission_denied.html")
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -313,6 +336,28 @@ def add_user():
             user_level=user_level,
             receive_email_alerts=receive_email_alerts
         )
+
+        admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
+        if admin_email_address:
+            subject = "New User Alert"
+            context = {
+                "current_user": current_user.username,
+                "username": new_user.username,
+                "email": new_user.email,
+                "signup_time": datetime.datetime.now(),
+                "user_level": new_user.user_level
+            }
+            html_body = render_template_from_file("src/templates/email_templates/new_user_create.html", **context)
+            send_smpt_email(admin_email_address, subject, html_body, is_html=True)
+
+        subject = "Welcome to the systemGuard"  
+        context = {
+            "username": new_user.username,
+            "email": new_user.email,
+        }
+        html_body = render_template_from_file("src/templates/email_templates/welcome.html", **context)
+        send_smpt_email(email, subject, html_body, is_html=True)
+            
         db.session.add(new_user)
         db.session.commit()
         flash('User created successfully!', 'success')

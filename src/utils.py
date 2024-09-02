@@ -51,7 +51,8 @@ def get_established_connections():
             elif ':' in conn.laddr.ip:
                 ipv6_set.add(conn.laddr.ip)
 
-    ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
+    # ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
+    ipv4 = list(ipv4_set)[0] if ipv4_set else "N/A"
     ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
 
     return ipv4, ipv6
@@ -173,8 +174,6 @@ def get_cached_value(key, fresh_value_func):
     settings = DashboardSettings.query.first()
     if settings:
         enable_cahce = settings.enable_cache
-
-    print("Cache enabled:", enable_cahce)
     
     current_time = time.time()
     # if key not in cache, create a new entry
@@ -187,7 +186,6 @@ def get_cached_value(key, fresh_value_func):
         return cache[key]['value']
 
     # Fetch fresh value
-    print(f"Fetching fresh {key}...")
     fresh_value = fresh_value_func()
 
     # Store value in cache

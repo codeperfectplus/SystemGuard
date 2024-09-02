@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import DashboardSettings, SpeedTestResult
 from src.utils import run_speedtest, render_template_from_file
-from src.scripts.email_me import send_email
+from src.scripts.email_me import send_smpt_email
 
 speedtest_bp = blueprints.Blueprint("speedtest", __name__)
 
@@ -40,7 +40,7 @@ def speedtest():
             subject = "Speedtest Result"
             context = {"speedtest_result": speedtest_result}
             body = render_template_from_file("src/templates/email_templates/speedtest_result.html", **context)
-            send_email(receiver_email, subject, body, is_html=True)
+            send_smpt_email(receiver_email, subject, body, is_html=True)
             return render_template(
                 "speedtest_result.html",
                 speedtest_result=speedtest_result,
