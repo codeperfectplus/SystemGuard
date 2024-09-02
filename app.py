@@ -6,7 +6,7 @@ from src.models import User
 from src.scripts.email_me import send_smpt_email
 
 def register_routes():
-    app.register_blueprint(routes.homepage_bp)
+    app.register_blueprint(routes.dashboard_bp)
     app.register_blueprint(routes.settings_bp)
     app.register_blueprint(routes.system_health_bp)
     app.register_blueprint(routes.cpu_info_bp)

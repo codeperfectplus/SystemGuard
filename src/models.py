@@ -97,6 +97,19 @@ class SystemInfo(db.Model):
         return f"<SystemInfo {self.username}, {self.cpu_percent}, {self.memory_percent}, {self.disk_usage}, {self.battery_percent}, {self.cpu_core}, {self.boot_time}, {self.network_sent}, {self.network_received}, {self.process_count}, {self.swap_memory}, {self.uptime}, {self.ipv4_connections}, {self.ipv6_connections}, {self.dashboard_memory_usage}>"
 
 
+# home page to show links to multiple dashbaord
+class DashboardNetwork(db.Model):
+    __tablename__ = "DashboardGroup"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(150), nullable=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    port = db.Column(db.Integer, nullable=True)
+    link = db.Column(db.String(150), nullable=True)
+
+    def __repr__(self):
+        return f"<DashboardGroup {self.name}, {self.description}>"
+
 
 class SmptEamilPasswordConfig(db.Model):
     __tablename__ = "SmptEamilPasswordConfig"
@@ -121,7 +134,6 @@ with app.app_context():
         if not user.dashboard_settings:
             db.session.add(DashboardSettings(user_id=user.id))
             db.session.commit()
-
 
     pre_defined_users_json = "src/assets/predefine_user.json"
     with open(pre_defined_users_json, "r") as file:

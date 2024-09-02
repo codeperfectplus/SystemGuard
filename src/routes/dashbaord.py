@@ -6,9 +6,9 @@ from src.config import app
 from src.models import SpeedTestResult, DashboardSettings, SystemInfo
 from src.utils import datetimeformat, get_system_info
 
-homepage_bp = blueprints.Blueprint("homepage", __name__)
+dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 
-@app.route("/")
+@app.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
     settings = DashboardSettings.query.first()
@@ -57,36 +57,4 @@ def dashboard():
             show_prompt=show_prompt,
             current_user=current_user,
         )
-    # if current_user.profession == "developer":
-    #     return render_template(
-    #         "dashboard/developer.html",
-    #         system_info=system_info,
-    #         speedtest_result=speedtest_result,
-    #         source=source,
-    #         last_timestamp=last_timestamp,
-    #         next_test_time=remaining_time_for_next_test,
-    #         show_prompt=show_prompt,
-    #         current_user=current_user,
-    #     )
-    # elif current_user.profession == "manager":
-    #     return render_template(
-    #         "dashboard/manager.html",
-    #         system_info=system_info,
-    #         speedtest_result=speedtest_result,
-    #         source=source,
-    #         last_timestamp=last_timestamp,
-    #         next_test_time=remaining_time_for_next_test,
-    #         show_prompt=show_prompt,
-    #         current_user=current_user,
-    #     )
-    # else:
-    #     return render_template(
-    #         "dashboard/developer.html",
-    #         system_info=system_info,
-    #         speedtest_result=speedtest_result,
-    #         source=source,
-    #         last_timestamp=last_timestamp,
-    #         next_test_time=remaining_time_for_next_test,
-    #         show_prompt=show_prompt,
-    #         current_user=current_user,
-    #     )
+    

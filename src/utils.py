@@ -35,7 +35,7 @@ def get_flask_memory_usage():
         pid = os.getpid()  # Get the current process ID
         process = psutil.Process(pid)  # Get the process information using psutil
         memory_info = process.memory_info()  # Get the memory usage information
-        memory_in_mb = memory_info.rss / (1024 ** 2)  # Convert bytes to MB
+        memory_in_mb = memory_info.rss / (1000 ** 2)  # Convert bytes to MB
         return round(memory_in_mb)  # Return the memory usage rounded to 2 decimal places
     except Exception as e:
         print(f"Error getting memory usage: {e}")
@@ -87,7 +87,6 @@ def run_speedtest():
 def get_cpu_frequency():
     return round(psutil.cpu_freq().current)
 
-
 def get_cpu_core_count():
     return psutil.cpu_count(logical=True)
 
@@ -109,38 +108,35 @@ def get_top_processes(number=5):
 
 def get_disk_free():
     """Returns the free disk space in GB."""
-    return round(psutil.disk_usage("/").free / (1024**3), 2)
+    return round(psutil.disk_usage("/").free / (1000**3), 1)
 
 def get_disk_used():
     """Returns the used disk space in GB."""
-    return round(psutil.disk_usage("/").used / (1024**3), 2)
+    return round(psutil.disk_usage("/").used / (1000**3), 1)
 
 def get_disk_total():
     """Returns the total disk space in GB."""
-    return round(psutil.disk_usage("/").total / (1024**3), 2)
+    return round(psutil.disk_usage("/").total / (1000**3), 1)
 
 def get_disk_usage_percent():
     """Returns the percentage of disk used."""
-    return psutil.disk_usage("/").percent
+    disk_usage = psutil.disk_usage("/")
+    calculated_percent = (disk_usage.used / disk_usage.total) * 100
+    return disk_usage.percent, round(calculated_percent, 1)
 
+
+def get_memory_available():
+    """Returns the available memory in GB."""
+    return round(psutil.virtual_memory().total / (1000**3), 2)
+
+
+def get_memory_used():
+    """Returns the used memory in GB."""
+    return round((psutil.virtual_memory().total - psutil.virtual_memory().available) / (1000**3), 2)
 
 def get_memory_percent():
     """Returns the percentage of memory used."""
     return psutil.virtual_memory().percent
-
-def get_memory_available():
-    """Returns the available memory in GB."""
-    return round(psutil.virtual_memory().available / (1024**3), 2)
-
-
-def get_memory_used():
-    """Returns the used memory in GB."""
-    return round(psutil.virtual_memory().used / (1024**3), 2)
-
-
-def get_memory_used():
-    """Returns the used memory in GB."""
-    return round(psutil.virtual_memory().used / (1024**3), 2)
 
 def get_swap_memory_info():
     """Returns the total, used, and free swap memory in GB."""
@@ -150,9 +146,9 @@ def get_swap_memory_info():
     free_swap = total_swap - used_swap  # Calculate free swap memory
 
     return {
-        "total_swap": round(total_swap / (1024**3), 2),  # In GB
-        "used_swap": round(used_swap / (1024**3), 2),    # In GB
-        "free_swap": round(free_swap / (1024**3), 2),    # In GB
+        "total_swap": round(total_swap / (1000**3), 2),  # In GB
+        "used_swap": round(used_swap / (1000**3), 2),    # In GB
+        "free_swap": round(free_swap / (1000**3), 2),    # In GB
     }
 
 def render_template_from_file(template_file_path, **context):
@@ -213,7 +209,8 @@ def get_system_info():
     battery_info = psutil.sensors_battery()
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
-    net_io = psutil.net_io_counters()
+    net_io = psutil.net_io_counters(pernic=False)
+    # ifconfig | grep -E 'RX packets|TX packets' -A 1
     current_server_time = datetime.datetime.now()
 
     # Prepare system information dictionary
@@ -222,11 +219,11 @@ def get_system_info():
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
         'disk_usage': round(disk_info.percent, 2),
-        'battery_percent': round(battery_info.percent) if battery_info else "N/A",
+        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
         'cpu_core': get_cpu_core_count(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'network_sent': round(net_io.bytes_sent / (1024 ** 2), 2),  # In MB
-        'network_received': round(net_io.bytes_recv / (1024 ** 2), 2),  # In MB
+        'network_sent': round(net_io.bytes_sent / (1000 ** 2), 1),  # In MB
+        'network_received': round(net_io.bytes_recv / (1000 ** 2), 1),  # In MB
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
         'uptime': uptime,
