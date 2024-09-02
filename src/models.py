@@ -1,9 +1,10 @@
+import json
 import datetime
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from src.config import db, app
 
+from src.config import db, app
 
 class SpeedTestResult(db.Model):
     __tablename__ = "SpeedTestResult"
@@ -18,28 +19,37 @@ class SpeedTestResult(db.Model):
             f"<SpeedTestResult {self.download_speed}, {self.upload_speed}, {self.ping}>"
         )
 
-class DashboardSettings(db.Model):
-    __tablename__ = "DashboardSettings"
-    id = db.Column(db.Integer, primary_key=True)
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
     
-    # speedtest setting
-    speedtest_cooldown = db.Column(db.Integer, default=1)
-    number_of_speedtests = db.Column(db.Integer, default=1)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    user_level = db.Column(db.String(10), nullable=False, default='user')
+    receive_email_alerts = db.Column(db.Boolean, default=False)
+    profession = db.Column(db.String(50), nullable=True)
+    
+    # Backref renamed to avoid conflict
+    dashboard_settings = db.relationship('DashboardSettings', backref='user', uselist=False)
 
-    # general settings
-    timezone = db.Column(db.String(50), default="Asia/Kolkata")
-    enable_cache = db.Column(db.Boolean, default=True)
-    enable_alerts = db.Column(db.Boolean, default=False)
+class DashboardSettings(db.Model):
+    __tablename__ = 'dashboard_settings'
 
-    # page enable/disable
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    speedtest_cooldown = db.Column(db.Integer, default=3600)
+    number_of_speedtests = db.Column(db.Integer, default=3)
+    
+    # Feature Toggles
     is_cpu_info_enabled = db.Column(db.Boolean, default=True)
     is_memory_info_enabled = db.Column(db.Boolean, default=True)
     is_disk_info_enabled = db.Column(db.Boolean, default=True)
     is_network_info_enabled = db.Column(db.Boolean, default=True)
-    is_process_info_enabled = db.Column(db.Boolean, default=False)
+    is_process_info_enabled = db.Column(db.Boolean, default=True)
 
-
-    # card enable/disable
+    # Card Toggles
     is_user_card_enabled = db.Column(db.Boolean, default=True)
     is_server_card_enabled = db.Column(db.Boolean, default=True)
     is_battery_card_enabled = db.Column(db.Boolean, default=True)
@@ -51,10 +61,15 @@ class DashboardSettings(db.Model):
     is_disk_usage_card_enabled = db.Column(db.Boolean, default=True)
     is_system_uptime_card_enabled = db.Column(db.Boolean, default=True)
     is_network_statistic_card_enabled = db.Column(db.Boolean, default=True)
-    is_speedtest_enabled = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f"<DashboardSettings {self.speedtest_cooldown}, {self.timezone}, {self.number_of_speedtests}>"
+    is_speedtest_enabled = db.Column(db.Boolean, default=True)
+    
+class GeneralSettings(db.Model):
+    __tablename__ = 'general_settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    enable_alerts = db.Column(db.Boolean, default=False)
+    timezone = db.Column(db.String(50), default='UTC')
+    enable_cache = db.Column(db.Boolean, default=False)
 
 
 class SystemInfo(db.Model):
@@ -81,13 +96,6 @@ class SystemInfo(db.Model):
     def __repr__(self):
         return f"<SystemInfo {self.username}, {self.cpu_percent}, {self.memory_percent}, {self.disk_usage}, {self.battery_percent}, {self.cpu_core}, {self.boot_time}, {self.network_sent}, {self.network_received}, {self.process_count}, {self.swap_memory}, {self.uptime}, {self.ipv4_connections}, {self.ipv6_connections}, {self.dashboard_memory_usage}>"
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    user_level = db.Column(db.String(50), nullable=False, default='user')
-    receive_email_alerts = db.Column(db.Boolean, default=True)
 
 
 class SmptEamilPasswordConfig(db.Model):
@@ -102,32 +110,37 @@ with app.app_context():
     db.create_all()
 
     # Initialize default settings
-    settings = DashboardSettings.query.first()
-    if not settings:
-        db.session.add(DashboardSettings())
+    general_settings = GeneralSettings.query.first()
+    if not general_settings:
+        db.session.add(GeneralSettings())
         db.session.commit()
 
-    # Create admin user if not exists
-    if not User.query.filter_by(username='admin').first():
-        hashed_password = generate_password_hash('adminpassword')
-        admin_user = User(username='admin', email="codeperfectplus@gmail.com", password=hashed_password, user_level='admin',
-                          receive_email_alerts=True)
-        
-        db.session.add(admin_user)
-        db.session.commit()
+    # initialize default dashboard settings for users
+    users = User.query.all()
+    for user in users:
+        if not user.dashboard_settings:
+            db.session.add(DashboardSettings(user_id=user.id))
+            db.session.commit()
 
-    # create a user if not exists
-    if not User.query.filter_by(username='user').first():
-        hashed_password = generate_password_hash('userpassword')
-        user = User(username='user', email="test@mail.com",
-                    password=hashed_password, user_level='user', receive_email_alerts=False)
-        
-        db.session.add(user)
-        db.session.commit()
+
+    pre_defined_users_json = "src/assets/predefine_user.json"
+    with open(pre_defined_users_json, "r") as file:
+        pre_defined_users = json.load(file)
+    for user in pre_defined_users:
+        if not User.query.filter_by(user_level=user['user_level']).first():
+            hashed_password = generate_password_hash(user['password'])
+            user = User(username=user['username'], email=user['email'], password=hashed_password, user_level=user['user_level'],
+                        receive_email_alerts=user['receive_email_alerts'], profession=user['profession'])
+            
+            db.session.add(user)
+            db.session.commit()
 
 # ibject for all templates
 @app.context_processor
 def inject_settings():
-    settings = DashboardSettings.query.first()
-    return dict(settings=settings)
-
+    if current_user.is_anonymous:
+        return dict(settings=None)
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    general_settings = GeneralSettings.query.first()
+    all_settings = dict(settings=settings, general_settings=general_settings)
+    return all_settings

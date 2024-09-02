@@ -47,19 +47,6 @@ def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_us
         # Return list of email addresses
         return [user.email for user in users]
 
-# Get Admin Emails with Alerts Enabled:
-# admin_emails = get_email_addresses(user_level='admin', receive_email_alerts=True)
-# Get All Admin Emails Regardless of Alert Preference:
-# all_admin_emails = get_email_addresses(user_level='admin', fetch_all_users=True)
-
-# Get All Users with Alerts Enabled:
-# all_user_emails = get_email_addresses(receive_email_alerts=True)
-# Get All Users Regardless of Alert Preference:
-# all_users_emails = get_email_addresses(fetch_all_users=True)
-
-
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -109,6 +96,7 @@ def signup():
         confirm_password = request.form['confirm_password']
         user_level = request.form.get('user_level', 'user')  # Default to 'user' if not provided
         receive_email_alerts = 'receive_email_alerts' in request.form  # Checkbox is either checked or not
+        profession = request.form.get('profession', None)
 
         if password != confirm_password:
             flash('Passwords do not match')
@@ -120,7 +108,12 @@ def signup():
             return redirect(url_for('signup'))
 
         hashed_password = generate_password_hash(password)
-        new_user = User(username=username, email=email, password=hashed_password, user_level=user_level, receive_email_alerts=receive_email_alerts)
+        new_user = User(username=username, 
+                        email=email, 
+                        password=hashed_password, 
+                        user_level=user_level, 
+                        receive_email_alerts=receive_email_alerts,
+                        profession=profession)
         
         # Get Admin Emails with Alerts Enabled:
         admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
@@ -202,8 +195,23 @@ def delete_user(username):
         return redirect(url_for('view_users'))  # Redirect to the users page
 
     user = User.query.filter_by(username=username).first_or_404()
+
+    # Get Admin Emails with Alerts Enabled:
+    admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
+    if admin_email_address:
+        subject = "User Deletion Alert"
+        context = {
+            "username": user.username,
+            "deletion_time": datetime.datetime.now(),
+            "current_user": current_user.username,
+        }
+        html_body = render_template_from_file("src/templates/email_templates/deletion_email.html", **context)
+        send_smpt_email(admin_email_address, subject, html_body, is_html=True)
+
     db.session.delete(user)
     db.session.commit()
+
+            
     
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect(url_for('view_users'))

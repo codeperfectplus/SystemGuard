@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}<div class="container mt-4">
+    <div class="row">{% include 'dasbhboard_comp/cpu/frequency.html' %}{% include 'dasbhboard_comp/cpu/usages.html' %}{% include
+        'dasbhboard_comp/cpu/current_temp.html' %}{% include 'dasbhboard_comp/memory/dashboard_memory.html' %}{% include
+        'dasbhboard_comp/memory/usage.html' %}{% include 'dasbhboard_comp/disk/usage.html' %}{% include
+        'dasbhboard_comp/other/uptime.html' %}{% include 'dasbhboard_comp/network/stats.html' %}{% include
+        'dasbhboard_comp/other/speedtest.html' %} </div>
+</div>{% endblock %}

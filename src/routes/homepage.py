@@ -1,6 +1,6 @@
 import datetime
 from flask import render_template, blueprints
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from src.config import app
 from src.models import SpeedTestResult, DashboardSettings, SystemInfo
@@ -46,13 +46,47 @@ def dashboard():
         source = None
         show_prompt = True
         remaining_time_for_next_test = None
-
+    
     return render_template(
-        "dashboard.html",
-        system_info=system_info,
-        speedtest_result=speedtest_result,
-        source=source,
-        last_timestamp=last_timestamp,
-        next_test_time=remaining_time_for_next_test,
-        show_prompt=show_prompt,
-    )
+            "dashboard/developer.html",
+            system_info=system_info,
+            speedtest_result=speedtest_result,
+            source=source,
+            last_timestamp=last_timestamp,
+            next_test_time=remaining_time_for_next_test,
+            show_prompt=show_prompt,
+            current_user=current_user,
+        )
+    # if current_user.profession == "developer":
+    #     return render_template(
+    #         "dashboard/developer.html",
+    #         system_info=system_info,
+    #         speedtest_result=speedtest_result,
+    #         source=source,
+    #         last_timestamp=last_timestamp,
+    #         next_test_time=remaining_time_for_next_test,
+    #         show_prompt=show_prompt,
+    #         current_user=current_user,
+    #     )
+    # elif current_user.profession == "manager":
+    #     return render_template(
+    #         "dashboard/manager.html",
+    #         system_info=system_info,
+    #         speedtest_result=speedtest_result,
+    #         source=source,
+    #         last_timestamp=last_timestamp,
+    #         next_test_time=remaining_time_for_next_test,
+    #         show_prompt=show_prompt,
+    #         current_user=current_user,
+    #     )
+    # else:
+    #     return render_template(
+    #         "dashboard/developer.html",
+    #         system_info=system_info,
+    #         speedtest_result=speedtest_result,
+    #         source=source,
+    #         last_timestamp=last_timestamp,
+    #         next_test_time=remaining_time_for_next_test,
+    #         show_prompt=show_prompt,
+    #         current_user=current_user,
+    #     )

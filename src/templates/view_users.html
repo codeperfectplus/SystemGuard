@@ -13,6 +13,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>User Level</th>
+                <th>Profession</th>
                 <th>Receive Email Alerts</th>
                 <th>Actions</th>
             </tr>
@@ -23,6 +24,7 @@
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.user_level }}</td>
+                <td>{{ user.profession }}</td>
                 <td>{{ 'Yes' if user.receive_email_alerts else 'No' }}</td>
                 <td>
                     <a href="{{ url_for('change_user_settings', username=user.username) }}" class="btn btn-edit">Edit</a>

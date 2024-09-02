@@ -1,16 +1,18 @@
 import os
 import time
+import json
 import datetime
 import subprocess
 import psutil
 from flask import render_template_string
 
-from src.models import DashboardSettings
+from src.models import DashboardSettings, GeneralSettings
 
 # Simple in-memory cache for specific data with individual timestamps
 cache = {}
 enable_cahce = True
 CACHE_EXPIRATION = 3600  # Cache expiration time in seconds (1 hour)
+
 
 def format_uptime(uptime_seconds):
     """Convert uptime from seconds to a human-readable format."""
@@ -52,6 +54,8 @@ def get_established_connections():
                 ipv6_set.add(conn.laddr.ip)
 
     # ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
+    ipv4_set.discard('127.0.0.0')
+    print(ipv4_set)
     ipv4 = list(ipv4_set)[0] if ipv4_set else "N/A"
     ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
 
@@ -171,9 +175,10 @@ def render_template_from_file(template_file_path, **context):
 
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. """
-    settings = DashboardSettings.query.first()
-    if settings:
-        enable_cahce = settings.enable_cache
+    general_settings = GeneralSettings.query.first()
+    if general_settings:
+        enable_cahce = general_settings.enable_cache
+        print("Enable cache:", enable_cahce)
     
     current_time = time.time()
     # if key not in cache, create a new entry
@@ -194,12 +199,12 @@ def get_cached_value(key, fresh_value_func):
 
     return fresh_value
 
+def get_system_node_name():
+    return os.uname().nodename
+
 def get_system_info():
     """ Get system information with caching for certain values and fresh data for others. """
-    print("Getting system information...")
-
-    # Get cached or fresh values
-    username = get_cached_value('username', os.getlogin)
+    username = get_cached_value('username', get_system_node_name)
     ipv4_dict = get_cached_value('ipv4', lambda: get_established_connections()[0])
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))

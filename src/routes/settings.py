@@ -1,19 +1,17 @@
 import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
 from src.config import app, db
-from src.models import DashboardSettings, User
+from src.models import DashboardSettings, User, GeneralSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file
 from src.scripts.email_me import send_smpt_email
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
-
-
 @app.route('/settings/speedtest', methods=['GET', 'POST'])
 @login_required
 def speedtest_settings():
-    settings = DashboardSettings.query.first()  # Retrieve settings from DB
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         settings.speedtest_cooldown = request.form.get('speedtest_cooldown')
         settings.number_of_speedtests = request.form.get('number_of_speedtests')
@@ -25,31 +23,31 @@ def speedtest_settings():
 @app.route('/settings/general', methods=['GET', 'POST'])
 @login_required
 def general_settings():
-    settings = DashboardSettings.query.first()  # Retrieve settings from DB
+    general_settings = GeneralSettings.query.filter_by().first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
-        settings.timezone = request.form.get('timezone')
-        settings.enable_cache = 'enable_cache' in request.form
-        settings.enable_alerts = 'enable_alerts' in request.form
+        general_settings.timezone = request.form.get('timezone')
+        general_settings.enable_cache = 'enable_cache' in request.form
+        general_settings.enable_alerts = 'enable_alerts' in request.form
         admin_emails = [user.email for user in User.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
         if admin_emails:
             subject = "SystemGuard Server Started"
             context = {
                 "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "notifications_enabled": settings.enable_alerts,
+                "notifications_enabled": general_settings.enable_alerts,
                 "current_user": current_user.username
             }
             html_body = render_template_from_file("src/templates/email_templates/notification_alert.html", **context)
-            print("Notification enabled:", settings.enable_alerts)
+            print("Notification enabled:", general_settings.enable_alerts)
             send_smpt_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))
-    return render_template('general_settings.html', settings=settings)
+    return render_template('general_settings.html', general_settings=general_settings)
 
 @app.route('/settings/feature-toggles', methods=['GET', 'POST'])
 @login_required
 def feature_toggles():
-    settings = DashboardSettings.query.first()  # Retrieve settings from DB
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
         settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
@@ -64,7 +62,7 @@ def feature_toggles():
 @app.route('/settings/card-toggles', methods=['GET', 'POST'])
 @login_required
 def card_toggles():
-    settings = DashboardSettings.query.first()  # Retrieve settings from DB
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         settings.is_user_card_enabled = 'is_user_card_enabled' in request.form
         settings.is_server_card_enabled = 'is_server_card_enabled' in request.form
@@ -83,7 +81,6 @@ def card_toggles():
         return redirect(url_for('card_toggles'))
     return render_template('card_toggles.html', settings=settings)
 
-
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
@@ -94,7 +91,7 @@ def settings():
         return render_template("error/permission_denied.html")
 
     # Fetch the settings from the database
-    settings = DashboardSettings.query.first()
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()
 
     if settings:
         if request.method == "POST":
@@ -103,9 +100,6 @@ def settings():
                 settings.speedtest_cooldown = int(request.form["speedtest_cooldown"])
             if "number_of_speedtests" in request.form:
                 settings.number_of_speedtests = int(request.form["number_of_speedtests"])
-            if "timezone" in request.form:
-                settings.timezone = request.form["timezone"]
-            settings.enable_cache = "enable_cache" in request.form
 
             # Feature settings
             settings.is_cpu_info_enabled = "is_cpu_info_enabled" in request.form
