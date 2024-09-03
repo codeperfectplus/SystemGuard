@@ -8,6 +8,7 @@ from flask import render_template_string, jsonify
 
 from src.models import UserDashboardSettings, ApplicationGeneralSettings
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Simple in-memory cache for specific data with individual timestamps
 cache = {}
 enable_cahce = True

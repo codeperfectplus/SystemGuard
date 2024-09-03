@@ -11,8 +11,9 @@ from src.models.user_profile import UserProfile
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 import json
+import os
 
-
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 with app.app_context():
     print("Creating tables")
@@ -27,7 +28,7 @@ with app.app_context():
             db.session.add(FeatureToggleSettings(user_id=user.id))
             db.session.commit()
 
-    pre_defined_users_json = "src/assets/predefine_user.json"
+    pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
     with open(pre_defined_users_json, "r") as file:
         pre_defined_users = json.load(file)
     for user in pre_defined_users:
