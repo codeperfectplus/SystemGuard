@@ -1,5 +1,5 @@
 
-{% extends 'base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}
+{% extends 'base/base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashbaord.css') }}">
 {% endblock %}
@@ -7,11 +7,11 @@
     <div class="row">
         <label for="refresh-interval">Select Refresh Interval (seconds):</label>
         <select id="refresh-interval">
-            <option value="5" {% if feature_toggles_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
-            <option value="10" {% if feature_toggles_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
-            <option value="15" {% if feature_toggles_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
-            <option value="30" {% if feature_toggles_settings.refresh_interval == 30 %}selected{% endif %}>30 seconds</option>
-            <option value="60" {% if feature_toggles_settings.refresh_interval == 60 %}selected{% endif %}>60 seconds</option>
+            <option value="5" {% if user_dashboard_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
+            <option value="10" {% if user_dashboard_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
+            <option value="15" {% if user_dashboard_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
+            <option value="30" {% if user_dashboard_settings.refresh_interval == 30 %}selected{% endif %}>30 seconds</option>
+            <option value="60" {% if user_dashboard_settings.refresh_interval == 60 %}selected{% endif %}>60 seconds</option>
         </select>
     </div>
 </div>
@@ -26,7 +26,7 @@
         'dasbhboard_comp/other/speedtest.html' %} </div>
 </div>
 <script>
-    let refreshInterval = {{ feature_toggles_settings.refresh_interval *1000 }};
+    let refreshInterval = {{ user_dashboard_settings.refresh_interval *1000 }};
     let refreshTimeout;
 
     function startRefresh() {

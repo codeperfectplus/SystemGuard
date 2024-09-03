@@ -1,12 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% block title %}Add New User{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/add_user.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create_user.css') }}">
 {% endblock %}
 {% block content %}
 <div class="add-user-container">
     <h2 class="page-title">Add New User</h2>
-    <form action="{{ url_for('add_user') }}" method="post">
+    <form action="{{ url_for('create_user') }}" method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
 

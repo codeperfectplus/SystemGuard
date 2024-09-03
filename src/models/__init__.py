@@ -2,7 +2,7 @@ from src.config import db, app
 from src.models.user_card_settings import UserCardSettings
 from src.models.dashboard_netowrk import DashboardNetworkSettings
 from src.models.user_dashboard_settings import UserDashboardSettings
-from src.models.feature_toggle_settings import FeatureToggleSettings
+from src.models.feature_toggle_settings import PageToggleSettings
 from src.models.application_general_settings import ApplicationGeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
@@ -25,7 +25,7 @@ with app.app_context():
         if not user.dashboard_settings:
             db.session.add(UserDashboardSettings(user_id=user.id))
             db.session.add(UserCardSettings(user_id=user.id))
-            db.session.add(FeatureToggleSettings(user_id=user.id))
+            db.session.add(PageToggleSettings(user_id=user.id))
             db.session.commit()
 
     pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
@@ -57,19 +57,19 @@ with app.app_context():
 @app.context_processor
 def inject_settings():
     if current_user.is_anonymous:
-        return dict(user_dashboard_settings=None, card_settings=None, feature_toggles_settings=None, general_settings=None)
+        return dict(user_dashboard_settings=None, card_settings=None, page_toggles_settings=None, general_settings=None)
     general_settings = ApplicationGeneralSettings.query.first()
     card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()
     user_dashboard_settings = UserDashboardSettings.query.filter_by(
         user_id=current_user.id
     ).first()  # Retrieve user-specific user_dashboard_settings from DB
-    feature_toggles_settings = FeatureToggleSettings.query.filter_by(
+    page_toggles_settings = PageToggleSettings.query.filter_by(
         user_id=current_user.id
     ).first()
     all_settings = dict(
         user_dashboard_settings=user_dashboard_settings,
         general_settings=general_settings,
         card_settings=card_settings,
-        feature_toggles_settings=feature_toggles_settings,
+        page_toggles_settings=page_toggles_settings,
     )
     return all_settings

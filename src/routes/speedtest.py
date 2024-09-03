@@ -47,8 +47,8 @@ def speedtest():
             speedtest_result_template = os.path.join(
                 ROOT_DIR, "src/templates/email_templates/speedtest_result.html"
             )
-            html_body = render_template_from_file(speedtest_result_template, **context)
-            send_smpt_email(receiver_email, subject, html_body, is_html=True)
+            email_body = render_template_from_file(speedtest_result_template, **context)
+            send_smpt_email(receiver_email, subject, email_body, is_html=True)
 
             return render_template(
                 "speedtest_result.html",

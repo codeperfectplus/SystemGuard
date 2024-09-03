@@ -8,7 +8,7 @@ smtp_email_config_bp = blueprints.Blueprint('smtp_email_config', __name__)
 
 @app.route("/update-email-password", methods=["GET", "POST"])
 @login_required
-def update_smpt_email_password():
+def smtp_config():
     smtp_config = SMTPSettings.query.first()
 
     if request.method == "POST":
@@ -17,7 +17,7 @@ def update_smpt_email_password():
 
         if not new_email or not new_password:
             flash("Please provide email and password.", "danger")
-            return redirect(url_for("update_smpt_email_password"))
+            return redirect(url_for("smtp_config"))
         
         
         if not smtp_config:
@@ -29,6 +29,6 @@ def update_smpt_email_password():
         
         db.session.commit()
         flash("Email and password updated successfully!", "success")
-        return redirect(url_for("update_smpt_email_password"))
+        return redirect(url_for("smtp_config"))
 
-    return render_template("update_smpt_email_password.html", smtp_config=smtp_config)
+    return render_template("smtp_config.html", smtp_config=smtp_config)

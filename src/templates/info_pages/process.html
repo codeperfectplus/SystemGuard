@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% block title %}System Process{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/process.css') }}">
 {% endblock %}
 {% block content %}
 <div class="container">
-    <h1>Top Processes by Memory Usage</h1>
+    <h1>Top Processes on System</h1>
 
     <!-- Display flash messages -->
     {% include 'ext/message.html' %}

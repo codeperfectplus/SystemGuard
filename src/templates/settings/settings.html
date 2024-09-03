@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% block title %}Settings{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
@@ -13,23 +13,26 @@
         <a href="{{ url_for('view_users') }}" class="btn btn-primary">
             <i class="fas fa-users"></i> All Users
         </a>
-        <a href="{{ url_for('update_smpt_email_password') }}" class="btn btn-primary">
-            <i class="fas fa-key"></i> Update Email Config
+        <a href="{{ url_for('create_user') }}" class="btn btn-primary">
+            <i class="fas fa-users"></i> Create User
         </a>
-    </div>    
-
+    </div>  
+    
     <div class="settings-buttons">
-        <a href="{{ url_for('speedtest_settings') }}" class="btn btn-primary">
-            <i class="fas fa-tachometer-alt"></i> Speedtest Settings
+        <a href="{{ url_for('smtp_config') }}" class="btn btn-primary">
+            <i class="fas fa-key"></i> Smtp Configuration
         </a>
         <a href="{{ url_for('general_settings') }}" class="btn btn-primary">
             <i class="fas fa-cogs"></i> General Settings
         </a>
-    </div>
+    </div> 
 
     <div class="settings-buttons">
+        <a href="{{ url_for('user_settings') }}" class="btn btn-primary">
+            <i class="fa-solid fa-user"></i> User Settings
+        </a>
         <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary">
-            <i class="fas fa-toggle-on"></i> Feature Toggles
+            <i class="fas fa-toggle-on"></i> Page Toggles
         </a>
         <a href="{{ url_for('card_toggles') }}" class="btn btn-primary">
             <i class="fas fa-toggle-on"></i> Card Toggles

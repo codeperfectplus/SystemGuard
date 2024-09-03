@@ -1,0 +1,40 @@
+{% extends 'base/base.html' %}
+{% block title %}Feature Toggles{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+{% block content %}
+<div class="settings-container">
+    <h1 class="settings-title">Page Toggles</h1>
+
+    <form method="POST">
+        {% include 'ext/message.html' %}
+        
+        <div class="form-group">
+            <label for="is_cpu_info_enabled">Enable CPU Information:</label>
+            <input type="checkbox" id="is_cpu_info_enabled" name="is_cpu_info_enabled" {% if page_toggles_settings.is_cpu_info_enabled %}checked{% endif %}>
+        </div>
+
+        <div class="form-group">
+            <label for="is_memory_info_enabled">Enable Memory Information:</label>
+            <input type="checkbox" id="is_memory_info_enabled" name="is_memory_info_enabled" {% if page_toggles_settings.is_memory_info_enabled %}checked{% endif %}>
+        </div>
+        
+        <div class="form-group">
+            <label for="is_disk_info_enabled">Enable Disk Information:</label>
+            <input type="checkbox" id="is_disk_info_enabled" name="is_disk_info_enabled" {% if page_toggles_settings.is_disk_info_enabled %}checked{% endif %}>
+        </div>
+
+        <div class="form-group">
+            <label for="is_network_info_enabled">Enable Network Information:</label>
+            <input type="checkbox" id="is_network_info_enabled" name="is_network_info_enabled" {% if page_toggles_settings.is_network_info_enabled %}checked{% endif %}>
+        </div>
+
+        <div class="form-group">
+            <label for="is_process_info_enabled">Enable Process Information:</label>
+            <input type="checkbox" id="is_process_info_enabled" name="is_process_info_enabled" {% if page_toggles_settings.is_process_info_enabled %}checked{% endif %}>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+</div>
+{% endblock %}

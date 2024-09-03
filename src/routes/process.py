@@ -3,7 +3,7 @@ from flask import request, render_template, redirect, url_for, flash, session, b
 from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
-from src.models import  FeatureToggleSettings
+from src.models import  PageToggleSettings
 from src.scripts.email_me import send_smpt_email
 
 process_bp = blueprints.Blueprint("process", __name__)
@@ -11,8 +11,8 @@ process_bp = blueprints.Blueprint("process", __name__)
 @app.route("/process", methods=["GET", "POST"])
 @login_required
 def process():
-    feature_toggles_settings = FeatureToggleSettings.query.first()
-    if not feature_toggles_settings.is_process_info_enabled:
+    page_toggles_settings = PageToggleSettings.query.first()
+    if not page_toggles_settings.is_process_info_enabled:
         flash("You do not have permission to view this page.", "danger")
         return render_template("error/permission_denied.html")
     if current_user.user_level != "admin":
@@ -36,8 +36,8 @@ def process():
                 subject = f"Process '{process_name}' (PID {pid_to_kill}) killed successfully."
                 context = {"process_name": process_name, "pid_to_kill": pid_to_kill, "username": current_user.username}
                 process_killed_template = os.path.join(ROOT_DIR, "src/templates/email_templates/process_killed.html")
-                html_body = render_template_from_file(process_killed_template, **context)
-                send_smpt_email(receiver_email, subject, html_body, is_html=True)
+                email_body = render_template_from_file(process_killed_template, **context)
+                send_smpt_email(receiver_email, subject, email_body, is_html=True)
             except Exception as e:
                 flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {e}", "danger")
             return redirect(url_for("process"))  # Refresh the page after killing process

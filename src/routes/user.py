@@ -5,16 +5,16 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 
 from src.config import app, db
-from src.models import UserProfile, UserDashboardSettings, UserCardSettings, FeatureToggleSettings
+from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smpt_email
 from src.routes.helper import get_email_addresses
 
 user_bp = blueprints.Blueprint('user', __name__)
 
-@app.route('/add_user', methods=['GET', 'POST'])
+@app.route('/create_user', methods=['GET', 'POST'])
 @login_required
-def add_user():
+def create_user():
     if current_user.user_level != 'admin':
         flash("Your account does not have permission to view this page.", "danger")
         return render_template("error/permission_denied.html")
@@ -28,7 +28,7 @@ def add_user():
         # Check if user already exists
         if UserProfile.query.filter_by(username=username).first() or UserProfile.query.filter_by(email=email).first():
             flash('Username or email already exists.', 'danger')
-            return redirect(url_for('add_user'))
+            return redirect(url_for('create_user'))
 
         new_user = UserProfile(
             username=username,
@@ -46,12 +46,12 @@ def add_user():
                 "current_user": current_user.username,
                 "username": new_user.username,
                 "email": new_user.email,
-                "signup_time": datetime.datetime.now(),
+                "registration_time": datetime.datetime.now(),
                 "user_level": new_user.user_level
             }
             new_user_alert_template =  os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_create.html")
-            html_body = render_template_from_file(new_user_alert_template, **context)
-            send_smpt_email(admin_email_address, subject, html_body, is_html=True)
+            email_body = render_template_from_file(new_user_alert_template, **context)
+            send_smpt_email(admin_email_address, subject, email_body, is_html=True)
 
         # Send welcome email to new user
         subject = "Welcome to the systemGuard"  
@@ -60,8 +60,8 @@ def add_user():
             "email": new_user.email,
         }
         welcome_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
-        html_body = render_template_from_file(welcome_email_template, **context)
-        send_smpt_email(email, subject, html_body, is_html=True)
+        email_body = render_template_from_file(welcome_email_template, **context)
+        send_smpt_email(email, subject, email_body, is_html=True)
 
         # Add and commit the new user to get the correct user ID
         db.session.add(new_user)
@@ -72,13 +72,13 @@ def add_user():
         # Now you can use the new user's ID to create related settings
         db.session.add(UserDashboardSettings(user_id=new_user.id))
         db.session.add(UserCardSettings(user_id=new_user.id))
-        db.session.add(FeatureToggleSettings(user_id=new_user.id))
+        db.session.add(PageToggleSettings(user_id=new_user.id))
         db.session.commit()
 
         flash('User created successfully!', 'success')
         return redirect(url_for('view_users'))
 
-    return render_template('add_user.html')
+    return render_template('users/create_user.html')
 
 @app.route('/users')
 @login_required
@@ -88,9 +88,9 @@ def view_users():
         return render_template("error/permission_denied.html")
 
     # Fetch all users from the database
-    users = User.query.all()
+    users = UserProfile.query.all()
 
-    return render_template('view_users.html', users=users)
+    return render_template('users/view_users.html', users=users)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
@@ -114,7 +114,7 @@ def change_user_settings(username):
         flash('User settings updated successfully!', 'success')
         return redirect(url_for('change_user_settings', username=user.username))
 
-    return render_template('change_user.html', user=user)
+    return render_template('users/change_user.html', user=user)
 
 @app.route('/delete_user/<username>', methods=['POST'])
 @login_required
@@ -135,13 +135,11 @@ def delete_user(username):
             "current_user": current_user.username,
         }
         deletion_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/deletion_email.html")
-        html_body = render_template_from_file(deletion_email_template, **context)
-        send_smpt_email(admin_email_address, subject, html_body, is_html=True)
+        email_body = render_template_from_file(deletion_email_template, **context)
+        send_smpt_email(admin_email_address, subject, email_body, is_html=True)
 
     db.session.delete(user)
     db.session.commit()
-
-            
     
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect(url_for('view_users'))

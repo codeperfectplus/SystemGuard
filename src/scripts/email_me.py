@@ -29,7 +29,7 @@ def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html
         if not email_password:
             print("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
             flash("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.", "danger")
-            return redirect(url_for('update_smpt_email_password'))
+            return redirect(url_for('smtp_config'))
 
     EMAIL_ADDRESS = email_password.email
     EMAIL_PASSWORD = email_password.password

@@ -1,8 +1,12 @@
 import subprocess
-from flask import render_template, request, jsonify, flash, blueprints
+from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required, current_user
-from src.models import FeatureToggleSettings
+
+from src.models import PageToggleSettings, UserCardSettings, UserDashboardSettings
 from src.config import app, db
+from src.routes.helper import get_email_addresses
+from src.scripts.email_me import send_smpt_email
+
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -38,11 +42,11 @@ def update_refresh_interval():
         return jsonify({'error': 'Invalid refresh interval value'}), 400
 
     # Query the settings for the current user
-    settings = FeatureToggleSettings.query.filter_by(user_id=user_id).first()
+    settings = PageToggleSettings.query.filter_by(user_id=user_id).first()
 
     # If settings do not exist for the user, create them
     if not settings:
-        settings = FeatureToggleSettings(user_id=user_id, refresh_interval=new_interval)
+        settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
         db.session.add(settings)
     else:
         # Update the refresh interval
@@ -52,3 +56,69 @@ def update_refresh_interval():
     db.session.commit()
 
     return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
+
+
+
+@app.route("/send_email", methods=["GET", "POST"])
+@login_required
+def send_email_page():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        flash("User level for this account is: " + current_user.user_level, "danger")
+        flash("Please contact your administrator for more information.", "danger")
+        return render_template("error/permission_denied.html")
+    dasboard_settings = UserCardSettings.query.first()
+    receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
+    if dasboard_settings:
+        enable_alerts = dasboard_settings.enable_alerts
+    if request.method == "POST":
+        receiver_email = request.form.get("recipient")
+        subject = request.form.get("subject")
+        body = request.form.get("body")
+        priority = request.form.get("priority")
+        attachment = request.files.get("attachment")
+
+        if not receiver_email or not subject or not body:
+            flash("Please provide recipient, subject, and body.", "danger")
+            return redirect(url_for('send_email_page'))
+        
+        print("Priority:", priority)
+        print("receiver_email:", receiver_email)
+
+        # on high priority, send to all users or admin users even the receive_email_alerts is False
+        if priority == "high" and receiver_email == "all_users":
+            print("Sending to all users")
+            receiver_email = get_email_addresses(fetch_all_users=True)
+        elif priority == "high" and receiver_email == "admin_users":
+            print("Sending to admin users")
+            receiver_email = get_email_addresses(user_level='admin', fetch_all_users=True)
+
+        # priority is low, send to users with receive_email_alerts is True
+        if priority == "low" and receiver_email == "all_users":
+            print("Sending to all users with receive_email_alerts=True")
+            receiver_email = get_email_addresses(receive_email_alerts=True)
+        elif priority == "low" and receiver_email == "admin_users":
+            print("Sending to admin users with receive_email_alerts=True")
+            receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)
+
+        if not receiver_email:
+            flash("No users found to send email to.", "danger")
+            return redirect(url_for('send_email_page'))
+        
+        # Save attachment if any
+        attachment_path = None
+        if attachment:
+            attachment_path = f"/tmp/{attachment.filename}"
+            attachment.save(attachment_path)
+        try:
+            respose = send_smpt_email(receiver_email, subject, body, attachment_path)
+            print(respose)
+            if respose and respose.get("status") == "success":
+                flash(respose.get("message"), "success")
+        except Exception as e:
+            flash(f"Failed to send email: {str(e)}", "danger")
+        
+        return redirect(url_for('send_email_page'))
+
+    return render_template("other/send_email.html", enable_alerts=enable_alerts)
+

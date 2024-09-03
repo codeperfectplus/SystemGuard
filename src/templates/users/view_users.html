@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% block title %}View Users{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/view_users.css') }}">
@@ -6,7 +6,7 @@
 {% block content %}
 <div class="view-users-container">
     <h2 class="page-title">All Users</h2>
-    <a href="{{ url_for('add_user') }}" class="btn btn-add-user">Add New User</a>
+    <a href="{{ url_for('create_user') }}" class="btn btn-add-user">Add New User</a>
     <table class="user-table">
         <thead>
             <tr>

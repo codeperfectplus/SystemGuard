@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'base/base.html' %}
 {% block title %}Speedtest Settings{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 {% endblock %}
 {% block content %}
 <div class="settings-container">
-    <h1 class="settings-title">Speedtest Settings</h1>
+    <h1 class="settings-title">User Settings</h1>
 
     <form method="POST">
         {% include 'ext/message.html' %}
@@ -20,6 +20,11 @@
             <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ user_dashboard_settings.number_of_speedtests }}" min="1" required>
         </div>
 
+        <div class="form-group">
+            <label for="refresh_interval">Refresh Interval(sec):</label>
+            <input type="number" id="refresh_interval" name="refresh_interval" value="{{ user_dashboard_settings.refresh_interval }}">
+        </div>
+        
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>
 </div>

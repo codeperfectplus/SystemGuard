@@ -8,4 +8,4 @@ class UserDashboardSettings(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     speedtest_cooldown = db.Column(db.Integer, default=60)
     number_of_speedtests = db.Column(db.Integer, default=1)
-    
+    refresh_interval = db.Column(db.Integer, default=10)

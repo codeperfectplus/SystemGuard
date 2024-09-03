@@ -3,7 +3,7 @@ import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
 
 from src.config import app, db
-from src.models import UserCardSettings, UserDashboardSettings, UserProfile, ApplicationGeneralSettings, FeatureToggleSettings
+from src.models import UserCardSettings, UserDashboardSettings, UserProfile, ApplicationGeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smpt_email
@@ -12,15 +12,16 @@ settings_bp = blueprints.Blueprint("settings", __name__)
 
 @app.route('/settings/speedtest', methods=['GET', 'POST'])
 @login_required
-def speedtest_settings():
+def user_settings():
     user_dashboard_settings = UserDashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         user_dashboard_settings.speedtest_cooldown = request.form.get('speedtest_cooldown')
         user_dashboard_settings.number_of_speedtests = request.form.get('number_of_speedtests')
+        user_dashboard_settings.refresh_interval = request.form.get('refresh_interval')
         db.session.commit()
         flash('Speedtest settings updated successfully!', 'success')
-        return redirect(url_for('speedtest_settings'))
-    return render_template('speedtest_settings.html', user_dashboard_settings=user_dashboard_settings)
+        return redirect(url_for('user_settings'))
+    return render_template('settings/user_settings.html', user_dashboard_settings=user_dashboard_settings)
 
 @app.route('/settings/general', methods=['GET', 'POST'])
 @login_required
@@ -39,29 +40,28 @@ def general_settings():
                 "current_user": current_user.username
             }
             notficiation_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
-            html_body = render_template_from_file(notficiation_alert_template, **context)
-            send_smpt_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
+            email_body = render_template_from_file(notficiation_alert_template, **context)
+            send_smpt_email(admin_emails, subject, email_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))
-    return render_template('general_settings.html', general_settings=general_settings)
+    return render_template('settings/general_settings.html', general_settings=general_settings)
 
 @app.route('/settings/feature-toggles', methods=['GET', 'POST'])
 @login_required
 def feature_toggles():
-    feature_toggles_settings = FeatureToggleSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    page_toggles_settings = PageToggleSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
-        feature_toggles_settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
-        feature_toggles_settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
-        feature_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
-        feature_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
-        feature_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
-        feature_toggles_settings.refresh_interval = request.form["refresh_interval"]
-        print("refresh_interval", feature_toggles_settings.refresh_interval)
+        page_toggles_settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
+        page_toggles_settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
+        page_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
+        page_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
+        page_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
+        print("refresh_interval", page_toggles_settings.refresh_interval)
         db.session.commit()
         flash('Feature toggles updated successfully!', 'success')
         return redirect(url_for('feature_toggles'))
-    return render_template('feature_toggles.html', feature_toggles_settings=feature_toggles_settings)
+    return render_template('settings/page_toggles.html', page_toggles_settings=page_toggles_settings)
 
 @app.route('/settings/card-toggles', methods=['GET', 'POST'])
 @login_required
@@ -83,7 +83,7 @@ def card_toggles():
         db.session.commit()
         flash('Card toggles updated successfully!', 'success')
         return redirect(url_for('card_toggles'))
-    return render_template('card_toggles.html', card_settings=card_settings)
+    return render_template('settings/card_toggles.html', card_settings=card_settings)
 
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
@@ -94,4 +94,4 @@ def settings():
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/permission_denied.html")
 
-    return render_template("settings.html", settings=settings)
+    return render_template("settings/settings.html", settings=settings)
