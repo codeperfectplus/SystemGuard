@@ -18,7 +18,7 @@ with app.app_context():
     print("Creating tables")
     db.create_all()
 
-    # initialize default dashboard settings for users
+    # initialize default dashboard user_dashboard_settings for users
     users = UserProfile.query.all()
     for user in users:
         if not user.dashboard_settings:
@@ -45,7 +45,7 @@ with app.app_context():
             db.session.add(user)
             db.session.commit()
 
-    # Initialize default settings
+    # Initialize default user_dashboard_settings
     general_settings = ApplicationGeneralSettings.query.first()
     if not general_settings:
         db.session.add(ApplicationGeneralSettings())
@@ -56,17 +56,17 @@ with app.app_context():
 @app.context_processor
 def inject_settings():
     if current_user.is_anonymous:
-        return dict(settings=None, card_settings=None)
+        return dict(user_dashboard_settings=None, card_settings=None)
     general_settings = ApplicationGeneralSettings.query.first()
     card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()
-    settings = UserDashboardSettings.query.filter_by(
+    user_dashboard_settings = UserDashboardSettings.query.filter_by(
         user_id=current_user.id
-    ).first()  # Retrieve user-specific settings from DB
+    ).first()  # Retrieve user-specific user_dashboard_settings from DB
     feature_toggles_settings = FeatureToggleSettings.query.filter_by(
         user_id=current_user.id
     ).first()
     all_settings = dict(
-        settings=settings,
+        user_dashboard_settings=user_dashboard_settings,
         general_settings=general_settings,
         card_settings=card_settings,
         feature_toggles_settings=feature_toggles_settings,

@@ -4,7 +4,7 @@ import json
 import datetime
 import subprocess
 import psutil
-from flask import render_template_string
+from flask import render_template_string, jsonify
 
 from src.models import UserDashboardSettings, ApplicationGeneralSettings
 
@@ -22,7 +22,15 @@ def format_uptime(uptime_seconds):
     hours = int(uptime_seconds // 3600)
     uptime_seconds %= 3600
     minutes = int(uptime_seconds // 60)
-    return f"{days} days, {hours} hours, {minutes} minutes"
+    seconds = int(uptime_seconds % 60)
+    
+    return {
+        'uptime_days': days,
+        'uptime_hours': hours,
+        'uptime_minutes': minutes,
+        'uptime_seconds': seconds
+    }
+
 
 def datetimeformat(value, format='%Y-%m-%d %H:%M:%S'):
     return value.strftime(format)
@@ -174,7 +182,6 @@ def get_cached_value(key, fresh_value_func):
     general_settings = ApplicationGeneralSettings.query.first()
     if general_settings:
         enable_cahce = general_settings.enable_cache
-        print("Enable cache:", enable_cahce)
     
     current_time = time.time()
     # if key not in cache, create a new entry
@@ -203,7 +210,7 @@ def get_system_info():
     username = get_cached_value('username', get_system_node_name)
     ipv4_dict = get_cached_value('ipv4', lambda: get_established_connections()[0])
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
-    uptime = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
+    uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
 
     # Gathering fresh system information
     battery_info = psutil.sensors_battery()
@@ -226,7 +233,6 @@ def get_system_info():
         'network_received': round(net_io.bytes_recv / (1000 ** 2), 1),  # In MB
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
-        'uptime': uptime,
         'ipv4_connections': ipv4_dict,
         'dashboard_memory_usage': get_flask_memory_usage(),
         'timestamp': datetime.datetime.now(),
@@ -234,5 +240,7 @@ def get_system_info():
         'current_temp': get_cpu_temp()[0],
         'current_server_time': datetimeformat(current_server_time),
     }
+    # update uptime dictionary
+    info.update(uptime_dict)
 
     return info

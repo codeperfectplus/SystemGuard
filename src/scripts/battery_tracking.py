@@ -1,7 +1,7 @@
 import psutil
 import os
 from datetime import datetime, timedelta
-from src.utils.email_me import send_smpt_email
+from src.scripts.email_me import send_email
 
 STATUS_FILE = 'battery_status.txt'
 NOTIFICATION_INTERVAL = timedelta(hours=1)  # Minimum time between notifications

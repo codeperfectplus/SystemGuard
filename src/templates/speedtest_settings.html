@@ -11,13 +11,13 @@
         {% include 'ext/message.html' %}
         
         <div class="form-group">
-            <label for="speedtest_cooldown">Speedtest Cooldown (hours):</label>
-            <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ settings.speedtest_cooldown }}" min="1" required>
+            <label for="speedtest_cooldown">Speedtest Cooldown (minutes):</label>
+            <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ user_dashboard_settings.speedtest_cooldown }}" min="1" required>
         </div>
         
         <div class="form-group">
             <label for="number_of_speedtests">Number of Speedtests Allowed per Hour:</label>
-            <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ settings.number_of_speedtests }}" min="1" required>
+            <input type="number" id="number_of_speedtests" name="number_of_speedtests" value="{{ user_dashboard_settings.number_of_speedtests }}" min="1" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Save Settings</button>
