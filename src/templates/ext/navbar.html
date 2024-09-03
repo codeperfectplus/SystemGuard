@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <a class="navbar-brand d-flex align-items-center {% if request.endpoint == 'dashboard' %}active{% endif %}" 
-       href="{{ url_for('dashboard_network') }}">SystemGuard
+       href="{{ url_for('dashboard') }}">SystemGuard
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,11 +8,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-            {% if current_user.is_authenticated %}
+            {% if page_toggles_settings.is_dashboard_network_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}" 
-                   href="{{ url_for('dashboard') }}">
-                   <i class="fa-solid fa-gauge mr-2"></i></i>Dashboard
+                   href="{{ url_for('dashboard_network') }}">
+                   <i class="fa-solid fa-network-wired"></i></i> Dashboard Network
                 </a>
             </li>
             {% endif %}

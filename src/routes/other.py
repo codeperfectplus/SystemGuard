@@ -15,7 +15,7 @@ other_bp = blueprints.Blueprint('other', __name__)
 def terminal():
     if current_user.user_level != 'admin':
         flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     if request.method == 'POST':
         command = request.form.get('command')
         if command:
@@ -66,7 +66,7 @@ def send_email_page():
         flash("Your account does not have permission to view this page.", "danger")
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     dasboard_settings = UserCardSettings.query.first()
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
     if dasboard_settings:

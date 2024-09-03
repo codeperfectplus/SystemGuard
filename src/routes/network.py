@@ -5,13 +5,13 @@ from src.config import app, db
 from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
 from src.models import  DashboardNetworkSettings
 
-homepages_bp = blueprints.Blueprint('homepages', __name__)
+network_bp = blueprints.Blueprint('network', __name__)
 
 
 from flask import render_template
 from flask_login import login_required
 
-@app.route('/', methods=['GET'])
+@app.route('/netowrk', methods=['GET'])
 @login_required
 def dashboard_network():
     groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
@@ -48,7 +48,7 @@ def add_server():
 def edit_server(server_id):
     if current_user.user_level != 'admin':
         flash('You are not authorized to access this page.', 'danger')
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
 
     server = DashboardNetworkSettings.query.get_or_404(server_id)
     if request.method == 'POST':
@@ -67,7 +67,7 @@ def edit_server(server_id):
 def delete_server(server_id):
     if current_user.user_level != 'admin':
         flash('You are not authorized to access this page.', 'danger')
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     server = DashboardNetworkSettings.query.get_or_404(server_id)
     db.session.delete(server)
     db.session.commit()

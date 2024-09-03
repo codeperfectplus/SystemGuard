@@ -47,17 +47,18 @@ def general_settings():
         return redirect(url_for('general_settings'))
     return render_template('settings/general_settings.html', general_settings=general_settings)
 
-@app.route('/settings/feature-toggles', methods=['GET', 'POST'])
+@app.route('/settings/page-toggles', methods=['GET', 'POST'])
 @login_required
 def feature_toggles():
     page_toggles_settings = PageToggleSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
+        # is_dashboard_network_enabled
+        page_toggles_settings.is_dashboard_network_enabled = 'is_dashboard_network_enabled' in request.form
         page_toggles_settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
         page_toggles_settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
         page_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
         page_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
         page_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
-        print("refresh_interval", page_toggles_settings.refresh_interval)
         db.session.commit()
         flash('Feature toggles updated successfully!', 'success')
         return redirect(url_for('feature_toggles'))
@@ -92,6 +93,6 @@ def settings():
         flash("Your account does not have permission to view this page.", "danger")
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
 
     return render_template("settings/settings.html", settings=settings)

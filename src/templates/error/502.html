@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% block title %}Bad Gateway{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="content-wrapper">
+        <div class="icon">&#9888;</div> <!-- Unicode for a warning sign -->
+        <h1>502</h1>
+        <p>Bad gateway. Please try again later.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+    </div>
+</div>
+{% endblock %}

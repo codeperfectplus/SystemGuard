@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% block title %}Method Not Allowed{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="content-wrapper">
+        <div class="icon">&#128683;</div> <!-- Unicode for a stop sign -->
+        <h1>405</h1>
+        <p>Sorry, the method is not allowed on this page.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+    </div>
+</div>
+{% endblock %}

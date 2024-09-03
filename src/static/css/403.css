@@ -1,4 +1,4 @@
-.not-found-container {
+.permission-denied-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9,20 +9,20 @@
 .content-wrapper {
     text-align: center;
     background-color: #ffffff;
-    padding: 50px 70px;
-    border-radius: 12px;
+    padding: 40px 60px;
+    border-radius: 10px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.5s ease-in-out;
 }
 
 .icon {
-    font-size: 80px;
-    color: #ffc107;
+    font-size: 60px;
+    color: #dc3545;
     margin-bottom: 20px;
 }
 
 h1 {
-    font-size: 80px;
+    font-size: 48px;
     margin: 10px 0;
     color: #dc3545;
     font-weight: bold;
@@ -30,7 +30,7 @@ h1 {
 
 p {
     font-size: 18px;
-    margin: 15px 0 30px;
+    margin: 20px 0;
     color: #6c757d;
 }
 

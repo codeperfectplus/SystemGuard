@@ -15,7 +15,7 @@ def cpu_usage():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_cpu_info_enabled:
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     
     current_temp, high_temp, critical_temp = get_cpu_temp()
     cpu_core = get_cached_value("cpu_core", get_cpu_core_count)

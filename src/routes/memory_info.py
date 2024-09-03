@@ -15,7 +15,7 @@ def memory_usage():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_memory_info_enabled:
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     memory_available = get_cached_value("memory_available", get_memory_available) 
     system_info = {
         "memory_percent": get_memory_percent(),

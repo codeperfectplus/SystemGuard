@@ -13,7 +13,7 @@ def network_stats():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_network_info_enabled:
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     net_io = psutil.net_io_counters()
     ipv4_ip, ipv6_ip = get_established_connections()
     system_info = {

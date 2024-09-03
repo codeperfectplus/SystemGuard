@@ -1,0 +1,63 @@
+/* dashboard.css */
+
+/* General container styling */
+.container {
+    padding: 20px;
+}
+
+/* Grid layout for cards */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* Card styles */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    color: #ffffff; /* Ensure text color contrasts well with the card color */
+    transition: transform 0.2s ease;
+}
+
+.card.small {
+    width: 150px;
+}
+
+.card.medium {
+    width: 250px;
+}
+
+.card.large {
+    width: 350px;
+}
+
+.card-header {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.card-body {
+    font-size: 16px;
+}
+
+.card-footer {
+    margin-top: 10px;
+}
+
+/* Positioning based on card_position attribute */
+.position-0 {
+    grid-column: span 1;
+}
+
+.position-1 {
+    grid-column: span 2;
+}
+
+.position-2 {
+    grid-column: span 3;
+}
+
+/* Add more positioning styles as needed */

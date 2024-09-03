@@ -14,7 +14,7 @@ def disk_usage():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_disk_info_enabled:
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     disk_total = get_cached_value("disk_total", get_disk_total)
     system_info = {
         "disk_usage": get_disk_usage_percent(),

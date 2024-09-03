@@ -8,7 +8,7 @@ from src.utils import datetimeformat, get_system_info
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 
-@app.route("/dashboard", methods=["GET"])
+@app.route("/", methods=["GET"])
 @login_required
 def dashboard():
     user_dashboard_settings = UserDashboardSettings.query.first()

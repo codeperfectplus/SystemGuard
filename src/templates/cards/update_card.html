@@ -1,0 +1,63 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Update Card{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/update_card.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Card Settings</h1>
+    
+    <form method="GET" action="{{ url_for('update_card') }}">
+        <div class="form-group">
+            <label for="card_id">Select Card:</label>
+            <select id="card_id" name="card_id" onchange="this.form.submit()">
+                <option value="">-- Select a Card --</option>
+                {% for card in user_cards %}
+                <option value="{{ card.id }}" {% if request.args.get('card_id')|int == card.id %}selected{% endif %}>
+                    {{ card.card_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if request.args.get('card_id') %}
+    {% set selected_card = user_cards | selectattr('id', 'equalto', request.args.get('card_id')|int) | first %}
+    <form method="POST" action="{{ url_for('update_card') }}">
+        <input type="hidden" name="card_id" value="{{ selected_card.id }}">
+        <div class="form-group">
+            <label for="card_name">Card Name:</label>
+            <input type="text" id="card_name" name="card_name" value="{{ selected_card.card_name }}" required>
+        </div>
+        <div class="form-group">
+            <label for="card_description">Card Description:</label>
+            <textarea id="card_description" name="card_description">{{ selected_card.card_description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="card_color">Card Color:</label>
+            <input type="color" id="card_color" name="card_color" value="{{ selected_card.card_color }}">
+        </div>
+        <div class="form-group">
+            <label for="card_length">Card Length:</label>
+            <select id="card_length" name="card_length">
+                <option value="small" {% if selected_card.card_length == 'small' %}selected{% endif %}>Small</option>
+                <option value="medium" {% if selected_card.card_length == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="large" {% if selected_card.card_length == 'large' %}selected{% endif %}>Large</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="card_position">Card Position:</label>
+            <input type="number" id="card_position" name="card_position" value="{{ selected_card.card_position }}" min="0">
+        </div>
+        <div class="form-group">
+            <label for="card_enabled">Enable Card:</label>
+            <input type="checkbox" id="card_enabled" name="card_enabled" {% if selected_card.card_enabled %}checked{% endif %}>
+        </div>
+        <button type="submit" class="btn">Update Card</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

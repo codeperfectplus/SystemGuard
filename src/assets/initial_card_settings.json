@@ -1,0 +1,101 @@
+[
+    {
+        "card_name": "User Info",
+        "card_description": "Displays user information",
+        "card_color": "#00bfff",
+        "card_length": 300,
+        "card_position": 1,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Server Stats",
+        "card_description": "Shows server statistics",
+        "card_color": "#ff6347",
+        "card_length": 300,
+        "card_position": 2,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Battery Status",
+        "card_description": "Displays battery status",
+        "card_color": "#32cd32",
+        "card_length": 300,
+        "card_position": 3,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "CPU Core Usage",
+        "card_description": "Shows CPU core usage",
+        "card_color": "#ffd700",
+        "card_length": 300,
+        "card_position": 4,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "CPU Usage",
+        "card_description": "Displays CPU usage",
+        "card_color": "#ff4500",
+        "card_length": 300,
+        "card_position": 5,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "CPU Temperature",
+        "card_description": "Shows CPU temperature",
+        "card_color": "#ff1493",
+        "card_length": 300,
+        "card_position": 6,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Memory Usage",
+        "card_description": "Displays memory usage",
+        "card_color": "#00ff7f",
+        "card_length": 300,
+        "card_position": 7,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Disk Usage",
+        "card_description": "Shows disk usage",
+        "card_color": "#8a2be2",
+        "card_length": 300,
+        "card_position": 8,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "System Uptime",
+        "card_description": "Displays system uptime",
+        "card_color": "#7fff00",
+        "card_length": 300,
+        "card_position": 9,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Network Statistics",
+        "card_description": "Shows network statistics",
+        "card_color": "#ff69b4",
+        "card_length": 300,
+        "card_position": 10,
+        "card_data": {},
+        "is_enabled": true
+    },
+    {
+        "card_name": "Speedtest",
+        "card_description": "Displays speedtest results",
+        "card_color": "#00ced1",
+        "card_length": 300,
+        "card_position": 11,
+        "card_data": {},
+        "is_enabled": true
+    }
+]

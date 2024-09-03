@@ -17,7 +17,7 @@ user_bp = blueprints.Blueprint('user', __name__)
 def create_user():
     if current_user.user_level != 'admin':
         flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -85,7 +85,7 @@ def create_user():
 def view_users():
     if current_user.user_level != 'admin':
         flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
 
     # Fetch all users from the database
     users = UserProfile.query.all()

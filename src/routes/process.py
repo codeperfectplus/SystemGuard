@@ -1,5 +1,5 @@
 import os
-from flask import request, render_template, redirect, url_for, flash, session, blueprints
+from flask import request, render_template, redirect, url_for, flash, session, blueprints, abort
 from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
@@ -14,10 +14,10 @@ def process():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_process_info_enabled:
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return render_template("error/403.html")
     if current_user.user_level != "admin":
         flash("You do not have permission to view this page.", "danger")
-        return render_template("error/permission_denied.html")
+        return abort(403)
 
     # Retrieve number of processes from session or set default
     number_of_processes = session.get('number_of_processes', 50)

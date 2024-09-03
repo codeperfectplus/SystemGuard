@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% block title %}Service Unavailable{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/error.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="content-wrapper">
+        <div class="icon">&#128172;</div> <!-- Unicode for a speech bubble -->
+        <h1>503</h1>
+        <p>Service is temporarily unavailable. Please check back soon.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn">Go Back Home</a>
+    </div>
+</div>
+{% endblock %}
