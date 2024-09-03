@@ -14,3 +14,4 @@ db = SQLAlchemy(app)
 @app.cli.command("run")
 def server_start():
     print("Server started")
+
