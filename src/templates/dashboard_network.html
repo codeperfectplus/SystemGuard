@@ -14,14 +14,15 @@
         </a>
         {% for group in groups %}
         <div class="card">
-            <a href="{% if group.ip_address and group.port %}http://{{ group.ip_address }}:{{ group.port }}{% elif group.link %}{{ group.link }}{% endif %}">
+            <a
+                href="{% if group.ip_address and group.port %}http://{{ group.ip_address }}:{{ group.port }}{% elif group.link %}{{ group.link }}{% endif %}/dashboard">
                 <h2>{{ group.name }}</h2>
                 <p>{{ group.description }}</p>
-                <!-- {% if group.ip_address and group.port %}
+                {% if group.ip_address and group.port %}
                 <p><strong>IP Address:</strong> {{ group.ip_address }}</p>
                 <p><strong>Port:</strong> {{ group.port }}</p>
                 {% elif group.link %}
-                <p><strong>Link:</strong> {{ group.link }}</p> -->
+                <p><strong>URL:</strong> {{ group.link }}</p>
                 {% endif %}
             </a>
             <div class="card-actions">

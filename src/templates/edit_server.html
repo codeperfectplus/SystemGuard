@@ -44,7 +44,7 @@
             <label for="type" class="form-label">Server Type</label>
             <select class="form-control" id="type" name="type" onchange="toggleFields()" required>
                 <option value="ip" {% if server.ip_address %}selected{% endif %}>IP Address:Port</option>
-                <option value="link" {% if server.link %}selected{% endif %}>Link</option>
+                <option value="link" {% if server.link %}selected{% endif %}>URL</option>
             </select>
         </div>
         <div id="ip-fields" style="display: {% if server.ip_address %}block{% else %}none{% endif %};">
@@ -59,7 +59,7 @@
         </div>
         <div id="link-field" style="display: {% if server.link %}block{% else %}none{% endif %};">
             <div class="mb-3">
-                <label for="link" class="form-label">Link</label>
+                <label for="link" class="form-label">URL</label>
                 <input type="text" class="form-control" id="link" name="link" value="{{ server.link }}">
             </div>
         </div>

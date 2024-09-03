@@ -8,4 +8,7 @@ from src.routes.speedtest import speedtest_bp
 from src.routes.system_health import system_health_bp
 from src.routes.process import process_bp
 from src.routes.auth import auth_bp
+from src.routes.homepage import homepages_bp
 from src.routes.other import other_bp
+from src.routes.smtp_email_config import smtp_email_config_bp
+from src.routes.user import user_bp
