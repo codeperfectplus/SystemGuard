@@ -4,7 +4,7 @@ from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
-from src.models import DashboardSettings
+from src.models import DashboardSettings, FeatureTogglesSettings
 
 memory_info_bp = blueprints.Blueprint("memory_usage", __name__)
 
@@ -12,8 +12,8 @@ memory_info_bp = blueprints.Blueprint("memory_usage", __name__)
 @app.route("/memory_usage")
 @login_required
 def memory_usage():
-    settings = DashboardSettings.query.first()
-    if not settings.is_memory_info_enabled:
+    feature_toggles_settings = FeatureTogglesSettings.query.first()
+    if not feature_toggles_settings.is_memory_info_enabled:
         flash("You do not have permission to view this page.", "danger")
         return render_template("error/permission_denied.html")
     memory_available = get_cached_value("memory_available", get_memory_available) 

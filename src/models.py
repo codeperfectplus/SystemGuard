@@ -32,6 +32,7 @@ class User(db.Model, UserMixin):
     
     # Backref renamed to avoid conflict
     dashboard_settings = db.relationship('DashboardSettings', backref='user', uselist=False)
+    card_settings = db.relationship('CardSettings', backref='user', uselist=False)
 
 class DashboardSettings(db.Model):
     __tablename__ = 'dashboard_settings'
@@ -40,7 +41,14 @@ class DashboardSettings(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     
     speedtest_cooldown = db.Column(db.Integer, default=3600)
-    number_of_speedtests = db.Column(db.Integer, default=3)
+    number_of_speedtests = db.Column(db.Integer, default=1)
+    
+
+class FeatureTogglesSettings(db.Model):
+    __tablename__ = 'FeatureToggles'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     
     # Feature Toggles
     is_cpu_info_enabled = db.Column(db.Boolean, default=True)
@@ -49,6 +57,12 @@ class DashboardSettings(db.Model):
     is_network_info_enabled = db.Column(db.Boolean, default=True)
     is_process_info_enabled = db.Column(db.Boolean, default=True)
 
+class CardSettings(db.Model):
+    __tablename__ = 'CardSettings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
     # Card Toggles
     is_user_card_enabled = db.Column(db.Boolean, default=True)
     is_server_card_enabled = db.Column(db.Boolean, default=True)
@@ -122,17 +136,13 @@ with app.app_context():
     print("Creating tables")
     db.create_all()
 
-    # Initialize default settings
-    general_settings = GeneralSettings.query.first()
-    if not general_settings:
-        db.session.add(GeneralSettings())
-        db.session.commit()
-
     # initialize default dashboard settings for users
     users = User.query.all()
     for user in users:
         if not user.dashboard_settings:
             db.session.add(DashboardSettings(user_id=user.id))
+            db.session.add(CardSettings(user_id=user.id))
+            db.session.add(FeatureTogglesSettings(user_id=user.id))
             db.session.commit()
 
     pre_defined_users_json = "src/assets/predefine_user.json"
@@ -147,12 +157,20 @@ with app.app_context():
             db.session.add(user)
             db.session.commit()
 
+    # Initialize default settings
+    general_settings = GeneralSettings.query.first()
+    if not general_settings:
+        db.session.add(GeneralSettings())
+        db.session.commit()
+
 # ibject for all templates
 @app.context_processor
 def inject_settings():
     if current_user.is_anonymous:
-        return dict(settings=None)
-    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+        return dict(settings=None, card_settings=None)
     general_settings = GeneralSettings.query.first()
-    all_settings = dict(settings=settings, general_settings=general_settings)
+    card_settings = CardSettings.query.filter_by(user_id=current_user.id).first()
+    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    feature_toggles_settings = FeatureTogglesSettings.query.filter_by(user_id=current_user.id).first()
+    all_settings = dict(settings=settings, general_settings=general_settings, card_settings=card_settings, feature_toggles_settings=feature_toggles_settings)
     return all_settings

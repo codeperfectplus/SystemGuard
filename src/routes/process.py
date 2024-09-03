@@ -3,7 +3,7 @@ from flask import request, render_template, redirect, url_for, flash, session, b
 from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file
-from src.models import DashboardSettings
+from src.models import DashboardSettings, FeatureTogglesSettings
 from src.scripts.email_me import send_smpt_email
 
 process_bp = blueprints.Blueprint("process", __name__)
@@ -11,8 +11,8 @@ process_bp = blueprints.Blueprint("process", __name__)
 @app.route("/process", methods=["GET", "POST"])
 @login_required
 def process():
-    settings = DashboardSettings.query.first()
-    if not settings.is_process_info_enabled:
+    feature_toggles_settings = FeatureTogglesSettings.query.first()
+    if not feature_toggles_settings.is_process_info_enabled:
         flash("You do not have permission to view this page.", "danger")
         return render_template("error/permission_denied.html")
     if current_user.user_level != "admin":

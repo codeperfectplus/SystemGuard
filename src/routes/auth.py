@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.scripts.email_me import send_smpt_email
 from src.config import app, db
-from src.models import User, DashboardSettings
+from src.models import User, DashboardSettings, CardSettings, FeatureTogglesSettings
 from src.utils import render_template_from_file
 from src.routes.helper import get_email_addresses
 
@@ -110,6 +110,10 @@ def signup():
         send_smpt_email(email, subject, html_body, is_html=True)
 
         db.session.add(new_user)
+        db.session.commit()
+        db.session.add(DashboardSettings(user_id=new_user.id))
+        db.session.add(CardSettings(user_id=new_user.id))
+        db.session.add(FeatureTogglesSettings(user_id=new_user.id))
         db.session.commit()
         flash('Account created successfully, please log in.')
         return redirect(url_for('login'))

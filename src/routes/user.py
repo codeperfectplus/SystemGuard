@@ -1,10 +1,10 @@
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
-from flask_login import LoginManager, login_required, current_user
+from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 
 from src.config import app, db
-from src.models import User
+from src.models import User, DashboardSettings, CardSettings, FeatureTogglesSettings
 from src.utils import render_template_from_file
 from src.scripts.email_me import send_smpt_email
 from src.routes.helper import get_email_addresses
@@ -37,6 +37,7 @@ def add_user():
             receive_email_alerts=receive_email_alerts
         )
 
+        # Send email alerts to admins
         admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
         if admin_email_address:
             subject = "New User Alert"
@@ -50,6 +51,7 @@ def add_user():
             html_body = render_template_from_file("src/templates/email_templates/new_user_create.html", **context)
             send_smpt_email(admin_email_address, subject, html_body, is_html=True)
 
+        # Send welcome email to new user
         subject = "Welcome to the systemGuard"  
         context = {
             "username": new_user.username,
@@ -57,14 +59,23 @@ def add_user():
         }
         html_body = render_template_from_file("src/templates/email_templates/welcome.html", **context)
         send_smpt_email(email, subject, html_body, is_html=True)
-            
+
+        # Add and commit the new user to get the correct user ID
         db.session.add(new_user)
+        db.session.commit()  # Commit to generate the ID
+        
+        print("new user", new_user.id)  # Now the ID should be available
+
+        # Now you can use the new user's ID to create related settings
+        db.session.add(DashboardSettings(user_id=new_user.id))
+        db.session.add(CardSettings(user_id=new_user.id))
+        db.session.add(FeatureTogglesSettings(user_id=new_user.id))
         db.session.commit()
+
         flash('User created successfully!', 'success')
         return redirect(url_for('view_users'))
 
     return render_template('add_user.html')
-
 
 @app.route('/users')
 @login_required

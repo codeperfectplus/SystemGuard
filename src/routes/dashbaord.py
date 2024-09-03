@@ -3,7 +3,7 @@ from flask import render_template, blueprints
 from flask_login import login_required, current_user
 
 from src.config import app
-from src.models import SpeedTestResult, DashboardSettings, SystemInfo
+from src.models import SpeedTestResult, DashboardSettings, CardSettings
 from src.utils import datetimeformat, get_system_info
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)

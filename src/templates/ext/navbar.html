@@ -16,7 +16,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if settings.is_cpu_info_enabled %}
+            {% if feature_toggles_settings.is_cpu_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'cpu_usage' %}active{% endif %}" 
                    href="{{ url_for('cpu_usage') }}">
@@ -24,7 +24,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if settings.is_memory_info_enabled %}
+            {% if feature_toggles_settings.is_memory_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'memory_usage' %}active{% endif %}" 
                    href="{{ url_for('memory_usage') }}">
@@ -32,7 +32,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if settings.is_disk_info_enabled %}
+            {% if feature_toggles_settings.is_disk_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'disk_usage' %}active{% endif %}" 
                    href="{{ url_for('disk_usage') }}">
@@ -40,7 +40,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if settings.is_network_info_enabled %}
+            {% if feature_toggles_settings.is_network_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'network_stats' %}active{% endif %}" 
                    href="{{ url_for('network_stats') }}">
@@ -48,7 +48,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if settings.is_process_info_enabled and current_user.user_level == 'admin' %}
+            {% if feature_toggles_settings.is_process_info_enabled and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'process' %}active{% endif %}" 
                    href="{{ url_for('process') }}">
