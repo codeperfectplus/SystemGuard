@@ -1,3 +1,4 @@
+import os
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
 from flask_login import login_required, current_user
@@ -5,7 +6,7 @@ from werkzeug.security import generate_password_hash
 
 from src.config import app, db
 from src.models import UserProfile, UserDashboardSettings, UserCardSettings, FeatureToggleSettings
-from src.utils import render_template_from_file
+from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smpt_email
 from src.routes.helper import get_email_addresses
 
@@ -48,7 +49,8 @@ def add_user():
                 "signup_time": datetime.datetime.now(),
                 "user_level": new_user.user_level
             }
-            html_body = render_template_from_file("src/templates/email_templates/new_user_create.html", **context)
+            new_user_alert_template =  os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_create.html")
+            html_body = render_template_from_file(new_user_alert_template, **context)
             send_smpt_email(admin_email_address, subject, html_body, is_html=True)
 
         # Send welcome email to new user
@@ -57,7 +59,8 @@ def add_user():
             "username": new_user.username,
             "email": new_user.email,
         }
-        html_body = render_template_from_file("src/templates/email_templates/welcome.html", **context)
+        welcome_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
+        html_body = render_template_from_file(welcome_email_template, **context)
         send_smpt_email(email, subject, html_body, is_html=True)
 
         # Add and commit the new user to get the correct user ID
@@ -131,7 +134,8 @@ def delete_user(username):
             "deletion_time": datetime.datetime.now(),
             "current_user": current_user.username,
         }
-        html_body = render_template_from_file("src/templates/email_templates/deletion_email.html", **context)
+        deletion_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/deletion_email.html")
+        html_body = render_template_from_file(deletion_email_template, **context)
         send_smpt_email(admin_email_address, subject, html_body, is_html=True)
 
     db.session.delete(user)

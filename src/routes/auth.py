@@ -1,3 +1,4 @@
+import os
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -6,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from src.scripts.email_me import send_smpt_email
 from src.config import app, db
 from src.models import UserProfile, UserCardSettings, FeatureToggleSettings, UserDashboardSettings
-from src.utils import render_template_from_file
+from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper import get_email_addresses
 
 auth_bp = blueprints.Blueprint('auth', __name__)
@@ -37,14 +38,20 @@ def login():
                     admin_email_address.remove(receiver_email)
                 if admin_email_address:
                     context = {"username": current_user.username, "login_time": datetime.datetime.now()}
-                    login_body = render_template_from_file("src/templates/email_templates/admin_login_alert.html", **context)
-                    send_smpt_email(admin_email_address, 'Login Alert', login_body, is_html=True)
+
+                    login_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/admin_login_alert.html")
+                    html_body = render_template_from_file(login_alert_template, **context)
+
+                    send_smpt_email(admin_email_address, 'Login Alert', html_body, is_html=True)
 
             # log in alert to user
             if receiver_email:
                 context = {"username": current_user.username, "login_time": datetime.datetime.now()}
-                login_body = render_template_from_file("src/templates/email_templates/login.html", **context)
-                send_smpt_email(receiver_email, 'Login Alert', login_body, is_html=True)
+
+                login_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/login.html") 
+                html_body = render_template_from_file(login_message_template, **context)
+                
+                send_smpt_email(receiver_email, 'Login Alert', html_body, is_html=True)
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
     return render_template('login.html')
@@ -54,8 +61,9 @@ def logout():
     receiver_email = current_user.email
     if receiver_email:
         context = {"username": current_user.username}
-        logout_body = render_template_from_file("src/templates/email_templates/logout.html", **context)
-        send_smpt_email(receiver_email, 'Logout Alert', logout_body, is_html=True)
+        logout_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/logout.html")
+        html_body = render_template_from_file(logout_message_template, **context)
+        send_smpt_email(receiver_email, 'Logout Alert', html_body, is_html=True)
     logout_user()
     return redirect(url_for('login'))
 
@@ -97,7 +105,8 @@ def signup():
                 "signup_time": datetime.datetime.now(),
                 "user_level": new_user.user_level
             }
-            html_body = render_template_from_file("src/templates/email_templates/new_user_alert.html", **context)
+            new_user_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_alert.html")
+            html_body = render_template_from_file(new_user_alert_template, **context)
             send_smpt_email(admin_email_address, subject, html_body, is_html=True)
             
         # Send email to the new user
@@ -106,7 +115,8 @@ def signup():
             "username": new_user.username,
             "email": new_user.email,
         }
-        html_body = render_template_from_file("src/templates/email_templates/welcome.html", **context)
+        welcome_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
+        html_body = render_template_from_file(welcome_template, **context)
         send_smpt_email(email, subject, html_body, is_html=True)
 
         db.session.add(new_user)

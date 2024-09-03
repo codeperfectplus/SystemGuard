@@ -108,6 +108,7 @@ A Docker image has not been created for this project because it requires access 
 - Threshold notifications
 - Customizable dashboards
 - Plugin support to make SystemGuard even more powerful.
+- make server logs
 
 ## Acknowledgments
 

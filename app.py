@@ -1,7 +1,7 @@
 import datetime
 from src.config import app
 from src import routes
-from src.utils import render_template_from_file, get_flask_memory_usage, cpu_usage_percent, get_memory_percent
+from src.utils import render_template_from_file, get_flask_memory_usage, cpu_usage_percent, get_memory_percent, ROOT_DIR
 from src.models import UserProfile
 from src.scripts.email_me import send_smpt_email
 
@@ -30,7 +30,8 @@ def server_up_email():
                 "app_memory_usage": get_flask_memory_usage(),
 
             }
-            html_body = render_template_from_file("src/templates/email_templates/server_up.html", **context)
+            server_up_template = os.path.join(ROOT_DIR, "src/templates/email_templates/server_up.html")
+            html_body = render_template_from_file(server_up_template, **context)
             # send_smpt_email(admin_emails, subject, html_body, is_html=True)
             print("Server up email sent to", admin_emails)
 

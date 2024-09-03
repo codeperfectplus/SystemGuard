@@ -1,10 +1,11 @@
+import os
 import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
 
 from src.config import app, db
 from src.models import UserCardSettings, UserDashboardSettings, UserProfile, ApplicationGeneralSettings, FeatureToggleSettings
 from flask_login import login_required, current_user
-from src.utils import render_template_from_file
+from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smpt_email
 
 settings_bp = blueprints.Blueprint("settings", __name__)
@@ -37,8 +38,8 @@ def general_settings():
                 "notifications_enabled": general_settings.enable_alerts,
                 "current_user": current_user.username
             }
-            html_body = render_template_from_file("src/templates/email_templates/notification_alert.html", **context)
-            print("Notification enabled:", general_settings.enable_alerts)
+            notficiation_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
+            html_body = render_template_from_file(notficiation_alert_template, **context)
             send_smpt_email(admin_emails, subject, html_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
