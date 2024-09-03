@@ -1,7 +1,7 @@
 [
     {
         "username": "admin",
-        "email": "codeperfectplus@gmail.com",
+        "email": "admin@gmail.com",
         "password": "admin",
         "user_level": "admin",
         "profession": "developer",
@@ -9,7 +9,7 @@
     },
     {
         "username": "manager",
-        "email": "dr47806@gmail.com",
+        "email": "manager@gmail.com",
         "password": "manager",
         "user_level": "user",
         "profession": "manager",
