@@ -1,3 +1,4 @@
+import datetime
 from src.config import db
 
 class FeatureToggleSettings(db.Model):
@@ -12,3 +13,5 @@ class FeatureToggleSettings(db.Model):
     is_disk_info_enabled = db.Column(db.Boolean, default=True)
     is_network_info_enabled = db.Column(db.Boolean, default=True)
     is_process_info_enabled = db.Column(db.Boolean, default=True)
+    refresh_interval = db.Column(db.Integer, default=10)
+

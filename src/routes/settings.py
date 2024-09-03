@@ -30,7 +30,7 @@ def general_settings():
         general_settings.timezone = request.form.get('timezone')
         general_settings.enable_cache = 'enable_cache' in request.form
         general_settings.enable_alerts = 'enable_alerts' in request.form
-        admin_emails = [user.email for user in User.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
+        admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
         if admin_emails:
             subject = "SystemGuard Server Started"
             context = {
@@ -56,6 +56,8 @@ def feature_toggles():
         feature_toggles_settings.is_disk_info_enabled = 'is_disk_info_enabled' in request.form
         feature_toggles_settings.is_network_info_enabled = 'is_network_info_enabled' in request.form
         feature_toggles_settings.is_process_info_enabled = 'is_process_info_enabled' in request.form
+        feature_toggles_settings.refresh_interval = request.form["refresh_interval"]
+        print("refresh_interval", feature_toggles_settings.refresh_interval)
         db.session.commit()
         flash('Feature toggles updated successfully!', 'success')
         return redirect(url_for('feature_toggles'))

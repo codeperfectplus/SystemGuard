@@ -34,7 +34,10 @@
             <label for="is_process_info_enabled">Enable Process Information:</label>
             <input type="checkbox" id="is_process_info_enabled" name="is_process_info_enabled" {% if feature_toggles_settings.is_process_info_enabled %}checked{% endif %}>
         </div>
-
+        <div class="form-group">
+            <label for="refresh_interval">Refresh Interval(sec):</label>
+            <input type="number" id="refresh_interval" name="refresh_interval" value="{{ feature_toggles_settings.refresh_interval }}">
+        </div>
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>
 </div>

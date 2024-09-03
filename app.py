@@ -1,3 +1,4 @@
+import os
 import datetime
 from src.config import app
 from src import routes
@@ -18,31 +19,9 @@ def register_routes():
 
 app.config['is_server_up_email_sent'] = False
 
-def server_up_email():
-    with app.app_context():
-        admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
-        if admin_emails:
-            subject = "SystemGuard Server Started"
-            context = {
-                "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "cpu_usage": cpu_usage_percent(),
-                "memory_usage": get_memory_percent(),
-                "app_memory_usage": get_flask_memory_usage(),
-
-            }
-            server_up_template = os.path.join(ROOT_DIR, "src/templates/email_templates/server_up.html")
-            html_body = render_template_from_file(server_up_template, **context)
-            # send_smpt_email(admin_emails, subject, html_body, is_html=True)
-            print("Server up email sent to", admin_emails)
-
 
 if __name__ == "__main__":
     register_routes()
-    # TODO: fix this email alert sent twice
-    # if not app.config['is_server_up_email_sent']:
-    #     app.config['is_server_up_email_sent'] = True
-    #     server_up_email()
-    
     # # Start the memory-consuming program in a separate thread
     # memory_thread = threading.Thread(target=memory_consuming_program, daemon=True)
     # memory_thread.start()

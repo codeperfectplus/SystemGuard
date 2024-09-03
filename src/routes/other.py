@@ -1,8 +1,8 @@
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints
 from flask_login import login_required, current_user
-
-from src.config import app
+from src.models import FeatureToggleSettings
+from src.config import app, db
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -24,3 +24,31 @@ def terminal():
             return jsonify(output=output)
     return render_template('terminal.html')
 
+
+@app.route('/update-refresh-interval', methods=['POST'])
+def update_refresh_interval():
+    # Retrieve user ID from session or other authentication methods
+    user_id = current_user.id
+
+    # Get the new refresh interval from the request
+    new_interval = request.json.get('refresh_interval')
+
+    # Validate the new interval (must be a positive integer)
+    if not isinstance(new_interval, int) or new_interval <= 0:
+        return jsonify({'error': 'Invalid refresh interval value'}), 400
+
+    # Query the settings for the current user
+    settings = FeatureToggleSettings.query.filter_by(user_id=user_id).first()
+
+    # If settings do not exist for the user, create them
+    if not settings:
+        settings = FeatureToggleSettings(user_id=user_id, refresh_interval=new_interval)
+        db.session.add(settings)
+    else:
+        # Update the refresh interval
+        settings.refresh_interval = new_interval
+
+    # Commit changes to the database
+    db.session.commit()
+
+    return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})

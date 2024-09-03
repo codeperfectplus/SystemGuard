@@ -1,0 +1,25 @@
+/* Container for the select input */
+.selector-container {
+    display: flex;            /* Use flexbox for alignment */
+    justify-content: flex-end; /* Align items to the right */
+    padding: 10px;            /* Add some padding for spacing */
+}
+
+/* Styling the select input */
+#refresh-interval {
+    padding: 5px 8px;         /* Adjust padding for a smaller look */
+    font-size: 14px;          /* Smaller font size */
+    border-radius: 4px;       /* Rounded corners */
+    border: 1px solid #ccc;   /* Light border */
+    outline: none;            /* Remove default focus outline */
+    background-color: #fff;   /* White background */
+    cursor: pointer;          /* Pointer cursor for better UX */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Hover and focus styles for better interactivity */
+#refresh-interval:hover, #refresh-interval:focus {
+    border-color: #007bff;    /* Border color change on hover */
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2); /* More pronounced shadow */
+}

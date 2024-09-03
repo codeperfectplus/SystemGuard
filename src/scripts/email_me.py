@@ -31,8 +31,8 @@ def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html
             flash("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.", "danger")
             return redirect(url_for('update_smpt_email_password'))
 
-    EMAIL_ADDRESS = "email_password.email"
-    EMAIL_PASSWORD = "email_password.password"
+    EMAIL_ADDRESS = email_password.email
+    EMAIL_PASSWORD = email_password.password
 
     print(f"Sending email to {receiver_email}")
 
@@ -85,6 +85,7 @@ def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html
             }
 
         except Exception as e:
+            print(f"Failed to send email to {email}. Error: {str(e)}")
             return {
                 "message": f"Failed to send email to {email}. Error: {str(e)}",
                 "status": "failed",

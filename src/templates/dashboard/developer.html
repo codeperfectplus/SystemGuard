@@ -1,9 +1,70 @@
-{% extends 'base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}<div class="container mt-4">
-    <div class="row">{% include 'dasbhboard_comp/other/username.html' %}{% include
+
+{% extends 'base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashbaord.css') }}">
+{% endblock %}
+<div class="selector-container">
+    <div class="row">
+        <label for="refresh-interval">Select Refresh Interval (seconds):</label>
+        <select id="refresh-interval">
+            <option value="5" {% if feature_toggles_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
+            <option value="10" {% if feature_toggles_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
+            <option value="15" {% if feature_toggles_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
+            <option value="30" {% if feature_toggles_settings.refresh_interval == 30 %}selected{% endif %}>30 seconds</option>
+            <option value="60" {% if feature_toggles_settings.refresh_interval == 60 %}selected{% endif %}>60 seconds</option>
+        </select>
+    </div>
+</div>
+<div class="row">
+        <!-- Container for positioning the select input on the right -->
+        {% include 'dasbhboard_comp/other/username.html' %}{% include
         'dasbhboard_comp/other/boot_time.html' %}{% include 'dasbhboard_comp/battery/percentage.html' %}{% include
         'dasbhboard_comp/cpu/core.html' %}{% include 'dasbhboard_comp/cpu/usages.html' %}{% include
         'dasbhboard_comp/cpu/current_temp.html' %}{% include 'dasbhboard_comp/memory/dashboard_memory.html' %}{% include
         'dasbhboard_comp/memory/usage.html' %}{% include 'dasbhboard_comp/disk/usage.html' %}{% include
         'dasbhboard_comp/other/uptime.html' %}{% include 'dasbhboard_comp/network/stats.html' %}{% include
         'dasbhboard_comp/other/speedtest.html' %} </div>
-</div>{% endblock %}
+</div>
+<script>
+    let refreshInterval = {{ feature_toggles_settings.refresh_interval *1000 }};
+    let refreshTimeout;
+
+    function startRefresh() {
+        refreshTimeout = setTimeout(function () {
+            location.reload();
+        }, refreshInterval);
+    }
+
+    // Start the refresh process
+    startRefresh();
+
+    // Event listener for select input change
+    document.getElementById('refresh-interval').addEventListener('change', function() {
+        // Clear the existing timeout
+        clearTimeout(refreshTimeout);
+
+        // Update the interval based on the selected value
+        refreshInterval = parseInt(this.value) * 1000;
+
+        // Restart the refresh process with the new interval
+        startRefresh();
+
+        // Send the updated refresh interval to the server
+        fetch('/update-refresh-interval', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ refresh_interval: parseInt(this.value) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Refresh interval updated successfully:', data.refresh_interval);
+            } else {
+                console.error('Failed to update refresh interval:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>{% endblock %}
