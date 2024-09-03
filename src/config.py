@@ -10,3 +10,7 @@ app.config['SECRET_KEY'] = 'secret'
 
 # Initialize the database
 db = SQLAlchemy(app)
+
+@app.cli.command("run")
+def server_start():
+    print("Server started")

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User Signup Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333333;
+            background-color: #f7f7f7;
+            padding: 20px;
+            margin: 0;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .email-body {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .user-details {
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777777;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            New User Signup on the Server
+        </div>
+        <div class="email-body">
+            <p>Hello Admin,</p>
+            <p>A new user has just created by {{ current_user.username }}. Below are the details:</p>
+            <div class="user-details">
+                <p><strong>Username:</strong> {{ username }}</p>
+                <p><strong>Email:</strong> {{ email }}</p>
+                <p><strong>Signup Time:</strong> {{ signup_time }}</p>
+                <p><strong>User Level:</strong> {{ user_level }}</p>
+            </div>
+            <p>Please take any necessary actions if required.</p>
+            <p>Thank you.</p>
+        </div>
+        <div class="footer">
+            <p>This is an automated email, please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>

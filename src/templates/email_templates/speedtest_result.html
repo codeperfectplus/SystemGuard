@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test Results</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content h2 {
+            font-size: 20px;
+            color: #333333;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.5;
+        }
+
+        .result {
+            font-size: 18px;
+            color: #333333;
+            margin: 10px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #999999;
+        }
+
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Speed Test Results</h1>
+        </div>
+        <div class="content">
+            <h2>Here are your latest speed test results:</h2>
+            <p class="result">Download Speed: {{ speedtest_result['download_speed'] }}</p>
+            <p class="result">Upload Speed: {{ speedtest_result['upload_speed'] }}</p>
+            <p class="result">Ping: {{ speedtest_result['ping'] }}</p>
+        </div>
+        <div class="footer">
+            <p>Thank you for using SystemGuard!</p>
+            <p>If you have any questions, feel free to <a href="mailto:codeperfectplus@gmail.com">contact us</a>.</p>
+        </div>
+    </div>
+</body>
+
+</html>

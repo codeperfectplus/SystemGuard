@@ -2,20 +2,22 @@ import os
 from flask import request, render_template, redirect, url_for, flash, session, blueprints
 from flask_login import login_required, current_user
 from src.config import app
-from src.utils import get_top_processes
-from src.models import DashboardSettings
+from src.utils import get_top_processes, render_template_from_file
+from src.models import  FeatureToggleSettings
+from src.scripts.email_me import send_smpt_email
 
 process_bp = blueprints.Blueprint("process", __name__)
 
 @app.route("/process", methods=["GET", "POST"])
 @login_required
 def process():
-    settings = DashboardSettings.query.first()
-    if not settings.is_process_info_enabled:
-        return render_template("error/404.html")
+    feature_toggles_settings = FeatureToggleSettings.query.first()
+    if not feature_toggles_settings.is_process_info_enabled:
+        flash("You do not have permission to view this page.", "danger")
+        return render_template("error/permission_denied.html")
     if current_user.user_level != "admin":
         flash("You do not have permission to view this page.", "danger")
-        return redirect(url_for("dashboard"))
+        return render_template("error/permission_denied.html")
 
     # Retrieve number of processes from session or set default
     number_of_processes = session.get('number_of_processes', 50)
@@ -30,6 +32,11 @@ def process():
             try:
                 os.kill(int(pid_to_kill), 9)  # Sends a SIGKILL signal
                 flash(f"Process '{process_name}' (PID {pid_to_kill}) killed successfully.", "success")
+                receiver_email = current_user.email
+                subject = f"Process '{process_name}' (PID {pid_to_kill}) killed successfully."
+                context = {"process_name": process_name, "pid_to_kill": pid_to_kill, "username": current_user.username}
+                html_body = render_template_from_file("src/templates/email_templates/process_killed.html", **context)
+                send_smpt_email(receiver_email, subject, html_body, is_html=True)
             except Exception as e:
                 flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {e}", "danger")
             return redirect(url_for("process"))  # Refresh the page after killing process
@@ -49,4 +56,4 @@ def process():
     elif sort_by == 'name':
         top_processes.sort(key=lambda x: x[0], reverse=(order == 'desc'))
 
-    return render_template("process.html", processes=top_processes, number=number_of_processes, toggle_order=toggle_order)
+    return render_template("info_pages/process.html", processes=top_processes, number=number_of_processes, toggle_order=toggle_order)

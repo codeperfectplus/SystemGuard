@@ -1,0 +1,26 @@
+body {
+    font-family: monospace;
+    background-color: #000;
+    color: #0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+#terminal {
+    background-color: #000;
+    color: #0f0;
+    padding: 10px;
+    border: 1px solid #0f0;
+    height: 400px;
+    overflow-y: auto;
+    margin-top: 50px;
+}
+
+#command {
+    width: 100%;
+    background-color: #000;
+    color: #0f0;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}

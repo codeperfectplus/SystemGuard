@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Notification</title>
+    <style>
+        .alert-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-header {
+            font-size: 24px;
+            color: #343a40;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .alert-body {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .alert-footer {
+            text-align: center;
+        }
+
+        .alert-footer a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="alert-container">
+        <div class="alert-header">
+            <i class="fas fa-info-circle"></i> Login Notification
+        </div>
+        <div class="alert-body">
+            Hello {{ username }},<br><br>
+            We noticed a login to your account on {{ login_time }}, This is a Notification that your account was accessed.
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Edit Server{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_server.css') }}">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleFields();
+    });
+
+    function toggleFields() {
+        var typeSelect = document.getElementById("type");
+        var ipFields = document.getElementById("ip-fields");
+        var linkField = document.getElementById("link-field");
+
+        if (typeSelect.value === "ip") {
+            ipFields.style.display = "block";
+            linkField.style.display = "none";
+            document.getElementById("ip_address").required = true;
+            document.getElementById("port").required = true;
+            document.getElementById("link").required = false;
+        } else {
+            ipFields.style.display = "none";
+            linkField.style.display = "block";
+            document.getElementById("ip_address").required = false;
+            document.getElementById("port").required = false;
+            document.getElementById("link").required = true;
+        }
+    }
+</script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Edit Server</h1>
+    <form method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ server.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" class="form-control" id="description" name="description" value="{{ server.description }}">
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">Server Type</label>
+            <select class="form-control" id="type" name="type" onchange="toggleFields()" required>
+                <option value="ip" {% if server.ip_address %}selected{% endif %}>IP Address:Port</option>
+                <option value="link" {% if server.link %}selected{% endif %}>URL</option>
+            </select>
+        </div>
+        <div id="ip-fields" style="display: {% if server.ip_address %}block{% else %}none{% endif %};">
+            <div class="mb-3">
+                <label for="ip_address" class="form-label">IP Address</label>
+                <input type="text" class="form-control" id="ip_address" name="ip_address" value="{{ server.ip_address }}">
+            </div>
+            <div class="mb-3">
+                <label for="port" class="form-label">Port</label>
+                <input type="number" class="form-control" id="port" name="port" value="{{ server.port }}">
+            </div>
+        </div>
+        <div id="link-field" style="display: {% if server.link %}block{% else %}none{% endif %};">
+            <div class="mb-3">
+                <label for="link" class="form-label">URL</label>
+                <input type="text" class="form-control" id="link" name="link" value="{{ server.link }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Update Server</button>
+    </form>
+</div>
+{% endblock %}

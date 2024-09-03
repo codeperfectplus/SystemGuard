@@ -13,6 +13,7 @@ REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5050}"
 LOG_FILE="/home/$(whoami)/logs/systemguard_flask.log"
 USERNAME="$(whoami)"
+CONDA_ENV_NAME="systemguard"
 
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
@@ -44,9 +45,6 @@ fi
 
 # Initialize Conda
 source "$CONDA_SETUP_SCRIPT"
-
-# Define Conda environment name
-CONDA_ENV_NAME="dashboar"
 
 echo "Conda environment name: $CONDA_ENV_NAME"
 

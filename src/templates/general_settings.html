@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}General Settings{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+{% block content %}
+<div class="settings-container">
+    <h1 class="settings-title">General Settings</h1>
+
+    <form method="POST">
+        {% include 'ext/message.html' %}
+        
+        <div class="form-group">
+            <label for="timezone">Timezone:</label>
+            <select id="timezone" name="timezone">
+                <option value="Asia/Kolkata" {% if general_settings.timezone == "Asia/Kolkata" %}selected{% endif %}>Asia/Kolkata</option>
+                <option value="America/New_York" {% if general_settings.timezone == "America/New_York" %}selected{% endif %}>America/New_York</option>
+                <option value="Europe/London" {% if general_settings.timezone == "Europe/London" %}selected{% endif %}>Europe/London</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="enable_cache">Enable Caching:</label>
+            <input type="checkbox" id="enable_cache" name="enable_cache" {% if general_settings.enable_cache %}checked{% endif %}>
+        </div>
+        <div class="form-group">
+            <label for="enable_alerts">Enable Alerts:</label>
+            <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if general_settings.enable_alerts %}checked{% endif %}>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+</div>
+{% endblock %}

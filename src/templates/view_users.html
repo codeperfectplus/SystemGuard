@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}View Users{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view_users.css') }}">
+{% endblock %}
+{% block content %}
+<div class="view-users-container">
+    <h2 class="page-title">All Users</h2>
+    <a href="{{ url_for('add_user') }}" class="btn btn-add-user">Add New User</a>
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>User Level</th>
+                <th>Profession</th>
+                <th>Receive Email Alerts</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.user_level }}</td>
+                <td>{{ user.profession }}</td>
+                <td>{{ 'Yes' if user.receive_email_alerts else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('change_user_settings', username=user.username) }}" class="btn btn-edit">Edit</a>
+                    <form action="{{ url_for('delete_user', username=user.username) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

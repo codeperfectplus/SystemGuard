@@ -1,0 +1,101 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    background-color: var(--color-username);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: calc(33.333% - 40px); /* Adjust based on gaps */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px #378fe7;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #fff;
+}
+
+.card p {
+    margin: 5px 0;
+    color: #fff;
+}
+
+.card a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.add-server-link {
+    margin-top: 20px;
+}
+
+.add-server-link .btn {
+    font-size: 1.2em;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.add-server-link .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive layout */
+@media (max-width: 992px) {
+    .card {
+        width: calc(50% - 30px); /* Two cards per line on medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: calc(100% - 40px); /* One card per line on small screens */
+    }
+}
+
+.card-actions {
+    margin-top: 10px;
+}
+
+.card-actions .btn {
+    margin-right: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.card-actions .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #fff;
+}
+
+.card-actions .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+}

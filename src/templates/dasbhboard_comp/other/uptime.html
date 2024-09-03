@@ -1,10 +1,50 @@
-{% if settings.is_system_uptime_card_enabled %}
+{% if card_settings.is_system_uptime_card_enabled %}
 <div class="col-md-6 col-lg-6 mb-4">
-    <div class="card bg-uptime" data-disk="{{ system_info['disk_usage']}}" shadow-sm border-0 rounded-3>
+    <div class="card bg-uptime shadow-sm border-0 rounded-3">
         <div class="card-body bg-uptime">
             <h5 class="card-title">System Uptime <i class="fas fa-clock"></i></h5>
-            <p class="card-text fs-4">{{ system_info['uptime']}}</p>
+            <p class="card-text fs-4" id="system-uptime">
+                {{ system_info['uptime_days'] }} days, {{ system_info['uptime_hours'] }} hours, 
+                {{ system_info['uptime_minutes'] }} minutes, {{ system_info['uptime_seconds'] }} seconds
+            </p>
         </div>
     </div>
 </div>
 {% endif %}
+
+<script>
+// Function to format uptime as 'X days, Y hours, Z minutes, W seconds'
+function formatUptime(days, hours, minutes, seconds) {
+    let uptimeString = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+    return uptimeString;
+}
+
+// Initial uptime values from the backend
+let days = parseInt('{{ system_info["uptime_days"] }}');
+let hours = parseInt('{{ system_info["uptime_hours"] }}');
+let minutes = parseInt('{{ system_info["uptime_minutes"] }}');
+let seconds = parseInt('{{ system_info["uptime_seconds"] }}');
+
+// Function to update uptime
+function updateUptime() {
+    seconds++;
+    if (seconds >= 60) {
+        seconds = 0;
+        minutes++;
+        if (minutes >= 60) {
+            minutes = 0;
+            hours++;
+            if (hours >= 24) {
+                hours = 0;
+                days++;
+            }
+        }
+    }
+
+    // Update the display
+    document.getElementById('system-uptime').textContent = formatUptime(days, hours, minutes, seconds);
+}
+
+// Update the uptime every second
+setInterval(updateUptime, 1000);
+</script>

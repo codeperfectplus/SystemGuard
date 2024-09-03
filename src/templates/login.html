@@ -1,18 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}Login
-{% endblock %}
+{% block title %}Login{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 {% endblock %}
 {% block content %}
-<h2>Login</h2>
-<div class="container">
-    <form method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
-        <input type="submit" value="Login">
+<div class="login-container">
+    <h2 class="login-title">Login To Your Account</h2>
+    {% include 'ext/message.html' %}
+    <form method="post" class="login-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Login" class="btn btn-primary">
+        </div>
     </form>
+    <p class="signup-link">Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>.</p>
 </div>
 {% endblock %}

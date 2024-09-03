@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings Changed</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .alert-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-header {
+            font-size: 24px;
+            color: #343a40;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .alert-body {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .alert-footer {
+            text-align: center;
+        }
+
+        .alert-footer a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="alert-container">
+        <div class="alert-header">
+            <i class="fas fa-bell"></i> Notification Settings Changed
+        </div>
+        <div class="alert-body">
+            Hello, <br><br>
+            Your notification settings have been updated. <br><br>
+            {% if notifications_enabled %}
+                You will now receive alerts for updates and changes.
+            {% else %}
+                You will no longer receive alerts.
+            {% endif %} <br><br>
+            The changes were made by {{ current_user }} on {{ current_time }}.
+        </div>
+        <div class="alert-footer">
+            <p>For any questions or if you need assistance, please <a href="mailto:codeperfectplus@gmail.com">contact us</a>.</p>
+            <p>Thank you for using SystemGuard!</p>
+        </div>
+    </div>
+</body>
+
+</html>

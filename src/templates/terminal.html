@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Update Email & Password{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/terminal.css') }}">
+{% endblock %}
+{% block content %}
+    <div id="terminal"></div>
+    <form id="terminal-form">
+        <input type="text" id="command" placeholder="Enter command" autocomplete="off" autofocus>
+    </form>
+
+    <script>
+        document.getElementById('terminal-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let command = document.getElementById('command').value;
+            if (command.trim() !== '') {
+                let terminal = document.getElementById('terminal');
+                terminal.innerHTML += `<span>$ ${command}</span><br>`;
+                document.getElementById('command').value = '';
+                
+                fetch('/terminal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `command=${command}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    terminal.innerHTML += `<pre>${data.output}</pre><br>`;
+                    terminal.scrollTop = terminal.scrollHeight;
+                });
+            }
+        });
+    </script>
+{% endblock %}
