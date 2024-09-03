@@ -6,6 +6,6 @@ class UserDashboardSettings(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    speedtest_cooldown = db.Column(db.Integer, default=3600)
+    speedtest_cooldown = db.Column(db.Integer, default=60)
     number_of_speedtests = db.Column(db.Integer, default=1)
     
