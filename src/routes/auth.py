@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.scripts.email_me import send_smpt_email
 from src.config import app, db
-from src.models import User, DashboardSettings, CardSettings, FeatureTogglesSettings
+from src.models import UserProfile, UserCardSettings, FeatureToggleSettings, UserDashboardSettings
 from src.utils import render_template_from_file
 from src.routes.helper import get_email_addresses
 
@@ -17,14 +17,14 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return UserProfile.query.get(int(user_id))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
+        user = UserProfile.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
             receiver_email = current_user.email
@@ -74,13 +74,13 @@ def signup():
             flash('Passwords do not match')
             return redirect(url_for('signup'))
 
-        existing_user = User.query.filter_by(username=username).first()
+        existing_user = UserProfile.query.filter_by(username=username).first()
         if existing_user:
             flash('Username already exists')
             return redirect(url_for('signup'))
 
         hashed_password = generate_password_hash(password)
-        new_user = User(username=username, 
+        new_user = UserProfile(username=username, 
                         email=email, 
                         password=hashed_password, 
                         user_level=user_level, 
@@ -111,9 +111,9 @@ def signup():
 
         db.session.add(new_user)
         db.session.commit()
-        db.session.add(DashboardSettings(user_id=new_user.id))
-        db.session.add(CardSettings(user_id=new_user.id))
-        db.session.add(FeatureTogglesSettings(user_id=new_user.id))
+        db.session.add(UserDashboardSettings(user_id=new_user.id))
+        db.session.add(UserCardSettings(user_id=new_user.id))
+        db.session.add(FeatureToggleSettings(user_id=new_user.id))
         db.session.commit()
         flash('Account created successfully, please log in.')
         return redirect(url_for('login'))
@@ -123,7 +123,7 @@ def signup():
 @app.route("/send_email", methods=["GET", "POST"])
 @login_required
 def send_email_page():
-    dasboard_settings = DashboardSettings.query.first()
+    dasboard_settings = UserCardSettings.query.first()
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
     if dasboard_settings:
         enable_alerts = dasboard_settings.enable_alerts

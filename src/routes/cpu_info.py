@@ -5,14 +5,14 @@ from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cpu_core_count, get_cpu_frequency, cpu_usage_percent, get_cpu_temp, get_cached_value
-from src.models import DashboardSettings, FeatureTogglesSettings
+from src.models import FeatureToggleSettings
 
 cpu_info_bp = blueprints.Blueprint("cpu_usage", __name__)
 
 @app.route("/cpu_usage")
 @login_required
 def cpu_usage():
-    feature_toggles_settings = FeatureTogglesSettings.query.first()
+    feature_toggles_settings = FeatureToggleSettings.query.first()
     if not feature_toggles_settings.is_cpu_info_enabled:
         flash("You do not have permission to view this page.", "danger")
         return render_template("error/permission_denied.html")

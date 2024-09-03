@@ -2,7 +2,7 @@ import datetime
 from src.config import app
 from src import routes
 from src.utils import render_template_from_file, get_flask_memory_usage, cpu_usage_percent, get_memory_percent
-from src.models import User
+from src.models import UserProfile
 from src.scripts.email_me import send_smpt_email
 
 def register_routes():
@@ -20,7 +20,7 @@ app.config['is_server_up_email_sent'] = False
 
 def server_up_email():
     with app.app_context():
-        admin_emails = [user.email for user in User.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
+        admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
         if admin_emails:
             subject = "SystemGuard Server Started"
             context = {

@@ -6,7 +6,7 @@ import subprocess
 import psutil
 from flask import render_template_string
 
-from src.models import DashboardSettings, GeneralSettings
+from src.models import UserDashboardSettings, ApplicationGeneralSettings
 
 # Simple in-memory cache for specific data with individual timestamps
 cache = {}
@@ -171,7 +171,7 @@ def render_template_from_file(template_file_path, **context):
 
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. """
-    general_settings = GeneralSettings.query.first()
+    general_settings = ApplicationGeneralSettings.query.first()
     if general_settings:
         enable_cahce = general_settings.enable_cache
         print("Enable cache:", enable_cahce)

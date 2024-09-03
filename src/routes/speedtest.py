@@ -2,7 +2,7 @@ import datetime
 from flask import render_template, blueprints
 from flask_login import login_required, current_user
 from src.config import app, db
-from src.models import DashboardSettings, SpeedTestResult
+from src.models import UserCardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file
 from src.scripts.email_me import send_smpt_email
 
@@ -11,14 +11,14 @@ speedtest_bp = blueprints.Blueprint("speedtest", __name__)
 @app.route("/speedtest")
 @login_required
 def speedtest():
-    settings = DashboardSettings.query.first()
+    settings = UserCardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
     NUMBER_OF_SPEEDTESTS = settings.number_of_speedtests
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(
         hours=SPEEDTEST_COOLDOWN_IN_HOURS
     )
-    recent_results = SpeedTestResult.query.filter(
-        SpeedTestResult.timestamp > n_hour_ago
+    recent_results = NetworkSpeedTestResult.query.filter(
+        NetworkSpeedTestResult.timestamp > n_hour_ago
     ).all()
 
     if len(recent_results) < NUMBER_OF_SPEEDTESTS:
@@ -29,7 +29,7 @@ def speedtest():
             )
 
         if speedtest_result:
-            new_result = SpeedTestResult(
+            new_result = NetworkSpeedTestResult(
                 download_speed=speedtest_result["download_speed"],
                 upload_speed=speedtest_result["upload_speed"],
                 ping=speedtest_result["ping"],

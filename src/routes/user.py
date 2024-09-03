@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 
 from src.config import app, db
-from src.models import User, DashboardSettings, CardSettings, FeatureTogglesSettings
+from src.models import UserProfile, UserDashboardSettings, UserCardSettings, FeatureToggleSettings
 from src.utils import render_template_from_file
 from src.scripts.email_me import send_smpt_email
 from src.routes.helper import get_email_addresses
@@ -25,11 +25,11 @@ def add_user():
         receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on'
 
         # Check if user already exists
-        if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
+        if UserProfile.query.filter_by(username=username).first() or UserProfile.query.filter_by(email=email).first():
             flash('Username or email already exists.', 'danger')
             return redirect(url_for('add_user'))
 
-        new_user = User(
+        new_user = UserProfile(
             username=username,
             email=email,
             password=generate_password_hash(password),
@@ -67,9 +67,9 @@ def add_user():
         print("new user", new_user.id)  # Now the ID should be available
 
         # Now you can use the new user's ID to create related settings
-        db.session.add(DashboardSettings(user_id=new_user.id))
-        db.session.add(CardSettings(user_id=new_user.id))
-        db.session.add(FeatureTogglesSettings(user_id=new_user.id))
+        db.session.add(UserDashboardSettings(user_id=new_user.id))
+        db.session.add(UserCardSettings(user_id=new_user.id))
+        db.session.add(FeatureToggleSettings(user_id=new_user.id))
         db.session.commit()
 
         flash('User created successfully!', 'success')
@@ -92,7 +92,7 @@ def view_users():
 @app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def change_user_settings(username):
-    user = User.query.filter_by(username=username).first_or_404()
+    user = UserProfile.query.filter_by(username=username).first_or_404()
 
     if request.method == 'POST':
         new_username = request.form['username']
@@ -120,7 +120,7 @@ def delete_user(username):
         flash("Your account does not have permission to perform this action.", "danger")
         return redirect(url_for('view_users'))  # Redirect to the users page
 
-    user = User.query.filter_by(username=username).first_or_404()
+    user = UserProfile.query.filter_by(username=username).first_or_404()
 
     # Get Admin Emails with Alerts Enabled:
     admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)

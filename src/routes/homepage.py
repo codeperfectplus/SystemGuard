@@ -3,19 +3,18 @@ from flask_login import login_required, current_user
 
 from src.config import app, db
 from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
-from src.models import DashboardSettings, DashboardNetwork
+from src.models import  DashboardNetworkSettings
 
 homepages_bp = blueprints.Blueprint('homepages', __name__)
 
 
 from flask import render_template
-from src.models import DashboardNetwork
 from flask_login import login_required
 
 @app.route('/', methods=['GET'])
 @login_required
 def dashboard_network():
-    groups = DashboardNetwork.query.all()  # Fetch all dashboard groups
+    groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
     return render_template('dashboard_network.html', groups=groups)
 
 
@@ -29,13 +28,13 @@ def add_server():
         link = request.form.get('link')
 
         # Check if the server name already exists
-        existing_server = DashboardNetwork.query.filter_by(name=name).first()
+        existing_server = DashboardNetworkSettings.query.filter_by(name=name).first()
         if existing_server:
             flash('Server name already exists. Please choose a different name.', 'danger')
             return redirect(url_for('add_server'))
 
         # Create a new server entry
-        new_server = DashboardNetwork(name=name, description=description, ip_address=ip_address, port=port, link=link)
+        new_server = DashboardNetworkSettings(name=name, description=description, ip_address=ip_address, port=port, link=link)
         db.session.add(new_server)
         db.session.commit()
 
@@ -51,7 +50,7 @@ def edit_server(server_id):
         flash('You are not authorized to access this page.', 'danger')
         return render_template("error/permission_denied.html")
 
-    server = DashboardNetwork.query.get_or_404(server_id)
+    server = DashboardNetworkSettings.query.get_or_404(server_id)
     if request.method == 'POST':
         server.name = request.form['name']
         server.description = request.form['description']
@@ -69,7 +68,7 @@ def delete_server(server_id):
     if current_user.user_level != 'admin':
         flash('You are not authorized to access this page.', 'danger')
         return render_template("error/permission_denied.html")
-    server = DashboardNetwork.query.get_or_404(server_id)
+    server = DashboardNetworkSettings.query.get_or_404(server_id)
     db.session.delete(server)
     db.session.commit()
     flash('Server deleted successfully!', 'success')

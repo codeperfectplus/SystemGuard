@@ -6,7 +6,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 from flask import redirect, url_for, flash
 from src.config import app
-from src.models import SmptEamilPasswordConfig, DashboardSettings, GeneralSettings
+from src.models import ApplicationGeneralSettings, SMTPSettings
 
 system_name = os.uname().sysname
 
@@ -17,7 +17,7 @@ def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html
 
     with app.app_context():
         if not bypass_alerts:
-            general_settings = GeneralSettings.query.first()
+            general_settings = ApplicationGeneralSettings.query.first()
             if general_settings:
                 enable_alerts = general_settings.enable_alerts
                 if not enable_alerts:
@@ -25,7 +25,7 @@ def send_smpt_email(receiver_email, subject, body, attachment_path=None, is_html
                     flash("Email alerts are disabled. Please enable them in the settings.", "danger")
                     return redirect(url_for('general_settings'))
     
-        email_password = SmptEamilPasswordConfig.query.first()
+        email_password = SMTPSettings.query.first()
         if not email_password:
             print("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.")
             flash("SMTP email credentials not found. Please set EMAIL_ADDRESS and EMAIL_PASSWORD environment variables.", "danger")

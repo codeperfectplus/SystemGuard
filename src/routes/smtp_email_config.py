@@ -2,14 +2,14 @@ from flask_login import login_required
 from flask import render_template, request, flash, redirect, url_for, blueprints
 
 from src.config import app, db
-from src.models import SmptEamilPasswordConfig
+from src.models import SMTPSettings
 
 smtp_email_config_bp = blueprints.Blueprint('smtp_email_config', __name__)
 
 @app.route("/update-email-password", methods=["GET", "POST"])
 @login_required
 def update_smpt_email_password():
-    smtp_config = SmptEamilPasswordConfig.query.first()
+    smtp_config = SMTPSettings.query.first()
 
     if request.method == "POST":
         new_email = request.form.get("email")
@@ -21,7 +21,7 @@ def update_smpt_email_password():
         
         
         if not smtp_config:
-            smtp_config = SmptEamilPasswordConfig(email=new_email, password=new_password)
+            smtp_config = SMTPSettings(email=new_email, password=new_password)
             db.session.add(smtp_config)
         else:
             smtp_config.email = new_email

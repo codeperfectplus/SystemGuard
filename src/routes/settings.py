@@ -1,7 +1,8 @@
 import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
+
 from src.config import app, db
-from src.models import DashboardSettings, User, GeneralSettings, CardSettings
+from src.models import UserCardSettings, UserDashboardSettings, UserProfile, ApplicationGeneralSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file
 from src.scripts.email_me import send_smpt_email
@@ -11,7 +12,7 @@ settings_bp = blueprints.Blueprint("settings", __name__)
 @app.route('/settings/speedtest', methods=['GET', 'POST'])
 @login_required
 def speedtest_settings():
-    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    settings = UserDashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         settings.speedtest_cooldown = request.form.get('speedtest_cooldown')
         settings.number_of_speedtests = request.form.get('number_of_speedtests')
@@ -23,7 +24,7 @@ def speedtest_settings():
 @app.route('/settings/general', methods=['GET', 'POST'])
 @login_required
 def general_settings():
-    general_settings = GeneralSettings.query.filter_by().first()  # Retrieve user-specific settings from DB
+    general_settings = ApplicationGeneralSettings.query.filter_by().first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         general_settings.timezone = request.form.get('timezone')
         general_settings.enable_cache = 'enable_cache' in request.form
@@ -47,7 +48,7 @@ def general_settings():
 @app.route('/settings/feature-toggles', methods=['GET', 'POST'])
 @login_required
 def feature_toggles():
-    settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    settings = UserDashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         settings.is_cpu_info_enabled = 'is_cpu_info_enabled' in request.form
         settings.is_memory_info_enabled = 'is_memory_info_enabled' in request.form
@@ -62,7 +63,7 @@ def feature_toggles():
 @app.route('/settings/card-toggles', methods=['GET', 'POST'])
 @login_required
 def card_toggles():
-    card_settings = CardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
+    card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
     if request.method == 'POST':
         card_settings.is_user_card_enabled = 'is_user_card_enabled' in request.form
         card_settings.is_server_card_enabled = 'is_server_card_enabled' in request.form
@@ -89,41 +90,5 @@ def settings():
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/permission_denied.html")
-
-    # # Fetch the settings from the database
-    # settings = DashboardSettings.query.filter_by(user_id=current_user.id).first()
-
-    # if settings:
-    #     if request.method == "POST":
-    #         # Update settings only if the form field is provided, otherwise keep the current value
-    #         if "speedtest_cooldown" in request.form:
-    #             settings.speedtest_cooldown = int(request.form["speedtest_cooldown"])
-    #         if "number_of_speedtests" in request.form:
-    #             settings.number_of_speedtests = int(request.form["number_of_speedtests"])
-
-    #         # Feature settings
-    #         settings.is_cpu_info_enabled = "is_cpu_info_enabled" in request.form
-    #         settings.is_memory_info_enabled = "is_memory_info_enabled" in request.form
-    #         settings.is_disk_info_enabled = "is_disk_info_enabled" in request.form
-    #         settings.is_network_info_enabled = "is_network_info_enabled" in request.form
-    #         settings.is_process_info_enabled = "is_process_info_enabled" in request.form
-
-    #         # Card settings
-    #         settings.is_user_card_enabled = "is_user_card_enabled" in request.form
-    #         settings.is_server_card_enabled = "is_server_card_enabled" in request.form
-    #         settings.is_battery_card_enabled = "is_battery_card_enabled" in request.form
-    #         settings.is_cpu_core_card_enabled = "is_cpu_core_card_enabled" in request.form
-    #         settings.is_cpu_usage_card_enabled = "is_cpu_usage_card_enabled" in request.form
-    #         settings.is_cpu_temp_card_enabled = "is_cpu_temp_card_enabled" in request.form
-    #         settings.is_dashboard_memory_card_enabled = "is_dashboard_memory_card_enabled" in request.form
-    #         settings.is_memory_usage_card_enabled = "is_memory_usage_card_enabled" in request.form
-    #         settings.is_disk_usage_card_enabled = "is_disk_usage_card_enabled" in request.form
-    #         settings.is_system_uptime_card_enabled = "is_system_uptime_card_enabled" in request.form
-    #         settings.is_network_statistic_card_enabled = "is_network_statistic_card_enabled" in request.form
-    #         settings.is_speedtest_enabled = "is_speedtest_enabled" in request.form
-
-    #         # Commit the changes to the database
-    #         db.session.commit()
-    #         flash("Settings updated successfully!", "success")
 
     return render_template("settings.html", settings=settings)

@@ -3,7 +3,7 @@ from flask import render_template, blueprints
 from flask_login import login_required, current_user
 
 from src.config import app
-from src.models import SpeedTestResult, DashboardSettings, CardSettings
+from src.models import NetworkSpeedTestResult, UserDashboardSettings, UserCardSettings
 from src.utils import datetimeformat, get_system_info
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)
@@ -11,15 +11,15 @@ dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 @app.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
-    settings = DashboardSettings.query.first()
+    settings = UserDashboardSettings.query.first()
     SPEEDTEST_COOLDOWN_IN_HOURS = settings.speedtest_cooldown
     system_info = get_system_info()
 
     # Fetch the last speedtest result
     n_hour_ago = datetime.datetime.now() - datetime.timedelta(
         hours=SPEEDTEST_COOLDOWN_IN_HOURS)
-    recent_results = SpeedTestResult.query.filter(
-        SpeedTestResult.timestamp > n_hour_ago).all()
+    recent_results = NetworkSpeedTestResult.query.filter(
+        NetworkSpeedTestResult.timestamp > n_hour_ago).all()
     last_timestamp = (
         datetimeformat(recent_results[-1].timestamp) if recent_results else None
     )
