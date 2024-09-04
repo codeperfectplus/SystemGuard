@@ -177,12 +177,22 @@ install() {
     if [ "$INSTALL_METHOD" == "git" ]; then
         log "Installing SystemGuard from Git repository..."
 
-        log "Removing any existing installation in the directory $EXTRACT_DIR..."
+
+        log "Removing any existing installation in the directory $EXTRACT_DIR/SystemGuard-dev ..."
         if [ -d "$EXTRACT_DIR/SystemGuard-*" ]; then
             rm -rf "$EXTRACT_DIR/SystemGuard-*"
             log "Old installation removed."
         fi
 
+        # Clean up previous cron jobs related to SystemGuard
+        log "Cleaning up previous cron jobs related to SystemGuard..."
+        if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+            $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
+            log "Old cron jobs removed."
+        else
+            log "No previous cron jobs found."
+        fi
+        
         log "Cloning the SystemGuard repository from GitHub..."
         if ! git clone https://github.com/codeperfectplus/SystemGuard.git "$EXTRACT_DIR/SystemGuard-dev"; then
             log "Error: Failed to clone the repository. Please check your internet connection and try again."
@@ -438,6 +448,6 @@ change_ownership() {
 # Call the change_ownership function
 change_ownership "$EXTRACT_DIR"
 
-log "For any issues or feedback, please report at: $ISSUE_URL"
-log "For more information, check the log file: $LOG_FILE"
-# End of script
+# log "For any issues or feedback, please report at: $ISSUE_URL"
+# log "For more information, check the log file: $LOG_FILE"
+# # End of script
