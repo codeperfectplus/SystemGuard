@@ -12,4 +12,3 @@ from src.routes.network import network_bp
 from src.routes.other import other_bp
 from src.routes.smtp_email_config import smtp_email_config_bp
 from src.routes.user import user_bp
-from src.routes.experimental import experimental_bp
