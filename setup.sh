@@ -171,83 +171,128 @@ install_executable() {
 # Install function
 install() {
     log "Starting installation of SystemGuard..."
-    echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
-    read VERSION
-    echo "Warning: This script will remove any existing installation of SystemGuard. Continue? (y/n)"
-    read CONFIRM
+    echo "Do you want to install from a Git repository or a specific release? (git/release):"
+    read INSTALL_METHOD
 
-    if [ "$CONFIRM" != "y" ]; then
-        log "Installation aborted by user."
-        exit 0
-    fi
+    if [ "$INSTALL_METHOD" == "git" ]; then
+        log "Installing SystemGuard from Git repository..."
 
-    # Fetch latest version if specified
-    if [ "$VERSION" == "latest" ]; then
-        log "Fetching the latest version of SystemGuard from GitHub..."
-        VERSION=$(curl -s https://api.github.com/repos/codeperfectplus/SystemGuard/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
-        if [ -z "$VERSION" ]; then
-            log "Error: Unable to fetch the latest version. Please try again or specify a version manually."
+        log "Removing any existing installation in the directory $EXTRACT_DIR..."
+        if [ -d "$EXTRACT_DIR/SystemGuard-*" ]; then
+            rm -rf "$EXTRACT_DIR/SystemGuard-*"
+            log "Old installation removed."
+        fi
+
+        log "Cloning the SystemGuard repository from GitHub..."
+        if ! git clone https://github.com/codeperfectplus/SystemGuard.git "$EXTRACT_DIR/SystemGuard-dev"; then
+            log "Error: Failed to clone the repository. Please check your internet connection and try again."
             exit 1
         fi
-        log "Latest version found: $VERSION"
-    fi
+        log "Repository cloned successfully."
 
-    # Define URL after determining the version
-    ZIP_URL="https://github.com/codeperfectplus/SystemGuard/archive/refs/tags/$VERSION.zip"
-    log "Installing SystemGuard version $VERSION..."
-    
-    # Download the SystemGuard zip file
-    log "Downloading SystemGuard version $VERSION from $ZIP_URL..."
-    if ! wget -q "$ZIP_URL" -O "$DOWNLOAD_DIR/systemguard.zip"; then
-        log "Error: Failed to download SystemGuard version $VERSION. Please check the version number and try again."
+        cd "$EXTRACT_DIR/SystemGuard-dev"
+        log "Setting up SystemGuard from Git repository..."
+        
+        # Install the executable
+        install_executable
+        log "SystemGuard installed successfully from Git!"
+        
+        # Set up cron job if needed
+        log "Preparing cron job script..."
+        add_cron_job
+
+        if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+            log "Cron job added successfully."
+        else
+            log "Error: Failed to add the cron job."
+            exit 1
+        fi
+
+        exit 0
+    elif [ "$INSTALL_METHOD" == "release" ]; then
+        echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
+        read VERSION
+        echo "Warning: This script will remove any existing installation of SystemGuard. Continue? (y/n)"
+        read CONFIRM
+
+        if [ "$CONFIRM" != "y" ]; then
+            log "Installation aborted by user."
+            exit 0
+        fi
+
+        # Fetch latest version if specified
+        if [ "$VERSION" == "latest" ]; then
+            log "Fetching the latest version of SystemGuard from GitHub..."
+            VERSION=$(curl -s https://api.github.com/repos/codeperfectplus/SystemGuard/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+            if [ -z "$VERSION" ]; then
+                log "Error: Unable to fetch the latest version. Please try again or specify a version manually."
+                exit 1
+            fi
+            log "Latest version found: $VERSION"
+        fi
+
+        # Define URL after determining the version
+        ZIP_URL="https://github.com/codeperfectplus/SystemGuard/archive/refs/tags/$VERSION.zip"
+        log "Installing SystemGuard version $VERSION..."
+        
+        # Download the SystemGuard zip file
+        log "Downloading SystemGuard version $VERSION from $ZIP_URL..."
+        if ! wget -q "$ZIP_URL" -O "$DOWNLOAD_DIR/systemguard.zip"; then
+            log "Error: Failed to download SystemGuard version $VERSION. Please check the version number and try again."
+            exit 1
+        fi
+        log "Download completed successfully."
+
+        # Backup existing configurations
+        backup_configs
+
+        # Remove any existing installation of SystemGuard
+        log "Removing previous installation of SystemGuard, if any..."
+        if [ -d "$EXTRACT_DIR" ]; then
+            rm -rf "$EXTRACT_DIR"
+            log "Old installation removed."
+        fi
+
+        # Clean up previous cron jobs related to SystemGuard
+        log "Cleaning up previous cron jobs related to SystemGuard..."
+        if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+            $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
+            log "Old cron jobs removed."
+        else
+            log "No previous cron jobs found."
+        fi
+
+        # Create the extraction directory
+        log "Setting up installation directory..."
+        mkdir -p $EXTRACT_DIR
+
+        # Extract the downloaded zip file
+        log "Extracting SystemGuard package..."
+        unzip -q $DOWNLOAD_DIR/systemguard.zip -d $EXTRACT_DIR
+        rm $DOWNLOAD_DIR/systemguard.zip
+        log "Extraction completed."
+        log "Preparing cron job script..."
+        add_cron_job
+
+        # Check if the cron job is added successfully
+        if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
+            log "Cron job added successfully."
+        else
+            log "Error: Failed to add the cron job."
+            exit 1
+        fi
+
+        # Install the executable
+        install_executable
+        log "SystemGuard version $VERSION installed successfully!"
+        log "Server may take a few minutes to start, if you face any try to restart the server."
+
+    else
+        log "Invalid installation method. Please choose 'git' or 'release'."
         exit 1
     fi
-    log "Download completed successfully."
-
-    # Backup existing configurations
-    backup_configs
-
-    # Remove any existing installation of SystemGuard
-    log "Removing previous installation of SystemGuard, if any..."
-    if [ -d "$EXTRACT_DIR" ]; then
-        rm -rf "$EXTRACT_DIR"
-        log "Old installation removed."
-    fi
-
-    # Clean up previous cron jobs related to SystemGuard
-    log "Cleaning up previous cron jobs related to SystemGuard..."
-    if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
-        $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
-        log "Old cron jobs removed."
-    else
-        log "No previous cron jobs found."
-    fi
-
-    # Create the extraction directory
-    log "Setting up installation directory..."
-    mkdir -p $EXTRACT_DIR
-
-    # Extract the downloaded zip file
-    log "Extracting SystemGuard package..."
-    unzip -q $DOWNLOAD_DIR/systemguard.zip -d $EXTRACT_DIR
-    rm $DOWNLOAD_DIR/systemguard.zip
-    log "Extraction completed."
-    log "Preparing cronjob script..."
-    add_cron_job
-
-    # check if the cron job is added successfully
-    if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
-        log "Cron job added successfully."
-    else
-        log "Error: Failed to add the cron job."
-        exit 1
-    fi
-
-    # Install the executable
-    install_executable
-    log "SystemGuard version $VERSION installed successfully!"
-    log "Server may take a few minutes to start, if you face any try to restart the server."
 }
+
 
 # Uninstall function
 uninstall() {
