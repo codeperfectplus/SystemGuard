@@ -3,8 +3,14 @@
 # SystemGuard Installer Script
 # ----------------------------
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
-
 # Determine the correct user's home directory
+
+# run this script with sudo
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this program with sudo."
+    exit 1
+fi
+
 get_user_home() {
     if [ -n "$SUDO_USER" ]; then
         # When using sudo, SUDO_USER gives the original user who invoked sudo
@@ -24,6 +30,7 @@ USER_HOME=$(get_user_home)
 USER_NAME=$(echo $USER_HOME | awk -F'/' '{print $3}')
 DOWNLOAD_DIR="/tmp"
 EXTRACT_DIR="$USER_HOME/.systemguard"
+GIT_INSTALL_DIR="$EXTRACT_DIR/SystemGuard-dev"
 LOG_DIR="$HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
 BACKUP_DIR="$USER_HOME/.systemguard_backup"
@@ -50,6 +57,17 @@ if [ "$EUID" -eq 0 ]; then
 else
     crontab_cmd="crontab"
 fi
+
+change_ownership() {
+    local directory="$1"
+    if [ -d "$directory" ]; then
+        # if permission is set to root then change it to the user
+        if [ "$(stat -c %U "$directory")" == "root" ]; then
+            chown -R "$USER_NAME:$USER_NAME" "$directory"
+            log "Ownership changed from root to $USER_NAME for $directory"
+        fi
+    fi
+}
 
 
 # Function to add a cron job with error handling
@@ -98,7 +116,8 @@ add_cron_job() {
     fi
 
     rm "$temp_cron"
-    log "Cron job added successfully: $cron_job"
+    log "Cron job added successfully" 
+    log $cron_job
 }
 
 # Backup function for existing configurations
@@ -171,10 +190,12 @@ install_executable() {
 # Install function
 install() {
     log "Starting installation of SystemGuard..."
-    echo "Do you want to install from a Git repository or a specific release? (git/release):"
+    echo "Do you want to install from a Git repository or a specific release?"
+    echo "1. Git repository"
+    echo "2. Release"
     read INSTALL_METHOD
 
-    if [ "$INSTALL_METHOD" == "git" ]; then
+    if [ "$INSTALL_METHOD" == "1" ]; then
         log "Installing SystemGuard from Git repository..."
 
 
@@ -194,13 +215,13 @@ install() {
         fi
         
         log "Cloning the SystemGuard repository from GitHub..."
-        if ! git clone https://github.com/codeperfectplus/SystemGuard.git "$EXTRACT_DIR/SystemGuard-dev"; then
+        if ! git clone https://github.com/codeperfectplus/SystemGuard.git $GIT_INSTALL_DIR; then
             log "Error: Failed to clone the repository. Please check your internet connection and try again."
             exit 1
         fi
         log "Repository cloned successfully."
 
-        cd "$EXTRACT_DIR/SystemGuard-dev"
+        cd $GIT_INSTALL_DIR
         log "Setting up SystemGuard from Git repository..."
         
         # Install the executable
@@ -217,9 +238,10 @@ install() {
             log "Error: Failed to add the cron job."
             exit 1
         fi
+        change_ownership "$EXTRACT_DIR"
 
         exit 0
-    elif [ "$INSTALL_METHOD" == "release" ]; then
+    elif [ "$INSTALL_METHOD" == "2" ]; then
         echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
         read VERSION
         echo "Warning: This script will remove any existing installation of SystemGuard. Continue? (y/n)"
@@ -294,6 +316,7 @@ install() {
 
         # Install the executable
         install_executable
+        change_ownership "$EXTRACT_DIR"
         log "SystemGuard version $VERSION installed successfully!"
         log "Server may take a few minutes to start, if you face any try to restart the server."
 
@@ -434,25 +457,4 @@ case $ACTION in
     health_check) health_check ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-
-# this script ran with sudo command so all the files have root permission 
-# remove the root permission from the files to the user 
-# Function to change ownership of a directory to the user
-change_ownership() {
-    local directory="$1"
-    if [ -d "$directory" ]; then
-        # if permission is set to root then change it to the user
-        if [ "$(stat -c %U "$directory")" == "root" ]; then
-            chown -R "$USER_NAME:$USER_NAME" "$directory"
-            log "Ownership changed to $USER_NAME for directory: $directory"
-        fi
-    fi
-}
-
-
-# Call the change_ownership function
-change_ownership "$EXTRACT_DIR"
-
-# log "For any issues or feedback, please report at: $ISSUE_URL"
-# log "For more information, check the log file: $LOG_FILE"
 # # End of script
