@@ -178,9 +178,9 @@ install() {
         log "Installing SystemGuard from Git repository..."
 
 
-        log "Removing any existing installation in the directory $EXTRACT_DIR/SystemGuard-dev ..."
-        if [ -d "$EXTRACT_DIR/SystemGuard-*" ]; then
-            rm -rf "$EXTRACT_DIR/SystemGuard-*"
+        log "Removing previous installation of SystemGuard, if any..."
+        if [ -d "$EXTRACT_DIR" ]; then
+            rm -rf "$EXTRACT_DIR"
             log "Old installation removed."
         fi
 
@@ -376,7 +376,7 @@ check_status() {
         log "No cron job found for SystemGuard."
     fi
 
-    log "Performing health check on localhost:5005..."
+    log "Performing health check on $HOST_URL..."
     if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
         log "SystemGuard services are running."
     else
@@ -441,9 +441,14 @@ esac
 change_ownership() {
     local directory="$1"
     if [ -d "$directory" ]; then
-        chown -R "$USER_NAME:$USER_NAME" "$directory"
+        # if permission is set to root then change it to the user
+        if [ "$(stat -c %U "$directory")" == "root" ]; then
+            chown -R "$USER_NAME:$USER_NAME" "$directory"
+            log "Ownership changed to $USER_NAME for directory: $directory"
+        fi
     fi
 }
+
 
 # Call the change_ownership function
 change_ownership "$EXTRACT_DIR"
