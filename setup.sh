@@ -246,6 +246,7 @@ install() {
     # Install the executable
     install_executable
     log "SystemGuard version $VERSION installed successfully!"
+    log "Server may take a few minutes to start, if you face any try to restart the server."
 }
 
 # Uninstall function
@@ -392,7 +393,6 @@ change_ownership() {
 # Call the change_ownership function
 change_ownership "$EXTRACT_DIR"
 
-echo "SystemGuard Installer script completed, Server may take a few minutes to start, if you face any try to restart the server."
-echo "For any issues or feedback, please report at: $ISSUE_URL"
-echo "For more information, check the log file: $LOG_FILE"
+log "For any issues or feedback, please report at: $ISSUE_URL"
+log "For more information, check the log file: $LOG_FILE"
 # End of script

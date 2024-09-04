@@ -109,6 +109,8 @@ A Docker image has not been created for this project because it requires access 
 - Customizable dashboards
 - Plugin support to make SystemGuard even more powerful.
 - make server logs
+- Check Disk read/write speed 
+- Check Firewall status 
 
 ## Acknowledgments
 

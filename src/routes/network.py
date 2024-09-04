@@ -11,7 +11,7 @@ network_bp = blueprints.Blueprint('network', __name__)
 from flask import render_template
 from flask_login import login_required
 
-@app.route('/netowrk', methods=['GET'])
+@app.route('/network', methods=['GET'])
 @login_required
 def dashboard_network():
     groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
