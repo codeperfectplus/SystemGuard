@@ -100,12 +100,14 @@ GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
 LOG_DIR="$USER_HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
 BACKUP_DIR="$USER_HOME/.systemguard_backup"
-EXECUTABLE="/usr/local/bin/systemguard-installer"
+EXECUTABLE_APP_NAME="systemguard-installer"
+EXECUTABLE="/usr/local/bin/$EXECUTABLE_APP_NAME"
 
 # File paths related to the application
 LOCUST_FILE="$EXTRACT_DIR/${APP_NAME}-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
+FLASK_LOG_FILE="$USER_HOME/logs/systemguard_flask.log"
 
 # Number of backups to keep
 NUM_OF_BACKUP=5
@@ -203,7 +205,7 @@ add_cron_job() {
 
     rm "$temp_cron"
     log "INFO" "Cron job added successfully" 
-    log $cron_job
+    # log $cron_job
 }
 
 # Function to clean up all backups
@@ -511,7 +513,7 @@ load_test() {
     # Check if Locust is installed
     if ! command -v locust &> /dev/null
     then
-        log "Locust is not installed. Please install it first."
+        log "WARNING" "Locust is not installed. Please install it first."
         exit 1
     fi
 
@@ -557,21 +559,57 @@ health_check() {
     fi
 }
 
+# app logs
+show_server_logs() {
+    log "Checking server logs at $FLASK_LOG_FILE..."
+    log "INFO" "Press Ctrl+C to exit."
+    echo ""
+    echo "--- Server Logs ---"
+    echo ""
+    if [ -f "$FLASK_LOG_FILE" ]; then
+        tail -f "$FLASK_LOG_FILE"
+    else
+        log "No logs found at $FLASK_LOG_FILE."
+    fi
+}
+
 
 # Display help
 show_help() {
     echo "$APP_NAME Installer"
-    echo "Usage: ./installer.sh [options]"
+    echo ""
+    echo "Usage: $EXECUTABLE_APP_NAME [options]"
+    echo ""
     echo "Options:"
-    echo "  --install           Install $APP_NAME"
-    echo "  --uninstall         Uninstall $APP_NAME"
-    echo "  --restore           Restore $APP_NAME from a backup"
-    echo "  --load-test         Start Locust load testing"
-    echo "  --status            Check the status of $APP_NAME installation"
-    echo "  --health-check      Perform a health check on localhost:5005"
-    echo "  --clean-backups     Clean up all backups"
-    echo "  --help              Display this help message"
+    echo "  --install           Install $APP_NAME and set up all necessary dependencies."
+    echo "                      This will configure the environment and start the application."
+    echo ""
+    echo "  --uninstall         Uninstall $APP_NAME completely."
+    echo "                      This will remove the application and all associated files."
+    echo ""
+    echo "  --restore           Restore $APP_NAME from a backup."
+    echo "                      Use this option to recover data or settings from a previous backup."
+    echo ""
+    echo "  --load-test         Start Locust load testing for $APP_NAME."
+    echo "                      This will initiate performance testing to simulate multiple users."
+    echo ""
+    echo "  --status            Check the status of $APP_NAME installation."
+    echo "                      Displays whether $APP_NAME is installed, running, or if there are any issues."
+    echo ""
+    echo "  --health-check      Perform a health check on $HOST_URL."
+    echo "                      Verifies that the application is running correctly and responding to requests."
+    echo ""
+    echo "  --clean-backups     Clean up all backups of $APP_NAME."
+    echo "                      This will delete all saved backup files to free up space."
+    echo ""
+    echo "  --server-logs       Show server logs for $APP_NAME."
+    echo "                      Displays the latest server logs, which can help in troubleshooting issues."
+    echo "                      Press Ctrl+C to exit the log viewing session."
+    echo ""
+    echo "  --help              Display this help message."
+    echo "                      Shows information about all available options and how to use them."
 }
+
 
 # Parse command-line options
 for arg in "$@"; do
@@ -583,6 +621,7 @@ for arg in "$@"; do
         --status) ACTION="check_status" ;;
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
+        --server-logs) show_server_logs; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
