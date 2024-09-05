@@ -25,25 +25,45 @@ get_user_home() {
     echo "$USER_HOME"
 }
 
-# Set paths relative to the correct user's home directory
+# Retrieve the home directory of the current user
 USER_HOME=$(get_user_home)
-USER_NAME=$(echo $USER_HOME | awk -F'/' '{print $3}')
+USER_NAME=$(basename "$USER_HOME")
+
+# Define directories and file paths
 DOWNLOAD_DIR="/tmp"
+APP_NAME="SystemGuard"
 EXTRACT_DIR="$USER_HOME/.systemguard"
-GIT_INSTALL_DIR="$EXTRACT_DIR/SystemGuard-dev"
-LOG_DIR="$HOME/logs"
+GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
+LOG_DIR="$USER_HOME/logs"
 LOG_FILE="$LOG_DIR/systemguard-installer.log"
 BACKUP_DIR="$USER_HOME/.systemguard_backup"
 EXECUTABLE="/usr/local/bin/systemguard-installer"
-LOCUST_FILE="$EXTRACT_DIR/SystemGuard-*/src/scripts/locustfile.py"
+
+# File paths related to the application
+LOCUST_FILE="$EXTRACT_DIR/${APP_NAME}-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
-ISSUE_URL="https://github.com/codeperfectplus/SystemGuard/issues"
-CRON_PATTERN=".systemguard/SystemGuard-.*/src/scripts/dashboard.sh"
 
-# Create necessary directories
-mkdir -p "$LOG_DIR"
-mkdir -p "$BACKUP_DIR"
+# Pattern for identifying cron jobs related to SystemGuard
+CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
+
+# GitHub repository details
+GIT_USER="codeperfectplus"
+GIT_REPO="$APP_NAME"
+GIT_URL="https://github.com/$GIT_USER/$GIT_REPO.git"
+ISSUE_URL="$GIT_URL/issues"
+
+
+# Function to create a directory if it does not exist
+create_dir_if_not_exists() {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+        mkdir -p "$dir" || { log "Error: Failed to create directory: $dir"; exit 1; }
+    fi
+}
+
+create_dir_if_not_exists "$LOG_DIR"
+create_dir_if_not_exists "$BACKUP_DIR"
 
 # Logging function with timestamp
 log() {
@@ -72,13 +92,7 @@ change_ownership() {
     fi
 }
 
-# Function to create a directory if it does not exist
-create_dir_if_not_exists() {
-    local dir="$1"
-    if [ ! -d "$dir" ]; then
-        mkdir -p "$dir" || { log "Error: Failed to create directory: $dir"; exit 1; }
-    fi
-}
+
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -185,7 +199,7 @@ restore() {
 install_executable() {
     # Use $0 to get the full path of the currently running script
     # CURRENT_SCRIPT=$(realpath "$0")
-    cd $EXTRACT_DIR/SystemGuard-*/
+    cd $EXTRACT_DIR/$APP_NAME-*/
     CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT  
     # Verify that the script exists before attempting to copy
     if [ -f "$CURRENT_SCRIPT" ]; then
@@ -199,13 +213,13 @@ install_executable() {
 
 # remove previous installation of cron jobs and SystemGuard
 remove_previous_installation() {
-    log "Removing previous installation of SystemGuard, if any..."
+    log "Removing previous installation of $APP_NAME, if any..."
     if [ -d "$EXTRACT_DIR" ]; then
         rm -rf "$EXTRACT_DIR"
         log "Old installation removed."
     fi
 
-    log "Cleaning up previous cron jobs related to SystemGuard..."
+    log "Cleaning up previous cron jobs related to $APP_NAME..."
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
@@ -216,8 +230,8 @@ remove_previous_installation() {
 
 # Function to fetch the latest version of SystemGuard from GitHub releases
 fetch_latest_version() {
-    log "Fetching the latest version of SystemGuard from GitHub..."
-    VERSION=$(curl -s https://api.github.com/repos/codeperfectplus/SystemGuard/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
+    log "Fetching the latest version of $APP_NAME from GitHub..."
+    VERSION=$(curl -s https://api.github.com/repos/$GIT_USER/$GIT_REPO/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
     if [ -z "$VERSION" ]; then
         log "Error: Unable to fetch the latest version. Please try again or specify a version manually."
         exit 1
@@ -229,9 +243,9 @@ fetch_latest_version() {
 download_release() {
     local url=$1
     local output=$2
-    log "Downloading SystemGuard from $url..."
+    log "Downloading $APP_NAME from $url..."
     if ! wget -q "$url" -O "$output"; then
-        log "Error: Failed to download SystemGuard. Please check the URL and try again."
+        log "Error: Failed to download $APP_NAME. Please check the URL and try again."
         exit 1
     fi
     log "Download completed successfully."
@@ -249,41 +263,86 @@ setup_cron_job() {
     fi
 }
 
-# Function to install the latest version of SystemGuard
+# Function to install SystemGuard from Git repository
 install_from_git() {
-    log "Installing SystemGuard from Git repository..."
+    log "Starting installation of $APP_NAME from Git repository..."
 
+    # Backup existing configurations
     backup_configs
+
+    # Remove any previous installations
     remove_previous_installation
 
-    log "Cloning the SystemGuard repository from GitHub..."
-    if ! git clone https://github.com/codeperfectplus/SystemGuard.git "$GIT_INSTALL_DIR"; then
-        log "Error: Failed to clone the repository. Please check your internet connection and try again."
+    log "Select the version of $APP_NAME to install:"
+    echo "1. Stable (default)"
+    echo "2. Development (unstable)"
+    echo "3. Enter a specific branch name"
+    read -r VERSION
+
+    # Set Git URL based on user choice
+    case "$VERSION" in
+        1|"")  # Stable is the default option if nothing is entered
+            BRANCH="main"
+            log "Selected Stable version (main branch)."
+            ;;
+        2)  # Development version
+            BRANCH="dev"
+            log "Selected Development (dev branch)."
+            ;;
+        3)  # Specific branch
+            echo "Enter the branch name to install:"
+            read -r BRANCH
+            log "Selected branch: $BRANCH."
+            ;;
+        *)  # Invalid input handling
+            log "Invalid selection. Please enter '1' for Stable, '2' for Development, or '3' to specify a branch."
+            exit 1
+            ;;
+    esac
+
+    # Construct the full Git URL with branch
+    FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
+
+    log "Cloning the $APP_NAME repository from GitHub..."
+    if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
+        log "Error: Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
 
     log "Repository cloned successfully."
-    cd "$GIT_INSTALL_DIR" || { log "Error: Failed to navigate to the installation directory."; exit 1; }
-    
-    log "Setting up SystemGuard from Git repository..."
+
+    # Change to the installation directory
+    cd "$GIT_INSTALL_DIR" || { 
+        log "Error: Failed to navigate to the installation directory."; 
+        exit 1; 
+    }
+
+    log "Setting up $APP_NAME from Git repository..."
+
+    # Install the executable
     install_executable
 
-    log "SystemGuard installed successfully from Git!"
+    log "$APP_NAME installed successfully from Git!"
+
+    # Set up the cron job if necessary
     setup_cron_job
 
+    # Change ownership of the installation directory
     change_ownership "$EXTRACT_DIR"
+
+    log "Installation complete. $APP_NAME is ready to use."
     exit 0
 }
 
 # install the latest version of SystemGuard from the release
 install_from_release() {
-    echo "Enter the version of SystemGuard to install (e.g., v1.0.0 or 'latest' for the latest version):"
+    echo "Enter the version of $APP_NAME to install (e.g., v1.0.0 or 'latest' for the latest version):"
     read -r VERSION
 
     [ "$VERSION" == "latest" ] && fetch_latest_version
 
-    ZIP_URL="https://github.com/codeperfectplus/SystemGuard/archive/refs/tags/$VERSION.zip"
-    log "Installing SystemGuard version $VERSION..."
+    ZIP_URL="$GIT_URL/archive/refs/tags/$VERSION.zip"
+    log "Installing $APP_NAME version $VERSION..."
 
     download_release "$ZIP_URL" "$DOWNLOAD_DIR/systemguard.zip"
 
@@ -293,7 +352,7 @@ install_from_release() {
     log "Setting up installation directory..."
     mkdir -p "$EXTRACT_DIR"
 
-    log "Extracting SystemGuard package..."
+    log "Extracting $APP_NAME package..."
     unzip -q "$DOWNLOAD_DIR/systemguard.zip" -d "$EXTRACT_DIR"
     rm "$DOWNLOAD_DIR/systemguard.zip"
     log "Extraction completed."
@@ -302,13 +361,13 @@ install_from_release() {
     setup_cron_job
 
     change_ownership "$EXTRACT_DIR"
-    log "SystemGuard version $VERSION installed successfully!"
+    log "$APP_NAME version $VERSION installed successfully!"
     log "Server may take a few minutes to start. If you face any issues, try restarting the server."
 }
 
 # Install function
 install() {
-    log "Starting installation of SystemGuard..."
+    log "Starting installation of $APP_NAME..."
     echo "Do you want to install from a Git repository or a specific release?"
     echo "1. Git repository"
     echo "2. Release"
@@ -329,7 +388,7 @@ install() {
 }
 # Uninstall function
 uninstall() {
-    log "Uninstalling SystemGuard..."
+    log "Uninstalling $APP_NAME..."
     
     # Remove cron jobs related to SystemGuard
     # cronjob 
@@ -364,26 +423,26 @@ load_test() {
 
 # Check if SystemGuard is installed
 check_status() {
-    log "Checking SystemGuard status..."
+    log "Checking $APP_NAME status..."
     
     if [ -d "$EXTRACT_DIR" ]; then
-        log "SystemGuard is installed at $EXTRACT_DIR."
+        log "$APP_NAME is installed at $EXTRACT_DIR."
     else
-        log "SystemGuard is not installed."
+        log "$APP_NAME is not installed."
     fi
 
     
     if $crontab_cmd '-l' | grep -q "$CRON_PATTERN"; then
-        log "Cron job for SystemGuard is set."
+        log "Cron job for $APP_NAME is set."
     else
-        log "No cron job found for SystemGuard."
+        log "No cron job found for $APP_NAME."
     fi
 
     log "Performing health check on $HOST_URL..."
     if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
-        log "SystemGuard services are running."
+        log "$APP_NAME services are running."
     else
-        log "SystemGuard services are not running."
+        log "$APP_NAME services are not running."
     fi
 }
 
@@ -400,14 +459,14 @@ health_check() {
 
 # Display help
 show_help() {
-    echo "SystemGuard Installer"
+    echo "$APP_NAME Installer"
     echo "Usage: ./installer.sh [options]"
     echo "Options:"
-    echo "  --install           Install SystemGuard"
-    echo "  --uninstall         Uninstall SystemGuard"
-    echo "  --restore           Restore SystemGuard from a backup"
+    echo "  --install           Install $APP_NAME"
+    echo "  --uninstall         Uninstall $APP_NAME"
+    echo "  --restore           Restore $APP_NAME from a backup"
     echo "  --load-test         Start Locust load testing"
-    echo "  --status            Check the status of SystemGuard installation"
+    echo "  --status            Check the status of $APP_NAME installation"
     echo "  --health-check      Perform a health check on localhost:5005"
     echo "  --help              Display this help message"
 }
