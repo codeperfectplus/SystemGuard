@@ -5,11 +5,74 @@
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
 # Determine the correct user's home directory
 
+log() {
+    # Check if the level is passed; if not, set it to "INFO" as default.
+    local level="${1:-INFO}"
+    local message
+
+    # Check if a second argument exists, indicating that the first is the level.
+    if [ -z "$2" ]; then
+        message="$1"  # Only message is passed, assign the first argument to message.
+        level="INFO"  # Default level when only message is passed.
+    else
+        message="$2"  # When both level and message are passed.
+    fi
+
+    # Define colors based on log levels.
+    local color_reset="\033[0m"
+    local color_debug="\033[1;34m"   # Blue
+    local color_info="\033[1;32m"    # Green
+    local color_warning="\033[1;33m" # Yellow
+    local color_error="\033[1;31m"   # Red
+    local color_critical="\033[1;41m" # Red background
+
+    # Select color based on level.
+    local color="$color_reset"
+    case "$level" in
+        DEBUG)
+            color="$color_debug"
+            ;;
+        INFO)
+            color="$color_info"
+            ;;
+        WARNING)
+            color="$color_warning"
+            ;;
+        ERROR)
+            color="$color_error"
+            ;;
+        CRITICAL)
+            color="$color_critical"
+            ;;
+        *)
+            color="$color_reset"  # Default to no color if the level is unrecognized.
+            ;;
+    esac
+
+    # Log the message with timestamp, level, and message content, applying the selected color.
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
+}
+
+set -e
+trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
+    
 # run this script with sudo
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run this program with sudo."
+    log "CRITICAL" "Please run this program with sudo."
     exit 1
 fi
+
+# function to check for required dependencies
+check_dependencies() {
+    local dependencies=(git curl wget unzip)
+    for cmd in "${dependencies[@]}"; do
+        if ! command -v $cmd &> /dev/null; then
+            log "CRITICAL" "$cmd is required but not installed. Please install it and rerun the script."
+            exit 1
+        fi
+    done
+}
+check_dependencies
 
 get_user_home() {
     if [ -n "$SUDO_USER" ]; then
@@ -44,6 +107,9 @@ LOCUST_FILE="$EXTRACT_DIR/${APP_NAME}-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
 
+# Number of backups to keep
+NUM_OF_BACKUP=5
+
 # Pattern for identifying cron jobs related to SystemGuard
 CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
 
@@ -58,18 +124,14 @@ ISSUE_URL="$GIT_URL/issues"
 create_dir_if_not_exists() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
-        mkdir -p "$dir" || { log "Error: Failed to create directory: $dir"; exit 1; }
+        mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
     fi
 }
 
 create_dir_if_not_exists "$LOG_DIR"
 create_dir_if_not_exists "$BACKUP_DIR"
 
-# Logging function with timestamp
-log() {
-    local message="$1"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" | tee -a "$LOG_FILE"
-}
+
 
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
@@ -87,7 +149,7 @@ change_ownership() {
         # if permission is set to root then change it to the user
         if [ "$(stat -c %U "$directory")" == "root" ]; then
             chown -R "$USER_NAME:$USER_NAME" "$directory"
-            log "Ownership changed from root to $USER_NAME for $directory"
+            log "INFO" "Ownership changed from root to $USER_NAME for $directory"
         fi
     fi
 }
@@ -105,7 +167,7 @@ add_cron_job() {
     # Create log directory with error handling
     mkdir -p "$log_dir"
     if [ $? -ne 0 ]; then
-        log "Error: Failed to create log directory: $log_dir"
+        log "CRITICAL" "Failed to create log directory: $log_dir"
         exit 1
     fi
 
@@ -113,20 +175,20 @@ add_cron_job() {
     # Temporarily store current crontab to avoid overwriting on error
     local temp_cron=$(mktemp)
     if [ $? -ne 0 ]; then
-        log "Error: Failed to create temporary file for crontab."
+        log "CRITICAL "Failed to create temporary file for crontab."
         exit 1
     fi
 
     # List the current crontab
     if ! $crontab_cmd -l 2>/dev/null > "$temp_cron"; then
-        log "Error: Unable to list current crontab."
+        log "CRITICAL" "Unable to list current crontab."
         rm "$temp_cron"
         exit 1
     fi
 
     # Ensure the cron job does not already exist
     if grep -Fxq "$cron_job" "$temp_cron"; then
-        log "Cron job already exists: $cron_job"
+        log "Cron "job already exists: $cron_job"
         rm "$temp_cron"
         exit 0
     fi
@@ -134,18 +196,58 @@ add_cron_job() {
     # Add the new cron job
     echo "$cron_job" >> "$temp_cron"
     if ! $crontab_cmd "$temp_cron"; then
-        log "Error: Failed to add the cron job to crontab."
+        log "ERROR" "Failed to add the cron job to crontab."
         rm "$temp_cron"
         exit 1
     fi
 
     rm "$temp_cron"
-    log "Cron job added successfully" 
+    log "INFO" "Cron job added successfully" 
     log $cron_job
 }
 
+# Function to clean up all backups
+cleanup_backups() {
+    log "INFO" "Cleaning up all backups in $BACKUP_DIR..."
+    
+    # Check if the backup directory exists
+    if [ -d "$BACKUP_DIR" ]; then
+        # List all items in the backup directory
+        local backups=( $(ls -A "$BACKUP_DIR") )
+        
+        # Check if there are any backups to remove
+        if [ ${#backups[@]} -gt 0 ]; then
+            # Loop through each item and remove it
+            for backup in "${backups[@]}"; do
+                rm -rf "$BACKUP_DIR/$backup"
+                log "INFO" "Removed backup: $backup"
+            done
+            log "INFO" "All backups have been cleaned up."
+        else
+            log "INFO" "No backups found to clean up."
+        fi
+    else
+        log "ERROR" "Backup directory $BACKUP_DIR does not exist."
+    fi
+}
+
+
+rotate_backups() {
+    local num_of_backup=$1
+    log "INFO" "Rotating backups... Keeping last $num_of_backup backups."
+    local backups=( $(ls -t $BACKUP_DIR) )
+    local count=${#backups[@]}
+    if [ "$count" -gt "$num_of_backup" ]; then
+        local to_remove=( "${backups[@]:$num_of_backup}" )
+        for backup in "${to_remove[@]}"; do
+            rm -rf "$BACKUP_DIR/$backup"
+            log "INFO" "Removed old backup: $backup"
+        done
+    fi
+}
 # Backup function for existing configurations
 backup_configs() {
+    rotate_backups $NUM_OF_BACKUP
     log "Backing up existing configurations..."
     if [ -d "$EXTRACT_DIR" ]; then
         mkdir -p "$BACKUP_DIR"
@@ -176,7 +278,7 @@ restore() {
         echo "Are you sure you want to restore this backup? This will overwrite the current installation. (y/n)"
         read CONFIRM
         if [ "$CONFIRM" != "y" ]; then
-            log "Restore aborted by user."
+            log "WARNING" "Restore aborted by user."
             exit 0
         fi
         
@@ -190,8 +292,7 @@ restore() {
         cp -r "$BACKUP" "$EXTRACT_DIR"
         log "Restore completed from backup: $BACKUP"
     else
-        log "No backups found to restore."
-        echo "No backups found in $BACKUP_DIR."
+        log "WARNING" "No backups found to restore."
     fi
 }
 
@@ -207,7 +308,7 @@ install_executable() {
         cp "$CURRENT_SCRIPT" "$EXECUTABLE"
         log "Executable installed successfully."
     else
-        log "Error: Script file not found. Cannot copy to /usr/local/bin."
+        log "ERROR" "Script file not found. Cannot copy to /usr/local/bin."
     fi
 }
 
@@ -233,7 +334,7 @@ fetch_latest_version() {
     log "Fetching the latest version of $APP_NAME from GitHub..."
     VERSION=$(curl -s https://api.github.com/repos/$GIT_USER/$GIT_REPO/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
     if [ -z "$VERSION" ]; then
-        log "Error: Unable to fetch the latest version. Please try again or specify a version manually."
+        log "ERROR" "Unable to fetch the latest version. Please try again or specify a version manually."
         exit 1
     fi
     log "Latest version found: $VERSION"
@@ -245,7 +346,7 @@ download_release() {
     local output=$2
     log "Downloading $APP_NAME from $url..."
     if ! wget -q "$url" -O "$output"; then
-        log "Error: Failed to download $APP_NAME. Please check the URL and try again."
+        log "ERROR" "Failed to download $APP_NAME. Please check the URL and try again."
         exit 1
     fi
     log "Download completed successfully."
@@ -258,7 +359,7 @@ setup_cron_job() {
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         log "Cron job added successfully."
     else
-        log "Error: Failed to add the cron job."
+        log "ERROR" "Failed to add the cron job."
         exit 1
     fi
 }
@@ -295,7 +396,7 @@ install_from_git() {
             log "Selected branch: $BRANCH."
             ;;
         *)  # Invalid input handling
-            log "Invalid selection. Please enter '1' for Stable, '2' for Development, or '3' to specify a branch."
+            log "WARNING" "Invalid selection. Please enter '1' for Stable, '2' for Development, or '3' to specify a branch."
             exit 1
             ;;
     esac
@@ -305,7 +406,7 @@ install_from_git() {
 
     log "Cloning the $APP_NAME repository from GitHub..."
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
-        log "Error: Failed to clone the repository. Please check your internet connection and the branch name, and try again."
+        log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
 
@@ -313,7 +414,7 @@ install_from_git() {
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || { 
-        log "Error: Failed to navigate to the installation directory."; 
+        log "ERROR" "Failed to navigate to the installation directory."; 
         exit 1; 
     }
 
@@ -468,6 +569,7 @@ show_help() {
     echo "  --load-test         Start Locust load testing"
     echo "  --status            Check the status of $APP_NAME installation"
     echo "  --health-check      Perform a health check on localhost:5005"
+    echo "  --clean-backups     Clean up all backups"
     echo "  --help              Display this help message"
 }
 
@@ -480,6 +582,7 @@ for arg in "$@"; do
         --load-test) ACTION="load_test" ;;
         --status) ACTION="check_status" ;;
         --health-check) ACTION="health_check" ;;
+        --clean-backups) ACTION="cleanup_backups" ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -494,6 +597,7 @@ case $ACTION in
     install_latest) install_latest ;;
     check_status) check_status ;;
     health_check) health_check ;;
+    cleanup_backups) cleanup_backups ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 # # End of script
