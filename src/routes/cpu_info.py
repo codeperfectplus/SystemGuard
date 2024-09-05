@@ -5,7 +5,7 @@ from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cpu_core_count, get_cpu_frequency, cpu_usage_percent, get_cpu_temp, get_cached_value
-from src.models import PageToggleSettings
+from src.models import PageToggleSettings, SystemInformation
 
 cpu_info_bp = blueprints.Blueprint("cpu_usage", __name__)
 
@@ -27,4 +27,14 @@ def cpu_usage():
         "high_temp": high_temp,
         "critical_temp": critical_temp,
     }
-    return render_template("info_pages/cpu_info.html", system_info=system_info)
+
+    recent_system_info_entries = SystemInformation.query.all()
+    if recent_system_info_entries:
+        # Extract cpu_percent and timestamp from the query results
+        cpu_data = [info.cpu_percent for info in recent_system_info_entries]
+        time_data = [info.timestamp for info in recent_system_info_entries]
+
+        print("CPU Data:", cpu_data)
+        print("Time Data:", time_data)
+    return render_template("info_pages/cpu_info.html", system_info=system_info,
+                            cpu=cpu_data, time=time_data)

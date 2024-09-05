@@ -1,8 +1,9 @@
+import datetime
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
-from src.models import PageToggleSettings, UserCardSettings, UserDashboardSettings
+from src.models import PageToggleSettings, UserCardSettings, UserDashboardSettings, SystemInformation
 from src.config import app, db
 from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smpt_email
@@ -41,22 +42,27 @@ def update_refresh_interval():
     if not isinstance(new_interval, int) or new_interval <= 0:
         return jsonify({'error': 'Invalid refresh interval value'}), 400
 
-    # Query the settings for the current user
-    settings = PageToggleSettings.query.filter_by(user_id=user_id).first()
+    try:
+        # Query the settings for the current user
+        settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
 
-    # If settings do not exist for the user, create them
-    if not settings:
-        settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
-        db.session.add(settings)
-    else:
-        # Update the refresh interval
-        settings.refresh_interval = new_interval
+        # If settings do not exist for the user, create them
+        if not settings:
+            settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
+            db.session.add(settings)
+        else:
+            # Update the refresh interval
+            settings.refresh_interval = new_interval
 
-    # Commit changes to the database
-    db.session.commit()
+        # Commit changes to the database
+        db.session.commit()
 
-    return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
+        return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
 
+    except Exception as e:
+        # Handle any exceptions that occur during database operations
+        db.session.rollback()  # Rollback any changes if an error occurs
+        return jsonify({'error': 'An error occurred while updating the refresh interval', 'details': str(e)}), 500
 
 
 @app.route("/send_email", methods=["GET", "POST"])
@@ -122,3 +128,18 @@ def send_email_page():
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
 
+
+@app.route('/cpu-graph')
+def cpu_graph():
+    # Query the last 3 entries from the SystemInformation table
+    recent_system_info_entries = SystemInformation.query.order_by(SystemInformation.timestamp.desc()).all()
+    if recent_system_info_entries:
+        # Extract cpu_percent and timestamp from the query results
+        cpu_data = [info.cpu_percent for info in recent_system_info_entries]
+        time_data = [info.timestamp for info in recent_system_info_entries]
+
+        print("CPU Data:", cpu_data)
+        print("Time Data:", time_data)
+   
+    # Pass the data to the template
+    return render_template('cpu_graph.html', cpu=cpu_data, time=time_data)

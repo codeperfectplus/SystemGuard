@@ -1,7 +1,116 @@
-{% extends 'base/base.html' %}{% block title %}CPU Usage Details{% endblock %}{% block content %}<h2 class="my-4">CPU Details
+{% extends 'base/base.html' %}{% block title %}CPU Usage Details{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashbaord.css') }}">
+{% endblock %}
+{% block content %}
+<div class="selector-container">
+    <div class="row">
+        <label for="refresh-interval">Select Refresh Interval (seconds):</label>
+        <select id="refresh-interval">
+            <option value="5" {% if user_dashboard_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
+            <option value="10" {% if user_dashboard_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
+            <option value="15" {% if user_dashboard_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
+            <option value="30" {% if user_dashboard_settings.refresh_interval == 30 %}selected{% endif %}>30 seconds</option>
+            <option value="60" {% if user_dashboard_settings.refresh_interval == 60 %}selected{% endif %}>60 seconds</option>
+        </select>
+    </div>
+</div>
+<h2 class="my-4">CPU
+    Details
 </h2>
 <div class="container mt-4">
     <div class="row">{% include 'dasbhboard_comp/cpu/core.html' %} {% include 'dasbhboard_comp/cpu/frequency.html' %} {%
         include 'dasbhboard_comp/cpu/usages.html' %} {% include 'dasbhboard_comp/cpu/current_temp.html' %} {% include
         'dasbhboard_comp/cpu/highest_temp.html' %} {% include 'dasbhboard_comp/cpu/critical_temp.html' %} </div>
-</div>{% endblock %}
+</div>
+
+<div style="width: 80%; margin-top: 50px;">
+    <h2 class="text-center">CPU Usage Over Time</h2>
+    <canvas id="cpuTimeChart"></canvas>
+</div>
+
+<script>
+    // Get CPU and time data from Jinja
+    console.log("Time Data:", {{ time | tojson | safe }});
+    const cpuData = {{ cpu | tojson }};
+    const timeData = {{ time | tojson | safe }};
+
+    // Create the chart
+    const ctx = document.getElementById('cpuTimeChart').getContext('2d');
+    const cpuTimeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeData,  // Use formatted time for labels
+            datasets: [{
+                label: 'CPU Usage (%)',
+                data: cpuData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'CPU Usage (%)'
+                    }
+                }
+            }
+        }
+    });
+
+    let refreshInterval = {{ user_dashboard_settings.refresh_interval *1000 }};
+    let refreshTimeout;
+
+    function startRefresh() {
+        refreshTimeout = setTimeout(function () {
+            location.reload();
+        }, refreshInterval);
+    }
+
+    // Start the refresh process
+    startRefresh();
+
+    // Event listener for select input change
+    document.getElementById('refresh-interval').addEventListener('change', function() {
+        // Clear the existing timeout
+        clearTimeout(refreshTimeout);
+
+        // Update the interval based on the selected value
+        refreshInterval = parseInt(this.value) * 1000;
+
+        // Restart the refresh process with the new interval
+        startRefresh();
+
+        // Send the updated refresh interval to the server
+        fetch('/update-refresh-interval', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ refresh_interval: parseInt(this.value) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Refresh interval updated successfully:', data.refresh_interval);
+            } else {
+                console.error('Failed to update refresh interval:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
+{% endblock %}

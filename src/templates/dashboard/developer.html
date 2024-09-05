@@ -1,8 +1,10 @@
 
-{% extends 'base/base.html' %}{% block title %}Server Dashboard{% endblock %}{% block content %}
+{% extends 'base/base.html' %}
+{% block title %}Server Dashboard{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashbaord.css') }}">
 {% endblock %}
+{% block content %}
 <div class="selector-container">
     <div class="row">
         <label for="refresh-interval">Select Refresh Interval (seconds):</label>
@@ -67,4 +69,5 @@
         })
         .catch(error => console.error('Error:', error));
     });
-</script>{% endblock %}
+</script>
+{% endblock %}

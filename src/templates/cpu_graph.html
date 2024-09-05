@@ -1,0 +1,54 @@
+{% extends 'base/base.html' %}
+{% block title %}Dashboard Network{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+
+<div style="width: 80%; margin-top: 50px;">
+    <h2>CPU Usage Over Time</h2>
+    <canvas id="cpuTimeChart"></canvas>
+</div>
+
+<script>
+    // Get CPU and time data from Jinja
+    console.log("Time Data:", {{ time | tojson | safe }});
+    const cpuData = {{ cpu | tojson }};
+    const timeData = {{ time | tojson | safe }};
+
+    // Create the chart
+    const ctx = document.getElementById('cpuTimeChart').getContext('2d');
+    const cpuTimeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timeData,  // Use formatted time for labels
+            datasets: [{
+                label: 'CPU Usage (%)',
+                data: cpuData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'CPU Usage (%)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

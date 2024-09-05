@@ -248,3 +248,22 @@ def get_system_info():
     info.update(uptime_dict)
 
     return info
+
+# cpu_percent, memory_percent, battery_percent, network_sent, network_received, timestamp
+def get_system_info_for_db():
+    """ Get system information for logging in the database. """
+    battery_info = psutil.sensors_battery()
+    memory_info = psutil.virtual_memory()
+    net_io = psutil.net_io_counters(pernic=False)
+
+    # Prepare system information dictionary
+    info = {
+        'cpu_percent': cpu_usage_percent(),
+        'memory_percent': round(memory_info.percent, 2),
+        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
+        'network_sent': round(net_io.bytes_sent / (1000 ** 2), 1),  # In MB
+        'network_received': round(net_io.bytes_recv / (1000 ** 2), 1),  # In MB
+        'timestamp': datetime.datetime.now(),
+    }
+
+    return info
