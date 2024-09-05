@@ -1,0 +1,12 @@
+<div class="selector-container">
+    <div class="row">
+        <label for="refresh-interval">Select Refresh Interval (seconds):</label>
+        <select id="refresh-interval">
+            <option value="5" {% if user_dashboard_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
+            <option value="10" {% if user_dashboard_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
+            <option value="15" {% if user_dashboard_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
+            <option value="30" {% if user_dashboard_settings.refresh_interval == 30 %}selected{% endif %}>30 seconds</option>
+            <option value="60" {% if user_dashboard_settings.refresh_interval == 60 %}selected{% endif %}>60 seconds</option>
+        </select>
+    </div>
+</div>

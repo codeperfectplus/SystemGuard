@@ -127,19 +127,3 @@ def send_email_page():
         return redirect(url_for('send_email_page'))
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
-
-
-@app.route('/cpu-graph')
-def cpu_graph():
-    # Query the last 3 entries from the SystemInformation table
-    recent_system_info_entries = SystemInformation.query.order_by(SystemInformation.timestamp.desc()).all()
-    if recent_system_info_entries:
-        # Extract cpu_percent and timestamp from the query results
-        cpu_data = [info.cpu_percent for info in recent_system_info_entries]
-        time_data = [info.timestamp for info in recent_system_info_entries]
-
-        print("CPU Data:", cpu_data)
-        print("Time Data:", time_data)
-   
-    # Pass the data to the template
-    return render_template('cpu_graph.html', cpu=cpu_data, time=time_data)

@@ -63,7 +63,7 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 - Responsive design that works on mobile, tablet, and desktop.
 - Update itself to the latest version.
 - Easy download and installation using a bash script.
-- Logged user and admin user will get the notification if the user kill some process manully on dashbaord.
+- Logged user and admin user will get the notification if the user kill some process manully on dashboard.
 - Different email alerts for different actions.
 - Different Dashboards for different users.(Deveoper, Admin, IT Manager, Manager)
 
