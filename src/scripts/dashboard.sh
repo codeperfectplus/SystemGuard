@@ -192,7 +192,7 @@ if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>> "$LOG_FILE" &
 else
     # if auto-update is enabled, fetch the latest changes
-    [ "$systemguard_auto_update" = true ] &&
-    fetch_latest_changes "$PROJECT_DIR" $GIT_REMOTE_URL
+    # [ "$systemguard_auto_update" = true ] &&
+    # fetch_latest_changes "$PROJECT_DIR" $GIT_REMOTE_URL
     log_message "Flask app is already running."
 fi
