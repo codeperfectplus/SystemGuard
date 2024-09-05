@@ -27,6 +27,13 @@ sudo systemguard-installer --uninstall
 sudo systemguard-installer --restore
 ```
 
+### Incase of any error, run the following command:
+
+```bash
+sudo systemguard-installer --fix
+```
+
+
 ### Help
     
 ```bash

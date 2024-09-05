@@ -564,21 +564,41 @@ check_status() {
 
 # Health check by pinging localhost:5050 every 30 seconds
 health_check() {
-    sleep_time=30
-    while true; do
+    local sleep_time=30
+    local max_retries=5
+    local retries=0
+    
+    # Check if HOST_URL is set
+    if [[ -z "$HOST_URL" ]]; then
+        log "ERROR" "HOST_URL is not set. Exiting."
+        exit 1
+    fi
+
+    while (( retries < max_retries )); do
         log "Performing health check on $HOST_URL..."
-        response_code=$(curl -s -o /dev/null -w "%{http_code}" $HOST_URL)
-        if [ $response_code -eq 200 ] || [ $response_code -eq 302 ]; then
+        
+        # Get the HTTP response code
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" "$HOST_URL")
+        
+        # Check if the response code indicates success
+        if [[ $response_code -eq 200 || $response_code -eq 302 ]]; then
             log "Health check successful: $HOST_URL is up and running."
             generate_ascii_art "SystemGuard is UP" "green"
             exit 0
         else
-            log "WARNING" "Health check failed: $HOST_URL is not responding."
-            log "WARNING" "Next health check in $sleep_time seconds."
-            sleep $sleep_time
+            ((retries++))
+            log "WARNING" "Health check failed: $HOST_URL is not responding (HTTP $response_code)."
+            log "WARNING" "Retry $retries of $max_retries. Next health check in $sleep_time seconds."
+            sleep "$sleep_time"
         fi
     done
+    
+    # If max retries are reached, log the failure and exit with an error
+    log "ERROR" "Max retries reached. $HOST_URL is still not responding. Exiting with error."
+    generate_ascii_art "SystemGuard is DOWN" "red"
+    exit 1
 }
+
 
 # app logs
 show_server_logs() {
@@ -605,6 +625,21 @@ stop_server() {
         log "Server is not running."
     fi
 }
+
+
+# stop flask server
+fix() {
+    log "Fixing $APP_NAME server..."
+    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
+        kill -9 $(lsof -t -i:5050)
+        log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
+        log "Server started successfully in the background, user can check the logs using --server-logs"
+        log "Server will be running on $HOST_URL"
+    else
+        log "Server is not running."
+    fi
+}
+
 
 # Display help
 show_help() {
@@ -639,7 +674,11 @@ show_help() {
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
     echo "  --server-stop       Stop the $APP_NAME server."
-    echo "                      This will stop the running server instance."    
+    echo "                      This will stop the running server instance."
+    echo ""
+    echo "  --fix               Fix the $APP_NAME server."
+    echo "                      This will restart the server."
+    echo ""   
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
 }
@@ -657,6 +696,7 @@ for arg in "$@"; do
         --clean-backups) ACTION="cleanup_backups" ;;
         --server-logs) show_server_logs; exit 0 ;;
         --server-stop) stop_server; exit 0 ;;
+        --fix) fix; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -673,6 +713,7 @@ case $ACTION in
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
     stop_server) stop_server ;;
+    fix) fix ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 # # End of script
