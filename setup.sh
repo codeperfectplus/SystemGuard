@@ -5,6 +5,33 @@
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
 # Determine the correct user's home directory
 
+set -e
+trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
+
+# Function to generate colored ASCII art from text using figlet
+generate_ascii_art() {
+  local text="$1"
+  local color_code="$2"
+  
+  # Define color codes with default to reset if not specified
+  local color_reset="\033[0m"
+  local color="$color_reset"
+
+  case "$color_code" in
+    red)    color="\033[31m" ;;  # Red
+    green)  color="\033[32m" ;;  # Green
+    yellow) color="\033[33m" ;;  # Yellow
+    blue)   color="\033[34m" ;;  # Blue
+    magenta) color="\033[35m" ;; # Magenta
+    cyan)   color="\033[36m" ;;  # Cyan
+    white)  color="\033[37m" ;;  # White
+    *)      color="$color_reset" ;; # Default to no color
+  esac
+
+  # Print the ASCII art with color
+  echo -e "${color}$(figlet "$text")${color_reset}"
+}
+
 log() {
     # Check if the level is passed; if not, set it to "INFO" as default.
     local level="${1:-INFO}"
@@ -53,33 +80,11 @@ log() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
 }
 
-set -e
-trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
-
-# Function to generate compact ASCII art from text using figlet
-# Function to generate colored ASCII art from text using figlet
-generate_ascii_art() {
-  local text="$1"
-  local color_code="$2"
-  
-  # Define color codes with default to reset if not specified
-  local color_reset="\033[0m"
-  local color="$color_reset"
-
-  case "$color_code" in
-    red)    color="\033[31m" ;;  # Red
-    green)  color="\033[32m" ;;  # Green
-    yellow) color="\033[33m" ;;  # Yellow
-    blue)   color="\033[34m" ;;  # Blue
-    magenta) color="\033[35m" ;; # Magenta
-    cyan)   color="\033[36m" ;;  # Cyan
-    white)  color="\033[37m" ;;  # White
-    *)      color="$color_reset" ;; # Default to no color
-  esac
-
-  # Print the ASCII art with color
-  echo -e "${color}$(figlet -f small "$text")${color_reset}"
-}
+# introductary message
+generate_ascii_art "SystemGuard" "yellow"
+generate_ascii_art "Installer" "yellow"
+generate_ascii_art "By" "yellow"
+generate_ascii_art "CodePerfectPlus" "yellow"
 
 # run this script with sudo
 if [ "$EUID" -ne 0 ]; then
@@ -92,7 +97,7 @@ check_dependencies() {
     local dependencies=(git curl wget unzip figlet)
     for cmd in "${dependencies[@]}"; do
         if ! command -v $cmd &> /dev/null; then
-            log "CRITICAL" "$cmd is required but not installed. Please install it and rerun the script."
+            log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"
             exit 1
         fi
     done
@@ -287,7 +292,7 @@ cleanup_backups() {
     fi
 }
 
-
+# Function to rotate backups and keep only the latest n backups
 rotate_backups() {
     local num_of_backup=$1
     log "INFO" "Rotating backups... Keeping last $num_of_backup backups."
@@ -558,6 +563,12 @@ uninstall() {
 # Load test function to start Locust server
 load_test() {
     log "Starting Locust server for load testing..."
+    echo "It's for advanced users only. Do you want to continue? (y/n)"
+    read -r CONFIRM
+    if [ "$CONFIRM" != "y" ]; then
+        log "Load test aborted by user."
+        exit 0
+    fi
     
     # Check if Locust is installed
     if ! command -v locust &> /dev/null
@@ -569,8 +580,6 @@ load_test() {
     # Start Locust server
     log "Starting Locust server..."
     locust -f "$LOCUST_FILE" --host="$HOST_URL"
-    # Optionally, you can pass additional Locust flags here if needed
-    # locust -f "$LOCUST_FILE" --host="$HOST_URL" --headless -u 10 -r 1 --run-time 1m
 }
 
 # Check if SystemGuard is installed
@@ -658,7 +667,7 @@ stop_server() {
 }
 
 
-# stop flask server
+# fix the server
 fix() {
     log "Fixing $APP_NAME server..."
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
