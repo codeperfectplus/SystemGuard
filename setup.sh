@@ -461,18 +461,12 @@ install_from_git() {
     FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
 
     set_auto_update
-
-    echo "Do you want to install the dependencies? (y/n)"
-    read -r INSTALL_DEPS
     
     log "Cloning the $APP_NAME repository from GitHub..."
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
-
-    # do you want to install the dependencies
-   
 
     log "Repository cloned successfully."
 
