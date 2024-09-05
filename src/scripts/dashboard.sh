@@ -2,7 +2,51 @@
 
 # Function to log messages with timestamps
 log_message() {
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+    # Check if the level is passed; if not, set it to "INFO" as default.
+    local level="${1:-INFO}"
+    local message
+
+    # Check if a second argument exists, indicating that the first is the level.
+    if [ -z "$2" ]; then
+        message="$1"  # Only message is passed, assign the first argument to message.
+        level="INFO"  # Default level when only message is passed.
+    else
+        message="$2"  # When both level and message are passed.
+    fi
+
+    # Define colors based on log levels.
+    local color_reset="\033[0m"
+    local color_debug="\033[1;34m"   # Blue
+    local color_info="\033[1;32m"    # Green
+    local color_warning="\033[1;33m" # Yellow
+    local color_error="\033[1;31m"   # Red
+    local color_critical="\033[1;41m" # Red background
+
+    # Select color based on level.
+    local color="$color_reset"
+    case "$level" in
+        DEBUG)
+            color="$color_debug"
+            ;;
+        INFO)
+            color="$color_info"
+            ;;
+        WARNING)
+            color="$color_warning"
+            ;;
+        ERROR)
+            color="$color_error"
+            ;;
+        CRITICAL)
+            color="$color_critical"
+            ;;
+        *)
+            color="$color_reset"  # Default to no color if the level is unrecognized.
+            ;;
+    esac
+
+    # Log the message with timestamp, level, and message content, applying the selected color.
+    echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
 }
 
 # Determine the directory where this script is located
@@ -14,7 +58,12 @@ FLASK_PORT="${FLASK_PORT:-5050}"
 LOG_FILE="/home/$(whoami)/logs/systemguard_flask.log"
 USERNAME="$(whoami)"
 CONDA_ENV_NAME="systemguard"
+GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
 
+# Fetch systemguard_auto_update from bashrc
+systemguard_auto_update=$(grep -E "^export systemguard_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
+echo "auto-update:" $systemguard_auto_update
+# 
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
 mkdir -p "$LOG_DIR"
@@ -46,8 +95,6 @@ fi
 # Initialize Conda
 source "$CONDA_SETUP_SCRIPT"
 
-echo "Conda environment name: $CONDA_ENV_NAME"
-
 # Check if the Conda environment exists and create it if not
 if ! conda info --envs | awk '{print $1}' | grep -q "^$CONDA_ENV_NAME$"; then
     log_message "Conda environment '$CONDA_ENV_NAME' not found. Creating it..."
@@ -59,20 +106,93 @@ else
     log_message "Activating existing Conda environment '$CONDA_ENV_NAME'."
 fi
 
-# Continue with the rest of your script
-log_message "Conda environment '$CONDA_ENV_NAME' is active."
-
 # Export Flask environment variables
 export FLASK_APP="$FLASK_APP_PATH"
 export FLASK_ENV=development  # or production
 
+fetch_latest_changes() {
+    local project_dir="$1"
+    local git_remote_url="${2-}" # Optional remote URL if needed
+    
+    # Check if the project directory is set and exists
+    if [[ -z "$project_dir" || ! -d "$project_dir" ]]; then
+        log_message "ERROR" "Invalid project directory specified."
+        return 1
+    fi
+    
+    # Check if Git is installed
+    if ! command -v git &> /dev/null; then
+        log_message "ERROR" "Git is not installed. Please install Git and try again."
+        return 1
+    fi
+
+    # Check if the directory is a Git repository
+    if [ -d "$project_dir/.git" ]; then
+        log_message "INFO" "Repository found at $project_dir. Checking the current branch and for latest changes..."
+        
+        # Navigate to the project directory
+        pushd "$project_dir" > /dev/null
+        
+        # Get the current branch name
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+        log_message "INFO" "Current branch is '$branch'."
+        
+        # Check if there are untracked files
+        if git status --porcelain | grep '^[?]'; then
+            # Check if the repository has any commits
+            if [ $(git rev-list --count HEAD 2>/dev/null) -gt 0 ]; then
+                # Repository has commits, proceed with stashing
+                log_message "INFO" "Stashing untracked files..."
+                if git stash -u; then
+                    log_message "INFO" "Untracked files stashed successfully."
+                    stash_applied=true
+                else
+                    log_message "ERROR" "Failed to stash untracked files."
+                    popd > /dev/null
+                    return 1
+                fi
+            else
+                log_message "ERROR" "Repository does not have any commits. Cannot stash untracked files."
+                # Handle untracked files manually or abort
+                log_message "INFO" "Manual intervention required to handle untracked files."
+                # Optionally, you can clean untracked files or exit
+                # git clean -fd
+                popd > /dev/null
+                return 1
+            fi
+        fi
+
+        if git pull origin "$branch"; then
+            log_message "INFO" "Successfully pulled the latest changes from branch '$branch'."
+        else
+            log_message "ERROR" "Failed to pull the latest changes. Check your network connection or repository settings."
+            popd > /dev/null
+            return 1
+        fi
+
+        # Apply stashed changes if any
+        if [ "$stash_applied" = true ]; then
+            log_message "INFO" "Applying stashed changes..."
+            git stash pop
+        fi
+
+        # Return to the original directory
+        popd > /dev/null
+    fi
+
+}
+
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     log_message "Flask app is not running. Checking repository and starting it..."
-
+    [ "$systemguard_auto_update" = true ] &&
+    fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>> "$LOG_FILE" &
 else
+    # if auto-update is enabled, fetch the latest changes
+    [ "$systemguard_auto_update" = true ] &&
+    fetch_latest_changes "$PROJECT_DIR" $GIT_REMOTE_URL
     log_message "Flask app is already running."
 fi

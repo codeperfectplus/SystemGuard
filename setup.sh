@@ -99,6 +99,33 @@ check_dependencies() {
 }
 check_dependencies
 
+# Function to set systemguard_auto_update variable permanently
+# set_auto_update() {
+#     local env_file="$HOME/.bashrc" # Default file for setting environment variables
+
+#     # Prompt user for input
+#     read -p "Do you want to enable systemguard_auto_update? (true/false): " auto_update
+
+#     # Validate input
+#     if [[ "$auto_update" != "true" && "$auto_update" != "false" ]]; then
+#         echo "Invalid input. Please enter 'true' or 'false'."
+#         return 1
+#     fi
+
+#     # Check if the variable is already set
+#     if grep -q '^export systemguard_auto_update=' "$env_file"; then
+#         # Update existing entry
+#         sed -i "s/^export systemguard_auto_update=.*/export systemguard_auto_update=$auto_update/" "$env_file"
+#     else
+#         # Add new entry
+#         echo "export systemguard_auto_update=$auto_update" >> "$env_file"
+#     fi
+
+#     # Notify user and reload the environment file
+#     echo "systemguard_auto_update set to $auto_update in $env_file."
+#     source "$env_file"
+# }
+
 get_user_home() {
     if [ -n "$SUDO_USER" ]; then
         # When using sudo, SUDO_USER gives the original user who invoked sudo
@@ -431,11 +458,16 @@ install_from_git() {
     # Construct the full Git URL with branch
     FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
 
+    # set_auto_update
+    
     log "Cloning the $APP_NAME repository from GitHub..."
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
+
+    # do you want to install the dependencies
+   
 
     log "Repository cloned successfully."
 
