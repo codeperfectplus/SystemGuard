@@ -55,7 +55,32 @@ log() {
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
-    
+
+# Function to generate compact ASCII art from text using figlet
+# Function to generate colored ASCII art from text using figlet
+generate_ascii_art() {
+  local text="$1"
+  local color_code="$2"
+  
+  # Define color codes with default to reset if not specified
+  local color_reset="\033[0m"
+  local color="$color_reset"
+
+  case "$color_code" in
+    red)    color="\033[31m" ;;  # Red
+    green)  color="\033[32m" ;;  # Green
+    yellow) color="\033[33m" ;;  # Yellow
+    blue)   color="\033[34m" ;;  # Blue
+    magenta) color="\033[35m" ;; # Magenta
+    cyan)   color="\033[36m" ;;  # Cyan
+    white)  color="\033[37m" ;;  # White
+    *)      color="$color_reset" ;; # Default to no color
+  esac
+
+  # Print the ASCII art with color
+  echo -e "${color}$(figlet -f small "$text")${color_reset}"
+}
+
 # run this script with sudo
 if [ "$EUID" -ne 0 ]; then
     log "CRITICAL" "Please run this program with sudo."
@@ -64,7 +89,7 @@ fi
 
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip)
+    local dependencies=(git curl wget unzip figlet)
     for cmd in "${dependencies[@]}"; do
         if ! command -v $cmd &> /dev/null; then
             log "CRITICAL" "$cmd is required but not installed. Please install it and rerun the script."
@@ -118,7 +143,7 @@ CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
 # GitHub repository details
 GIT_USER="codeperfectplus"
 GIT_REPO="$APP_NAME"
-GIT_URL="https://github.com/$GIT_USER/$GIT_REPO.git"
+GIT_URL="https://github.com/$GIT_USER/$GIT_REPO"
 ISSUE_URL="$GIT_URL/issues"
 
 
@@ -434,7 +459,6 @@ install_from_git() {
     change_ownership "$EXTRACT_DIR"
 
     log "Installation complete. $APP_NAME is ready to use."
-    exit 0
 }
 
 # install the latest version of SystemGuard from the release
@@ -488,22 +512,16 @@ install() {
             exit 1
             ;;
     esac
+	stop_server
+	generate_ascii_art "SystemGuard Installed" "green"
 }
 # Uninstall function
 uninstall() {
     log "Uninstalling $APP_NAME..."
-    
-    # Remove cron jobs related to SystemGuard
-    # cronjob 
     remove_previous_installation
-    
-    # Remove the executable
-    if [ -f "$EXECUTABLE" ]; then
-        rm "$EXECUTABLE"
-        log "Executable $EXECUTABLE removed."
-    else
-        log "No executable found to remove."
-    fi
+
+	stop_server
+	generate_ascii_art "SystemGuard Uninstalled" "red"
 }
 
 # Load test function to start Locust server
@@ -541,22 +559,25 @@ check_status() {
         log "No cron job found for $APP_NAME."
     fi
 
-    log "Performing health check on $HOST_URL..."
-    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
-        log "$APP_NAME services are running."
-    else
-        log "$APP_NAME services are not running."
-    fi
+    health_check
 }
 
-# Health check by pinging localhost:5005
+# Health check by pinging localhost:5050 every 30 seconds
 health_check() {
-    log "Performing health check on localhost:5005..."
-    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
-        log "Health check successful: $HOST_URL is up and running."
-    else
-        log "Health check failed: $HOST_URL is not responding."
-    fi
+    sleep_time=30
+    while true; do
+        log "Performing health check on $HOST_URL..."
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" $HOST_URL)
+        if [ $response_code -eq 200 ] || [ $response_code -eq 302 ]; then
+            log "Health check successful: $HOST_URL is up and running."
+            generate_ascii_art "SystemGuard is UP" "green"
+            exit 0
+        else
+            log "WARNING" "Health check failed: $HOST_URL is not responding."
+            log "WARNING" "Next health check in $sleep_time seconds."
+            sleep $sleep_time
+        fi
+    done
 }
 
 # app logs
@@ -573,6 +594,17 @@ show_server_logs() {
     fi
 }
 
+# stop flask server
+stop_server() {
+    log "Stopping $APP_NAME server..."
+    # check if server is running on 5050
+    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
+        kill -9 $(lsof -t -i:5050)
+        log "Server stopped successfully."
+    else
+        log "Server is not running."
+    fi
+}
 
 # Display help
 show_help() {
@@ -606,6 +638,8 @@ show_help() {
     echo "                      Displays the latest server logs, which can help in troubleshooting issues."
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
+    echo "  --server-stop       Stop the $APP_NAME server."
+    echo "                      This will stop the running server instance."    
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
 }
@@ -622,6 +656,7 @@ for arg in "$@"; do
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
         --server-logs) show_server_logs; exit 0 ;;
+        --server-stop) stop_server; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -637,6 +672,7 @@ case $ACTION in
     check_status) check_status ;;
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
+    stop_server) stop_server ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 # # End of script
