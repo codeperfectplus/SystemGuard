@@ -1,10 +1,14 @@
 import os
+import time
 import datetime
-from src.config import app
+import threading
+from src.config import app, db
 from src import routes
-from src.utils import render_template_from_file, get_flask_memory_usage, cpu_usage_percent, get_memory_percent, ROOT_DIR
-from src.models import UserProfile
-from src.scripts.email_me import send_smpt_email
+from src.utils import get_system_info_for_db
+from src.models import SystemInformation, ApplicationGeneralSettings
+from sqlalchemy.exc import SQLAlchemyError
+from src.logger import logger
+from src.thread_process import monitor_settings, start_website_monitoring
 
 def register_routes():
     app.register_blueprint(routes.dashboard_bp)
@@ -17,14 +21,16 @@ def register_routes():
     app.register_blueprint(routes.speedtest_bp)
     app.register_blueprint(routes.process_bp)
 
-app.config['is_server_up_email_sent'] = False
+
+
 
 
 if __name__ == "__main__":
     register_routes()
-    # # Start the memory-consuming program in a separate thread
-    # memory_thread = threading.Thread(target=memory_consuming_program, daemon=True)
-    # memory_thread.start()
-    
+
+        # Start monitoring settings and website pinging when the server starts
+    # monitor_settings()  # Starts monitoring for system logging changes
+    # start_website_monitoring()  # Starts pinging active websites
+
     # Run the Flask application
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -51,22 +51,30 @@ def get_flask_memory_usage():
         return None
 
 def get_established_connections():
-    connections = psutil.net_connections()
-    ipv4_set = set()
-    ipv6_set = set()
+    # Get all active network connections of type 'inet' (IPv4 and IPv6)
+    connections = psutil.net_connections(kind='inet')
+    
+    # Use sets to store unique IPv4 and IPv6 addresses
+    ipv4_addresses = set()
+    ipv6_addresses = set()
 
+    # Iterate through each connection
     for conn in connections:
+        # Filter only established connections
         if conn.status == 'ESTABLISHED':
+            # Check if the local address (laddr) is IPv4 or IPv6 and add to the corresponding set
             if '.' in conn.laddr.ip:
-                ipv4_set.add(conn.laddr.ip)
+                ipv4_addresses.add(conn.laddr.ip)
             elif ':' in conn.laddr.ip:
-                ipv6_set.add(conn.laddr.ip)
+                ipv6_addresses.add(conn.laddr.ip)
 
-    # ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
-    ipv4_set.discard('127.0.0.0')
-    print(ipv4_set)
-    ipv4 = list(ipv4_set)[0] if ipv4_set else "N/A"
-    ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
+    # Remove loopback address for IPv4 if it exists
+    # ipv4_addresses.discard('127.0.0.1')
+    print(ipv4_addresses)
+
+    # Return the first available IP from each set, or "N/A" if none found
+    ipv4 = next(iter(ipv4_addresses), "N/A")
+    ipv6 = next(iter(ipv6_addresses), "N/A")
 
     return ipv4, ipv6
 
@@ -103,7 +111,10 @@ def cpu_usage_percent():
     return psutil.cpu_percent(interval=1)
 
 def get_cpu_temp():
-    temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
+    try:
+        temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
+    except Exception as e:
+        temp = {'current_temp': 'N/A', 'high_temp': 'N/A', 'critical_temp': 'N/A'}
     return temp.current, temp.high, temp.critical
 
 def get_top_processes(number=5):
@@ -243,5 +254,24 @@ def get_system_info():
     }
     # update uptime dictionary
     info.update(uptime_dict)
+
+    return info
+
+# cpu_percent, memory_percent, battery_percent, network_sent, network_received, timestamp
+def get_system_info_for_db():
+    """ Get system information for logging in the database. """
+    battery_info = psutil.sensors_battery()
+    memory_info = psutil.virtual_memory()
+    net_io = psutil.net_io_counters(pernic=False)
+
+    # Prepare system information dictionary
+    info = {
+        'cpu_percent': cpu_usage_percent(),
+        'memory_percent': round(memory_info.percent, 2),
+        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
+        'network_sent': round(net_io.bytes_sent / (1000 ** 2), 1),  # In MB
+        'network_received': round(net_io.bytes_recv / (1000 ** 2), 1),  # In MB
+        'timestamp': datetime.datetime.now(),
+    }
 
     return info

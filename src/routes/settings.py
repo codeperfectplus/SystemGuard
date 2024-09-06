@@ -31,17 +31,18 @@ def general_settings():
         general_settings.timezone = request.form.get('timezone')
         general_settings.enable_cache = 'enable_cache' in request.form
         general_settings.enable_alerts = 'enable_alerts' in request.form
-        admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
-        if admin_emails:
-            subject = "SystemGuard Server Started"
-            context = {
-                "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "notifications_enabled": general_settings.enable_alerts,
-                "current_user": current_user.username
-            }
-            notficiation_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
-            email_body = render_template_from_file(notficiation_alert_template, **context)
-            send_smpt_email(admin_emails, subject, email_body, is_html=True, bypass_alerts=True)
+        general_settings.is_logging_system_info = 'is_logging_system_info' in request.form
+        # admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
+        # if admin_emails:
+        #     subject = "SystemGuard Server Started"
+        #     context = {
+        #         "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        #         "notifications_enabled": general_settings.enable_alerts,
+        #         "current_user": current_user.username
+        #     }
+        #     notficiation_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
+        #     email_body = render_template_from_file(notficiation_alert_template, **context)
+        #     send_smpt_email(admin_emails, subject, email_body, is_html=True, bypass_alerts=True)
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))

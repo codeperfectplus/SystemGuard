@@ -1,0 +1,47 @@
+/* ping.css */
+
+/* Edit form styling */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+form input, form button {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 300px;
+    max-width: 100%;
+}
+
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form button {
+    background-color: #5cb85c;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+form button:hover {
+    background-color: #4cae4c;
+}
+
+/* Edit form back link */
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}

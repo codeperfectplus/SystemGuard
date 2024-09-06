@@ -1,8 +1,9 @@
+import datetime
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
-from src.models import PageToggleSettings, UserCardSettings, UserDashboardSettings
+from src.models import UserCardSettings, UserDashboardSettings, ApplicationGeneralSettings
 from src.config import app, db
 from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smpt_email
@@ -41,22 +42,27 @@ def update_refresh_interval():
     if not isinstance(new_interval, int) or new_interval <= 0:
         return jsonify({'error': 'Invalid refresh interval value'}), 400
 
-    # Query the settings for the current user
-    settings = PageToggleSettings.query.filter_by(user_id=user_id).first()
+    try:
+        # Query the settings for the current user
+        settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
 
-    # If settings do not exist for the user, create them
-    if not settings:
-        settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
-        db.session.add(settings)
-    else:
-        # Update the refresh interval
-        settings.refresh_interval = new_interval
+        # If settings do not exist for the user, create them
+        if not settings:
+            settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
+            db.session.add(settings)
+        else:
+            # Update the refresh interval
+            settings.refresh_interval = new_interval
 
-    # Commit changes to the database
-    db.session.commit()
+        # Commit changes to the database
+        db.session.commit()
 
-    return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
+        return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
 
+    except Exception as e:
+        # Handle any exceptions that occur during database operations
+        db.session.rollback()  # Rollback any changes if an error occurs
+        return jsonify({'error': 'An error occurred while updating the refresh interval', 'details': str(e)}), 500
 
 
 @app.route("/send_email", methods=["GET", "POST"])
@@ -67,10 +73,10 @@ def send_email_page():
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/403.html")
-    dasboard_settings = UserCardSettings.query.first()
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
-    if dasboard_settings:
-        enable_alerts = dasboard_settings.enable_alerts
+    general_settings = ApplicationGeneralSettings.query.first()
+    if general_settings:
+        enable_alerts = general_settings.enable_alerts
     if request.method == "POST":
         receiver_email = request.form.get("recipient")
         subject = request.form.get("subject")
@@ -121,4 +127,3 @@ def send_email_page():
         return redirect(url_for('send_email_page'))
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
-

@@ -5,6 +5,33 @@
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
 # Determine the correct user's home directory
 
+set -e
+trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
+
+# Function to generate colored ASCII art from text using figlet
+generate_ascii_art() {
+  local text="$1"
+  local color_code="$2"
+  
+  # Define color codes with default to reset if not specified
+  local color_reset="\033[0m"
+  local color="$color_reset"
+
+  case "$color_code" in
+    red)    color="\033[31m" ;;  # Red
+    green)  color="\033[32m" ;;  # Green
+    yellow) color="\033[33m" ;;  # Yellow
+    blue)   color="\033[34m" ;;  # Blue
+    magenta) color="\033[35m" ;; # Magenta
+    cyan)   color="\033[36m" ;;  # Cyan
+    white)  color="\033[37m" ;;  # White
+    *)      color="$color_reset" ;; # Default to no color
+  esac
+
+  # Print the ASCII art with color
+  echo -e "${color}$(figlet "$text")${color_reset}"
+}
+
 log() {
     # Check if the level is passed; if not, set it to "INFO" as default.
     local level="${1:-INFO}"
@@ -53,9 +80,12 @@ log() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
 }
 
-set -e
-trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
-    
+# introductary message
+generate_ascii_art "SystemGuard" "yellow"
+generate_ascii_art "Installer" "yellow"
+generate_ascii_art "By" "yellow"
+generate_ascii_art "CodePerfectPlus" "yellow"
+
 # run this script with sudo
 if [ "$EUID" -ne 0 ]; then
     log "CRITICAL" "Please run this program with sudo."
@@ -64,15 +94,44 @@ fi
 
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip)
+    local dependencies=(git curl wget unzip figlet)
     for cmd in "${dependencies[@]}"; do
         if ! command -v $cmd &> /dev/null; then
-            log "CRITICAL" "$cmd is required but not installed. Please install it and rerun the script."
+            log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"
             exit 1
         fi
     done
 }
 check_dependencies
+
+# Function to set systemguard_auto_update variable permanently
+set_auto_update() {
+    local env_file="$USER_HOME/.bashrc" # Default file for setting environment variables
+
+    # Prompt user for input
+    echo "Do you want to enable systemguard_auto_update? (true/false)"
+    echo "This will enable automatic updates for SystemGuard."
+    read -p "Enter your choice: " auto_update
+
+    # Validate input
+    if [[ "$auto_update" != "true" && "$auto_update" != "false" ]]; then
+        echo "Invalid input. Please enter 'true' or 'false'."
+        return 1
+    fi
+
+    # Check if the variable is already set
+    if grep -q '^export systemguard_auto_update=' "$env_file"; then
+        # Update existing entry
+        sed -i "s/^export systemguard_auto_update=.*/export systemguard_auto_update=$auto_update/" "$env_file"
+    else
+        # Add new entry
+        echo "export systemguard_auto_update=$auto_update" >> "$env_file"
+    fi
+
+    # Notify user and reload the environment file
+    echo "systemguard_auto_update set to $auto_update in $env_file."
+    source "$env_file"
+}
 
 get_user_home() {
     if [ -n "$SUDO_USER" ]; then
@@ -118,7 +177,7 @@ CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
 # GitHub repository details
 GIT_USER="codeperfectplus"
 GIT_REPO="$APP_NAME"
-GIT_URL="https://github.com/$GIT_USER/$GIT_REPO.git"
+GIT_URL="https://github.com/$GIT_USER/$GIT_REPO"
 ISSUE_URL="$GIT_URL/issues"
 
 
@@ -127,6 +186,7 @@ create_dir_if_not_exists() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
+        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 1; }
     fi
 }
 
@@ -233,7 +293,7 @@ cleanup_backups() {
     fi
 }
 
-
+# Function to rotate backups and keep only the latest n backups
 rotate_backups() {
     local num_of_backup=$1
     log "INFO" "Rotating backups... Keeping last $num_of_backup backups."
@@ -377,16 +437,16 @@ install_from_git() {
     remove_previous_installation
 
     log "Select the version of $APP_NAME to install:"
-    echo "1. Stable (default)"
-    echo "2. Development (unstable)"
-    echo "3. Enter a specific branch name"
+    echo "1. Production (stable) - Recommended for most users"
+    echo "2. Development (dev) - Latest features, may be unstable"
+    echo "3. Specify a branch or tag name - Enter the branch/tag name when prompted"
     read -r VERSION
 
     # Set Git URL based on user choice
     case "$VERSION" in
         1|"")  # Stable is the default option if nothing is entered
-            BRANCH="main"
-            log "Selected Stable version (main branch)."
+            BRANCH="production"
+            log "Selected Production (stable branch)."
             ;;
         2)  # Development version
             BRANCH="dev"
@@ -406,6 +466,8 @@ install_from_git() {
     # Construct the full Git URL with branch
     FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
 
+    set_auto_update
+    
     log "Cloning the $APP_NAME repository from GitHub..."
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
@@ -434,7 +496,6 @@ install_from_git() {
     change_ownership "$EXTRACT_DIR"
 
     log "Installation complete. $APP_NAME is ready to use."
-    exit 0
 }
 
 # install the latest version of SystemGuard from the release
@@ -488,27 +549,27 @@ install() {
             exit 1
             ;;
     esac
+	stop_server
+	generate_ascii_art "SystemGuard Installed" "green"
 }
 # Uninstall function
 uninstall() {
     log "Uninstalling $APP_NAME..."
-    
-    # Remove cron jobs related to SystemGuard
-    # cronjob 
     remove_previous_installation
-    
-    # Remove the executable
-    if [ -f "$EXECUTABLE" ]; then
-        rm "$EXECUTABLE"
-        log "Executable $EXECUTABLE removed."
-    else
-        log "No executable found to remove."
-    fi
+
+	stop_server
+	generate_ascii_art "SystemGuard Uninstalled" "red"
 }
 
 # Load test function to start Locust server
 load_test() {
     log "Starting Locust server for load testing..."
+    echo "It's for advanced users only. Do you want to continue? (y/n)"
+    read -r CONFIRM
+    if [ "$CONFIRM" != "y" ]; then
+        log "Load test aborted by user."
+        exit 0
+    fi
     
     # Check if Locust is installed
     if ! command -v locust &> /dev/null
@@ -520,8 +581,6 @@ load_test() {
     # Start Locust server
     log "Starting Locust server..."
     locust -f "$LOCUST_FILE" --host="$HOST_URL"
-    # Optionally, you can pass additional Locust flags here if needed
-    # locust -f "$LOCUST_FILE" --host="$HOST_URL" --headless -u 10 -r 1 --run-time 1m
 }
 
 # Check if SystemGuard is installed
@@ -541,23 +600,46 @@ check_status() {
         log "No cron job found for $APP_NAME."
     fi
 
-    log "Performing health check on $HOST_URL..."
-    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
-        log "$APP_NAME services are running."
-    else
-        log "$APP_NAME services are not running."
-    fi
+    health_check
 }
 
-# Health check by pinging localhost:5005
+# Health check by pinging localhost:5050 every 30 seconds
 health_check() {
-    log "Performing health check on localhost:5005..."
-    if curl -s --head $HOST_URL | grep "200 OK" > /dev/null; then
-        log "Health check successful: $HOST_URL is up and running."
-    else
-        log "Health check failed: $HOST_URL is not responding."
+    local sleep_time=30
+    local max_retries=5
+    local retries=0
+    
+    # Check if HOST_URL is set
+    if [[ -z "$HOST_URL" ]]; then
+        log "ERROR" "HOST_URL is not set. Exiting."
+        exit 1
     fi
+
+    while (( retries < max_retries )); do
+        log "Performing health check on $HOST_URL..."
+        
+        # Get the HTTP response code
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" "$HOST_URL")
+        
+        # Check if the response code indicates success
+        if [[ $response_code -eq 200 || $response_code -eq 302 ]]; then
+            log "Health check successful: $HOST_URL is up and running."
+            generate_ascii_art "SystemGuard is UP" "green"
+            exit 0
+        else
+            ((retries++))
+            log "WARNING" "Health check failed: $HOST_URL is not responding (HTTP $response_code)."
+            log "WARNING" "Retry $retries of $max_retries. Next health check in $sleep_time seconds."
+            sleep "$sleep_time"
+        fi
+    done
+    
+    # If max retries are reached, log the failure and exit with an error
+    log "ERROR" "Max retries reached. $HOST_URL is still not responding. Exiting with error."
+    generate_ascii_art "SystemGuard is DOWN" "red"
+    exit 1
 }
+
 
 # app logs
 show_server_logs() {
@@ -570,6 +652,32 @@ show_server_logs() {
         tail -f "$FLASK_LOG_FILE"
     else
         log "No logs found at $FLASK_LOG_FILE."
+    fi
+}
+
+# stop flask server
+stop_server() {
+    log "Stopping $APP_NAME server..."
+    # check if server is running on 5050
+    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
+        kill -9 $(lsof -t -i:5050)
+        log "Server stopped successfully."
+    else
+        log "Server is not running."
+    fi
+}
+
+
+# fix the server
+fix() {
+    log "Fixing $APP_NAME server..."
+    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
+        kill -9 $(lsof -t -i:5050)
+        log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
+        log "Server is starting in the background, check logs for more details."
+        log "Server will be running on $HOST_URL"
+    else
+        log "Server is not running."
     fi
 }
 
@@ -606,6 +714,12 @@ show_help() {
     echo "                      Displays the latest server logs, which can help in troubleshooting issues."
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
+    echo "  --server-stop       Stop the $APP_NAME server."
+    echo "                      This will stop the running server instance."
+    echo ""
+    echo "  --fix               Fix the $APP_NAME server."
+    echo "                      This will restart the server."
+    echo ""   
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
 }
@@ -622,6 +736,8 @@ for arg in "$@"; do
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
         --server-logs) show_server_logs; exit 0 ;;
+        --server-stop) stop_server; exit 0 ;;
+        --fix) fix; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -637,6 +753,8 @@ case $ACTION in
     check_status) check_status ;;
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
+    stop_server) stop_server ;;
+    fix) fix ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 # # End of script

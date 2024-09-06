@@ -1,1 +1,12 @@
-{% extends 'base/base.html' %}{% block title %}Network Statistics{% endblock %}{% block content %} <h2 class="my-4">Network Statistics</h2><div class="row">{% include 'dasbhboard_comp/network/packets_sent.html' %} {% include 'dasbhboard_comp/network/packets_received.html' %} {% include 'dasbhboard_comp/network/ipv4_ip.html' %} {% include 'dasbhboard_comp/network/ipv6_ip.html' %} </div>{% endblock %}
+{% extends 'base/base.html' %}{% block title %}Network Statistics{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
+{% endblock %}
+{% block content %} 
+{% include 'components/refresh_button.html' %}
+<h2 class="my-4">
+    Network Statistics</h2>
+<div class="row">{% include 'card_comp/network/packets_sent.html' %} {% include
+    'card_comp/network/packets_received.html' %} {% include 'card_comp/network/ipv4_ip.html' %} {% include
+    'card_comp/network/ipv6_ip.html' %} </div>
+    {% include 'components/refresh_button_script.html' %}{% endblock %}
