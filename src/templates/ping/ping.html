@@ -6,9 +6,11 @@
 {% block content %}
 <h1>Website Pinger</h1>
 <!-- Form to add a new website -->
-<form action="/add_website" method="POST">
+<form action="/add_monitored_website" method="POST">
     <input type="text" name="name" placeholder="Website URL" required>
-    <input type="number" name="ping_period" placeholder="Ping Period (seconds)" required>
+    <input type="number" name="ping_interval" placeholder="Ping Period (seconds)" required>
+    <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled">
+
     <button type="submit">Add Website</button>
 </form>
 
@@ -20,7 +22,9 @@
             <th>Website</th>
             <th>Ping Period</th>
             <th>Status</th>
+            <th>Status Code</th>
             <th>Ping Status</th>
+            <th>Email Alerts</th>
             <th>Last Ping Time</th>
             <th>Actions</th>
         </tr>
@@ -29,18 +33,22 @@
         {% for website in websites %}
         <tr id="website-{{ website.id }}" class="website-row {{ 'updated-row' if website.updated }}">
             <td>{{ website.name }}</td>
-            <td>{{ website.ping_period }} seconds</td>
-            <td>{{ website.last_status or 'Unknown' }}</td>
-            <td>{{ 'Enabled' if website.is_ping else 'Disabled' }}</td>
-            <td>{{ website.last_ping_time or 'Never' }}</td>
-
+            <td>{{ website.ping_interval }} seconds</td>
+            <td>{{ website.ping_status or 'Unknown' }}</td>
+            <td>{{ website.ping_status_code or 'Unknown' }}</td>
+            <td>{{ 'Enabled' if website.is_ping_active else 'Disabled' }}</td>
+            <td>{{ 'Yes' if website.email_alerts_enabled else 'No' }}</td>
+            <td>{{ website.last_ping_time.strftime('%Y-%m-%d %H:%M:%S') if website.last_ping_time else 'Never' }}</td>
             <td class="table-actions">
-                <a href="/toggle_ping/{{ website.id }}">{{ 'Stop Pinging' if website.is_ping else 'Start Pinging' }}</a>
-                <a href="/edit_website/{{ website.id }}">Edit</a>
-                <form action="/remove_website/{{ website.id }}" method="POST"
-                    onsubmit="return confirm('Are you sure?')">
-                    <button type="submit">Remove</button>
-                </form>
+                <a href="/toggle_ping_status/{{ website.id }}">{{ 'Stop Pinging' if website.is_ping_active else 'Start
+                    Pinging' }}</a>
+                <a href="/edit_monitored_website/{{ website.id }}">Edit</a>
+                <div class="remove-btn">
+                    <form action="/delete_monitored_website/{{ website.id }}" method="POST"
+                        onsubmit="return confirm('Are you sure?')">
+                        <button type="submit" class="btn-danger">Remove</button>
+                    </form>
+                </div>
             </td>
         </tr>
         {% endfor %}

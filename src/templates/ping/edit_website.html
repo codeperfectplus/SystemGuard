@@ -10,11 +10,11 @@
     <label for="name">Website URL:</label>
     <input type="text" name="name" value="{{ website.name }}" required>
     
-    <label for="ping_period">Ping Period (seconds):</label>
-    <input type="number" name="ping_period" value="{{ website.ping_period }}" required>
+    <label for="ping_interval">Ping Period (seconds):</label>
+    <input type="number" name="ping_interval" value="{{ website.ping_interval }}" required>
     
     <button type="submit">Update Website</button>
 </form>
 
-<a href="{{ url_for('ping_website') }}">Back to Website List</a>
+<a href="{{ url_for('monitor_websites') }}">Back to Website List</a>
 {% endblock %}
