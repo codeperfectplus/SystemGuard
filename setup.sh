@@ -445,7 +445,7 @@ install_from_git() {
     # Set Git URL based on user choice
     case "$VERSION" in
         1|"")  # Stable is the default option if nothing is entered
-            BRANCH="main"
+            BRANCH="production"
             log "Selected Stable version (main branch)."
             ;;
         2)  # Development version
