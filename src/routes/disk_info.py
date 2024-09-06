@@ -17,7 +17,7 @@ def disk_usage():
         return render_template("error/403.html")
     disk_total = get_cached_value("disk_total", get_disk_total)
     system_info = {
-        "disk_usage": get_disk_usage_percent(),
+        "disk_percent": get_disk_usage_percent(),
         "disk_total": disk_total,
         "disk_used": get_disk_used(),
         "disk_free": get_disk_free(),

@@ -186,6 +186,7 @@ create_dir_if_not_exists() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
+        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 1; }
     fi
 }
 
@@ -673,7 +674,7 @@ fix() {
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
         kill -9 $(lsof -t -i:5050)
         log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
-        log "Server started successfully in the background, user can check the logs using --server-logs"
+        log "Server is starting in the background, check logs for more details."
         log "Server will be running on $HOST_URL"
     else
         log "Server is not running."

@@ -1,6 +1,14 @@
-{% extends 'base/base.html' %}{% block title %}Memory Usage Details{% endblock %}{% block content %} <h2 class="my-4">Memory
+{% extends 'base/base.html' %}{% block title %}Memory Usage Details{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
+{% endblock %}
+{% block content %} 
+{% include 'components/refresh_button.html' %}
+<h2 class="my-4">Memory
     Usage Details</h2>
-<div class="row">{% include 'dasbhboard_comp/memory/percentage.html' %} {% include
-    'dasbhboard_comp/memory/available.html' %} {% include 'dasbhboard_comp/memory/used.html' %} {% include
-    'dasbhboard_comp/memory/swap_total.html' %} {% include 'dasbhboard_comp/memory/swap_used.html' %} {% include
-    'dasbhboard_comp/memory/swap_free.html' %} </div>{% endblock %}
+<div class="row">{% include 'card_comp/memory/percentage.html' %} {% include
+    'card_comp/memory/available.html' %} {% include 'card_comp/memory/used.html' %} {% include
+    'card_comp/memory/swap_total.html' %} {% include 'card_comp/memory/swap_used.html' %} {% include
+    'card_comp/memory/swap_free.html' %} </div>
+    {% include 'components/refresh_button_script.html' %}{% endblock %}
+    

@@ -8,6 +8,7 @@ from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile
+from src.models.monitored_website import MonitoredWebsite
 from flask_login import current_user
 from werkzeug.security import generate_password_hash
 import json
