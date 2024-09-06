@@ -1,7 +1,19 @@
+# Flask web framework
 Flask==3.0.3
+
+# Library for retrieving system information
 psutil==6.0.0
-gunicorn==23.0.0
-flask-sqlalchemy==3.1.1
-flask-login==0.6.3
-flask-session==0.8.0
+
+# For managing environment variables
 python-dotenv==1.0.1
+
+# WSGI HTTP server for running the application in production
+gunicorn==23.0.0
+
+# Flask extensions for database and user session management
+flask-sqlalchemy==3.1.1  # SQLAlchemy integration for Flask
+flask-login==0.6.3       # User session management for Flask
+flask-session==0.8.0     # Server-side session handling for Flask
+
+# File system monitoring and watching
+watchdog==5.0.2
