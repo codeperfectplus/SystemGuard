@@ -3,7 +3,7 @@ import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
-from src.models import PageToggleSettings, UserCardSettings, UserDashboardSettings, SystemInformation
+from src.models import UserCardSettings, UserDashboardSettings, ApplicationGeneralSettings
 from src.config import app, db
 from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smpt_email
@@ -73,10 +73,10 @@ def send_email_page():
         flash("User level for this account is: " + current_user.user_level, "danger")
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/403.html")
-    dasboard_settings = UserCardSettings.query.first()
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
-    if dasboard_settings:
-        enable_alerts = dasboard_settings.enable_alerts
+    general_settings = ApplicationGeneralSettings.query.first()
+    if general_settings:
+        enable_alerts = general_settings.enable_alerts
     if request.method == "POST":
         receiver_email = request.form.get("recipient")
         subject = request.form.get("subject")

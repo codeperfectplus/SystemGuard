@@ -1,5 +1,5 @@
 import datetime
-from flask import render_template, blueprints
+from flask import render_template, blueprints, jsonify
 from flask_login import login_required, current_user
 
 from src.config import app
@@ -60,3 +60,8 @@ def dashboard():
             current_user=current_user,
         )
     
+
+# health page
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"})

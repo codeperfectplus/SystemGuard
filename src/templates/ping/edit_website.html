@@ -1,0 +1,20 @@
+{% extends 'base/base.html' %}
+{% block title %}Edit Website{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_website.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Edit Website</h1>
+<!-- Form to edit the website -->
+<form action="/edit_website/{{ website.id }}" method="POST">
+    <label for="name">Website URL:</label>
+    <input type="text" name="name" value="{{ website.name }}" required>
+    
+    <label for="ping_period">Ping Period (seconds):</label>
+    <input type="number" name="ping_period" value="{{ website.ping_period }}" required>
+    
+    <button type="submit">Update Website</button>
+</form>
+
+<a href="{{ url_for('ping_website') }}">Back to Website List</a>
+{% endblock %}

@@ -1,0 +1,140 @@
+/* ping.css */
+
+/* General page styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Form styles */
+form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+form input, form button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form input {
+    width: 300px;
+    max-width: 100%;
+}
+
+form input[type="text"], form input[type="number"] {
+    font-size: 1rem;
+    border: 2px solid #dfe2e5;
+    background-color: #ffffff;
+}
+
+form button {
+    background-color: #5cb85c;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+form button:hover {
+    background-color: #4cae4c;
+}
+
+/* Table styles */
+table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+table thead {
+    background-color: #007bff;
+    color: white;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Action buttons in a row */
+.table-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* space between action buttons */
+}
+
+.table-actions a, .table-actions form button {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.table-actions a:hover, .table-actions form button:hover {
+    background-color: #0056b3;
+}
+
+.table-actions form {
+    display: inline;
+}
+
+table th {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    table {
+        width: 95%;
+    }
+
+    table th, table td {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        gap: 5px; /* space between action buttons in smaller screens */
+    }
+}

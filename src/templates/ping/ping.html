@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% block title %}Ping Website{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ping.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Website Pinger</h1>
+<!-- Form to add a new website -->
+<form action="/add_website" method="POST">
+    <input type="text" name="name" placeholder="Website URL" required>
+    <input type="number" name="ping_period" placeholder="Ping Period (seconds)" required>
+    <button type="submit">Add Website</button>
+</form>
+
+<!-- List all websites -->
+<h2>Websites</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Website</th>
+            <th>Ping Period</th>
+            <th>Status</th>
+            <th>Ping Status</th>
+            <th>Last Ping Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for website in websites %}
+        <tr id="website-{{ website.id }}" class="website-row {{ 'updated-row' if website.updated }}">
+            <td>{{ website.name }}</td>
+            <td>{{ website.ping_period }} seconds</td>
+            <td>{{ website.last_status or 'Unknown' }}</td>
+            <td>{{ 'Enabled' if website.is_ping else 'Disabled' }}</td>
+            <td>{{ website.last_ping_time or 'Never' }}</td>
+
+            <td class="table-actions">
+                <a href="/toggle_ping/{{ website.id }}">{{ 'Stop Pinging' if website.is_ping else 'Start Pinging' }}</a>
+                <a href="/edit_website/{{ website.id }}">Edit</a>
+                <form action="/remove_website/{{ website.id }}" method="POST"
+                    onsubmit="return confirm('Are you sure?')">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

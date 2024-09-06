@@ -27,6 +27,10 @@
             <label for="enable_alerts">Enable Alerts:</label>
             <input type="checkbox" id="enable_alerts" name="enable_alerts" {% if general_settings.enable_alerts %}checked{% endif %}>
         </div>
+        <div class="form-group">
+            <label for="is_logging_system_info">Log System Info:</label>
+            <input type="checkbox" id="is_logging_system_info" name="is_logging_system_info" {% if general_settings.is_logging_system_info %}checked{% endif %}>
+        </div>
 
         <button type="submit" class="btn btn-primary">Save Settings</button>
     </form>

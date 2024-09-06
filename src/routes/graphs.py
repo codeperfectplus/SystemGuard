@@ -18,11 +18,7 @@ def graphs():
         battery_data = [info.battery_percent for info in recent_system_info_entries]
         network_sent_data = [info.network_sent for info in recent_system_info_entries]
         network_received_data = [info.network_received for info in recent_system_info_entries]
-
-        # Print for debugging
-        print("CPU Data:", cpu_data)
-        print("Time Data:", time_data)
-
+        
     # Pass the data to the template
     return render_template('graphs.html', cpu=cpu_data, time=time_data, 
                            memory=memory_data, battery=battery_data, 

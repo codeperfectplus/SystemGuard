@@ -673,7 +673,7 @@ fix() {
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
         kill -9 $(lsof -t -i:5050)
         log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
-        log "Server started successfully in the background, user can check the logs using --server-logs"
+        log "Server is starting in the background, check logs for more details."
         log "Server will be running on $HOST_URL"
     else
         log "Server is not running."

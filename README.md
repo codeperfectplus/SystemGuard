@@ -118,6 +118,7 @@ A Docker image has not been created for this project because it requires access 
 - make server logs
 - Check Disk read/write speed 
 - Check Firewall status 
+- website monitoring page
 
 ## Acknowledgments
 

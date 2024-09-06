@@ -34,7 +34,5 @@ def cpu_usage():
         cpu_data = [info.cpu_percent for info in recent_system_info_entries]
         time_data = [info.timestamp for info in recent_system_info_entries]
 
-        print("CPU Data:", cpu_data)
-        print("Time Data:", time_data)
     return render_template("info_pages/cpu_info.html", system_info=system_info,
                             cpu=cpu_data, time=time_data)
