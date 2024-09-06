@@ -1,17 +1,9 @@
 /* General page styles */
-
-.container{
+.container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     margin-top: 50px;
-}
-
-h1, h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 2rem;
 }
 
 /* Form styles */
@@ -62,8 +54,8 @@ form button:hover {
 
 /* Table styles */
 table {
-    width: 90%;
-    margin: 20px auto;
+    width: 100%;
+    margin: 20px 0;
     border-collapse: collapse;
     background-color: #ffffff;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
@@ -85,6 +77,7 @@ table th, table td {
     border-bottom: 1px solid #dee2e6;
     font-size: 1rem;
     vertical-align: middle;
+    word-wrap: break-word; /* Ensures text doesn't overflow */
 }
 
 table tr:nth-child(even) {
@@ -156,7 +149,7 @@ button:hover {
     }
 
     table {
-        width: 95%;
+        width: 100%; /* Ensure the table fits within the page width */
     }
 
     table th, table td {

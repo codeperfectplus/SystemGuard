@@ -19,10 +19,15 @@ def monitor_websites():
 @app.route('/add_monitored_website', methods=['POST'])
 @login_required
 def add_website():
+    print(request.form)
     name = request.form['name']
     ping_interval = int(request.form['ping_interval'])
+    email_address = request.form['email_address']
     email_alerts_enabled = request.form.get('email_alerts_enabled') == 'on'
-    website = MonitoredWebsite(name=name, ping_interval=ping_interval, is_ping_active=True, email_alerts_enabled=email_alerts_enabled)
+    website = MonitoredWebsite(name=name, ping_interval=ping_interval,
+                               email_address=email_address, 
+                               is_ping_active=True, 
+                               email_alerts_enabled=email_alerts_enabled)
     db.session.add(website)
     db.session.commit()
     return redirect(url_for('monitor_websites'))
@@ -43,6 +48,7 @@ def edit_website(website_id):
         website.name = request.form['name']
         website.ping_interval = int(request.form['ping_interval'])
         website.email_alerts_enabled = request.form.get('email_alerts_enabled') == 'on'
+        website.email_address = request.form['email_address']
         db.session.commit()
         flash('Website updated successfully!', 'success')
         return redirect(url_for('monitor_websites'))

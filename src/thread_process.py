@@ -10,7 +10,7 @@ import requests
 # Dictionary to track the last known status of each website
 website_status = {}
 
-def send_mail(website_name, status):
+def send_mail(website_name, status, email_adress):
     """
     Dummy function to simulate sending an email.
     
@@ -19,7 +19,7 @@ def send_mail(website_name, status):
         status (str): The status of the website, either 'DOWN' or 'UP'.
     """
     # This is a dummy function, so no real email is sent.
-    print(f"Sending email: {website_name} is now {status}")
+    print(f"Sending email to {email_adress}: {website_name} is now {status}")
 
 def update_website_status(website, status):
     """
@@ -35,7 +35,7 @@ def update_website_status(website, status):
         website_status[website.id] = 'UP'  # Initialize with UP status if not present
 
     if website_status[website.id] != status:
-        send_mail(website.name, status)
+        send_mail(website.name, status, website.email_address)
         website_status[website.id] = status
 
 def ping_website(website):

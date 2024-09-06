@@ -11,6 +11,7 @@
     <form action="/add_monitored_website" method="POST">
         <input type="text" name="name" placeholder="Website URL" required>
         <input type="number" name="ping_interval" placeholder="Ping Period (seconds)" required>
+        <input type="email" name="email_address" placeholder="Email Address" required>
         <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled" checked>
         <button type="submit">Add Website</button>
     </form>
@@ -39,7 +40,13 @@
             <td>{{ website.ping_status or 'Unknown' }}</td>
             <td>{{ website.ping_status_code or 'Unknown' }}</td>
             <td>{{ 'Enabled' if website.is_ping_active else 'Disabled' }}</td>
-            <td>{{ 'Yes' if website.email_alerts_enabled else 'No' }}</td>
+            <td>
+                {% if website.email_address %}
+                    {{ 'Yes' if website.email_alerts_enabled else 'No' }}
+                {% else %}
+                    Email not found
+                {% endif %}
+            </td>
             <td>{{ website.last_ping_time.strftime('%Y-%m-%d %H:%M:%S') if website.last_ping_time else 'Never' }}</td>
             <td class="table-actions">
                 <a href="/toggle_ping_status/{{ website.id }}">{{ 'Stop Pinging' if website.is_ping_active else 'Start

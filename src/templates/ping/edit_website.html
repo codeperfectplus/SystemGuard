@@ -13,6 +13,9 @@
     <label for="ping_interval">Ping Period (seconds):</label>
     <input type="number" name="ping_interval" value="{{ website.ping_interval }}" required>
 
+    <label for="email">Email Address:</label>
+    <input type="email" name="email_address" value="{{ website.email_address }}">
+
     <label for="email_alerts_enabled">Email Alerts Enabled:</label>
     <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled" {% if website.email_alerts_enabled %}checked{% endif %}>
     
