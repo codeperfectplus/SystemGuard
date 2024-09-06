@@ -30,9 +30,11 @@ def cpu_usage():
 
     recent_system_info_entries = SystemInformation.query.all()
     if recent_system_info_entries:
-        # Extract cpu_percent and timestamp from the query results
         cpu_data = [info.cpu_percent for info in recent_system_info_entries]
         time_data = [info.timestamp for info in recent_system_info_entries]
+    else:
+        cpu_data = []
+        time_data = []
 
     return render_template("info_pages/cpu_info.html", system_info=system_info,
                             cpu=cpu_data, time=time_data)

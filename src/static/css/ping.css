@@ -1,11 +1,10 @@
 /* General page styles */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-    color: #212529;
-    margin: 0;
+
+.container{
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
-    box-sizing: border-box;
+    margin-top: 50px;
 }
 
 h1, h2 {

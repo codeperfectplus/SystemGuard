@@ -58,34 +58,8 @@ def toggle_ping(website_id):
 
 @app.route('/toggle_email_alerts/<int:website_id>')
 @login_required
-def toggle_emaail_alerts(website_id):
+def toggle_email_alerts(website_id):
     website = MonitoredWebsite.query.get_or_404(website_id)
     website.email_alerts_enabled = not website.email_alerts_enabled
     db.session.commit()
     return redirect(url_for('monitor_websites'))
-
-# Function to ping websites periodically
-def start_website_monitoring():
-    with app.app_context():
-        websites = MonitoredWebsite.query.filter_by(is_ping_active=True).all()
-        for website in websites:
-            print(f'Pinging {website.name}...')
-            try:
-                response = requests.get(website.name, timeout=10)
-                website.last_ping_time = datetime.datetime.now()
-                website.ping_status_code = response.status_code
-                if response.status_code == 200:
-                    website.ping_status = 'UP'
-                else:
-                    website.ping_status = 'DOWN'
-            except requests.RequestException:
-                website.ping_status = 'Something went wrong'
-
-            db.session.commit()
-
-        # Schedule next ping after the minimum interval period
-        min_interval = min([w.ping_interval for w in websites]) if websites else 60
-        Timer(min_interval, monitor_websites).start()
-
-# Start pinging periodically after server starts
-start_website_monitoring()
