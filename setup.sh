@@ -186,6 +186,7 @@ create_dir_if_not_exists() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
+        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 1; }
     fi
 }
 
