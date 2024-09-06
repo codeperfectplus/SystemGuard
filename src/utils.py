@@ -51,22 +51,30 @@ def get_flask_memory_usage():
         return None
 
 def get_established_connections():
-    connections = psutil.net_connections()
-    ipv4_set = set()
-    ipv6_set = set()
+    # Get all active network connections of type 'inet' (IPv4 and IPv6)
+    connections = psutil.net_connections(kind='inet')
+    
+    # Use sets to store unique IPv4 and IPv6 addresses
+    ipv4_addresses = set()
+    ipv6_addresses = set()
 
+    # Iterate through each connection
     for conn in connections:
+        # Filter only established connections
         if conn.status == 'ESTABLISHED':
+            # Check if the local address (laddr) is IPv4 or IPv6 and add to the corresponding set
             if '.' in conn.laddr.ip:
-                ipv4_set.add(conn.laddr.ip)
+                ipv4_addresses.add(conn.laddr.ip)
             elif ':' in conn.laddr.ip:
-                ipv6_set.add(conn.laddr.ip)
+                ipv6_addresses.add(conn.laddr.ip)
 
-    # ipv4 = [ip for ip in ipv4_set if ip.startswith('192.168')][0] if ipv4_set else "N/A"
-    ipv4_set.discard('127.0.0.0')
-    print(ipv4_set)
-    ipv4 = list(ipv4_set)[0] if ipv4_set else "N/A"
-    ipv6 = list(ipv6_set)[0] if ipv6_set else "N/A"
+    # Remove loopback address for IPv4 if it exists
+    # ipv4_addresses.discard('127.0.0.1')
+    print(ipv4_addresses)
+
+    # Return the first available IP from each set, or "N/A" if none found
+    ipv4 = next(iter(ipv4_addresses), "N/A")
+    ipv6 = next(iter(ipv6_addresses), "N/A")
 
     return ipv4, ipv6
 

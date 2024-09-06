@@ -29,8 +29,8 @@ if __name__ == "__main__":
     register_routes()
 
         # Start monitoring settings and website pinging when the server starts
-    monitor_settings()  # Starts monitoring for system logging changes
-    start_website_monitoring()  # Starts pinging active websites
+    # monitor_settings()  # Starts monitoring for system logging changes
+    # start_website_monitoring()  # Starts pinging active websites
 
     # Run the Flask application
     app.run(host="0.0.0.0", port=5000, debug=True)

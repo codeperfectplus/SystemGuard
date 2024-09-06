@@ -55,17 +55,25 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 
 ## Features 🚀
 
-- Monitor server stats like CPU, Memory, Disk, and Network.
-- Check the network speed of the server using a speed test.
-- Rate limit the speed test to prevent abuse.
-- Kill the process that is consuming the most CPU.
-- Real-time monitoring of server stats.
-- Responsive design that works on mobile, tablet, and desktop.
-- Update itself to the latest version.
-- Easy download and installation using a bash script.
-- Logged user and admin user will get the notification if the user kill some process manully on dashboard.
-- Different email alerts for different actions.
-- Different Dashboards for different users.(Deveoper, Admin, IT Manager, Manager)
+- Lightweight, open-source, and free to use with a straightforward installation process.
+- Capable of monitoring core server metrics like CPU, memory, disk usage, and network traffic.
+- Includes built-in security features such as authentication for login, logout, and signup.
+- Administrators can manage user accounts by creating, updating, or deleting users.
+- Admin-level access is required for configuring settings, managing users, and adjusting security and notification - preferences.
+- Historical performance data can be viewed as charts, aiding in trend analysis.
+- Supports network speed testing directly from the server.
+- Provides the ability to terminate resource-heavy processes with a single command.
+- Real-time server metric monitoring keeps data consistently updated.
+- The interface is responsive and optimized for various devices including mobile, tablets, and desktops.
+- The system can automatically update to the latest version to simplify maintenance.
+- Installation can be done quickly via a bash script for easy setup.
+- Notifications are sent to users and admins when a process is manually terminated.
+- Offers website monitoring tasks that trigger email alerts when a website becomes unavailable.
+- Configurable email alerts for various actions across the server.
+- Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
+- Option to download historical data in CSV format for detailed analysis (upcoming feature).
+- Server status monitoring with alerts for server downtime or recovery (upcoming feature).
+
 
 ## Email Feature 📧
 
@@ -81,7 +89,9 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 | Server Up | Yes | Admin User |
 | Notification Settings Change | Yes | Admin User |
 | Signup | Yes(few changes required) | Admin User & Logged User |
-
+| Website Monitoring | Yes | Input Email |
+| Server Down | No | Admin User |
+| Server Up | No | Admin User |
 
 
 ## Product Screenshots 📸
@@ -112,14 +122,23 @@ A Docker image has not been created for this project because it requires access 
 
 ## Upcoming Features 📅
 
-- Threshold notifications
-- Customizable dashboards
-- Plugin support to make SystemGuard even more powerful.
-- make server logs
-- Check Disk read/write speed 
-- Check Firewall status 
-- website monitoring page
-- Save total networl sent/recieved data in database, to add the additional feature of data usage monitoring.
+- Receive notifications when system metrics cross predefined thresholds.
+- Customizable dashboards for personalized server monitoring.
+- Plugin support to enhance and extend SystemGuard's functionality.
+- Generate and manage server logs for better tracking and troubleshooting.
+- Monitor disk read/write speeds for performance insights.
+- Check the current firewall status to ensure security.
+- A dedicated website monitoring page for tracking uptime and performance.
+- Track and save total network data sent/received in the database for data usage monitoring.
+
+## Learnings 📖
+
+- How to use the `psutil` library to retrieve system stats.
+- How to use multiple Flask routes to display different pages.
+- How to use multi-threading to run a function in the background.
+- How to use the `chart.js` library to display charts on a webpage.
+- How to use the `flask-login` library to manage user sessions.
+- How to use the `flask-mail` library to send emails in Flask.
 
 ## Acknowledgments
 
