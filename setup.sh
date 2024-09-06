@@ -643,17 +643,22 @@ health_check() {
 
 # app logs
 show_server_logs() {
-    log "Checking server logs at $FLASK_LOG_FILE..."
     log "INFO" "Press Ctrl+C to exit."
     echo ""
     echo "--- Server Logs ---"
     echo ""
-    if [ -f "$FLASK_LOG_FILE" ]; then
-        tail -f "$FLASK_LOG_FILE"
+    
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    log_file=$(find . -name "app_debug.log" | head -n 1)
+    echo "log file: $log_file"
+    if [ -f "$log_file" ]; then
+        log "Server log file: $log_file"
+        tail -100f "$log_file"
     else
-        log "No logs found at $FLASK_LOG_FILE."
+        log "No logs found at $log_file."
     fi
 }
+
 
 # stop flask server
 stop_server() {
@@ -695,6 +700,9 @@ show_help() {
     echo "  --uninstall         Uninstall $APP_NAME completely."
     echo "                      This will remove the application and all associated files."
     echo ""
+    echo "  --fix               Fix the $APP_NAME installation errors."
+    echo "                      This will fix any issues with the installation and restart the server."
+    echo ""   
     echo "  --restore           Restore $APP_NAME from a backup."
     echo "                      Use this option to recover data or settings from a previous backup."
     echo ""
@@ -710,16 +718,13 @@ show_help() {
     echo "  --clean-backups     Clean up all backups of $APP_NAME."
     echo "                      This will delete all saved backup files to free up space."
     echo ""
-    echo "  --server-logs       Show server logs for $APP_NAME."
+    echo "  --logs              Show server logs for $APP_NAME."
     echo "                      Displays the latest server logs, which can help in troubleshooting issues."
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
     echo "  --server-stop       Stop the $APP_NAME server."
     echo "                      This will stop the running server instance."
     echo ""
-    echo "  --fix               Fix the $APP_NAME server."
-    echo "                      This will restart the server."
-    echo ""   
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
 }
@@ -735,7 +740,7 @@ for arg in "$@"; do
         --status) ACTION="check_status" ;;
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
-        --server-logs) show_server_logs; exit 0 ;;
+        --logs) show_server_logs; exit 0 ;;
         --server-stop) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
         --help) show_help; exit 0 ;;
@@ -754,6 +759,7 @@ case $ACTION in
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
     stop_server) stop_server ;;
+    logs) show_server_logs ;;
     fix) fix ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
