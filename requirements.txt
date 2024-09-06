@@ -1,7 +1,7 @@
-Flask==2.3.3
-psutil==5.9.5
-gunicorn
-flask-sqlalchemy
-flask-login
-flask-session
-python-dotenv
+Flask==3.0.3
+psutil==6.0.0
+gunicorn==23.0.0
+flask-sqlalchemy==3.1.1
+flask-login==0.6.3
+flask-session==0.8.0
+python-dotenv==1.0.1

@@ -92,9 +92,10 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip figlet)
+    local dependencies=(git curl wget unzip figlet locust)
     for cmd in "${dependencies[@]}"; do
         if ! command -v $cmd &> /dev/null; then
             log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"
@@ -163,7 +164,6 @@ EXECUTABLE_APP_NAME="systemguard-installer"
 EXECUTABLE="/usr/local/bin/$EXECUTABLE_APP_NAME"
 
 # File paths related to the application
-LOCUST_FILE="$EXTRACT_DIR/${APP_NAME}-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
 FLASK_LOG_FILE="$USER_HOME/logs/systemguard_flask.log"
@@ -180,6 +180,8 @@ GIT_REPO="$APP_NAME"
 GIT_URL="https://github.com/$GIT_USER/$GIT_REPO"
 ISSUE_URL="$GIT_URL/issues"
 
+# ENVIRONMENT VARIABLES
+CONDA_ENV_NAME="systemguard"
 
 # Function to create a directory if it does not exist
 create_dir_if_not_exists() {
@@ -580,6 +582,8 @@ load_test() {
 
     # Start Locust server
     log "Starting Locust server..."
+    LOCUST_FILE=$(find "$EXTRACT_DIR" -name "locustfile.py" | head -n 1)
+    echo "locust file: $LOCUST_FILE"
     locust -f "$LOCUST_FILE" --host="$HOST_URL"
 }
 
@@ -659,11 +663,74 @@ show_server_logs() {
     fi
 }
 
+# installation logs
+show_installer_logs() {
+    log "INFO" "Press Ctrl+C to exit."
+    echo ""
+    echo "--- Installer Logs ---"
+    echo ""
+    
+    if [ -f "$LOG_FILE" ]; then
+        log "Installer log file: $LOG_FILE"
+        tail -100f "$LOG_FILE"
+    else
+        log "No logs found at $LOG_FILE."
+    fi
+}
+
+
+update_dependencies() {
+    # Define possible Conda installation paths
+    CONDA_PATHS=("/home/$USER_NAME/miniconda3" "/home/$USER_NAME/anaconda3")
+    CONDA_FOUND=false
+
+    # Find Conda installation
+    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
+        if [ -d "$CONDA_PATH" ]; then
+            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
+            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
+            CONDA_FOUND=true
+            break
+        fi
+    done
+
+    if [ "$CONDA_FOUND" = false ]; then
+        log "ERROR" "Conda not found. Please install Conda or check your Conda paths."
+        exit 1
+    fi
+
+    # Activate Conda environment
+    source "$CONDA_SETUP_SCRIPT"
+    conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
+
+    # Check for missing dependencies
+    log "INFO" "Checking for missing dependencies..."
+    cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
+    REQUIREMENTS_FILE="requirements.txt"
+
+    if [ ! -f "$REQUIREMENTS_FILE" ]; then
+        log "ERROR" "Requirements file $REQUIREMENTS_FILE not found."
+        exit 1
+    fi
+
+    log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
+    echo "--------------------------------------------------------"
+    cat "$REQUIREMENTS_FILE"
+    echo ""
+    echo "--------------------------------------------------------"
+
+    # Install dependencies silently
+    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" > /dev/null 2>&1 || {
+        log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
+        exit 1
+    }
+
+    log "INFO" "Dependencies installation complete."
+}
+
 
 # stop flask server
-stop_server() {
-    log "Stopping $APP_NAME server..."
-    # check if server is running on 5050
+stop_server_helper() {    
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
         kill -9 $(lsof -t -i:5050)
         log "Server stopped successfully."
@@ -672,20 +739,17 @@ stop_server() {
     fi
 }
 
+stop_server() {
+    log "Stopping $APP_NAME server..."
+    stop_server_helper
+}
 
 # fix the server
 fix() {
+    update_dependencies
     log "Fixing $APP_NAME server..."
-    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
-        kill -9 $(lsof -t -i:5050)
-        log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
-        log "Server is starting in the background, check logs for more details."
-        log "Server will be running on $HOST_URL"
-    else
-        log "Server is not running."
-    fi
+    stop_server
 }
-
 
 # Display help
 show_help() {
@@ -722,8 +786,16 @@ show_help() {
     echo "                      Displays the latest server logs, which can help in troubleshooting issues."
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
+    echo " --installation-logs  Show installer logs for $APP_NAME."
+    echo "                      Displays the logs generated during the installation process."
+    echo "                      Press Ctrl+C to exit the log viewing session."
+    echo ""
     echo "  --server-stop       Stop the $APP_NAME server."
     echo "                      This will stop the running server instance."
+    echo ""
+    echo " --update-dependencies"
+    echo "                      Update the dependencies of the $APP_NAME."
+    echo "                      This will update the dependencies of the application."
     echo ""
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
@@ -741,8 +813,10 @@ for arg in "$@"; do
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
         --logs) show_server_logs; exit 0 ;;
+        --installation-logs) show_installer_logs; exit 0 ;;
         --server-stop) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
+        --update-dependencies) update_dependencies; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -760,7 +834,11 @@ case $ACTION in
     cleanup_backups) cleanup_backups ;;
     stop_server) stop_server ;;
     logs) show_server_logs ;;
+    installation-logs) show_installer_logs ;;
     fix) fix ;;
+    update_dependencies) update_dependencies ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-# # End of script
+
+log "INFO" "SystemGuard Installer script completed."
+log "INFO" "----------------------------------------"
