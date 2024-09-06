@@ -6,12 +6,15 @@
 {% block content %}
 <h1>Edit Website</h1>
 <!-- Form to edit the website -->
-<form action="/edit_website/{{ website.id }}" method="POST">
+<form action="/edit_monitored_website/{{ website.id }}" method="POST">
     <label for="name">Website URL:</label>
     <input type="text" name="name" value="{{ website.name }}" required>
     
     <label for="ping_interval">Ping Period (seconds):</label>
     <input type="number" name="ping_interval" value="{{ website.ping_interval }}" required>
+
+    <label for="email_alerts_enabled">Email Alerts Enabled:</label>
+    <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled" {% if website.email_alerts_enabled %}checked{% endif %}>
     
     <button type="submit">Update Website</button>
 </form>

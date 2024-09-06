@@ -42,6 +42,7 @@ def edit_website(website_id):
     if request.method == 'POST':
         website.name = request.form['name']
         website.ping_interval = int(request.form['ping_interval'])
+        website.email_alerts_enabled = request.form.get('email_alerts_enabled') == 'on'
         db.session.commit()
         flash('Website updated successfully!', 'success')
         return redirect(url_for('monitor_websites'))

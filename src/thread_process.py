@@ -7,6 +7,83 @@ from src.models import MonitoredWebsite, ApplicationGeneralSettings, SystemInfor
 from sqlalchemy.exc import SQLAlchemyError
 import requests
 
+# Dictionary to track the last known status of each website
+website_status = {}
+
+def send_mail(website_name, status):
+    """
+    Dummy function to simulate sending an email.
+    
+    Args:
+        website_name (str): The name or URL of the website.
+        status (str): The status of the website, either 'DOWN' or 'UP'.
+    """
+    # This is a dummy function, so no real email is sent.
+    print(f"Sending email: {website_name} is now {status}")
+
+def update_website_status(website, status):
+    """
+    Updates the status of the website and sends an email notification if the status has changed.
+    
+    Args:
+        website (MonitoredWebsite): The website object to update.
+        status (str): The new status of the website.
+    """
+    global website_status
+
+    if website.id not in website_status:
+        website_status[website.id] = 'UP'  # Initialize with UP status if not present
+
+    if website_status[website.id] != status:
+        send_mail(website.name, status)
+        website_status[website.id] = status
+
+def ping_website(website):
+    """
+    Pings a single website and updates its status in the database.
+    
+    Args:
+        website (MonitoredWebsite): The website object to ping.
+    """
+    with app.app_context():
+        try:
+            # Check if the website is still active
+            updated_website = MonitoredWebsite.query.get(website.id)
+            if not updated_website or not updated_website.is_ping_active:
+                logger.info(f"Website {website.name} is no longer active. Stopping monitoring.")
+                return
+
+            logger.info(f"Pinging {website.name} (Interval: {website.ping_interval}s)...")
+            response = requests.get(website.name, timeout=10)
+            updated_website.last_ping_time = datetime.datetime.now()
+            updated_website.ping_status_code = response.status_code
+
+            new_status = 'UP' if response.status_code == 200 else 'DOWN'
+            updated_website.ping_status = new_status
+
+            # Update the website status
+            db.session.commit()
+            logger.info(f"Website {website.name} updated successfully.")
+
+            # Determine if an email should be sent
+            update_website_status(website, new_status)
+
+        except requests.RequestException as req_err:
+            updated_website.ping_status = 'DOWN'
+            logger.error(f"Failed to ping {website.name}: {req_err}", exc_info=True)
+            db.session.rollback()
+
+        except SQLAlchemyError as db_err:
+            logger.error(f"Database commit error for {website.name}: {db_err}", exc_info=True)
+            db.session.rollback()
+
+        finally:
+            # Add more detailed logging for debugging
+            if db.session.new or db.session.dirty:
+                logger.warning(f"Database transaction not committed properly for {website.name}.")
+            
+            # Schedule the next ping for this website
+            Timer(updated_website.ping_interval, ping_website, args=[updated_website]).start()
 
 def monitor_settings():
     """
@@ -32,7 +109,6 @@ def monitor_settings():
         except SQLAlchemyError as db_err:
             logger.error(f"Error fetching settings: {db_err}", exc_info=True)
 
-
 def log_system_info():
     """
     Logs system information at regular intervals based on the general settings.
@@ -56,7 +132,6 @@ def log_system_info():
 
         except Exception as e:
             logger.error(f"Error during system info logging: {e}", exc_info=True)
-
 
 def log_system_info_to_db():
     """
@@ -83,52 +158,6 @@ def log_system_info_to_db():
         except Exception as e:
             logger.error(f"Failed to log system information: {e}", exc_info=True)
 
-
-def ping_website(website):
-    """
-    Pings a single website and updates its status in the database.
-    """
-    with app.app_context():
-        try:
-            # Check if the website is still active
-            updated_website = MonitoredWebsite.query.get(website.id)
-            if not updated_website or not updated_website.is_ping_active:
-                logger.info(f"Website {website.name} is no longer active. Stopping monitoring.")
-                return
-
-            logger.info(f"Pinging {website.name} (Interval: {website.ping_interval}s)...")
-            response = requests.get(website.name, timeout=10)
-            updated_website.last_ping_time = datetime.datetime.now()
-            updated_website.ping_status_code = response.status_code
-
-            if response.status_code == 200:
-                updated_website.ping_status = 'UP'
-                logger.info(f"{website.name} is UP.")
-            else:
-                updated_website.ping_status = 'DOWN'
-                logger.warning(f"{website.name} is DOWN with status code {response.status_code}.")
-            
-            db.session.commit()
-            logger.info(f"Website {website.name} updated successfully.")
-
-        except requests.RequestException as req_err:
-            updated_website.ping_status = 'DOWN'
-            logger.error(f"Failed to ping {website.name}: {req_err}", exc_info=True)
-            db.session.rollback()
-
-        except SQLAlchemyError as db_err:
-            logger.error(f"Database commit error for {website.name}: {db_err}", exc_info=True)
-            db.session.rollback()
-
-        finally:
-            # Add more detailed logging for debugging
-            if db.session.new or db.session.dirty:
-                logger.warning(f"Database transaction not committed properly for {website.name}.")
-            
-            # Schedule the next ping for this website
-            Timer(updated_website.ping_interval, ping_website, args=[updated_website]).start()
-
-
 def start_website_monitoring():
     """
     Periodically pings monitored websites based on individual ping intervals.
@@ -152,5 +181,3 @@ def start_website_monitoring():
             logger.error(f"Database error during website monitoring: {db_err}", exc_info=True)
         except Exception as e:
             logger.error(f"Error during website monitoring: {e}", exc_info=True)
-
-
