@@ -117,7 +117,7 @@
             labels: timeData,
             datasets: [
                 {
-                    label: 'Network Sent (Bytes)',
+                    label: 'Network Sent (MB)',
                     data: networkSentData,
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -125,7 +125,7 @@
                     tension: 0.4
                 },
                 {
-                    label: 'Network Received (Bytes)',
+                    label: 'Network Received (MB)',
                     data: networkReceivedData,
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -137,7 +137,7 @@
         options: {
             scales: {
                 x: { title: { display: true, text: 'Time' } },
-                y: { beginAtZero: true, title: { display: true, text: 'Data Transferred (Bytes)' } }
+                y: { beginAtZero: true, title: { display: true, text: 'Data Transferred (MB)' } }
             }
         }
     });
