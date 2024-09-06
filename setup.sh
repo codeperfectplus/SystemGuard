@@ -437,16 +437,16 @@ install_from_git() {
     remove_previous_installation
 
     log "Select the version of $APP_NAME to install:"
-    echo "1. Stable (default)"
-    echo "2. Development (unstable)"
-    echo "3. Enter a specific branch name"
+    echo "1. Production (stable) - Recommended for most users"
+    echo "2. Development (dev) - Latest features, may be unstable"
+    echo "3. Specify a branch or tag name - Enter the branch/tag name when prompted"
     read -r VERSION
 
     # Set Git URL based on user choice
     case "$VERSION" in
         1|"")  # Stable is the default option if nothing is entered
             BRANCH="production"
-            log "Selected Stable version (main branch)."
+            log "Selected Production (stable branch)."
             ;;
         2)  # Development version
             BRANCH="dev"
