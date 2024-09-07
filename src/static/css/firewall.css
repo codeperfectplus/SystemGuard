@@ -1,0 +1,143 @@
+/* Basic reset for consistent styling across browsers */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 20px;
+}
+
+/* Container for the content */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 50px;
+}
+
+/* Heading styles */
+h1 {
+    color: #343a40;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Form styling */
+form {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+
+/* Form label styles */
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Form input and select styling */
+form input[type="text"],
+form input[type="password"],
+form select {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Button styling */
+form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+form button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #dee2e6;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+}
+
+th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 600;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Message styling */
+p {
+    color: #dc3545; /* Bootstrap danger color */
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Styles for the Manage Port form to fit in one line */
+.manage-port-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Space between form elements */
+}
+
+.manage-port-form label {
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.manage-port-form input[type="text"],
+.manage-port-form input[type="password"],
+.manage-port-form select {
+    width: auto; /* Allow input elements to fit content */
+    flex: 1; /* Allow form elements to grow and shrink as needed */
+    min-width: 120px; /* Ensure a minimum width for better usability */
+}
+
+.manage-port-form button {
+    flex: none; /* Prevent the button from resizing */
+    width: auto; /* Allow button to fit its content */
+}
