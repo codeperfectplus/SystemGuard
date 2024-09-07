@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 {% include 'components/refresh_button.html' %}
-<div class="row">
+<div class="row">    
         <!-- Container for positioning the select input on the right -->
         {% include 'card_comp/other/username.html' %}{% include
         'card_comp/other/boot_time.html' %}{% include 'card_comp/battery/percentage.html' %}{% include
@@ -14,7 +14,8 @@
         'card_comp/cpu/current_temp.html' %}{% include 'card_comp/memory/dashboard_memory.html' %}{% include
         'card_comp/memory/usage.html' %}{% include 'card_comp/disk/usage.html' %}{% include
         'card_comp/other/uptime.html' %}{% include 'card_comp/network/stats.html' %}{% include
-        'card_comp/other/speedtest.html' %} </div>
+        'card_comp/other/speedtest.html' %} </div>  
 </div>
-{% include 'components/refresh_button_script.html' %}
+
+{% include 'components/refresh_button_script_2.html' %}
 {% endblock %}

@@ -7,4 +7,10 @@
         </div>
     </div>
 </div>
+<script>
+    function refreshData() {
+        refreshCardData('disk_percent', '.bg-disk', 'disk_percent'); // CPU Usage
+    }
+    setInterval(refreshData, {{ 30000}});
+</script>
 {% endif %}

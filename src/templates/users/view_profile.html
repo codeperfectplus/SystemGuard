@@ -5,12 +5,21 @@
 {% endblock %}
 {% block content %}
 <h2>Profile</h2>
+{% include 'ext/message.html' %}
 <p><strong><i class="fas fa-user"></i>
-    Username:</strong> {{ user.username }}</p>
+        Username:</strong> {{ user.username }}</p>
 <p><strong><i class="fas fa-envelope"></i>
-    Email:</strong> {{ user.email }}</p>
+        Email:</strong> {{ user.email }}</p>
 <p><strong><i class="fas fa-user-tag"></i>
-    User Level:</strong> {{ user.user_level }}</p>
+        User Level:</strong> {{ user.user_level }}</p>
+<p><strong><i class="fas fa-user-cog"></i>
+        Receive Email Alerts:</strong> {{ user.receive_email_alerts }}</p>
+<p><strong><i class="fas fa-user-md"></i>
+        Profession:</strong> {{ user.profession }}</p>
+<a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
 
 <a href="{{ url_for('change_password') }}" class="btn btn-primary">Change Password</a>
 {% endblock %}
+
+<!-- receive_email_alerts = db.Column(db.Boolean, default=False)
+    profession = db.Column(db.String(50), nullable=True) -->

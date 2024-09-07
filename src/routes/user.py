@@ -99,6 +99,7 @@ def change_user_settings(username):
         new_username = request.form['username']
         new_email = request.form['email']
         new_user_level = request.form['user_level']
+        new_profession = request.form['profession']
         receive_email_alerts = 'receive_email_alerts' in request.form
 
         # Update user details
@@ -106,11 +107,12 @@ def change_user_settings(username):
         user.email = new_email
         user.user_level = new_user_level
         user.receive_email_alerts = receive_email_alerts
+        user.profession = new_profession
 
         db.session.commit()
 
         flash('User settings updated successfully!', 'success')
-        return redirect(url_for('change_user_settings', username=user.username))
+        return redirect(url_for('view_users', username=user.username))
 
     return render_template('users/change_user.html', user=user)
 
@@ -182,3 +184,30 @@ def change_password():
         return redirect(url_for('view_profile'))
 
     return render_template('users/change_password.html')
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    """
+    This route allows the user to edit their profile information.
+    """
+    user = current_user  # Get the currently logged-in user
+
+    if request.method == 'POST':
+        new_username = request.form['username']
+        new_email = request.form['email']
+        profession = request.form['profession']
+        receive_email_alerts = 'receive_email_alerts' in request.form
+
+        # Update user information
+        user.username = new_username
+        user.email = new_email
+        user.profession = profession
+        user.receive_email_alerts = receive_email_alerts
+
+        db.session.commit()
+
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('view_profile'))
+
+    return render_template('users/edit_profile.html', user=user)

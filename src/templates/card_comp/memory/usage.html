@@ -7,4 +7,11 @@
         </div>
     </div>
 </div>
+<script>
+    function refreshData() {
+        refreshCardData('memory_percent', '.bg-memory', 'memory_percent'); // CPU Usage
+    }
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
+</script>
+
 {% endif %}
