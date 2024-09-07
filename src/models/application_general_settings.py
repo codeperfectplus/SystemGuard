@@ -1,6 +1,16 @@
 from src.config import db
 
-class ApplicationGeneralSettings(db.Model):
+class GeneralSettings(db.Model):
+    """
+    General settings model for the application
+    ---
+    Properties:
+        - id: int
+        - enable_alerts: if email alerts are enabled
+        - timezone: the timezone of the system
+        - enable_cache: if caching is enabled
+        - is_logging_system_info: if system info is logged
+    """
     __tablename__ = 'general_settings'
     
     id = db.Column(db.Integer, primary_key=True)

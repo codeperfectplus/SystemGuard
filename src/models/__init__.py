@@ -3,7 +3,7 @@ from src.models.user_card_settings import UserCardSettings
 from src.models.dashboard_netowrk import DashboardNetworkSettings
 from src.models.user_dashboard_settings import UserDashboardSettings
 from src.models.page_toggle_settings import PageToggleSettings
-from src.models.application_general_settings import ApplicationGeneralSettings
+from src.models.application_general_settings import GeneralSettings
 from src.models.smtp_configuration import SMTPSettings
 from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.system_information import SystemInformation
@@ -52,9 +52,9 @@ with app.app_context():
             db.session.commit()
 
     # Initialize default user_dashboard_settings
-    general_settings = ApplicationGeneralSettings.query.first()
+    general_settings = GeneralSettings.query.first()
     if not general_settings:
-        db.session.add(ApplicationGeneralSettings())
+        db.session.add(GeneralSettings())
         db.session.commit()
 
 
@@ -63,7 +63,7 @@ with app.app_context():
 def inject_settings():
     if current_user.is_anonymous:
         return dict(user_dashboard_settings=None, card_settings=None, page_toggles_settings=None, general_settings=None)
-    general_settings = ApplicationGeneralSettings.query.first()
+    general_settings = GeneralSettings.query.first()
     card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()
     user_dashboard_settings = UserDashboardSettings.query.filter_by(
         user_id=current_user.id

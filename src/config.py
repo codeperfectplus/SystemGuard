@@ -17,11 +17,12 @@ db = SQLAlchemy(app)
 def server_start():
     logger.info("Server started")
 
-
-
 # 403 forbidden
 @app.errorhandler(403)
 def forbidden(e):
+    """ 
+    This function is called when a user tries to access a resource that they are not allowed to access.
+    """
     return render_template("error/403.html"), 403
 
 # not found page

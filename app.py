@@ -1,29 +1,8 @@
-import os
-import time
-import datetime
-import threading
-from src.config import app, db
+from src.config import app
 from src import routes
-from src.utils import get_system_info_for_db
-from src.models import SystemInformation, ApplicationGeneralSettings
-from sqlalchemy.exc import SQLAlchemyError
-from src.logger import logger
 from src.thread_process import monitor_settings, start_website_monitoring
 
-def register_routes():
-    app.register_blueprint(routes.dashboard_bp)
-    app.register_blueprint(routes.settings_bp)
-    app.register_blueprint(routes.system_health_bp)
-    app.register_blueprint(routes.cpu_info_bp)
-    app.register_blueprint(routes.disk_info_bp)
-    app.register_blueprint(routes.memory_info_bp)
-    app.register_blueprint(routes.network_info_bp)
-    app.register_blueprint(routes.speedtest_bp)
-    app.register_blueprint(routes.process_bp)
-
-
 if __name__ == "__main__":
-    register_routes()
 
     # background thread to monitor system settings changes
     # monitor_settings()  # Starts monitoring for system logging changes

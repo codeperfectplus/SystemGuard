@@ -4,28 +4,34 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/create_user.css') }}">
 {% endblock %}
 {% block content %}
-<div class="add-user-container">
-    <h2 class="page-title">Add New User</h2>
+<div class="add-user-container mt-4">
+    <h2 class="page-title bg-primary p-2 text-white">Create New User</h2>
     <form action="{{ url_for('create_user') }}" method="post">
-        <label for="username">Username:</label>
+        <label for="username"><i class="fas fa-user"></i>
+            Username:</label>
         <input type="text" id="username" name="username" required>
-
-        <label for="email">Email:</label>
+        <label for="email"><i class="fas fa-envelope"></i>
+            Email:</label>
         <input type="email" id="email" name="email" required>
 
-        <label for="password">Password:</label>
+        <label for="password"><i class="fas fa-key"></i>
+            Password:</label>
         <input type="password" id="password" name="password" required>
 
-        <label for="user_level">User Level:</label>
+        <label for="user_level"><i class="fas fa-user-shield"></i>
+            User Level:</label>
         <select id="user_level" name="user_level">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            <option value="user">User<i class="fas fa-user"></i>
+            </option>
+            <option value="admin">Admin
+            </option>
         </select>
 
         <label for="receive_email_alerts">Receive Email Alerts:</label>
         <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" checked>
 
-        <button type="submit">Add User</button>
+        <button type="submit">Add User <i class="fas fa-user-plus ml-2"></i>
+        </button>
     </form>
 </div>
 {% endblock %}

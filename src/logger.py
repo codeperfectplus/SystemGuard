@@ -4,8 +4,7 @@ import os
 
 
 # Create a logs directory if it doesn't exist
-if not os.path.exists('logs'):
-    os.makedirs('logs')
+os.makedirs('logs', exist_ok=True)
 
 # Log Formatter with datetime, log level, and message
 formatter = logging.Formatter(
