@@ -2,6 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
+
 # Create a logs directory if it doesn't exist
 if not os.path.exists('logs'):
     os.makedirs('logs')
@@ -26,8 +27,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Log everything (DEBUG, INFO, WARNING, etc.)
 logger.addHandler(file_handler)
 
-# # Optionally, add console output for real-time debugging (optional)
-# console_handler = logging.StreamHandler()
-# console_handler.setLevel(logging.INFO)
-# console_handler.setFormatter(formatter)
-# logger.addHandler(console_handler)
+# Optionally, add console output for real-time debugging (optional)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+

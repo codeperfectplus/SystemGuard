@@ -9,13 +9,26 @@
     {% include 'ext/message.html' %}
     <form method="post">
         <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ smtp_config.email }}" required>
+            <label for="username">Username:</label>
+            <input type="username" id="username" name="username" value="{{ smtp_config.username }}" required>
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
+        <div class="form-group">
+            <label for="smtp_server">SMTP Server:</label>
+            <input type="text" id="smtp_server" name="smtp_server" value="{{ smtp_config.smtp_server }}" required>
+        </div>
+        <div class="form-group">
+            <label for="smtp_port">SMTP Port:</label>
+            <input type="number" id="smtp_port" name="smtp_port" value="{{ smtp_config.smtp_port }}" required>
+        </div>
+        <div class="form-group">
+            <label for="email_from">Email From:</label>
+            <input type="email" id="email_from" name="email_from" value="{{ smtp_config.email_from }}" required>
+        </div>
+
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>

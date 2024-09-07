@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Status Alert</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: auto;
+        }
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .status {
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 20px;
+            line-height: 1.4;
+        }
+        .status.up {
+            background-color: #28a745;
+        }
+        .status.down {
+            background-color: #dc3545;
+        }
+        .status.unknown {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .status-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .details {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .details p {
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #007bff;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .status {
+                font-size: 18px;
+            }
+            .details {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Website Status Alert</h1>
+
+        <div class="status {% if website_status == 'UP' %}up{% elif website_status == 'DOWN' %}down{% else %}unknown{% endif %}">
+            {% if website_status == 'UP' %}
+                <strong>Great news!</strong> Website is Up again and running smoothly. 
+            {% elif website_status == 'DOWN' %}
+                <strong>Attention Required!</strong> Website is Down and not accessible.
+            {% endif %}
+        </div>
+
+        <div class="details">
+            <p><strong>Website:</strong> {{ website_name }}</p>
+            <p><strong>Checked Time:</strong> {{ checked_time }}</p>
+            <p><strong>Additional Info:</strong> {{ message }}</p>
+            <p
+        </div>
+
+        <div class="footer">
+            <p>This is an automated alert from SystemGuard. Please do not reply to this email.</p>
+            <a class="button">Contact Support</a>
+        </div>
+    </div>
+</body>
+</html>

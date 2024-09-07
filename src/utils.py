@@ -4,9 +4,10 @@ import json
 import datetime
 import subprocess
 import psutil
-from flask import render_template_string, jsonify
+from flask import render_template_string
 
-from src.models import UserDashboardSettings, ApplicationGeneralSettings
+from src.logger import logger
+from src.models import ApplicationGeneralSettings
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Simple in-memory cache for specific data with individual timestamps
@@ -47,7 +48,7 @@ def get_flask_memory_usage():
         memory_in_mb = memory_info.rss / (1000 ** 2)  # Convert bytes to MB
         return round(memory_in_mb)  # Return the memory usage rounded to 2 decimal places
     except Exception as e:
-        print(f"Error getting memory usage: {e}")
+        logger.info(f"Error getting memory usage: {e}")
         return None
 
 def get_established_connections():
@@ -70,7 +71,7 @@ def get_established_connections():
 
     # Remove loopback address for IPv4 if it exists
     # ipv4_addresses.discard('127.0.0.1')
-    print(ipv4_addresses)
+    logger.info(ipv4_addresses)
 
     # Return the first available IP from each set, or "N/A" if none found
     ipv4 = next(iter(ipv4_addresses), "N/A")
@@ -171,6 +172,7 @@ def get_swap_memory_info():
         "free_swap": round(free_swap / (1000**3), 2),    # In GB
     }
 
+from jinja2 import Environment, FileSystemLoader
 def render_template_from_file(template_file_path, **context):
     """
     Renders a Jinja template from a file with the given context and returns the rendered HTML content.
@@ -179,14 +181,27 @@ def render_template_from_file(template_file_path, **context):
     :param context: Context variables to pass to the template.
     :return: Rendered HTML content as a string.
     """
-    # Open and read the template file content
-    with open(template_file_path, 'r') as file:
-        template_content = file.read()
-
-    # Render the template content with the provided context
-    rendered_html = render_template_string(template_content, **context)
+    template_dir = os.path.dirname(template_file_path)
+    template_file = os.path.basename(template_file_path)
+    
+    env = Environment(loader=FileSystemLoader(template_dir))
+    
+    # Load the template file
+    template = env.get_template(template_file)
+    
+    # Render the template with the provided context
+    rendered_html = template.render(**context)
     
     return rendered_html
+
+    # # Open and read the template file content
+    # with open(template_file_path, 'r') as file:
+    #     template_content = file.read()
+
+    # # Render the template content with the provided context
+    # rendered_html = render_template_string(template_content, **context)
+    
+    # return rendered_html
 
 
 def get_cached_value(key, fresh_value_func):
@@ -202,7 +217,6 @@ def get_cached_value(key, fresh_value_func):
 
     # Check if cache is valid
     if enable_cahce and cache[key]['value'] is not None and (current_time - cache[key]['timestamp'] < CACHE_EXPIRATION):
-        # print(key, cache[key]['value'])
         return cache[key]['value']
 
     # Fetch fresh value

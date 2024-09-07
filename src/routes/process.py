@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
 from src.models import  PageToggleSettings
-from src.scripts.email_me import send_smpt_email
+from src.scripts.email_me import send_smtp_email
 
 process_bp = blueprints.Blueprint("process", __name__)
 
@@ -37,7 +37,7 @@ def process():
                 context = {"process_name": process_name, "pid_to_kill": pid_to_kill, "username": current_user.username}
                 process_killed_template = os.path.join(ROOT_DIR, "src/templates/email_templates/process_killed.html")
                 email_body = render_template_from_file(process_killed_template, **context)
-                send_smpt_email(receiver_email, subject, email_body, is_html=True)
+                send_smtp_email(receiver_email, subject, email_body, is_html=True)
             except Exception as e:
                 flash(f"Failed to kill process '{process_name}' (PID {pid_to_kill}). Error: {e}", "danger")
             return redirect(url_for("process"))  # Refresh the page after killing process

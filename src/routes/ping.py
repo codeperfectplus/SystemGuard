@@ -19,7 +19,6 @@ def monitor_websites():
 @app.route('/add_monitored_website', methods=['POST'])
 @login_required
 def add_website():
-    print(request.form)
     name = request.form['name']
     ping_interval = int(request.form['ping_interval'])
     email_address = request.form['email_address']

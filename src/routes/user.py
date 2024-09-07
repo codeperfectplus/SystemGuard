@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 from src.config import app, db
 from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
 from src.utils import render_template_from_file, ROOT_DIR
-from src.scripts.email_me import send_smpt_email
+from src.scripts.email_me import send_smtp_email
 from src.routes.helper import get_email_addresses
 
 user_bp = blueprints.Blueprint('user', __name__)
@@ -51,7 +51,7 @@ def create_user():
             }
             new_user_alert_template =  os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_create.html")
             email_body = render_template_from_file(new_user_alert_template, **context)
-            send_smpt_email(admin_email_address, subject, email_body, is_html=True)
+            send_smtp_email(admin_email_address, subject, email_body, is_html=True)
 
         # Send welcome email to new user
         subject = "Welcome to the systemGuard"  
@@ -61,14 +61,12 @@ def create_user():
         }
         welcome_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
         email_body = render_template_from_file(welcome_email_template, **context)
-        send_smpt_email(email, subject, email_body, is_html=True)
+        send_smtp_email(email, subject, email_body, is_html=True)
 
         # Add and commit the new user to get the correct user ID
         db.session.add(new_user)
         db.session.commit()  # Commit to generate the ID
         
-        print("new user", new_user.id)  # Now the ID should be available
-
         # Now you can use the new user's ID to create related settings
         db.session.add(UserDashboardSettings(user_id=new_user.id))
         db.session.add(UserCardSettings(user_id=new_user.id))
@@ -136,7 +134,7 @@ def delete_user(username):
         }
         deletion_email_template = os.path.join(ROOT_DIR, "src/templates/email_templates/deletion_email.html")
         email_body = render_template_from_file(deletion_email_template, **context)
-        send_smpt_email(admin_email_address, subject, email_body, is_html=True)
+        send_smtp_email(admin_email_address, subject, email_body, is_html=True)
 
     db.session.delete(user)
     db.session.commit()

@@ -10,6 +10,7 @@ from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile
 from src.models.monitored_website import MonitoredWebsite
 from flask_login import current_user
+from src.logger import logger
 from werkzeug.security import generate_password_hash
 import json
 import os
@@ -17,7 +18,7 @@ import os
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 with app.app_context():
-    print("Creating tables")
+    logger.info("Creating tables")
     db.create_all()
 
     # initialize default dashboard user_dashboard_settings for users
@@ -29,7 +30,7 @@ with app.app_context():
             db.session.add(PageToggleSettings(user_id=user.id))
             
             db.session.commit()
-            print("Initial card data added.")
+            logger.info("Initial card data added.")
             db.session.commit()
 
     pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")

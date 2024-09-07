@@ -22,15 +22,12 @@ def register_routes():
     app.register_blueprint(routes.process_bp)
 
 
-
-
-
 if __name__ == "__main__":
     register_routes()
 
-        # Start monitoring settings and website pinging when the server starts
+    # background thread to monitor system settings changes
     # monitor_settings()  # Starts monitoring for system logging changes
-    # start_website_monitoring()  # Starts pinging active websites
+    start_website_monitoring()  # Starts pinging active websites
 
     # Run the Flask application
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from src.models import UserCardSettings, UserDashboardSettings, ApplicationGeneralSettings
 from src.config import app, db
 from src.routes.helper import get_email_addresses
-from src.scripts.email_me import send_smpt_email
-
+from src.scripts.email_me import send_smtp_email
+from src.logger import logger
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -88,23 +88,16 @@ def send_email_page():
             flash("Please provide recipient, subject, and body.", "danger")
             return redirect(url_for('send_email_page'))
         
-        print("Priority:", priority)
-        print("receiver_email:", receiver_email)
-
         # on high priority, send to all users or admin users even the receive_email_alerts is False
         if priority == "high" and receiver_email == "all_users":
-            print("Sending to all users")
             receiver_email = get_email_addresses(fetch_all_users=True)
         elif priority == "high" and receiver_email == "admin_users":
-            print("Sending to admin users")
             receiver_email = get_email_addresses(user_level='admin', fetch_all_users=True)
 
         # priority is low, send to users with receive_email_alerts is True
         if priority == "low" and receiver_email == "all_users":
-            print("Sending to all users with receive_email_alerts=True")
             receiver_email = get_email_addresses(receive_email_alerts=True)
         elif priority == "low" and receiver_email == "admin_users":
-            print("Sending to admin users with receive_email_alerts=True")
             receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)
 
         if not receiver_email:
@@ -117,8 +110,7 @@ def send_email_page():
             attachment_path = f"/tmp/{attachment.filename}"
             attachment.save(attachment_path)
         try:
-            respose = send_smpt_email(receiver_email, subject, body, attachment_path)
-            print(respose)
+            respose = send_smtp_email(receiver_email, subject, body, attachment_path)
             if respose and respose.get("status") == "success":
                 flash(respose.get("message"), "success")
         except Exception as e:

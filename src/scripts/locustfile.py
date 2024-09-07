@@ -3,6 +3,9 @@ import os
 from locust import HttpUser, TaskSet, task, between
 from locust.exception import StopUser
 
+from src.logger import logger
+
+
 class UserBehavior(TaskSet):
 
     def on_start(self):
@@ -16,9 +19,9 @@ class UserBehavior(TaskSet):
             "password": "adminpassword"
         })
         if response.status_code == 200 and "Invalid username or password" not in response.text:
-            print("Login successful")
+            logger.info("Login successful")
         else:
-            print("Login failed")
+            logger.info("Login failed")
             raise StopUser("Login failed")
 
     @task(1)
