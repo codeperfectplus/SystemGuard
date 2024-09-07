@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import subprocess
 
 from src.config import app
@@ -29,7 +29,6 @@ def check_sudo_password(sudo_password):
     
 def list_open_ports(sudo_password):
     try:
-        sudo_password = session.get('sudo_password', '')
         result = subprocess.run(['sudo', '-S', 'iptables', '-L', '-n'], input=f"{sudo_password}\n", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         output = result.stdout
         if "incorrect password" in result.stderr:
@@ -90,8 +89,10 @@ def firewall():
             sudo_password = request.form['sudo_password']
             if not check_sudo_password(sudo_password):
                 message = "Incorrect sudo password. Please try again."
+                flash(message, 'danger')
                 return render_template('firewall.html', message=message, open_ports=open_ports)
             session['sudo_password'] = sudo_password
+            flash("Sudo password saved in session successfully.", 'info')
         else:
             sudo_password = session.get('sudo_password', '')
 
@@ -107,13 +108,18 @@ def firewall():
             elif action == 'Disable':
                 message = disable_port(port, protocol, sudo_password)
             
+            flash(message, 'info')
+            
             open_ports, error_message = list_open_ports(sudo_password)
             if error_message:
                 message = error_message
+                flash(message, 'danger')
         else:
             open_ports, error_message = list_open_ports(sudo_password)
+            flash("Showing open ports.", 'info')
             if error_message:
                 message = error_message
+                flash(message, 'danger')
     else:
         sudo_password = session.get('sudo_password', '')
         print("sudo_password", sudo_password)
@@ -121,8 +127,10 @@ def firewall():
             open_ports, error_message = list_open_ports(sudo_password)
             if error_message:
                 message = error_message
+                flash(message, 'danger')
         else:
-            message = "Please enter your sudo password."
+            message = "Please enter your sudo password to view the open ports."
+            flash(message, 'info')
 
     return render_template('firewall.html', message=message, open_ports=open_ports)
 

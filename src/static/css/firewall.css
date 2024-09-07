@@ -1,29 +1,5 @@
-/* Basic reset for consistent styling across browsers */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Body styling */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    background-color: #e9ecef;
-    color: #495057;
-    padding: 20px;
-}
-
 /* Container for the content */
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-top: 50px;
-}
+
 
 /* Heading styles */
 h1 {
@@ -121,8 +97,8 @@ p {
 /* Styles for the Manage Port form to fit in one line */
 .manage-port-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px; /* Space between form elements */
+    flex-wrap: wrap; /* Allow form elements to wrap */
+    gap: 30px; /* Space between form elements */
 }
 
 .manage-port-form label {

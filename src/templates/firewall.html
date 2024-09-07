@@ -4,41 +4,39 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/firewall.css') }}">
 {% endblock %}
 {% block content %}
-<div class="container">
+<div class="mt-5">
     <h1 class="text-center">Firewall Management by <span class="text-danger">SystemGuard</span></h1>
-
+    {% include 'ext/message.html' %}
     <!-- Form to enable/disable port -->
-    <h2 class="text-center">Manage Port</h2>
-    <form method="POST" class="manage-port-form">        
+    <form method="POST" class="manage-port-form">
         <label for="port">Port:</label>
         <input type="text" id="port" name="port" required>
-        
+
         <label for="protocol">Protocol:</label>
         <select id="protocol" name="protocol" required>
-            <option value="tcp" {% if session.get('protocol') == 'tcp' %}selected{% endif %}>TCP</option>
-            <option value="udp" {% if session.get('protocol') == 'udp' %}selected{% endif %}>UDP</option>
+            <option value="tcp" {% if session.get('protocol')=='tcp' %}selected{% endif %}>TCP</option>
+            <option value="udp" {% if session.get('protocol')=='udp' %}selected{% endif %}>UDP</option>
         </select>
-        
+
         <label for="action">Action:</label>
         <select id="action" name="action" required>
-            <option value="Enable" {% if session.get('action') == 'Enable' %}selected{% endif %}>Enable</option>
-            <option value="Disable" {% if session.get('action') == 'Disable' %}selected{% endif %}>Disable</option>
+            <option value="Enable" {% if session.get('action')=='Enable' %}selected{% endif %}>Enable</option>
+            <option value="Disable" {% if session.get('action')=='Disable' %}selected{% endif %}>Disable</option>
         </select>
-    
+
         {% if not session.get('sudo_password') %}
         <label for="sudo_password">Sudo Password:</label>
         <input type="password" id="sudo_password" name="sudo_password" required>
         {% endif %}
-    
+
         <button type="submit">Submit</button>
     </form>
-    
+
 
     <!-- Form to enter sudo password to get open ports -->
     {% if not session.get('sudo_password') %}
     <form method="POST">
-        <h2>Get Open Ports</h2>
-        <label for="sudo_password">Enter Sudo Password:</label>
+        <label for="sudo_password">Enter Sudo Password to see open ports:</label>
         <input type="password" id="sudo_password" name="sudo_password" required>
 
         <button type="submit">Submit</button>
@@ -46,10 +44,10 @@
     {% endif %}
 
     <!-- Form to clear session data -->
+    {% if session.get('sudo_password') %}
     <form method="POST">
         <button type="submit" name="clear_session">Clear Session</button>
     </form>
-
     <!-- Open ports table -->
     <h2>Open Ports:</h2>
     <table>
@@ -68,9 +66,6 @@
             {% endfor %}
         </tbody>
     </table>
-
-    {% if message %}
-    <p>{{ message }}</p>
     {% endif %}
 </div>
 {% endblock %}
