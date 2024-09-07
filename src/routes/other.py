@@ -3,7 +3,7 @@ import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
-from src.models import UserCardSettings, UserDashboardSettings, ApplicationGeneralSettings
+from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings
 from src.config import app, db
 from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smtp_email
@@ -74,7 +74,7 @@ def send_email_page():
         flash("Please contact your administrator for more information.", "danger")
         return render_template("error/403.html")
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
-    general_settings = ApplicationGeneralSettings.query.first()
+    general_settings = GeneralSettings.query.first()
     if general_settings:
         enable_alerts = general_settings.enable_alerts
     if request.method == "POST":

@@ -84,6 +84,7 @@ A Docker image has not been created for this project because it requires access 
 - Check the current firewall status to ensure security.
 - A dedicated website monitoring page for tracking uptime and performance.
 - Track and save total network data sent/received in the database for data usage monitoring.
+- Improve website monitor, save data in database with timestamp to show the history of the website.
 
 ## Learnings 📖
 

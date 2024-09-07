@@ -7,7 +7,7 @@ from email import encoders
 from flask import redirect, url_for, flash
 from src.config import app
 from src.logger import logger
-from src.models import ApplicationGeneralSettings, SMTPSettings
+from src.models import GeneralSettings, SMTPSettings
 
 system_name = os.uname().sysname
 
@@ -20,7 +20,7 @@ def send_smtp_email(receiver_email, subject,
 
     with app.app_context():
         if not bypass_alerts:
-            general_settings = ApplicationGeneralSettings.query.first()
+            general_settings = GeneralSettings.query.first()
             if general_settings:
                 enable_alerts = general_settings.enable_alerts
                 if not enable_alerts:
