@@ -5,7 +5,7 @@ from flask import url_for
 from src.config import app, db
 from src.utils import get_system_info_for_db
 from src.logger import logger
-from src.models import MonitoredWebsite, ApplicationGeneralSettings, SystemInformation
+from src.models import MonitoredWebsite, GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 import requests
 from src.scripts.email_me import send_smtp_email
@@ -109,7 +109,7 @@ def monitor_settings():
     with app.app_context():
         try:
             # Fetch the general settings
-            general_settings = ApplicationGeneralSettings.query.first()
+            general_settings = GeneralSettings.query.first()
 
             # Check if logging should be active or not
             is_logging_system_info = general_settings.is_logging_system_info if general_settings else False
@@ -133,7 +133,7 @@ def log_system_info():
     with app.app_context():
         try:
             # Fetch the general settings to check if logging is enabled
-            general_settings = ApplicationGeneralSettings.query.first()
+            general_settings = GeneralSettings.query.first()
             is_logging_system_info = general_settings.is_logging_system_info if general_settings else False
 
             if not is_logging_system_info:

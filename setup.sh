@@ -95,7 +95,7 @@ fi
 
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip figlet locust)
+    local dependencies=(git curl wget unzip figlet locust iptables)
     for cmd in "${dependencies[@]}"; do
         if ! command -v $cmd &> /dev/null; then
             log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"

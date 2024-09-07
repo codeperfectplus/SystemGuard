@@ -6,7 +6,9 @@
 {% endblock %}
 {% block content %}
 <div class="settings-container">
-    <h1 class="settings-title">Settings</h1>
+    <h1 class="settings-title">SystemGuard Settings
+        <i class="fas fa-cogs"></i>
+    </h1>
 
     <!-- Buttons for additional functionalities -->
     <div class="settings-buttons">
@@ -42,6 +44,9 @@
     <div class="settings-buttons">
         <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary">
             <i class="fas fa-globe"></i> Ping Website
+        </a>
+        <a href="{{ url_for('firewall') }}" class="btn btn-primary">
+            <i class="fas fa-shield-alt"></i> Firewall
         </a>
         <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
             <i class="fas fa-envelope"></i> Send Email
