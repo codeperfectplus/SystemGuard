@@ -17,3 +17,6 @@ flask-session==0.8.0     # Server-side session handling for Flask
 
 # File system monitoring and watching
 watchdog==5.0.2
+
+# 
+requests
