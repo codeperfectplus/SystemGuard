@@ -28,6 +28,19 @@
         </div>
 
         <div class="form-group">
+            <label for="profession">Profession:</label>
+            <select id="profession" name="profession" required>
+                <option value="Software Developer" {% if user.profession == 'Software Developer' %}selected{% endif %}>Software Developer</option>
+                <option value="Network Engineer" {% if user.profession == 'Network Engineer' %}selected{% endif %}>Network Engineer</option>
+                <option value="System Administrator" {% if user.profession == 'System Administrator' %}selected{% endif %}>System Administrator</option>
+                <option value="Database Administrator" {% if user.profession == 'Database Administrator' %}selected{% endif %}>Database Administrator</option>
+                <option value="Security Analyst" {% if user.profession == 'Security Analyst' %}selected{% endif %}>Security Analyst</option>
+            </select>
+        </div>
+
+        
+
+        <div class="form-group">
             <label for="receive_email_alerts">Receive Email Alerts:</label>
             <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" {% if user.receive_email_alerts %}checked{% endif %}>
         </div>

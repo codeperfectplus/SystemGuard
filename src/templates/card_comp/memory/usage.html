@@ -2,9 +2,15 @@
 <div class="col-md-6 col-lg-4 mb-4">
     <div class="card bg-memory" data-memory="{{ system_info['memory_percent']}}" shadow-sm border-0 rounded-3">
         <div class="card-body">
-            <h5 class="card-title">Memory Usage <i class="fas fa-memory"></i></h5>
+            <h5 class="card-title">Percentage Memory Use <i class="fas fa-memory"></i></h5>
             <p class="card-text fs-4">{{ system_info['memory_percent']}}%</p>
         </div>
     </div>
 </div>
+<script>
+    function refreshData() {
+        refreshCardData('api/system-info', '.bg-memory', 'memory_percent', "%"); // CPU Usage
+    }
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
+</script>
 {% endif %}

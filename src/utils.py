@@ -361,6 +361,45 @@ def get_system_node_name():
     """
     return os.uname().nodename
 
+def _get_system_info():
+    """ Get system information with caching for certain values and fresh data for others. 
+    ---
+    Parameters:
+    ---
+    Returns:
+        dict: System information dictionary with various system metrics.
+    """
+    boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
+    uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
+
+    # Gathering fresh system information
+    battery_info = psutil.sensors_battery()
+    memory_info = psutil.virtual_memory()
+    disk_info = psutil.disk_usage('/')
+    net_io = psutil.net_io_counters(pernic=False)
+    network_sent = round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1)  # In MB
+    network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)  # In MB
+    # ifconfig | grep -E 'RX packets|TX packets' -A 1
+
+    # Prepare system information dictionary
+    info = {
+        'cpu_percent': cpu_usage_percent(),
+        'memory_percent': round(memory_info.percent, 2),
+        'disk_percent': round(disk_info.percent, 2),
+        'network_sent': network_sent,
+        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
+        'network_received': network_received,
+        "network_stats" : f"D: {network_received} MB / U: {network_sent} MB",
+        'dashboard_memory_usage': get_flask_memory_usage(),
+        'cpu_frequency': get_cpu_frequency(),
+        'current_temp': get_cpu_temp()[0],
+        'timestamp': datetime.datetime.now(),
+    }
+    # update uptime dictionary
+    info.update(uptime_dict)
+
+    return info
+
 def get_system_info():
     """ Get system information with caching for certain values and fresh data for others. 
     ---
@@ -373,61 +412,23 @@ def get_system_info():
     ipv4_dict = get_cached_value('ipv4', lambda: get_established_connections()[0])
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
-
-    # Gathering fresh system information
-    battery_info = psutil.sensors_battery()
-    memory_info = psutil.virtual_memory()
-    disk_info = psutil.disk_usage('/')
-    net_io = psutil.net_io_counters(pernic=False)
-    # ifconfig | grep -E 'RX packets|TX packets' -A 1
     current_server_time = datetime.datetime.now()
 
     # Prepare system information dictionary
     info = {
         'username': username,
-        'cpu_percent': cpu_usage_percent(),
-        'memory_percent': round(memory_info.percent, 2),
-        'disk_percent': round(disk_info.percent, 2),
-        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
         'cpu_core': get_cpu_core_count(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'network_sent': round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1),  # In MB
-        'network_received': round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1),  # In MB
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
         'ipv4_connections': ipv4_dict,
-        'dashboard_memory_usage': get_flask_memory_usage(),
         'timestamp': datetime.datetime.now(),
-        'cpu_frequency': get_cpu_frequency(),
-        'current_temp': get_cpu_temp()[0],
-        'current_server_time': datetimeformat(current_server_time),
+        'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
+        'timestamp': current_server_time
     }
     # update uptime dictionary
+    _info = _get_system_info()
     info.update(uptime_dict)
-
-    return info
-
-# cpu_percent, memory_percent, battery_percent, network_sent, network_received, timestamp
-def get_system_info_for_db():
-    """ Get system information for logging in the database. 
-    ---
-    Parameters:
-    ---
-    Returns:
-        dict: System information dictionary with various system metrics.
-    """
-    battery_info = psutil.sensors_battery()
-    memory_info = psutil.virtual_memory()
-    net_io = psutil.net_io_counters(pernic=False)
-
-    # Prepare system information dictionary
-    info = {
-        'cpu_percent': cpu_usage_percent(),
-        'memory_percent': round(memory_info.percent, 2),
-        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
-        'network_sent': round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1),  # In MB
-        'network_received': round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1),  # In MB
-        'timestamp': datetime.datetime.now(),
-    }
+    info.update(_info)
 
     return info

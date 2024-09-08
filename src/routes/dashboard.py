@@ -59,9 +59,3 @@ def dashboard():
             last_timestamp=last_speedtest_timestamp,
             current_user=current_user,
         )
-    
-
-# health page
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"})
