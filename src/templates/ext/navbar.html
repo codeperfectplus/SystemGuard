@@ -48,12 +48,14 @@
                 </a>
             </li>
             {% endif %}
+            {% if current_user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}" 
                    href="{{ url_for('graphs') }}">
                     <i class="fas fa-chart-line mr-1"></i>Graphs
                 </a>
             </li>
+            {% endif %}
             {% if page_toggles_settings.is_process_info_enabled and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'process' %}active{% endif %}" 

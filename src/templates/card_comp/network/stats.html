@@ -3,10 +3,15 @@
     <div class="card bg-network">
         <div class="card-body text-center">
             <h5 class="card-title">Network Statistics <i class="fas fa-network-wired"></i></h5>
-            <p class="card-text fs-4">D:{{ system_info['network_sent']}} MB / U:{{ system_info['network_received']}} MB
+            <p class="card-text fs-4">D: {{ system_info['network_sent']}} MB / U: {{ system_info['network_received']}} MB
             </p>
         </div>
     </div>
 </div>
-
+<script>
+    function refreshData() {
+        refreshCardData('api/system-info', '.bg-network', 'network_stats'); // CPU Usage
+    }
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
+</script>
 {% endif %}

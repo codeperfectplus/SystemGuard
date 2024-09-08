@@ -3,7 +3,7 @@ import datetime
 from threading import Timer
 from flask import url_for
 from src.config import app, db
-from src.utils import get_system_info_for_db
+from src.utils import _get_system_info
 from src.logger import logger
 from src.models import MonitoredWebsite, GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
@@ -155,13 +155,16 @@ def log_system_info_to_db():
     """
     with app.app_context():
         try:
-            system_info = get_system_info_for_db()
+            system_info = _get_system_info()
             system_log = SystemInformation(
                 cpu_percent=system_info["cpu_percent"],
                 memory_percent=system_info["memory_percent"],
                 battery_percent=system_info["battery_percent"],
                 network_sent=system_info["network_sent"],
                 network_received=system_info["network_received"],
+                dashboard_memory_usage=system_info["dashboard_memory_usage"],
+                cpu_frequency=system_info["cpu_frequency"],
+                current_temp=system_info["current_temp"],
                 timestamp=datetime.datetime.now()
             )
             db.session.add(system_log)

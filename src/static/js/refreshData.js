@@ -1,5 +1,5 @@
-function refreshCardData(apiEndpoint, cardSelector, dataKey, unit = '%') {
-    fetch(`/api/system-info/${apiEndpoint}`)
+function refreshCardData(apiEndpoint, cardSelector, dataKey, unit = '') {
+    fetch(`${apiEndpoint}`)
         .then(response => response.json())
         .then(data => {
             console.log(`Fetched ${apiEndpoint} data:`, data);

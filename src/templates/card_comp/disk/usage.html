@@ -9,8 +9,8 @@
 </div>
 <script>
     function refreshData() {
-        refreshCardData('disk_percent', '.bg-disk', 'disk_percent'); // CPU Usage
+        refreshCardData('api/system-info', '.bg-disk', 'disk_percent'); // CPU Usage
     }
-    setInterval(refreshData, {{ 30000}});
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
 </script>
 {% endif %}

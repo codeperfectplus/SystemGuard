@@ -23,5 +23,8 @@ class SystemInformation(db.Model):
     battery_percent = db.Column(db.Float, nullable=False)
     network_sent = db.Column(db.Float, nullable=False)
     network_received = db.Column(db.Float, nullable=False)
+    dashboard_memory_usage = db.Column(db.Float, nullable=False)
+    cpu_frequency = db.Column(db.Float, nullable=False)
+    current_temp = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     
