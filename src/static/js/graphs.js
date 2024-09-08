@@ -19,8 +19,8 @@ fetch('/api/graphs_data')
     })
     .catch(error => console.error('Error fetching data:', error));
 
-// Function to create a chart
-function createChart(ctx, label, data, borderColor, backgroundColor, yLabel, timeData) {
+// Function to create a chart with multiple datasets
+function createChart(ctx, datasets, yLabel) {
     if (ctx.chart) {
         ctx.chart.destroy(); // Destroy the existing chart if it exists
     }
@@ -28,15 +28,8 @@ function createChart(ctx, label, data, borderColor, backgroundColor, yLabel, tim
     ctx.chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: timeData,  // Ensure the timeData is passed in here
-            datasets: [{
-                label: label,
-                data: data,
-                borderColor: borderColor,
-                backgroundColor: backgroundColor,
-                fill: true,
-                tension: 0.4
-            }]
+            labels: datasets[0].data.map((_, i) => i), // Assuming all datasets have the same length
+            datasets: datasets
         },
         options: {
             scales: {
@@ -51,32 +44,90 @@ function createChart(ctx, label, data, borderColor, backgroundColor, yLabel, tim
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {
     // CPU Usage Chart
     const ctxCpu = document.getElementById('cpuTimeChart').getContext('2d');
-    createChart(ctxCpu, 'CPU Usage (%)', cpuData, 'rgba(75, 192, 192, 1)', 'rgba(75, 192, 192, 0.2)', 'CPU Usage (%)', timeData);
+    createChart(ctxCpu, [{
+        label: 'CPU Usage (%)',
+        data: cpuData,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'CPU Usage (%)');
 
     // Memory Usage Chart
     const ctxMemory = document.getElementById('memoryTimeChart').getContext('2d');
-    createChart(ctxMemory, 'Memory Usage (%)', memoryData, 'rgba(153, 102, 255, 1)', 'rgba(153, 102, 255, 0.2)', 'Memory Usage (%)', timeData);
+    createChart(ctxMemory, [{
+        label: 'Memory Usage (%)',
+        data: memoryData,
+        borderColor: 'rgba(153, 102, 255, 1)',
+        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'Memory Usage (%)');
 
     // Battery Percentage Chart
     const ctxBattery = document.getElementById('batteryTimeChart').getContext('2d');
-    createChart(ctxBattery, 'Battery Percentage (%)', batteryData, 'rgba(255, 159, 64, 1)', 'rgba(255, 159, 64, 0.2)', 'Battery Percentage (%)', timeData);
+    createChart(ctxBattery, [{
+        label: 'Battery Percentage (%)',
+        data: batteryData,
+        borderColor: 'rgba(255, 159, 64, 1)',
+        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'Battery Percentage (%)');
 
     // Network Sent & Received Chart
     const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');
-    createChart(ctxNetwork, 'Network Sent (MB)', networkSentData, 'rgba(255, 99, 132, 1)', 'rgba(255, 99, 132, 0.2)', 'Data Transferred (MB)', timeData);
-    createChart(ctxNetwork, 'Network Received (MB)', networkReceivedData, 'rgba(54, 162, 235, 1)', 'rgba(54, 162, 235, 0.2)', 'Data Transferred (MB)', timeData);
+    createChart(ctxNetwork, [
+        {
+            label: 'Network Sent (MB)',
+            data: networkSentData,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: true,
+            tension: 0.4
+        },
+        {
+            label: 'Network Received (MB)',
+            data: networkReceivedData,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            fill: true,
+            tension: 0.4
+        }
+    ], 'Data Transferred (MB)');
 
     // Dashboard Memory Usage Chart
     const ctxDashboardMemory = document.getElementById('dashboardMemoryTimeChart').getContext('2d');
-    createChart(ctxDashboardMemory, 'Dashboard Memory Usage (%)', dashboardMemoryUsageData, 'rgba(255, 99, 132, 1)', 'rgba(255, 99, 132, 0.2)', 'Dashboard Memory Usage (%)', timeData);
+    createChart(ctxDashboardMemory, [{
+        label: 'Dashboard Memory Usage (%)',
+        data: dashboardMemoryUsageData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'Dashboard Memory Usage (%)');
 
     // CPU Frequency Chart
     const ctxCpuFrequency = document.getElementById('cpuFrequencyTimeChart').getContext('2d');
-    createChart(ctxCpuFrequency, 'CPU Frequency (GHz)', cpuFrequencyData, 'rgba(255, 99, 132, 1)', 'rgba(255, 99, 132, 0.2)', 'CPU Frequency (GHz)', timeData);
+    createChart(ctxCpuFrequency, [{
+        label: 'CPU Frequency (GHz)',
+        data: cpuFrequencyData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'CPU Frequency (GHz)');
 
     // Current Temperature Chart
     const ctxCurrentTemp = document.getElementById('currentTempTimeChart').getContext('2d');
-    createChart(ctxCurrentTemp, 'Current Temperature (°C)', currentTempData, 'rgba(255, 99, 132, 1)', 'rgba(255, 99, 132, 0.2)', 'Current Temperature (°C)', timeData);
+    createChart(ctxCurrentTemp, [{
+        label: 'Current Temperature (°C)',
+        data: currentTempData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'Current Temperature (°C)');
 }
 
 // Refresh button interaction
