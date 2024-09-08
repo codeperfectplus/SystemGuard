@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 {% endblock %}
 {% block content %}
-{% include 'components/refresh_button.html' %}
+{% include 'card_comp/selector/refresh_button.html' %}
 <div class="row">    
         <!-- Container for positioning the select input on the right -->
         {% include 'card_comp/other/username.html' %}{% include
@@ -16,8 +16,8 @@
         'card_comp/other/uptime.html' %}{% include 'card_comp/network/stats.html' %}{% include
         'card_comp/other/speedtest.html' %} </div>  
 </div>
-{% include 'components/refresh_button_script_2.html' %}
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/battery_card.js')}}"></script>
+<script src="{{ url_for('static', filename='js/update_refresh_interval.js')}}"></script>
 {% endblock %}
