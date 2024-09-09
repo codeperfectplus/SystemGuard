@@ -94,15 +94,42 @@ generate_ascii_art "CodePerfectPlus" "yellow"
 
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip figlet locust iptables)
+    # List of required dependencies
+    local dependencies=(git curl wget unzip iptables)
+    
+    # Check if `apt-get` is available
+    if ! command -v apt-get &> /dev/null; then
+        log "ERROR" "This script requires apt-get but it is not available."
+        exit 1
+    fi
+
+    # Array to keep track of missing dependencies
+    local missing_dependencies=()
+    
+    # Check each dependency
     for cmd in "${dependencies[@]}"; do
-        if ! command -v $cmd &> /dev/null; then
-            log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"
-            exit 1
+        if ! command -v "$cmd" &> /dev/null; then
+            missing_dependencies+=("$cmd")
         fi
     done
+
+    # If there are missing dependencies, prompt the user for installation
+    if [ ${#missing_dependencies[@]} -gt 0 ]; then
+        log "The following dependencies are missing: ${missing_dependencies[*]}"
+        echo "Do you want to install them now? (y/n)"
+        read -r choice
+        if [ "$choice" == "y" ]; then
+            sudo apt-get install -y "${missing_dependencies[@]}"
+        else
+            log "Please install the required dependencies and run the script again."
+            exit 1
+        fi
+    else
+        log "All required dependencies are already installed."
+    fi
 }
-check_dependencies
+
+
 
 # Function to set systemguard_auto_update variable permanently
 set_auto_update() {
@@ -579,6 +606,7 @@ display_credentials() {
 
 # Install function
 install() {
+    check_dependencies
     log "Starting installation of $APP_NAME..."
     create_and_own_dir "$EXTRACT_DIR"
     echo ""
