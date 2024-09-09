@@ -111,7 +111,7 @@ set_auto_update() {
     # Prompt user for input
     echo "Do you want to enable systemguard_auto_update? (true/false)"
     echo "This will enable automatic updates for SystemGuard."
-    read -p "Enter your choice: " auto_update
+    read -p "Enter your choice: true/false: " auto_update
 
     # Validate input
     if [[ "$auto_update" != "true" && "$auto_update" != "false" ]]; then
@@ -187,7 +187,7 @@ SYSTEMGUARD_USERNAME="admin"
 SYSTEMGUARD_PASSWORD="admin"
 
 # Function to create a directory if it does not exist
-create_dir_if_not_exists() {
+create_and_own_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
@@ -195,10 +195,9 @@ create_dir_if_not_exists() {
     fi
 }
 
-create_dir_if_not_exists "$LOG_DIR"
-create_dir_if_not_exists "$BACKUP_DIR"
-
-
+create_and_own_dir "$LOG_DIR"
+create_and_own_dir "$BACKUP_DIR"
+create_and_own_dir "$EXTRACT_DIR"
 
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
@@ -231,8 +230,6 @@ add_cron_job() {
     local script_path=$(find "$EXTRACT_DIR" -name dashboard.sh)
     local cron_job="* * * * * /bin/bash $script_path >> $log_dir/systemguard_cron.log 2>&1"
 
-    # Create log directory with error handling
-    mkdir -p "$log_dir"
     if [ $? -ne 0 ]; then
         log "CRITICAL" "Failed to create log directory: $log_dir"
         exit 1
@@ -317,7 +314,6 @@ backup_configs() {
     rotate_backups $NUM_OF_BACKUP
     log "Backing up existing configurations..."
     if [ -d "$EXTRACT_DIR" ]; then
-        mkdir -p "$BACKUP_DIR"
         cp -r "$EXTRACT_DIR" "$BACKUP_DIR/$(date '+%Y%m%d_%H%M%S')"
         log "Backup completed: $BACKUP_DIR"
     else
@@ -445,11 +441,12 @@ install_from_git() {
     
     echo ""
     echo "Select the version of $APP_NAME to install:"
-    echo "|---------------------------------------------------------------------------|"
-    echo "|1. Production (stable) - Recommended for most users                        |"
-    echo "|2. Development (dev) - Latest features, may be unstable                    |"
-    echo "|3. Specify a branch or tag name - Enter the branch/tag name when prompted  |"
-    echo "|---------------------------------------------------------------------------|"
+    echo "|-----------------------------------------------------------------------------|"
+    echo "|  1. Production (stable)  -       Recommended for most users                 |"
+    echo "|  2. Development (dev)    -       Latest features, may be unstable           |"
+    echo "|  3. Specify a branch     -       Enter the branch/tag name when prompted    |"
+    echo "|-----------------------------------------------------------------------------|"
+    echo "Enter the number of your choice:"
     read -r VERSION
 
     # Set Git URL based on user choice
@@ -524,7 +521,6 @@ install_from_release() {
     remove_previous_installation
 
     log "Setting up installation directory..."
-    mkdir -p "$EXTRACT_DIR"
 
     log "Extracting $APP_NAME package..."
     unzip -q "$DOWNLOAD_DIR/systemguard.zip" -d "$EXTRACT_DIR"
@@ -539,17 +535,32 @@ install_from_release() {
     log "Server may take a few minutes to start. If you face any issues, try restarting the server."
 }
 
-# Install function
-install() {
-    log "Starting installation of $APP_NAME..."
-    echo ""
+# Function to select the installation method
+select_install_method() {
     echo "Do you want to install from a Git repository or a specific release?"
     echo "|----------------------------------------------------|"
     echo "|           1. Git repository                        |"
     echo "|           2. Release                               |"
     echo "|----------------------------------------------------|"
+    echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
 
+    case $INSTALL_METHOD in
+        1) install_from_git ;;
+        2) install_from_release ;;
+        *) log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."; exit 1 ;;
+    esac
+}
+
+display_credentials() {
+    log "INFO" "You can now login to the server using the following credentials:"
+    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
+    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+}
+
+# Install function
+install () {
+    select_install_method
     case $INSTALL_METHOD in
         1)
             install_from_git
@@ -564,10 +575,7 @@ install() {
     esac
 	stop_server
 	generate_ascii_art "SystemGuard Installed" "green"
-
-    log "INFO" "You can now login to the server using the following credentials:"
-    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
-    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+    display_credentials
 
 }
 # Uninstall function
@@ -669,6 +677,7 @@ show_server_logs() {
     echo ""
     
     cd $EXTRACT_DIR/$APP_NAME-*/
+    echo $EXTRACT_DIR/$APP_NAME-*/
     log_file=$(find . -name "app_debug.log" | head -n 1)
     echo "log file: $log_file"
     if [ -f "$log_file" ]; then
