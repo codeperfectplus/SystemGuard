@@ -111,7 +111,7 @@ set_auto_update() {
     # Prompt user for input
     echo "Do you want to enable systemguard_auto_update? (true/false)"
     echo "This will enable automatic updates for SystemGuard."
-    read -p "Enter your choice: true/false: " auto_update
+    read -p "Enter your choice: " auto_update
 
     # Validate input
     if [[ "$auto_update" != "true" && "$auto_update" != "false" ]]; then
@@ -230,6 +230,7 @@ add_cron_job() {
     local script_path=$(find "$EXTRACT_DIR" -name dashboard.sh)
     local cron_job="* * * * * /bin/bash $script_path >> $log_dir/systemguard_cron.log 2>&1"
 
+    # Create log directory with error handling
     if [ $? -ne 0 ]; then
         log "CRITICAL" "Failed to create log directory: $log_dir"
         exit 1
@@ -535,8 +536,16 @@ install_from_release() {
     log "Server may take a few minutes to start. If you face any issues, try restarting the server."
 }
 
-# Function to select the installation method
-select_install_method() {
+display_credentials() {
+    log "INFO" "You can now login to the server using the following credentials:"
+    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
+    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+}
+
+# Install function
+install() {
+    log "Starting installation of $APP_NAME..."
+    echo ""
     echo "Do you want to install from a Git repository or a specific release?"
     echo "|----------------------------------------------------|"
     echo "|           1. Git repository                        |"
@@ -545,22 +554,6 @@ select_install_method() {
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
 
-    case $INSTALL_METHOD in
-        1) install_from_git ;;
-        2) install_from_release ;;
-        *) log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."; exit 1 ;;
-    esac
-}
-
-display_credentials() {
-    log "INFO" "You can now login to the server using the following credentials:"
-    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
-    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
-}
-
-# Install function
-install () {
-    select_install_method
     case $INSTALL_METHOD in
         1)
             install_from_git
@@ -677,7 +670,6 @@ show_server_logs() {
     echo ""
     
     cd $EXTRACT_DIR/$APP_NAME-*/
-    echo $EXTRACT_DIR/$APP_NAME-*/
     log_file=$(find . -name "app_debug.log" | head -n 1)
     echo "log file: $log_file"
     if [ -f "$log_file" ]; then
@@ -685,21 +677,6 @@ show_server_logs() {
         tail -100f "$log_file"
     else
         log "No logs found at $log_file."
-    fi
-}
-
-# app logs
-post_installation_logs() {
-    log "INFO" "Press Ctrl+C to exit."
-    echo ""
-    echo "--- post installation Logs ---"
-    echo ""
-    echo "log file: $FLASK_LOG_FILE"
-    if [ -f "$FLASK_LOG_FILE" ]; then
-        log "Server log file: $FLASK_LOG_FILE"
-        tail -100f "$FLASK_LOG_FILE"
-    else
-        log "No logs found at $FLASK_LOG_FILE."
     fi
 }
 
@@ -792,47 +769,53 @@ fix() {
 }
 
 # Display help
-display_help() {
-    echo "$APP_NAME Installer and Manager"
+show_help() {
+    echo "$APP_NAME Installer"
     echo ""
-    echo "Usage: $EXECUTABLE_APP_NAME [command]"
+    echo "Usage: $EXECUTABLE_APP_NAME [options]"
     echo ""
-    echo "Commands:"
-    echo "  --install               Install $APP_NAME and configure all dependencies."
-    echo "                          Sets up the environment and starts the application."
+    echo "Options:"
+    echo "  --install           Install $APP_NAME and set up all necessary dependencies."
+    echo "                      This will configure the environment and start the application."
     echo ""
-    echo "  --uninstall             Completely remove $APP_NAME and all related files."
+    echo "  --uninstall         Uninstall $APP_NAME completely."
+    echo "                      This will remove the application and all associated files."
     echo ""
-    echo "  --repair                Repair $APP_NAME installation issues."
-    echo "                          Fixes any installation errors and restarts the server."
+    echo "  --fix               Fix the $APP_NAME installation errors."
+    echo "                      This will fix any issues with the installation and restart the server."
+    echo ""   
+    echo "  --restore           Restore $APP_NAME from a backup."
+    echo "                      Use this option to recover data or settings from a previous backup."
     echo ""
-    echo "  --restore-backup        Restore $APP_NAME from a backup."
-    echo "                          Recover data or settings from a previous backup."
+    echo "  --load-test         Start Locust load testing for $APP_NAME."
+    echo "                      This will initiate performance testing to simulate multiple users."
     echo ""
-    echo "  --run-load-test         Perform load testing using Locust for $APP_NAME."
-    echo "                          Simulates multiple users to test application performance."
+    echo "  --status            Check the status of $APP_NAME installation."
+    echo "                      Displays whether $APP_NAME is installed, running, or if there are any issues."
     echo ""
-    echo "  --check-status          Display the current status of $APP_NAME."
-    echo "                          Shows whether the application is installed, running, or encountering issues."
+    echo "  --health-check      Perform a health check on $HOST_URL."
+    echo "                      Verifies that the application is running correctly and responding to requests."
     echo ""
-    echo "  --perform-health-check  Check the health of $APP_NAME at $HOST_URL."
-    echo "                          Ensures the application is running properly and responding."
+    echo "  --clean-backups     Clean up all backups of $APP_NAME."
+    echo "                      This will delete all saved backup files to free up space."
     echo ""
-    echo "  --clean-old-backups     Remove all $APP_NAME backup files."
-    echo "                          Deletes stored backups to free up disk space."
+    echo "  --logs              Show server logs for $APP_NAME."
+    echo "                      Displays the latest server logs, which can help in troubleshooting issues."
+    echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
-    echo "  --view-server-logs      Display recent server logs for $APP_NAME."
-    echo "                          Helps diagnose server issues. Use Ctrl+C to exit."
+    echo " --installation-logs  Show installer logs for $APP_NAME."
+    echo "                      Displays the logs generated during the installation process."
+    echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
-    echo "  --view-install-logs     Show installation logs for $APP_NAME."
-    echo "                          Provides details on the installation process. Use Ctrl+C to exit."
+    echo "  --server-stop       Stop the $APP_NAME server."
+    echo "                      This will stop the running server instance."
     echo ""
-    echo "  --stop-server           Stop the currently running $APP_NAME server."
+    echo " --update-dependencies"
+    echo "                      Update the dependencies of the $APP_NAME."
+    echo "                      This will update the dependencies of the application."
     echo ""
-    echo "  --update-dependencies   Update $APP_NAME dependencies."
-    echo "                          Ensures all dependencies are up-to-date."
-    echo ""
-    echo "  --help                  Display this help message with available commands."
+    echo "  --help              Display this help message."
+    echo "                      Shows information about all available options and how to use them."
 }
 
 
@@ -841,18 +824,18 @@ for arg in "$@"; do
     case $arg in
         --install) ACTION="install" ;;
         --uninstall) ACTION="uninstall" ;;
-        --repair) ACTION="fix" ;;
-        --restore-backup) ACTION="restore" ;;
-        --run-load-test) ACTION="load_test" ;;
-        --check-status) ACTION="check_status" ;;
-        --perform-health-check) ACTION="health_check" ;;
-        --clean-old-backups) ACTION="cleanup_backups" ;;
-        --view-server-logs) ACTION="logs" ;;
-        --view-install-logs) ACTION="installation-logs" ;;
-        --stop-server) ACTION="stop_server" ;;
-        --update-dependencies) ACTION="update_dependencies" ;;
-        --help) ACTION="help" ;;
-        *) echo "Unknown option: $arg"; ACTION="help"; ;;
+        --restore) ACTION="restore" ;;
+        --load-test) ACTION="load_test" ;;
+        --status) ACTION="check_status" ;;
+        --health-check) ACTION="health_check" ;;
+        --clean-backups) ACTION="cleanup_backups" ;;
+        --logs) show_server_logs; exit 0 ;;
+        --installation-logs) show_installer_logs; exit 0 ;;
+        --server-stop) stop_server; exit 0 ;;
+        --fix) fix; exit 0 ;;
+        --update-dependencies) update_dependencies; exit 0 ;;
+        --help) show_help; exit 0 ;;
+        *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
 done
 
@@ -860,16 +843,16 @@ done
 case $ACTION in
     install) install ;;
     uninstall) uninstall ;;
-    fix) fix ;;
     restore) restore ;;
     load_test) load_test ;;
+    install_latest) install_latest ;;
     check_status) check_status ;;
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
+    stop_server) stop_server ;;
     logs) show_server_logs ;;
     installation-logs) show_installer_logs ;;
-    stop_server) stop_server ;;
+    fix) fix ;;
     update_dependencies) update_dependencies ;;
-    help) display_help ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
