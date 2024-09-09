@@ -3,7 +3,45 @@
 # SystemGuard Installer Script
 # ----------------------------
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
-# Determine the correct user's home directory
+
+# Retrieve the home directory of the current user
+USER_HOME=$(get_user_home)
+USER_NAME=$(basename "$USER_HOME")
+
+# Define directories and file paths
+DOWNLOAD_DIR="/tmp"
+APP_NAME="SystemGuard"
+EXTRACT_DIR="$USER_HOME/.systemguard"
+GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
+LOG_DIR="$USER_HOME/logs"
+LOG_FILE="$LOG_DIR/systemguard-installer.log"
+BACKUP_DIR="$USER_HOME/.systemguard_backup"
+EXECUTABLE="/usr/local/bin/systemguard-installer"
+
+# Application-related file paths
+HOST_URL="http://localhost:5050"
+INSTALLER_SCRIPT="setup.sh"
+FLASK_LOG_FILE="$LOG_DIR/systemguard_flask.log"
+
+# Backup settings
+NUM_BACKUPS=5
+
+# Cron job pattern for SystemGuard
+CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
+
+# GitHub repository details
+GITHUB_USER="codeperfectplus"
+GITHUB_REPO="$APP_NAME"
+GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
+ISSUE_TRACKER_URL="$GITHUB_URL/issues"
+
+# Environment variables
+CONDA_ENV_NAME="systemguard"
+ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
+
+# SystemGuard authentication
+SYSTEMGUARD_USER="admin"
+SYSTEMGUARD_PASS="admin"
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
@@ -129,37 +167,6 @@ check_dependencies() {
     fi
 }
 
-
-
-# Function to set systemguard_auto_update variable permanently
-set_auto_update() {
-    local env_file="$USER_HOME/.bashrc" # Default file for setting environment variables
-
-    # Prompt user for input
-    echo "Do you want to enable systemguard_auto_update? (true/false)"
-    echo "This will enable automatic updates for SystemGuard."
-    read -p "Enter your choice: " auto_update
-
-    # Validate input
-    if [[ "$auto_update" != "true" && "$auto_update" != "false" ]]; then
-        echo "Invalid input. Please enter 'true' or 'false'."
-        return 1
-    fi
-
-    # Check if the variable is already set
-    if grep -q '^export systemguard_auto_update=' "$env_file"; then
-        # Update existing entry
-        sed -i "s/^export systemguard_auto_update=.*/export systemguard_auto_update=$auto_update/" "$env_file"
-    else
-        # Add new entry
-        echo "export systemguard_auto_update=$auto_update" >> "$env_file"
-    fi
-
-    # Notify user and reload the environment file
-    echo "systemguard_auto_update set to $auto_update in $env_file."
-    source "$env_file"
-}
-
 get_user_home() {
     if [ -n "$SUDO_USER" ]; then
         # When using sudo, SUDO_USER gives the original user who invoked sudo
@@ -174,57 +181,26 @@ get_user_home() {
     echo "$USER_HOME"
 }
 
-# Retrieve the home directory of the current user
-USER_HOME=$(get_user_home)
-USER_NAME=$(basename "$USER_HOME")
-
-# Define directories and file paths
-DOWNLOAD_DIR="/tmp"
-APP_NAME="SystemGuard"
-EXTRACT_DIR="$USER_HOME/.systemguard"
-GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
-LOG_DIR="$USER_HOME/logs"
-LOG_FILE="$LOG_DIR/systemguard-installer.log"
-BACKUP_DIR="$USER_HOME/.systemguard_backup"
-EXECUTABLE_APP_NAME="systemguard-installer"
-EXECUTABLE="/usr/local/bin/$EXECUTABLE_APP_NAME"
-
-# File paths related to the application
-HOST_URL="http://localhost:5050"
-INSTALLER_SCRIPT='setup.sh'
-FLASK_LOG_FILE="$USER_HOME/logs/systemguard_flask.log"
-
-# Number of backups to keep
-NUM_OF_BACKUP=5
-
-# Pattern for identifying cron jobs related to SystemGuard
-CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
-
-# GitHub repository details
-GIT_USER="codeperfectplus"
-GIT_REPO="$APP_NAME"
-GIT_URL="https://github.com/$GIT_USER/$GIT_REPO"
-ISSUE_URL="$GIT_URL/issues"
-
-# ENVIRONMENT VARIABLES
-CONDA_ENV_NAME="systemguard"
-
-# systemguard authentication
-SYSTEMGUARD_USERNAME="admin"
-SYSTEMGUARD_PASSWORD="admin"
 
 # Function to create a directory if it does not exist
 create_and_own_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
-        mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
-        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 1; }
+        mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 10; }
+        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 11; }
     fi
 }
 
 create_and_own_dir "$LOG_DIR"
 create_and_own_dir "$BACKUP_DIR"
 
+# Function to handle errors
+handle_error() {
+    local exit_code="$1"
+    local message="$2"
+    log "ERROR" "$message"
+    exit "$exit_code"
+}
 
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
@@ -232,6 +208,53 @@ if [ "$EUID" -eq 0 ]; then
 else
     crontab_cmd="crontab"
 fi
+
+# Function to validate the user input
+validate_choice() {
+    local choice="$1"
+    if [[ "$choice" != "true" && "$choice" != "false" ]]; then
+        echo "Invalid input. Please enter 'true' or 'false'."
+        return 1
+    fi
+    return 0
+}
+
+update_env_variable() {
+    local var_name="$1"
+    local var_value="$2"
+
+    # Check if the variable already exists in the environment file
+    if grep -q "^export $var_name=" "$ENV_FILE"; then
+        # Update existing entry
+        sed -i "s/^export $var_name=.*/export $var_name=$var_value/" "$ENV_FILE"
+    else
+        # Add new entry
+        echo "export $var_name=$var_value" >> "$ENV_FILE"
+    fi
+
+    # Notify user of change
+    echo "$var_name set to $var_value in $ENV_FILE."
+}
+
+prompt_user() {
+    echo "Do you want to enable $var_name? (true/false) This will enable automatic updates for SystemGuard."
+    read -p "Enter your choice (true/false): " user_choice
+    echo "$user_choice"
+}
+
+# set the auto update variable
+set_auto_update() {
+    var_name=$1
+    prompt_user # Prompt user for input  
+    # Validate input
+    if ! validate_choice "$user_choice"; then
+        return 1
+    fi
+    # Update environment variable
+    update_env_variable "$var_name" "$user_choice"
+    # Reload environment file
+    source "$ENV_FILE"
+}
 
 # this function will change the ownership of the directory
 # from root to the user, as the script is run as root
@@ -496,11 +519,11 @@ install_from_git() {
     
     echo ""
     echo "Select the version of $APP_NAME to install:"
-    echo "|-----------------------------------------------------------------------------|"
-    echo "|  1. Production (stable)  -       Recommended for most users                 |"
-    echo "|  2. Development (dev)    -       Latest features, may be unstable           |"
-    echo "|  3. Specify a branch     -       Enter the branch/tag name when prompted    |"
-    echo "|-----------------------------------------------------------------------------|"
+    echo "|------------------------------------------------------------------------------|"
+    echo "|  1. Production (stable)  ->       Recommended for most users                 |"
+    echo "|  2. Development (dev)    ->       Latest features, may be unstable           |"
+    echo "|  3. Specify a branch     ->       Enter the branch/tag name when prompted    |"
+    echo "|------------------------------------------------------------------------------|"
     echo "Enter the number of your choice:"
     read -r VERSION
 
@@ -520,15 +543,15 @@ install_from_git() {
             log "Selected branch: $BRANCH."
             ;;
         *)  # Invalid input handling
-            log "WARNING" "Invalid selection. Please enter '1' for Stable, '2' for Development, or '3' to specify a branch."
-            exit 1
+            BRANCH="production"
+            log "WARNING" "Invalid branch selected. Defaulting to 'production'."
             ;;
     esac
 
     # Construct the full Git URL with branch
     FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
 
-    set_auto_update
+    set_auto_update "systemguard_auto_update"
     
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
@@ -536,7 +559,7 @@ install_from_git() {
     
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
-        exit 1
+        exit 30
     fi
 
     log "Repository cloned successfully."
