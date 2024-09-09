@@ -3,8 +3,9 @@ from logging.handlers import RotatingFileHandler
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(ROOT_DIR, 'logs')
 # Create a logs directory if it doesn't exist
-os.makedirs(os.path.join(ROOT_DIR, 'logs'), exist_ok=True)
+os.makedirs(LOG_DIR, exist_ok=True)
 
 # Log Formatter with datetime, log level, and message
 formatter = logging.Formatter(
@@ -14,7 +15,7 @@ formatter = logging.Formatter(
 
 # File handler for logging to a file
 file_handler = RotatingFileHandler(
-    'logs/app_debug.log', 
+    os.path.join(LOG_DIR, 'app_debug.log'),
     maxBytes=10 * 1024 * 1024,  # 10 MB per log file
     backupCount=5  # Keep up to 5 old log files
 )
