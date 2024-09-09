@@ -381,19 +381,20 @@ install_executable() {
 
 # remove previous installation of cron jobs and SystemGuard
 remove_previous_installation() {
-    log "Removing previous installation of $APP_NAME, if any..."
     if [ -d "$EXTRACT_DIR" ]; then
         rm -rf "$EXTRACT_DIR"
         log "Old installation removed."
+    else
+        log "No previous installation found."
     fi
 
-    log "Cleaning up previous cron jobs related to $APP_NAME..."
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
     else
         log "No previous cron jobs found."
     fi
+
 }
 
 # Function to fetch the latest version of SystemGuard from GitHub releases

@@ -2,9 +2,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 
-
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Create a logs directory if it doesn't exist
-os.makedirs('logs', exist_ok=True)
+os.makedirs(os.path.join(ROOT_DIR, 'logs'), exist_ok=True)
 
 # Log Formatter with datetime, log level, and message
 formatter = logging.Formatter(
