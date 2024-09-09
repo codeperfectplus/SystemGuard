@@ -8,6 +8,12 @@
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
+# run this script with sudo
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this program with sudo, exiting..."
+    exit 1
+fi
+
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
   local text="$1"
@@ -85,13 +91,6 @@ generate_ascii_art "SystemGuard" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
-
-# run this script with sudo
-if [ "$EUID" -ne 0 ]; then
-    log "CRITICAL" "Please run this program with sudo."
-    exit 1
-fi
-
 
 # function to check for required dependencies
 check_dependencies() {
@@ -182,6 +181,10 @@ ISSUE_URL="$GIT_URL/issues"
 
 # ENVIRONMENT VARIABLES
 CONDA_ENV_NAME="systemguard"
+
+# systemguard authentication
+SYSTEMGUARD_USERNAME="admin"
+SYSTEMGUARD_PASSWORD="admin"
 
 # Function to create a directory if it does not exist
 create_dir_if_not_exists() {
@@ -438,10 +441,14 @@ install_from_git() {
     # Remove any previous installations
     remove_previous_installation
 
-    log "Select the version of $APP_NAME to install:"
-    echo "1. Production (stable) - Recommended for most users"
-    echo "2. Development (dev) - Latest features, may be unstable"
-    echo "3. Specify a branch or tag name - Enter the branch/tag name when prompted"
+    
+    echo ""
+    echo "Select the version of $APP_NAME to install:"
+    echo "|---------------------------------------------------------------------------|"
+    echo "|1. Production (stable) - Recommended for most users                        |"
+    echo "|2. Development (dev) - Latest features, may be unstable                    |"
+    echo "|3. Specify a branch or tag name - Enter the branch/tag name when prompted  |"
+    echo "|---------------------------------------------------------------------------|"
     read -r VERSION
 
     # Set Git URL based on user choice
@@ -534,9 +541,12 @@ install_from_release() {
 # Install function
 install() {
     log "Starting installation of $APP_NAME..."
+    echo ""
     echo "Do you want to install from a Git repository or a specific release?"
-    echo "1. Git repository"
-    echo "2. Release"
+    echo "|----------------------------------------------------|"
+    echo "|           1. Git repository                        |"
+    echo "|           2. Release                               |"
+    echo "|----------------------------------------------------|"
     read -r INSTALL_METHOD
 
     case $INSTALL_METHOD in
@@ -553,6 +563,11 @@ install() {
     esac
 	stop_server
 	generate_ascii_art "SystemGuard Installed" "green"
+
+    log "INFO" "You can now login to the server using the following credentials:"
+    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
+    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+
 }
 # Uninstall function
 uninstall() {

@@ -153,10 +153,7 @@ fetch_latest_changes() {
                 fi
             else
                 log_message "ERROR" "Repository does not have any commits. Cannot stash untracked files."
-                # Handle untracked files manually or abort
                 log_message "INFO" "Manual intervention required to handle untracked files."
-                # Optionally, you can clean untracked files or exit
-                # git clean -fd
                 popd > /dev/null
                 return 1
             fi
@@ -191,8 +188,5 @@ if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     # Ensure environment activation and `flask` command
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>> "$LOG_FILE" &
 else
-    # if auto-update is enabled, fetch the latest changes
-    # [ "$systemguard_auto_update" = true ] &&
-    # fetch_latest_changes "$PROJECT_DIR" $GIT_REMOTE_URL
     log_message "Flask app is already running."
 fi
