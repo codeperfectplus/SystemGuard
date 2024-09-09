@@ -1,12 +1,44 @@
 {% extends 'base/base.html' %}
 {% block title %}Dashboard Network{% endblock %}
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/graphs.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-{% include 'components/refresh_button.html' %}
+<div class="col">
+    <div class="row selector-container">
+        <div class="time-filter-container">
+            <label for="timeFilter">Select Time Filter:</label>
+            <select id="timeFilter">
+                <option value="5 minutes">Last 5 Minutes</option>
+                <option value="15 minutes">Last 15 Minutes</option>
+                <option value="30 minutes">Last 30 Minutes</option>                
+                <option value="1 hour">Last 1 Hour</option>
+                <option value="3 hours">Last 3 Hours</option>
+                <option value="6 hours">Last 6 Hours</option>
+                <option value="12 hours">Last 12 Hours</option>
+                <option value="1 day">Last 1 Day</option>
+                <option value="2 days">Last 2 Days</option>
+                <option value="3 days">Last 3 Days</option>
+                <option value="1 week">Last 1 Week</option>
+                <option value="1 month">Last 1 Month</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Display current time and time zone -->
+<div class="container">
+    <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
+    <p id="currentTime">Current Time: </p>
+    <p id="timeZoneName">Time Zone: </p>
+</div>
+
+<!-- Chart containers -->
 <div class="container">
     <h2><i class="fas fa-microchip"></i> CPU Usage Over Time</h2>
     <canvas id="cpuTimeChart"></canvas>
@@ -28,124 +60,21 @@
 </div>
 
 <div class="container">
-    <button id="refresh"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+    <h2><i class="fas fa-memory"></i> Dashboard Memory Usage Over Time</h2>
+    <canvas id="dashboardMemoryTimeChart"></canvas>
 </div>
 
-<script>
-    // Get data from Jinja
-    const cpuData = {{ cpu | tojson }};
-    const timeData = {{ time | tojson | safe }};
-    const memoryData = {{ memory | tojson }};
-    const batteryData = {{ battery | tojson }};
-    const networkSentData = {{ network_sent | tojson }};
-    const networkReceivedData = {{ network_received | tojson }};
+<div class="container">
+    <h2><i class="fas fa-microchip"></i> CPU Frequency Over Time</h2>
+    <canvas id="cpuFrequencyTimeChart"></canvas>
+</div>
 
-    // CPU Usage Chart
-    const ctxCpu = document.getElementById('cpuTimeChart').getContext('2d');
-    const cpuTimeChart = new Chart(ctxCpu, {
-        type: 'line',
-        data: {
-            labels: timeData,
-            datasets: [{
-                label: 'CPU Usage (%)',
-                data: cpuData,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Time' } },
-                y: { beginAtZero: true, title: { display: true, text: 'CPU Usage (%)' } }
-            }
-        }
-    });
+<div class="container">
+    <h2><i class="fas fa-thermometer-half"></i> Current Temperature Over Time</h2>
+    <canvas id="currentTempTimeChart"></canvas>
+</div>
 
-    // Memory Usage Chart
-    const ctxMemory = document.getElementById('memoryTimeChart').getContext('2d');
-    const memoryTimeChart = new Chart(ctxMemory, {
-        type: 'line',
-        data: {
-            labels: timeData,
-            datasets: [{
-                label: 'Memory Usage (%)',
-                data: memoryData,
-                borderColor: 'rgba(153, 102, 255, 1)',
-                backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Time' } },
-                y: { beginAtZero: true, title: { display: true, text: 'Memory Usage (%)' } }
-            }
-        }
-    });
-
-    // Battery Percentage Chart
-    const ctxBattery = document.getElementById('batteryTimeChart').getContext('2d');
-    const batteryTimeChart = new Chart(ctxBattery, {
-        type: 'line',
-        data: {
-            labels: timeData,
-            datasets: [{
-                label: 'Battery Percentage (%)',
-                data: batteryData,
-                borderColor: 'rgba(255, 159, 64, 1)',
-                backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Time' } },
-                y: { beginAtZero: true, title: { display: true, text: 'Battery Percentage (%)' } }
-            }
-        }
-    });
-
-    // Network Sent & Received Chart
-    const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');
-    const networkTimeChart = new Chart(ctxNetwork, {
-        type: 'line',
-        data: {
-            labels: timeData,
-            datasets: [
-                {
-                    label: 'Network Sent (MB)',
-                    data: networkSentData,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                },
-                {
-                    label: 'Network Received (MB)',
-                    data: networkReceivedData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Time' } },
-                y: { beginAtZero: true, title: { display: true, text: 'Data Transferred (MB)' } }
-            }
-        }
-    });
-
-    // Refresh button interaction
-    document.getElementById('refresh').addEventListener('click', () => {
-        location.reload();
-    });
-</script>
-{% include 'components/refresh_button_script.html' %}
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
 {% endblock %}

@@ -2,11 +2,14 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 {% endblock %}
-{% block content %} 
-{% include 'components/refresh_button.html' %}
+{% block content %}
+{% include 'card_comp/selector/refresh_button.html' %}
 <h2 class="my-4">
     Network Statistics</h2>
 <div class="row">{% include 'card_comp/network/packets_sent.html' %} {% include
     'card_comp/network/packets_received.html' %} {% include 'card_comp/network/ipv4_ip.html' %} {% include
     'card_comp/network/ipv6_ip.html' %} </div>
-    {% include 'components/refresh_button_script.html' %}{% endblock %}
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/update_refresh_interval.js')}}"></script>
+{% endblock %}

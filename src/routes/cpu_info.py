@@ -28,13 +28,4 @@ def cpu_usage():
         "critical_temp": critical_temp,
     }
 
-    recent_system_info_entries = SystemInformation.query.all()
-    if recent_system_info_entries:
-        cpu_data = [info.cpu_percent for info in recent_system_info_entries]
-        time_data = [info.timestamp for info in recent_system_info_entries]
-    else:
-        cpu_data = []
-        time_data = []
-
-    return render_template("info_pages/cpu_info.html", system_info=system_info,
-                            cpu=cpu_data, time=time_data)
+    return render_template("info_pages/cpu_info.html", system_info=system_info)

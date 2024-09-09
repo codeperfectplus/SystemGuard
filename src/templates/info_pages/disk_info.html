@@ -2,10 +2,12 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 {% endblock %}
-{% block content %} 
-{% include 'components/refresh_button.html' %}<h2 class="my-4">Disk
+{% block content %}
+{% include 'card_comp/selector/refresh_button.html' %}<h2 class="my-4">Disk
     Usage Details</h2>
 <div class="row">{% include 'card_comp/disk/usage.html' %} {% include 'card_comp/disk/total.html' %} {% include
     'card_comp/disk/used.html' %} {% include 'card_comp/disk/free.html' %} </div>
-    {% include 'components/refresh_button_script.html' %}
-    {% endblock %}
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/update_refresh_interval.js')}}"></script>
+{% endblock %}

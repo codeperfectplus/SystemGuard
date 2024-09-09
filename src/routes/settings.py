@@ -3,10 +3,11 @@ import datetime
 from flask import render_template, request, flash, blueprints, redirect, url_for
 
 from src.config import app, db
-from src.models import UserCardSettings, UserDashboardSettings, UserProfile, ApplicationGeneralSettings, PageToggleSettings
+from src.models import UserCardSettings, UserDashboardSettings, UserProfile, GeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
-from src.scripts.email_me import send_smpt_email
+from src.scripts.email_me import send_smtp_email
+from src.routes.helper import get_email_addresses
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
@@ -26,26 +27,40 @@ def user_settings():
 @app.route('/settings/general', methods=['GET', 'POST'])
 @login_required
 def general_settings():
-    general_settings = ApplicationGeneralSettings.query.filter_by().first()  # Retrieve user-specific settings from DB
+    # Retrieve user-specific settings from DB
+    general_settings = GeneralSettings.query.filter_by().first()
+
+    # Store the current state of the 'enable_alerts' setting
+    current_alert_status = general_settings.enable_alerts
+
     if request.method == 'POST':
+        # Update the settings from the form
         general_settings.timezone = request.form.get('timezone')
         general_settings.enable_cache = 'enable_cache' in request.form
         general_settings.enable_alerts = 'enable_alerts' in request.form
         general_settings.is_logging_system_info = 'is_logging_system_info' in request.form
-        # admin_emails = [user.email for user in UserProfile.query.filter_by(user_level="admin", receive_email_alerts=True).all()]
-        # if admin_emails:
-        #     subject = "SystemGuard Server Started"
-        #     context = {
-        #         "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        #         "notifications_enabled": general_settings.enable_alerts,
-        #         "current_user": current_user.username
-        #     }
-        #     notficiation_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
-        #     email_body = render_template_from_file(notficiation_alert_template, **context)
-        #     send_smpt_email(admin_emails, subject, email_body, is_html=True, bypass_alerts=True)
+
+        # Check if the 'enable_alerts' status has changed
+        if current_alert_status != general_settings.enable_alerts:
+            # If 'enable_alerts' was changed, send an email to the admins
+            admin_emails_with_alerts = get_email_addresses(user_level="admin", receive_email_alerts=True)
+            if admin_emails_with_alerts:
+                subject = "SystemGuard Alert Status Changed"
+                context = {
+                    "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "notifications_enabled": general_settings.enable_alerts,
+                    "current_user": current_user.username
+                }
+                notification_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
+                email_body = render_template_from_file(notification_alert_template, **context)
+                
+                # Send email only if 'enable_alerts' changed
+                send_smtp_email(admin_emails_with_alerts, subject, email_body, is_html=True, bypass_alerts=True)
+        # Save the updated settings to the database
         db.session.commit()
         flash('General settings updated successfully!', 'success')
         return redirect(url_for('general_settings'))
+
     return render_template('settings/general_settings.html', general_settings=general_settings)
 
 @app.route('/settings/page-toggles', methods=['GET', 'POST'])

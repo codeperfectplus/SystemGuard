@@ -1,10 +1,18 @@
 {% if card_settings.is_cpu_usage_card_enabled %}
 <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card cpu-card bg-cpu" data-cpu-usage="{{ system_info['cpu_percent']}}%" shadow-sm border-0 rounded-3">
+    <div class="card cpu-card-usage bg-cpu">
         <div class="card-body">
             <h5 class="card-title">CPU Usage <i class="fas fa-microchip"></i></h5>
-            <p class="card-text fs-4">{{ system_info['cpu_percent']}}%</p>
+            <p class="card-text fs-4" data-bs-toggle="tooltip" title="Current CPU usage in percentage">{{
+                system_info['cpu_percent'] }}</p>        
         </div>
     </div>
 </div>
+<!-- 
+<script>
+    function refreshData() {
+        refreshCardData('api/system-info', '.cpu-card-usage', 'cpu_percent', "%"); // CPU Usage
+    }
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
+</script> -->
 {% endif %}

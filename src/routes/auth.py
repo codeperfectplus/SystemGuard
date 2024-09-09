@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from src.scripts.email_me import send_smpt_email
+from src.scripts.email_me import send_smtp_email
 from src.config import app, db
 from src.models import UserProfile, UserCardSettings, PageToggleSettings, UserDashboardSettings
 from src.utils import render_template_from_file, ROOT_DIR
@@ -30,9 +30,6 @@ def login():
             login_user(user)
             receiver_email = current_user.email
             admin_emails_with_alerts = get_email_addresses(user_level='admin', receive_email_alerts=True)
-            # if receiver_email in admin_emails_with_alerts don't send email to the admin
-            # log in alert to admin
-
             if admin_emails_with_alerts:
                 if receiver_email in admin_emails_with_alerts:
                     admin_emails_with_alerts.remove(receiver_email)
@@ -42,7 +39,7 @@ def login():
                     login_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/admin_login_alert.html")
                     email_body = render_template_from_file(login_alert_template, **context)
 
-                    send_smpt_email(admin_emails_with_alerts, 'Login Alert', email_body, is_html=True)
+                    send_smtp_email(admin_emails_with_alerts, 'Login Alert', email_body, is_html=True)
 
             # log in alert to user
             if receiver_email:
@@ -51,7 +48,7 @@ def login():
                 login_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/login.html") 
                 email_body = render_template_from_file(login_message_template, **context)
                 
-                send_smpt_email(receiver_email, 'Login Alert', email_body, is_html=True)
+                send_smtp_email(receiver_email, 'Login Alert', email_body, is_html=True)
             return redirect(url_for('dashboard'))
         flash('Invalid username or password', 'danger')
     return render_template('auths/login.html')
@@ -63,7 +60,7 @@ def logout():
         context = {"username": current_user.username}
         logout_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/logout.html")
         email_body = render_template_from_file(logout_message_template, **context)
-        send_smpt_email(receiver_email, 'Logout Alert', email_body, is_html=True)
+        send_smtp_email(receiver_email, 'Logout Alert', email_body, is_html=True)
     logout_user()
     return redirect(url_for('login'))
 
@@ -107,7 +104,7 @@ def signup():
             }
             new_user_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_alert.html")
             email_body = render_template_from_file(new_user_alert_template, **context)
-            send_smpt_email(admin_emails_with_alerts, subject, email_body, is_html=True)
+            send_smtp_email(admin_emails_with_alerts, subject, email_body, is_html=True)
             
         # Send email to the new user
         subject = "Welcome to the systemGuard"  
@@ -117,7 +114,7 @@ def signup():
         }
         welcome_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
         email_body = render_template_from_file(welcome_template, **context)
-        send_smpt_email(email, subject, email_body, is_html=True)
+        send_smtp_email(email, subject, email_body, is_html=True)
 
         db.session.add(new_user)
         db.session.commit()

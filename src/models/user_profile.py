@@ -3,6 +3,18 @@ from flask_login import UserMixin
 from src.config import db
 
 class UserProfile(db.Model, UserMixin):
+    """
+    User profile model for the application
+    ---
+    Properties:
+        - id: int
+        - username: the username
+        - email: the email
+        - password: the password
+        - user_level: the user level
+        - receive_email_alerts: if the user receives email alerts
+        - profession: the profession of the user
+    """
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)

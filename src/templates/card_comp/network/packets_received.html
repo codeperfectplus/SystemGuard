@@ -1,1 +1,14 @@
-<div class="col-md-6 col-lg-4 mb-4"><div class="card bg-network shadow-sm border-0 rounded-3"><div class="card-body"><h5 class="card-title">Network Received <i class="fas fa-download"></i></h5><p class="card-text fs-4">{{ system_info['network_received']}} MB</p></div></div></div>
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card bg-network network-received">
+        <div class="card-body">
+            <h5 class="card-title">Network Received <i class="fas fa-download"></i></h5>
+            <p class="card-text fs-4">{{ system_info['network_received']}} MB</p>
+        </div>
+    </div>
+</div>
+<!-- <script>
+    function refreshData() {
+        refreshCardData('api/system-info', '.network-received', 'network_received'); // CPU Usage
+    }
+    setInterval(refreshData, {{ user_dashboard_settings.refresh_interval * 1000}});
+</script> -->

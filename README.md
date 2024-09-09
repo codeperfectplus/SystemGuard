@@ -2,57 +2,6 @@
 
 System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
-## Installation 🛠️
-
-```bash
-wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/setup.sh
-chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
-```
-
-### To install the SystemGuard app, run the following command:
-
-```bash
-sudo systemguard-installer --install
-```
-
-### To uninstall the SystemGuard app, run the following command:
-
-```bash
-sudo systemguard-installer --uninstall
-```
-
-### To Restore the SystemGuard app, run the following command:
-
-```bash
-sudo systemguard-installer --restore
-```
-
-### Incase of any error, run the following command:
-
-```bash
-sudo systemguard-installer --fix
-```
-
-
-### Help
-    
-```bash
-systemguard-installer --help
-```
-
-
-It will install the SystemGuard app and its dependencies in the crontab and it will be started automatically every time the server is restarted. The app will be available at `http://localhost:5050`.
-
-## Dependencies(must be installed)
-
-- Anaconda3/Miniconda3
-
-```bash
-# install miniconda3 if not installed already
-wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
-chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
-```
-
 ## Features 🚀
 
 - Lightweight, open-source, and free to use with a straightforward installation process.
@@ -73,6 +22,11 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 - Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Option to download historical data in CSV format for detailed analysis (upcoming feature).
 - Server status monitoring with alerts for server downtime or recovery (upcoming feature).
+
+
+## Installation 🛠️
+
+check the [Installation.md](/src/docs/installation.md) file for installation instructions.
 
 
 ## Email Feature 📧
@@ -130,6 +84,7 @@ A Docker image has not been created for this project because it requires access 
 - Check the current firewall status to ensure security.
 - A dedicated website monitoring page for tracking uptime and performance.
 - Track and save total network data sent/received in the database for data usage monitoring.
+- Improve website monitor, save data in database with timestamp to show the history of the website.
 
 ## Learnings 📖
 

@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
+from src.logger import logger
+
 app = Flask(__name__)
 
 # Configure the SQLite database
@@ -13,13 +15,14 @@ db = SQLAlchemy(app)
 
 @app.cli.command("run")
 def server_start():
-    print("Server started")
-
-
+    logger.info("Server started")
 
 # 403 forbidden
 @app.errorhandler(403)
 def forbidden(e):
+    """ 
+    This function is called when a user tries to access a resource that they are not allowed to access.
+    """
     return render_template("error/403.html"), 403
 
 # not found page
@@ -55,9 +58,9 @@ class CustomError(Exception):
 # Purpose: Run functions before or after each request, useful for tasks like logging, performance monitoring, or pre-processing requests
 # @app.before_request
 # def before_request_func():
-#     print("This function runs before each request.")
+#     logger.info("This function runs before each request.")
 
 # @app.after_request
 # def after_request_func(response):
-#     print("This function runs after each request.")
+#     logger.info("This function runs after each request.")
 #     return response

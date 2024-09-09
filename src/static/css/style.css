@@ -38,11 +38,18 @@
 
 /* General Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Default font stack */
+    font-family: 'Roboto', sans-serif;
     color: #333;
     background-size: cover; /* Ensure the image covers the entire background */
     background-repeat: no-repeat; /* Prevent the image from repeating */
     background-position: center center; /* Center the image */
+}
+
+
+
+.card-title {
+    font-weight: 600;
+    font-size: 1.25rem;
 }
 
 .header {

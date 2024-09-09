@@ -1,0 +1,16 @@
+/* edit_server.css */
+.container {
+    margin-top: 50px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.btn-success {
+    margin-top: 20px;
+}

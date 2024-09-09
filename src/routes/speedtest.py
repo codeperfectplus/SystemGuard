@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file, ROOT_DIR
-from src.scripts.email_me import send_smpt_email
+from src.scripts.email_me import send_smtp_email
 
 speedtest_bp = Blueprint("speedtest", __name__)
 
@@ -48,7 +48,7 @@ def speedtest():
                 ROOT_DIR, "src/templates/email_templates/speedtest_result.html"
             )
             email_body = render_template_from_file(speedtest_result_template, **context)
-            send_smpt_email(receiver_email, subject, email_body, is_html=True)
+            send_smtp_email(receiver_email, subject, email_body, is_html=True)
 
             return render_template(
                 "speedtest_result.html",

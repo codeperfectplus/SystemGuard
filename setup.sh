@@ -8,6 +8,12 @@
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
+# run this script with sudo
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this program with sudo, exiting..."
+    exit 1
+fi
+
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
   local text="$1"
@@ -86,23 +92,44 @@ generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
 
-# run this script with sudo
-if [ "$EUID" -ne 0 ]; then
-    log "CRITICAL" "Please run this program with sudo."
-    exit 1
-fi
-
 # function to check for required dependencies
 check_dependencies() {
-    local dependencies=(git curl wget unzip figlet)
+    # List of required dependencies
+    local dependencies=(git curl wget unzip iptables)
+    
+    # Check if `apt-get` is available
+    if ! command -v apt-get &> /dev/null; then
+        log "ERROR" "This script requires apt-get but it is not available."
+        exit 1
+    fi
+
+    # Array to keep track of missing dependencies
+    local missing_dependencies=()
+    
+    # Check each dependency
     for cmd in "${dependencies[@]}"; do
-        if ! command -v $cmd &> /dev/null; then
-            log "CRITICAL" "$cmd is required but not installed. Please install it and try again.\nsudo apt install $cmd"
-            exit 1
+        if ! command -v "$cmd" &> /dev/null; then
+            missing_dependencies+=("$cmd")
         fi
     done
+
+    # If there are missing dependencies, prompt the user for installation
+    if [ ${#missing_dependencies[@]} -gt 0 ]; then
+        log "The following dependencies are missing: ${missing_dependencies[*]}"
+        echo "Do you want to install them now? (y/n)"
+        read -r choice
+        if [ "$choice" == "y" ]; then
+            sudo apt-get install -y "${missing_dependencies[@]}"
+        else
+            log "Please install the required dependencies and run the script again."
+            exit 1
+        fi
+    else
+        log "All required dependencies are already installed."
+    fi
 }
-check_dependencies
+
+
 
 # Function to set systemguard_auto_update variable permanently
 set_auto_update() {
@@ -163,7 +190,6 @@ EXECUTABLE_APP_NAME="systemguard-installer"
 EXECUTABLE="/usr/local/bin/$EXECUTABLE_APP_NAME"
 
 # File paths related to the application
-LOCUST_FILE="$EXTRACT_DIR/${APP_NAME}-*/src/scripts/locustfile.py"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT='setup.sh'
 FLASK_LOG_FILE="$USER_HOME/logs/systemguard_flask.log"
@@ -180,9 +206,15 @@ GIT_REPO="$APP_NAME"
 GIT_URL="https://github.com/$GIT_USER/$GIT_REPO"
 ISSUE_URL="$GIT_URL/issues"
 
+# ENVIRONMENT VARIABLES
+CONDA_ENV_NAME="systemguard"
+
+# systemguard authentication
+SYSTEMGUARD_USERNAME="admin"
+SYSTEMGUARD_PASSWORD="admin"
 
 # Function to create a directory if it does not exist
-create_dir_if_not_exists() {
+create_and_own_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 1; }
@@ -190,9 +222,8 @@ create_dir_if_not_exists() {
     fi
 }
 
-create_dir_if_not_exists "$LOG_DIR"
-create_dir_if_not_exists "$BACKUP_DIR"
-
+create_and_own_dir "$LOG_DIR"
+create_and_own_dir "$BACKUP_DIR"
 
 
 # Check if running with sudo
@@ -216,7 +247,27 @@ change_ownership() {
     fi
 }
 
+# check if conda is installed or not
+check_conda() {
+    CONDA_PATHS=("/home/$USER_NAME/miniconda3" "/home/$USER_NAME/anaconda3")
+    CONDA_FOUND=false
 
+    # Find Conda installation
+    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
+        if [ -d "$CONDA_PATH" ]; then
+            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
+            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
+            CONDA_FOUND=true
+            break
+        fi
+    done
+
+    if [ "$CONDA_FOUND" = false ]; then
+        log "ERROR" "Conda not found. Please install Conda or check your Conda paths."
+        exit 1
+    fi
+    echo "Conda executable: $CONDA_EXECUTABLE"
+}
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -227,7 +278,6 @@ add_cron_job() {
     local cron_job="* * * * * /bin/bash $script_path >> $log_dir/systemguard_cron.log 2>&1"
 
     # Create log directory with error handling
-    mkdir -p "$log_dir"
     if [ $? -ne 0 ]; then
         log "CRITICAL" "Failed to create log directory: $log_dir"
         exit 1
@@ -312,7 +362,6 @@ backup_configs() {
     rotate_backups $NUM_OF_BACKUP
     log "Backing up existing configurations..."
     if [ -d "$EXTRACT_DIR" ]; then
-        mkdir -p "$BACKUP_DIR"
         cp -r "$EXTRACT_DIR" "$BACKUP_DIR/$(date '+%Y%m%d_%H%M%S')"
         log "Backup completed: $BACKUP_DIR"
     else
@@ -374,21 +423,29 @@ install_executable() {
     fi
 }
 
-# remove previous installation of cron jobs and SystemGuard
-remove_previous_installation() {
-    log "Removing previous installation of $APP_NAME, if any..."
+# remove extract directory, break below functions
+# if the directory is not present
+remove_extract_dir() {
     if [ -d "$EXTRACT_DIR" ]; then
         rm -rf "$EXTRACT_DIR"
         log "Old installation removed."
+    else
+        log "No previous installation found."
     fi
+}
 
-    log "Cleaning up previous cron jobs related to $APP_NAME..."
+remove_cronjob () {
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
     else
         log "No previous cron jobs found."
     fi
+}
+# remove previous installation of cron jobs and SystemGuard
+remove_previous_installation() {
+    remove_extract_dir
+    remove_cronjob 
 }
 
 # Function to fetch the latest version of SystemGuard from GitHub releases
@@ -436,10 +493,15 @@ install_from_git() {
     # Remove any previous installations
     remove_previous_installation
 
-    log "Select the version of $APP_NAME to install:"
-    echo "1. Production (stable) - Recommended for most users"
-    echo "2. Development (dev) - Latest features, may be unstable"
-    echo "3. Specify a branch or tag name - Enter the branch/tag name when prompted"
+    
+    echo ""
+    echo "Select the version of $APP_NAME to install:"
+    echo "|-----------------------------------------------------------------------------|"
+    echo "|  1. Production (stable)  -       Recommended for most users                 |"
+    echo "|  2. Development (dev)    -       Latest features, may be unstable           |"
+    echo "|  3. Specify a branch     -       Enter the branch/tag name when prompted    |"
+    echo "|-----------------------------------------------------------------------------|"
+    echo "Enter the number of your choice:"
     read -r VERSION
 
     # Set Git URL based on user choice
@@ -469,12 +531,17 @@ install_from_git() {
     set_auto_update
     
     log "Cloning the $APP_NAME repository from GitHub..."
+    create_and_own_dir "$GIT_INSTALL_DIR"
+    check_conda # check if conda is installed
+    
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
 
     log "Repository cloned successfully."
+
+    install_conda_env # if conda is installed then install the conda environment
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || { 
@@ -514,12 +581,14 @@ install_from_release() {
     remove_previous_installation
 
     log "Setting up installation directory..."
-    mkdir -p "$EXTRACT_DIR"
 
     log "Extracting $APP_NAME package..."
     unzip -q "$DOWNLOAD_DIR/systemguard.zip" -d "$EXTRACT_DIR"
     rm "$DOWNLOAD_DIR/systemguard.zip"
     log "Extraction completed."
+
+    check_conda # check if conda is installed
+    install_conda_env # if conda is installed then install the conda environment
 
     install_executable
     setup_cron_job
@@ -529,12 +598,24 @@ install_from_release() {
     log "Server may take a few minutes to start. If you face any issues, try restarting the server."
 }
 
+display_credentials() {
+    log "INFO" "You can now login to the server using the following credentials:"
+    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
+    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+}
+
 # Install function
 install() {
+    check_dependencies
     log "Starting installation of $APP_NAME..."
+    create_and_own_dir "$EXTRACT_DIR"
+    echo ""
     echo "Do you want to install from a Git repository or a specific release?"
-    echo "1. Git repository"
-    echo "2. Release"
+    echo "|----------------------------------------------------|"
+    echo "|           1. Git repository                        |"
+    echo "|           2. Release                               |"
+    echo "|----------------------------------------------------|"
+    echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
 
     case $INSTALL_METHOD in
@@ -551,12 +632,13 @@ install() {
     esac
 	stop_server
 	generate_ascii_art "SystemGuard Installed" "green"
+    display_credentials
+
 }
 # Uninstall function
 uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
-
 	stop_server
 	generate_ascii_art "SystemGuard Uninstalled" "red"
 }
@@ -580,6 +662,8 @@ load_test() {
 
     # Start Locust server
     log "Starting Locust server..."
+    LOCUST_FILE=$(find "$EXTRACT_DIR" -name "locustfile.py" | head -n 1)
+    echo "locust file: $LOCUST_FILE"
     locust -f "$LOCUST_FILE" --host="$HOST_URL"
 }
 
@@ -643,22 +727,81 @@ health_check() {
 
 # app logs
 show_server_logs() {
-    log "Checking server logs at $FLASK_LOG_FILE..."
     log "INFO" "Press Ctrl+C to exit."
     echo ""
     echo "--- Server Logs ---"
     echo ""
-    if [ -f "$FLASK_LOG_FILE" ]; then
-        tail -f "$FLASK_LOG_FILE"
+    
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    log_file=$(find . -name "app_debug.log" | head -n 1)
+    echo "log file: $log_file"
+    if [ -f "$log_file" ]; then
+        log "Server log file: $log_file"
+        tail -100f "$log_file"
     else
-        log "No logs found at $FLASK_LOG_FILE."
+        log "No logs found at $log_file."
     fi
 }
 
+# installation logs
+show_installer_logs() {
+    log "INFO" "Press Ctrl+C to exit."
+    echo ""
+    echo "--- Installer Logs ---"
+    echo ""
+    
+    if [ -f "$LOG_FILE" ]; then
+        log "Installer log file: $LOG_FILE"
+        tail -100f "$LOG_FILE"
+    else
+        log "No logs found at $LOG_FILE."
+    fi
+}
+
+update_dependencies() {
+    # Activate Conda environment
+    check_conda
+    source "$CONDA_SETUP_SCRIPT"
+    conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
+    
+    # Check for missing dependencies
+    log "INFO" "Checking for missing dependencies..."
+    cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
+    REQUIREMENTS_FILE="requirements.txt"
+
+    if [ ! -f "$REQUIREMENTS_FILE" ]; then
+        log "ERROR" "Requirements file $REQUIREMENTS_FILE not found."
+        exit 1
+    fi
+
+    log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
+
+    # Install dependencies silently
+    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" > /dev/null 2>&1 || {
+        log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
+        exit 1
+    }
+
+    log "INFO" "Dependencies installation complete."
+}
+
+# Function to install Conda environment and dependencies
+install_conda_env() {
+    log "Checking conda environment $CONDA_ENV_NAME..."
+    if ! "$CONDA_EXECUTABLE" env list | grep -q "$CONDA_ENV_NAME"; then
+        log "Creating Conda environment $CONDA_ENV_NAME..."
+        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.8 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
+        # install the dependencies
+        update_dependencies
+    else
+        log "Conda environment $CONDA_ENV_NAME already exists."
+        update_dependencies
+    fi
+}
+
+
 # stop flask server
-stop_server() {
-    log "Stopping $APP_NAME server..."
-    # check if server is running on 5050
+stop_server_helper() {    
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
         kill -9 $(lsof -t -i:5050)
         log "Server stopped successfully."
@@ -667,20 +810,45 @@ stop_server() {
     fi
 }
 
+stop_server() {
+    log "Stopping $APP_NAME server..."
+    stop_server_helper
+}
 
 # fix the server
 fix() {
+    update_dependencies
     log "Fixing $APP_NAME server..."
-    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
-        kill -9 $(lsof -t -i:5050)
-        log "Restarting server... at $EXTRACT_DIR/${APP_NAME}-*/src"
-        log "Server is starting in the background, check logs for more details."
-        log "Server will be running on $HOST_URL"
-    else
-        log "Server is not running."
-    fi
+    stop_server
 }
 
+# update the code to the latest version
+install_latest() {
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    # check if the .git directory exists
+    if [ -d ".git" ]; then
+        log "Fetching the server for the latest version..."
+        # sleep 3 seconds
+        # some kind of animation of fetching the latest code
+        echo -n "connecting to the SystemGuard server"
+        for i in {1..3}; do
+            echo -n "..."
+            sleep 1
+        done
+        echo ""
+        echo -n "connected now fetching the latest code"
+        for i in {1..3}; do
+            echo -n "..."
+            sleep 1
+        done
+        echo ""
+        git pull >> /dev/null 2>&1 || { log "ERROR" "Failed to update the code. Please check your internet connection and try again."; exit 1; }
+        log "Hurray: Code updated successfully."
+    else
+        log "Probably you have installed the code from the release, so you can't update the code."
+        log "Please install the code from the git repository to update the code."
+    fi
+}
 
 # Display help
 show_help() {
@@ -695,6 +863,9 @@ show_help() {
     echo "  --uninstall         Uninstall $APP_NAME completely."
     echo "                      This will remove the application and all associated files."
     echo ""
+    echo "  --fix               Fix the $APP_NAME installation errors."
+    echo "                      This will fix any issues with the installation and restart the server."
+    echo ""   
     echo "  --restore           Restore $APP_NAME from a backup."
     echo "                      Use this option to recover data or settings from a previous backup."
     echo ""
@@ -710,16 +881,27 @@ show_help() {
     echo "  --clean-backups     Clean up all backups of $APP_NAME."
     echo "                      This will delete all saved backup files to free up space."
     echo ""
-    echo "  --server-logs       Show server logs for $APP_NAME."
+    echo "  --logs              Show server logs for $APP_NAME."
     echo "                      Displays the latest server logs, which can help in troubleshooting issues."
+    echo "                      Press Ctrl+C to exit the log viewing session."
+    echo ""
+    echo " --installation-logs  Show installer logs for $APP_NAME."
+    echo "                      Displays the logs generated during the installation process."
     echo "                      Press Ctrl+C to exit the log viewing session."
     echo ""
     echo "  --server-stop       Stop the $APP_NAME server."
     echo "                      This will stop the running server instance."
     echo ""
-    echo "  --fix               Fix the $APP_NAME server."
-    echo "                      This will restart the server."
-    echo ""   
+    echo " --install-latest     Update the code to the latest version."
+    echo "                      This will pull the latest code from the Git repository."
+    echo ""
+    echo ""
+    echo " --check-conda        Check if Conda is installed and available."
+    echo "                      This will verify the presence of Conda and display the installation path."
+    echo ""
+    echo " --update-dependencies Update the dependencies for $APP_NAME."
+    echo "                      This will install any missing dependencies required for the application."
+    echo ""
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
 }
@@ -735,9 +917,13 @@ for arg in "$@"; do
         --status) ACTION="check_status" ;;
         --health-check) ACTION="health_check" ;;
         --clean-backups) ACTION="cleanup_backups" ;;
-        --server-logs) show_server_logs; exit 0 ;;
+        --logs) show_server_logs; exit 0 ;;
+        --installation-logs) show_installer_logs; exit 0 ;;
         --server-stop) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
+        --update-dependencies) update_dependencies; exit 0 ;;
+        --check-conda) check_conda; exit 0 ;;
+        --install-latest) ACTION="install_latest" ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -749,12 +935,15 @@ case $ACTION in
     uninstall) uninstall ;;
     restore) restore ;;
     load_test) load_test ;;
-    install_latest) install_latest ;;
     check_status) check_status ;;
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
     stop_server) stop_server ;;
+    logs) show_server_logs ;;
+    installation-logs) show_installer_logs ;;
     fix) fix ;;
+    check-conda) check_conda ;;
+    install_latest) install_latest ;;
+    update_dependencies) update_dependencies ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-# # End of script

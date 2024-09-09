@@ -1,16 +1,21 @@
+import os
 import datetime
 from threading import Timer
+from flask import url_for
 from src.config import app, db
-from src.utils import get_system_info_for_db
+from src.utils import _get_system_info
 from src.logger import logger
-from src.models import MonitoredWebsite, ApplicationGeneralSettings, SystemInformation
+from src.models import MonitoredWebsite, GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 import requests
+from src.scripts.email_me import send_smtp_email
+from src.logger import logger
+from src.utils import render_template_from_file, ROOT_DIR
 
 # Dictionary to track the last known status of each website
 website_status = {}
 
-def send_mail(website_name, status, email_adress):
+def send_mail(website_name, status, email_adress, email_alerts_enabled):
     """
     Dummy function to simulate sending an email.
     
@@ -19,7 +24,17 @@ def send_mail(website_name, status, email_adress):
         status (str): The status of the website, either 'DOWN' or 'UP'.
     """
     # This is a dummy function, so no real email is sent.
-    print(f"Sending email to {email_adress}: {website_name} is now {status}")
+    if email_alerts_enabled:
+        context = {
+                    "website_status": status, #UP/DOWN
+                    "website_name": website_name,
+                    "checked_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "message": f"{website_name} is now {status}",
+                }
+        website_status_template = os.path.join(ROOT_DIR, "src/templates/email_templates/website_monitor_status.html")
+        email_subject = f"{website_name} is now {status}"
+        email_body = render_template_from_file(website_status_template, **context)
+        send_smtp_email(email_adress, email_subject, email_body, is_html=True)
 
 def update_website_status(website, status):
     """
@@ -35,7 +50,8 @@ def update_website_status(website, status):
         website_status[website.id] = 'UP'  # Initialize with UP status if not present
 
     if website_status[website.id] != status:
-        send_mail(website.name, status, website.email_address)
+        send_mail(website.name, status, website.email_address, 
+                  website.email_alerts_enabled)
         website_status[website.id] = status
 
 def ping_website(website):
@@ -93,7 +109,7 @@ def monitor_settings():
     with app.app_context():
         try:
             # Fetch the general settings
-            general_settings = ApplicationGeneralSettings.query.first()
+            general_settings = GeneralSettings.query.first()
 
             # Check if logging should be active or not
             is_logging_system_info = general_settings.is_logging_system_info if general_settings else False
@@ -117,7 +133,7 @@ def log_system_info():
     with app.app_context():
         try:
             # Fetch the general settings to check if logging is enabled
-            general_settings = ApplicationGeneralSettings.query.first()
+            general_settings = GeneralSettings.query.first()
             is_logging_system_info = general_settings.is_logging_system_info if general_settings else False
 
             if not is_logging_system_info:
@@ -139,13 +155,16 @@ def log_system_info_to_db():
     """
     with app.app_context():
         try:
-            system_info = get_system_info_for_db()
+            system_info = _get_system_info()
             system_log = SystemInformation(
                 cpu_percent=system_info["cpu_percent"],
                 memory_percent=system_info["memory_percent"],
                 battery_percent=system_info["battery_percent"],
                 network_sent=system_info["network_sent"],
                 network_received=system_info["network_received"],
+                dashboard_memory_usage=system_info["dashboard_memory_usage"],
+                cpu_frequency=system_info["cpu_frequency"],
+                current_temp=system_info["current_temp"],
                 timestamp=datetime.datetime.now()
             )
             db.session.add(system_log)

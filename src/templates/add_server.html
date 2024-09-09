@@ -2,67 +2,43 @@
 {% block title %}Add New Dashboard Network{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/add_server.css') }}">
-<script>
-    function toggleFields() {
-        var selection = document.getElementById('type_selection').value;
-        var ipField = document.getElementById('ip_address');
-        var portField = document.getElementById('port');
-        var linkField = document.getElementById('link');
 
-        if (selection === 'link') {
-            ipField.disabled = true;
-            portField.disabled = true;
-            linkField.disabled = false;
-            document.getElementById('ip_group').style.display = 'none';
-            document.getElementById('port_group').style.display = 'none';
-            document.getElementById('link_group').style.display = 'block';
-        } else {
-            ipField.disabled = false;
-            portField.disabled = false;
-            linkField.disabled = true;
-            document.getElementById('ip_group').style.display = 'block';
-            document.getElementById('port_group').style.display = 'block';
-            document.getElementById('link_group').style.display = 'none';
-        }
-    }
-
-    window.onload = function() {
-        toggleFields(); // Initialize the fields based on the current selection
-    };
-</script>
 {% endblock %}
 {% block content %}
-    <div class="container">
-        <h1>Add New Server</h1>
-        <form method="POST" action="{{ url_for('add_server') }}">
-            <div class="form-group">
-                <label for="name">Server Name</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" rows="3"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="type_selection">What do you have?</label>
-                <select id="type_selection" name="type_selection" onchange="toggleFields()">
-                    <option value="ip">IP Address and Port</option>
-                    <option value="link">URL</option>
-                </select>
-            </div>
-            <div id="ip_group" class="form-group">
-                <label for="ip_address">IP Address</label>
-                <input type="text" id="ip_address" name="ip_address">
-            </div>
-            <div id="port_group" class="form-group">
-                <label for="port">Port</label>
-                <input type="number" id="port" name="port">
-            </div>
-            <div id="link_group" class="form-group">
-                <label for="link">URL</label>
-                <input type="text" id="link" name="link">
-            </div>
-            <button type="submit">Add Server</button>
-        </form>
-    </div>
+<div class="container">
+    <h1>Add New Server</h1>
+    <form method="POST" action="{{ url_for('add_server') }}">
+        <div class="form-group">
+            <label for="name">Server Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="type_selection">What do you have?</label>
+            <select id="type_selection" name="type_selection" onchange="toggleFields()">
+                <option value="ip">IP Address and Port</option>
+                <option value="link">URL</option>
+            </select>
+        </div>
+        <div id="ip_group" class="form-group">
+            <label for="ip_address">IP Address</label>
+            <input type="text" id="ip_address" name="ip_address">
+        </div>
+        <div id="port_group" class="form-group">
+            <label for="port">Port</label>
+            <input type="number" id="port" name="port">
+        </div>
+        <div id="link_group" class="form-group">
+            <label for="link">URL</label>
+            <input type="text" id="link" name="link">
+        </div>
+        <button type="submit">Add Server</button>
+    </form>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/port_url_toggle.js') }}"></script>
 {% endblock %}
