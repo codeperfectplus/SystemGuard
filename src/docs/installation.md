@@ -1,6 +1,7 @@
 ## Installation 🛠️
 
 ```bash
+sudo apt-get update
 wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/setup.sh
 chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 ```
