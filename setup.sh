@@ -197,7 +197,7 @@ create_and_own_dir() {
 
 create_and_own_dir "$LOG_DIR"
 create_and_own_dir "$BACKUP_DIR"
-create_and_own_dir "$EXTRACT_DIR"
+
 
 # Check if running with sudo
 if [ "$EUID" -eq 0 ]; then
@@ -220,7 +220,27 @@ change_ownership() {
     fi
 }
 
+# check if conda is installed or not
+check_conda() {
+    CONDA_PATHS=("/home/$USER_NAME/miniconda3" "/home/$USER_NAME/anaconda3")
+    CONDA_FOUND=false
 
+    # Find Conda installation
+    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
+        if [ -d "$CONDA_PATH" ]; then
+            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
+            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
+            CONDA_FOUND=true
+            break
+        fi
+    done
+
+    if [ "$CONDA_FOUND" = false ]; then
+        log "ERROR" "Conda not found. Please install Conda or check your Conda paths."
+        exit 1
+    fi
+    echo "Conda executable: $CONDA_EXECUTABLE"
+}
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -376,22 +396,29 @@ install_executable() {
     fi
 }
 
-# remove previous installation of cron jobs and SystemGuard
-remove_previous_installation() {
+# remove extract directory, break below functions
+# if the directory is not present
+remove_extract_dir() {
     if [ -d "$EXTRACT_DIR" ]; then
         rm -rf "$EXTRACT_DIR"
         log "Old installation removed."
     else
         log "No previous installation found."
     fi
+}
 
+remove_cronjob () {
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
     else
         log "No previous cron jobs found."
     fi
-
+}
+# remove previous installation of cron jobs and SystemGuard
+remove_previous_installation() {
+    remove_extract_dir
+    remove_cronjob 
 }
 
 # Function to fetch the latest version of SystemGuard from GitHub releases
@@ -477,6 +504,7 @@ install_from_git() {
     set_auto_update
     
     log "Cloning the $APP_NAME repository from GitHub..."
+    create_and_own_dir "$GIT_INSTALL_DIR"
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
@@ -545,6 +573,9 @@ display_credentials() {
 # Install function
 install() {
     log "Starting installation of $APP_NAME..."
+    check_conda # check if conda is installed
+    install_conda_env # if conda is installed then install the conda environment
+    create_and_own_dir "$EXTRACT_DIR"
     echo ""
     echo "Do you want to install from a Git repository or a specific release?"
     echo "|----------------------------------------------------|"
@@ -575,7 +606,6 @@ install() {
 uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
-
 	stop_server
 	generate_ascii_art "SystemGuard Uninstalled" "red"
 }
@@ -695,31 +725,11 @@ show_installer_logs() {
     fi
 }
 
-
 update_dependencies() {
-    # Define possible Conda installation paths
-    CONDA_PATHS=("/home/$USER_NAME/miniconda3" "/home/$USER_NAME/anaconda3")
-    CONDA_FOUND=false
-
-    # Find Conda installation
-    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
-        if [ -d "$CONDA_PATH" ]; then
-            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
-            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
-            CONDA_FOUND=true
-            break
-        fi
-    done
-
-    if [ "$CONDA_FOUND" = false ]; then
-        log "ERROR" "Conda not found. Please install Conda or check your Conda paths."
-        exit 1
-    fi
-
     # Activate Conda environment
     source "$CONDA_SETUP_SCRIPT"
     conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
-
+    
     # Check for missing dependencies
     log "INFO" "Checking for missing dependencies..."
     cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
@@ -731,10 +741,6 @@ update_dependencies() {
     fi
 
     log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
-    echo "--------------------------------------------------------"
-    cat "$REQUIREMENTS_FILE"
-    echo ""
-    echo "--------------------------------------------------------"
 
     # Install dependencies silently
     sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" > /dev/null 2>&1 || {
@@ -743,6 +749,20 @@ update_dependencies() {
     }
 
     log "INFO" "Dependencies installation complete."
+}
+
+# Function to install Conda environment and dependencies
+install_conda_env() {
+    log "Checking conda environment $CONDA_ENV_NAME..."
+    if ! "$CONDA_EXECUTABLE" env list | grep -q "$CONDA_ENV_NAME"; then
+        log "Creating Conda environment $CONDA_ENV_NAME..."
+        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.8 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
+        # install the dependencies
+        update_dependencies
+    else
+        log "Conda environment $CONDA_ENV_NAME already exists."
+        update_dependencies
+    fi
 }
 
 
@@ -766,6 +786,20 @@ fix() {
     update_dependencies
     log "Fixing $APP_NAME server..."
     stop_server
+}
+
+# update the code to the latest version
+install_latest() {
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    # check if the .git directory exists
+    if [ -d ".git" ]; then
+        log "Updating the code to the latest version..."
+        git pull
+        log "Code updated successfully."
+    else
+        log "Probably you have installed the code from the release, so you can't update the code."
+        log "Please install the code from the git repository to update the code."
+    fi
 }
 
 # Display help
@@ -810,9 +844,15 @@ show_help() {
     echo "  --server-stop       Stop the $APP_NAME server."
     echo "                      This will stop the running server instance."
     echo ""
-    echo " --update-dependencies"
-    echo "                      Update the dependencies of the $APP_NAME."
-    echo "                      This will update the dependencies of the application."
+    echo " --install-latest     Update the code to the latest version."
+    echo "                      This will pull the latest code from the Git repository."
+    echo ""
+    echo ""
+    echo " --check-conda        Check if Conda is installed and available."
+    echo "                      This will verify the presence of Conda and display the installation path."
+    echo ""
+    echo " --update-dependencies Update the dependencies for $APP_NAME."
+    echo "                      This will install any missing dependencies required for the application."
     echo ""
     echo "  --help              Display this help message."
     echo "                      Shows information about all available options and how to use them."
@@ -834,6 +874,8 @@ for arg in "$@"; do
         --server-stop) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
         --update-dependencies) update_dependencies; exit 0 ;;
+        --check-conda) check_conda; exit 0 ;;
+        --install-latest) ACTION="install_latest" ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -845,7 +887,6 @@ case $ACTION in
     uninstall) uninstall ;;
     restore) restore ;;
     load_test) load_test ;;
-    install_latest) install_latest ;;
     check_status) check_status ;;
     health_check) health_check ;;
     cleanup_backups) cleanup_backups ;;
@@ -853,6 +894,12 @@ case $ACTION in
     logs) show_server_logs ;;
     installation-logs) show_installer_logs ;;
     fix) fix ;;
+    check-conda) check_conda ;;
+    install_latest) install_latest ;;
     update_dependencies) update_dependencies ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
+
+
+# check conda is there or not in fix
+# argument to update manually
