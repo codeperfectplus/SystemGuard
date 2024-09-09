@@ -1,12 +1,12 @@
 // let refreshInterval = {{ user_dashboard_settings.refresh_interval * 1000 }}; // Multiply by 1000 initially
 
 // Fetch the refresh interval from the server
-fetch('/get-refresh-interval')
+fetch('/refresh-interval')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             refreshInterval = data.refresh_interval * 1000; // Multiply by 1000 to convert to milliseconds
-            console.log('Refresh interval fetched successfully:', refreshInterval);
+            console.log('Refresh interval fetched successfully:', data.refresh_interval);
         } else {
             console.error('Failed to fetch refresh interval:', data.error);
         }
@@ -29,7 +29,7 @@ document.getElementById('refresh-interval').addEventListener('change', function 
     }, refreshInterval);
 
     // Send the updated refresh interval to the server
-    fetch('/update-refresh-interval', {
+    fetch('/refresh-interval', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

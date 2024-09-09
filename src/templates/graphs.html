@@ -1,12 +1,30 @@
 {% extends 'base/base.html' %}
 {% block title %}Dashboard Network{% endblock %}
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/graphs.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
-{% include 'card_comp/selector/refresh_button.html' %}
+<div class="col">
+    <div class="row selector-container">
+        {% include 'card_comp/selector/refresh_button.html' %}
+        <div class="time-filter-container">
+            <label for="timeFilter">Select Time Filter:</label>
+            <select id="timeFilter">
+                <option value="1 day">Last 1 Day</option>
+                <option value="2 days">Last 2 Days</option>
+                <option value="3 days">Last 3 Days</option>
+                <option value="1 week">Last 1 Week</option>
+                <option value="1 month">Last 1 Month</option>
+            </select>
+        </div>
+    </div>
+</div>
+
 <div class="container">
     <h2><i class="fas fa-microchip"></i> CPU Usage Over Time</h2>
     <canvas id="cpuTimeChart"></canvas>
@@ -42,12 +60,8 @@
     <canvas id="currentTempTimeChart"></canvas>
 </div>
 
-<div class="container">
-    <button id="refresh"><i class="fas fa-sync-alt"></i> Refresh Data</button>
-</div>
-
 {% endblock %}
-
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
+<script src="{{ url_for('static', filename='js/refresh_page.js')}}"></script>
 {% endblock %}

@@ -29,62 +29,6 @@ def terminal():
             return jsonify(output=output)
     return render_template('terminal.html')
 
-@app.route('/get-refresh-interval', methods=['GET'])
-def get_refresh_interval():
-    # Retrieve user ID from session or other authentication methods
-    user_id = current_user.id
-
-    try:
-        # Query the settings for the current user
-        settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
-
-        # If settings do not exist for the user, return the default refresh interval
-        if not settings:
-            return jsonify({'refresh_interval': 30})
-
-        # Return the refresh interval
-        return jsonify({
-            "success": "Refresh interval fetched successfully",
-            'refresh_interval': settings.refresh_interval})
-
-    except Exception as e:
-        # Handle any exceptions that occur during database operations
-        return jsonify({'error': 'An error occurred while fetching the refresh interval', 'details': str(e)}), 500
-
-@app.route('/update-refresh-interval', methods=['POST'])
-def update_refresh_interval():
-    # Retrieve user ID from session or other authentication methods
-    user_id = current_user.id
-
-    # Get the new refresh interval from the request
-    new_interval = request.json.get('refresh_interval')
-
-    # Validate the new interval (must be a positive integer)
-    if not isinstance(new_interval, int) or new_interval <= 0:
-        return jsonify({'error': 'Invalid refresh interval value'}), 400
-
-    try:
-        # Query the settings for the current user
-        settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
-
-        # If settings do not exist for the user, create them
-        if not settings:
-            settings = UserDashboardSettings(user_id=user_id, refresh_interval=new_interval)
-            db.session.add(settings)
-        else:
-            # Update the refresh interval
-            settings.refresh_interval = new_interval
-
-        # Commit changes to the database
-        db.session.commit()
-
-        return jsonify({'success': 'Refresh interval updated successfully', 'refresh_interval': new_interval})
-
-    except Exception as e:
-        # Handle any exceptions that occur during database operations
-        db.session.rollback()  # Rollback any changes if an error occurs
-        return jsonify({'error': 'An error occurred while updating the refresh interval', 'details': str(e)}), 500
-
 
 @app.route("/send_email", methods=["GET", "POST"])
 @login_required

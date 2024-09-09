@@ -1,20 +1,31 @@
-// Fetch the refresh interval from the server
-fetch('/get-refresh-interval')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            refreshInterval = data.refresh_interval * 1000; // Multiply by 1000 to convert to milliseconds
-            console.log('Refresh interval fetched successfully:', refreshInterval);
-        } else {
-            console.error('Failed to fetch refresh interval:', data.error);
-        }
-    })
-    .catch(error => console.error('Error:', error));
-
+let refreshInterval = 0; // Initialize with a default value
 let refreshTimeout;
 
-// Start the refresh process
-startRefresh();
+function fetchRefreshInterval() {
+    fetch('/refresh-interval')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                refreshInterval = data.refresh_interval * 1000; // Multiply by 1000 to convert to milliseconds
+                console.log('Refresh interval fetched successfully:', data.refresh_interval);
+                startRefresh(); // Start refreshing after fetching the interval
+            } else {
+                console.error('Failed to fetch refresh interval:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function startRefresh() {
+    if (refreshInterval > 0) { // Only refresh if the interval is greater than 0
+        refreshTimeout = setTimeout(function () {
+            location.reload();
+        }, refreshInterval);
+    }
+}
+
+// Start the process by fetching the refresh interval
+fetchRefreshInterval();
 
 // Event listener for select input change
 document.getElementById('refresh-interval').addEventListener('change', function () {
@@ -28,7 +39,7 @@ document.getElementById('refresh-interval').addEventListener('change', function 
     startRefresh();
 
     // Send the updated refresh interval to the server
-    fetch('/update-refresh-interval', {
+    fetch('/refresh-interval', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
