@@ -505,12 +505,16 @@ install_from_git() {
     
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
+    check_conda # check if conda is installed
+    
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 1
     fi
 
     log "Repository cloned successfully."
+
+    install_conda_env # if conda is installed then install the conda environment
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || { 
@@ -556,6 +560,9 @@ install_from_release() {
     rm "$DOWNLOAD_DIR/systemguard.zip"
     log "Extraction completed."
 
+    check_conda # check if conda is installed
+    install_conda_env # if conda is installed then install the conda environment
+
     install_executable
     setup_cron_job
 
@@ -573,8 +580,6 @@ display_credentials() {
 # Install function
 install() {
     log "Starting installation of $APP_NAME..."
-    check_conda # check if conda is installed
-    install_conda_env # if conda is installed then install the conda environment
     create_and_own_dir "$EXTRACT_DIR"
     echo ""
     echo "Do you want to install from a Git repository or a specific release?"
@@ -727,6 +732,7 @@ show_installer_logs() {
 
 update_dependencies() {
     # Activate Conda environment
+    check_conda
     source "$CONDA_SETUP_SCRIPT"
     conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
     
@@ -793,9 +799,23 @@ install_latest() {
     cd $EXTRACT_DIR/$APP_NAME-*/
     # check if the .git directory exists
     if [ -d ".git" ]; then
-        log "Updating the code to the latest version..."
-        git pull
-        log "Code updated successfully."
+        log "Fetching the server for the latest version..."
+        # sleep 3 seconds
+        # some kind of animation of fetching the latest code
+        echo -n "connecting to the SystemGuard server"
+        for i in {1..3}; do
+            echo -n "..."
+            sleep 1
+        done
+        echo ""
+        echo -n "connected now fetching the latest code"
+        for i in {1..3}; do
+            echo -n "..."
+            sleep 1
+        done
+        echo ""
+        git pull >> /dev/null 2>&1 || { log "ERROR" "Failed to update the code. Please check your internet connection and try again."; exit 1; }
+        log "Hurray: Code updated successfully."
     else
         log "Probably you have installed the code from the release, so you can't update the code."
         log "Please install the code from the git repository to update the code."
@@ -899,7 +919,3 @@ case $ACTION in
     update_dependencies) update_dependencies ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-
-
-# check conda is there or not in fix
-# argument to update manually
