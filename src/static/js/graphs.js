@@ -1,7 +1,11 @@
 // Variables to store chart instances
 let cpuTimeChart, memoryTimeChart, batteryTimeChart, networkTimeChart, dashboardMemoryTimeChart, cpuFrequencyTimeChart, currentTempTimeChart;
 
-// Function to fetch and display data
+function stringToDate(dateString) {
+    const date = new Date(dateString);
+    return date;
+}
+
 function fetchDataAndRenderCharts() {
     // Get the selected filter value
     const filterValue = document.getElementById('timeFilter').value;
@@ -11,7 +15,6 @@ function fetchDataAndRenderCharts() {
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
-            const timeData = data.time.map(t => new Date(t)); // Ensure date objects
             const memoryData = data.memory;
             const batteryData = data.battery;
             const networkSentData = data.network_sent;
@@ -19,11 +22,82 @@ function fetchDataAndRenderCharts() {
             const dashboardMemoryUsageData = data.dashboard_memory_usage;
             const cpuFrequencyData = data.cpu_frequency;
             const currentTempData = data.current_temp;
+            const currentTime = data.current_time;
+            const timeZoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            console.log(currentTime);
+        
+            // Format the time data using the currentTime from backend
+            const timeData = data.time.map(time => formatDate(time, currentTime));
+
+            displayTimeAndTimeZone(currentTime, timeZoneName);
 
             createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData);
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
+function formatDate(dateString, currentTime) {
+    const date = new Date(dateString);
+    const now = new Date(currentTime);  // Use currentTime from backend
+
+    // Helper function to format with leading zeros
+    const pad = (num) => String(num).padStart(2, '0');
+
+    // Manually extract UTC components
+    const day = pad(date.getUTCDate()); // e.g., 09
+    const month = pad(date.getUTCMonth() + 1); // e.g., 04
+    const year = date.getUTCFullYear(); // e.g., 2021
+    const hours = pad(date.getUTCHours()); // e.g., 11
+    const minutes = pad(date.getUTCMinutes()); // e.g., 33
+
+
+    // Calculate time differences
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    const diffWeeks = Math.floor(diffDays / 7);
+    const diffMonths = now.getMonth() - date.getUTCMonth() + (12 * (now.getFullYear() - date.getUTCFullYear()));
+    const diffYears = now.getFullYear() - date.getUTCFullYear();
+
+    // Determine the label based on time differences
+    if (diffDays === 0) {
+        return `Today ${hours}:${minutes}`;
+    } else if (diffDays === 1) {
+        return `Yesterday ${hours}:${minutes}`;
+    } else if (diffDays <= 3) {
+        return `${diffDays} Days Ago ${hours}:${minutes}`;
+    } else if (diffDays <= 7) {
+        return `${Math.ceil(diffDays / 7)} Week${diffDays > 7 ? 's' : ''} Ago ${hours}:${minutes}`;
+    } else if (diffDays <= 30) {
+        return `${Math.ceil(diffDays / 7)} Weeks Ago ${hours}:${minutes}`;
+    } else if (diffMonths < 12) {
+        return `${diffMonths} Month${diffMonths > 1 ? 's' : ''} Ago ${hours}:${minutes}`;
+    } else if (diffYears < 2) {
+        return `Last Year ${hours}:${minutes}`;
+    } else {
+        return `${year}/${month}/${day} ${hours}:${minutes}`;
+    }
+}
+
+function displayTimeAndTimeZone(currentTime, timeZoneName) {
+    // Update current time and timezone
+    function updateTime() {
+        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: timeZoneName };
+        now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', options);
+
+        // Display the current time and timezone
+        document.getElementById('currentTime').textContent = `Current Time: ${timeString}`;
+        document.getElementById('timeZoneName').textContent = `Time Zone: ${timeZoneName}`;
+    }
+
+    // Initial display
+    updateTime();
+    
+    // Update time every second
+    setInterval(updateTime, 1000);
+}
+
+// Display current time and time zone
+
 
 // Function to create a chart with multiple datasets
 function createChart(ctx, labels, datasets, yLabel) {
@@ -34,29 +108,22 @@ function createChart(ctx, labels, datasets, yLabel) {
     ctx.chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,  // Use timeData for x-axis labels
+            labels: labels,  // Use your timeData directly as labels
             datasets: datasets
         },
         options: {
             scales: {
                 x: {
-                    type: 'time', // Use 'time' scale for proper date formatting
-                    time: {
-                        unit: 'minute', // Adjust based on the granularity of your data
-                        tooltipFormat: 'll HH:mm', // Tooltip format for time
-                        displayFormats: {
-                            minute: 'HH:mm', // Display format for minute-level granularity
-                            hour: 'MMM D, HH:mm', // Display format for hour-level granularity
-                            day: 'MMM D', // Display format for day-level granularity
-                            week: 'MMM D', // Display format for week-level granularity
-                            month: 'MMM YYYY', // Display format for month-level granularity
-                            quarter: '[Q]Q YYYY', // Display format for quarter-level granularity
-                            year: 'YYYY' // Display format for year-level granularity
-                        }
-                    },
+                    type: 'category', // Use 'category' scale to treat time as strings
                     title: {
                         display: true,
                         text: 'Time'
+                    },
+                    ticks: {
+                        autoSkip: true,          // Automatically skip some labels to prevent overlap
+                        maxTicksLimit: 10,       // Maximum number of ticks to display
+                        maxRotation: 30,          // Prevent rotating the labels for better readability
+                        minRotation: 0
                     }
                 },
                 y: {
@@ -70,6 +137,7 @@ function createChart(ctx, labels, datasets, yLabel) {
         }
     });
 }
+
 
 // Function to create charts with the fetched data
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {

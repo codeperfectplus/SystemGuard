@@ -24,12 +24,28 @@ from datetime import datetime, timedelta
 @login_required
 def graph_data_api():
     try:
+        curent_time = datetime.now()
         # Get the time filter from query parameters
         time_filter = request.args.get('filter', default='1 day')
         
         # Determine the start time based on the filter
         now = datetime.now()
-        if time_filter == '1 day':
+        # 5 minutes, 15 minutes, 30 minutes, 1 hour, 3 hours, 6 hours, 12 hours, 1 day, 2 days, 3 days, 1 week, 1 month
+        if time_filter == '5 minutes':
+            start_time = now - timedelta(minutes=5)
+        elif time_filter == '15 minutes':
+            start_time = now - timedelta(minutes=15)
+        elif time_filter == '30 minutes':
+            start_time = now - timedelta(minutes=30)
+        elif time_filter == '1 hour':
+            start_time = now - timedelta(hours=1)
+        elif time_filter == '3 hours':
+            start_time = now - timedelta(hours=3)
+        elif time_filter == '6 hours':
+            start_time = now - timedelta(hours=6)
+        elif time_filter == '12 hours':
+            start_time = now - timedelta(hours=12)
+        elif time_filter == '1 day':
             start_time = now - timedelta(days=1)
         elif time_filter == '2 days':
             start_time = now - timedelta(days=2)
@@ -72,7 +88,8 @@ def graph_data_api():
             "network_received": network_received_data,
             "dashboard_memory_usage": dashboard_memory_usage,
             "cpu_frequency": cpu_frequency,
-            "current_temp": current_temp
+            "current_temp": current_temp,
+            "current_time": curent_time
         }), 200
     except Exception as e:
         # Handle and log the error for debugging purposes
