@@ -11,7 +11,6 @@
 {% block content %}
 <div class="col">
     <div class="row selector-container">
-        {% include 'card_comp/selector/refresh_button.html' %}
         <div class="time-filter-container">
             <label for="timeFilter">Select Time Filter:</label>
             <select id="timeFilter">
@@ -78,5 +77,4 @@
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
-<script src="{{ url_for('static', filename='js/refresh_page.js')}}"></script>
 {% endblock %}

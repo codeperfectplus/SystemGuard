@@ -78,25 +78,10 @@ function formatDate(dateString, currentTime) {
 }
 
 function displayTimeAndTimeZone(currentTime, timeZoneName) {
-    // Update current time and timezone
-    function updateTime() {
-        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: timeZoneName };
-        now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', options);
-
-        // Display the current time and timezone
-        document.getElementById('currentTime').textContent = `Current Time: ${timeString}`;
-        document.getElementById('timeZoneName').textContent = `Time Zone: ${timeZoneName}`;
-    }
-
-    // Initial display
-    updateTime();
-    
-    // Update time every second
-    setInterval(updateTime, 1000);
+    // Display the current time and timezone
+    document.getElementById('currentTime').textContent = `Current Time: ${currentTime}`;
+    document.getElementById('timeZoneName').textContent = `Time Zone: ${timeZoneName}`;
 }
-
-// Display current time and time zone
 
 
 // Function to create a chart with multiple datasets

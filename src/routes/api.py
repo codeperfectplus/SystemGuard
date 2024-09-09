@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import SystemInformation, UserDashboardSettings
 from src.utils import _get_system_info
+import gc
 
 api_bp = blueprints.Blueprint("api", __name__)
 
@@ -20,66 +21,62 @@ def cpu_percent_api():
 from flask import request
 from datetime import datetime, timedelta
 
-@app.route('/api/graphs_data')
+@app.route('/api/graphs_data', methods=['GET'])
 @login_required
 def graph_data_api():
     try:
-        curent_time = datetime.now()
+        current_time = datetime.now()
         # Get the time filter from query parameters
         time_filter = request.args.get('filter', default='1 day')
-        
+
         # Determine the start time based on the filter
         now = datetime.now()
-        # 5 minutes, 15 minutes, 30 minutes, 1 hour, 3 hours, 6 hours, 12 hours, 1 day, 2 days, 3 days, 1 week, 1 month
-        if time_filter == '5 minutes':
-            start_time = now - timedelta(minutes=5)
-        elif time_filter == '15 minutes':
-            start_time = now - timedelta(minutes=15)
-        elif time_filter == '30 minutes':
-            start_time = now - timedelta(minutes=30)
-        elif time_filter == '1 hour':
-            start_time = now - timedelta(hours=1)
-        elif time_filter == '3 hours':
-            start_time = now - timedelta(hours=3)
-        elif time_filter == '6 hours':
-            start_time = now - timedelta(hours=6)
-        elif time_filter == '12 hours':
-            start_time = now - timedelta(hours=12)
-        elif time_filter == '1 day':
-            start_time = now - timedelta(days=1)
-        elif time_filter == '2 days':
-            start_time = now - timedelta(days=2)
-        elif time_filter == '3 days':
-            start_time = now - timedelta(days=3)
-        elif time_filter == '1 week':
-            start_time = now - timedelta(weeks=1)
-        elif time_filter == '1 month':
-            start_time = now - timedelta(weeks=4)
-        else:
-            start_time = now - timedelta(days=1)  # Default to 1 day if filter is unknown
-
+        time_deltas = {
+            '5 minutes': timedelta(minutes=5),
+            '15 minutes': timedelta(minutes=15),
+            '30 minutes': timedelta(minutes=30),
+            '1 hour': timedelta(hours=1),
+            '3 hours': timedelta(hours=3),
+            '6 hours': timedelta(hours=6),
+            '12 hours': timedelta(hours=12),
+            '1 day': timedelta(days=1),
+            '2 days': timedelta(days=2),
+            '3 days': timedelta(days=3),
+            '1 week': timedelta(weeks=1),
+            '1 month': timedelta(weeks=4)
+        }
+        start_time = now - time_deltas.get(time_filter, timedelta(days=1))
 
         # Fetch entries within the time range
-        recent_system_info_entries = SystemInformation.query.filter(
-            SystemInformation.timestamp >= start_time
-        ).all()
+        query = SystemInformation.query.filter(SystemInformation.timestamp >= start_time)
+        recent_system_info_entries = query.all()
 
-        # Use list comprehension to extract data fields if entries exist, else provide empty lists
+        # Initialize lists for the data
+        time_data = []
+        cpu_data = []
+        memory_data = []
+        battery_data = []
+        network_sent_data = []
+        network_received_data = []
+        dashboard_memory_usage = []
+        cpu_frequency = []
+        current_temp = []
+
+        # Extract data fields if entries exist
         if recent_system_info_entries:
-            time_data, cpu_data, memory_data, battery_data, network_sent_data, network_received_data, \
-            dashboard_memory_usage, cpu_frequency, current_temp = zip(*[
-                (
-                    info.timestamp, info.cpu_percent, info.memory_percent, info.battery_percent,
-                    info.network_sent, info.network_received, info.dashboard_memory_usage,
-                    info.cpu_frequency, info.current_temp
-                )
-                for info in recent_system_info_entries
-            ])
-        else:
-            time_data = cpu_data = memory_data = battery_data = network_sent_data = network_received_data = []
-            dashboard_memory_usage = cpu_frequency = current_temp = []
+            for info in recent_system_info_entries:
+                time_data.append(info.timestamp)
+                cpu_data.append(info.cpu_percent)
+                memory_data.append(info.memory_percent)
+                battery_data.append(info.battery_percent)
+                network_sent_data.append(info.network_sent)
+                network_received_data.append(info.network_received)
+                dashboard_memory_usage.append(info.dashboard_memory_usage)
+                cpu_frequency.append(info.cpu_frequency)
+                current_temp.append(info.current_temp)
+
         # Return the data as JSON
-        return jsonify({
+        response = jsonify({
             "time": time_data,
             "cpu": cpu_data,
             "memory": memory_data,
@@ -89,8 +86,24 @@ def graph_data_api():
             "dashboard_memory_usage": dashboard_memory_usage,
             "cpu_frequency": cpu_frequency,
             "current_temp": current_temp,
-            "current_time": curent_time
-        }), 200
+            "current_time": current_time
+        })
+
+        # Clean up large data structures
+        del recent_system_info_entries
+        del time_data
+        del cpu_data
+        del memory_data
+        del battery_data
+        del network_sent_data
+        del network_received_data
+        del dashboard_memory_usage
+        del cpu_frequency
+        del current_temp
+
+        gc.collect()
+
+        return response, 200
     except Exception as e:
         # Handle and log the error for debugging purposes
         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
