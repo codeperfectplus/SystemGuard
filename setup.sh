@@ -4,7 +4,15 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$(logname)
+USER_NAME=$USER
+echo $USER_NAME
+echo $HOME
+if [ "$(whoami)" = "root" ]; then
+    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+else
+    USER_NAME=$(whoami)
+fi
+echo $USER_NAME
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -562,7 +570,7 @@ install_from_git() {
     # Construct the full Git URL with branch
     FULL_GIT_URL="$GITHUB_URL -b $BRANCH"
 
-    set_auto_update "$APP_NAME_LOWER-AUTO-UPDATE"
+    set_auto_update "sg_auto_update"
 
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
@@ -874,8 +882,8 @@ update_dependencies() {
 
     log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
 
-    # Install dependencies silently
-    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" > /dev/null 2>&1 || {
+    # Install dependencies
+    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" || {
         log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
         exit 1
     }
@@ -888,7 +896,7 @@ install_conda_env() {
     log "Checking conda environment $CONDA_ENV_NAME..."
     if ! "$CONDA_EXECUTABLE" env list | grep -q "$CONDA_ENV_NAME"; then
         log "Creating Conda environment $CONDA_ENV_NAME..."
-        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.8 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
+        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.11 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
         # install the dependencies
         update_dependencies
     else
@@ -1050,3 +1058,4 @@ case $ACTION in
     fetch_github_releases) fetch_github_releases ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
+

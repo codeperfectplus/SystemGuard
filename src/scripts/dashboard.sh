@@ -55,14 +55,14 @@ PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5050}"
-$APP_NAME="systemguard"
+APP_NAME="systemguard"
 LOG_FILE="/home/$(whoami)/logs/$APP_NAME-flask.log"
 USERNAME="$(whoami)"
 CONDA_ENV_NAME=$APP_NAME
 GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
 
 # Fetch from bashrc for auto-update
-auto_update=$(grep -E "^export $APP_NAME-AUTO-UPDATE=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
+auto_update=$(grep -E "^export sg_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
 echo "auto-update:" $auto_update
 # 
 # Ensure log directory exists
