@@ -18,10 +18,11 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 
 ### Installation Steps
 
-1. Update your system:
+1. Update your system and install the required dependencies:
 
 ```bash
 sudo apt-get update
+sudo apt-get install git curl wget unzip iptables figlet
 ```
 
 2. Download and set up the SystemGuard installer:

@@ -5,7 +5,6 @@
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
 USER_NAME=$(logname)
-echo "Welcome on board $USER_NAME"
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -24,8 +23,7 @@ HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
 FLASK_LOG_FILE="$LOG_DIR/flask.log"
 
-# Backup settings
-NUM_BACKUPS=5
+
 
 # Cron job pattern
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
@@ -36,8 +34,10 @@ GITHUB_REPO="$APP_NAME"
 GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
 NUM_OF_RELEASES=5
-
 NUM_OF_RETRIES=5
+
+# Backup settings
+NUM_BACKUPS=5
 
 # Environment variables
 CONDA_ENV_NAME="$APP_NAME_LOWER"
@@ -133,11 +133,12 @@ generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
+echo "Welcome on board: Mr. $(echo "$USER_NAME" | sed 's/.*/\u&/')"
 
 # function to check for required dependencies
 check_dependencies() {
     # List of required dependencies
-    local dependencies=(git curl wget unzip iptables)
+    local dependencies=(git curl wget unzip iptables figlet)
 
     # Check if `apt-get` is available
     if ! command -v apt-get &> /dev/null; then
