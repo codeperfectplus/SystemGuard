@@ -1,0 +1,49 @@
+{% extends "base/base.html" %}
+{% block title %}About {{title}} {% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title">{{ title }}</h1>
+                    <h4 class="card-subtitle mb-3 text-muted">{{ version }}</h4>
+
+                    <p class="card-text">
+                        {{ description }}
+                    </p>
+
+                    <hr>
+
+                    <h5 class="card-title">Author</h5>
+                    <p class="card-text">{{ author }}</p>
+
+                    <h5 class="card-title">Year</h5>
+                    <p class="card-text">{{ year }}</p>
+
+                    <hr>
+
+                    <h5 class="card-title">GitHub Repository</h5>
+                    <p class="card-text">
+                        <a href="https://github.com/codeperfectplus/SystemGuard" target="_blank"
+                            class="btn btn-primary">
+                            View on GitHub
+                        </a>
+                    </p>
+
+                    <hr>
+
+                    <h5 class="card-title">Contact</h5>
+                    <p class="card-text">
+                        For more information, please visit the <a href="{{project_url}}" target="_blank"> GitHub
+                            repository</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -641,7 +641,6 @@ timer() {
 }
 
 open_browser() {
-    log "Please use the above credentials to login to the SystemGuard server."
     log "If you face server server issues, run 'sudo systemguard-installer --fix' to fix the installation."
     log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
     # show timer for 50 seconds
@@ -878,6 +877,7 @@ fix() {
     update_dependencies
     log "Fixing $APP_NAME server..."
     stop_server
+    open_browser
 }
 
 # update the code to the latest version

@@ -77,6 +77,9 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     color: #007bff;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-start;
 }
 
 .navbar-nav {
@@ -399,3 +402,15 @@ body {
     box-shadow: 0 10px 20px var(--color-speedtest);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
+
+.title {
+    font-size: 2rem; /* Adjust the title size */
+    font-weight: bold; /* Adjust as needed */
+}
+
+.version {
+    font-size: 0.65rem; /* Smaller font size for version */
+    color: #6c757d; /* Optional: Adjust color */
+    margin-top: 0.25rem; /* Space between title and version */
+}
+

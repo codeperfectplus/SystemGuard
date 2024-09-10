@@ -10,6 +10,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///systemguard.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 
+# define a variable to use in the templates
+app.jinja_env.globals.update(
+    title="SystemGuard",
+    description="SystemGuard is a web application that allows you to monitor your system resources.",
+    author="Deepak Raj",
+    year="2024",
+    version="1.0.4-pre-release",
+    project_url="https://github.com/codeperfectplus/SystemGuard",
+    contact_email="",
+)
+
 # Initialize the database
 db = SQLAlchemy(app)
 

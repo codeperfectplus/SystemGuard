@@ -1,0 +1,35 @@
+/* Ensure the card has a light background and dark text */
+.card {
+    background-color: #ffffff; /* White background */
+    color: #333333; /* Dark text for readability */
+    border-radius: 0.5rem; /* Rounded corners */
+    margin-top: 1rem; /* Add space above the card */
+}
+
+.card-title {
+    font-size: 2rem; /* Larger font size for titles */
+    font-weight: bold;
+}
+
+.card-subtitle {
+    font-size: 1.25rem; /* Slightly smaller than the title */
+    color: #6c757d; /* Muted text color */
+}
+
+.card-text {
+    font-size: 1rem; /* Regular text size */
+    line-height: 1.5; /* Line height for readability */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff;
+}
+
+.text-primary {
+    color: #007bff; /* Link color matching the button */
+}
+
+hr {
+    border-top: 1px solid #dee2e6; /* Light gray border for separators */
+}
