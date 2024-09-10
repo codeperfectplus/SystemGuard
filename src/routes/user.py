@@ -55,7 +55,7 @@ def create_user():
             send_smtp_email(admin_email_address, subject, email_body, is_html=True)
 
         # Send welcome email to new user
-        subject = f"Welcome to the {get_app_info()["title"]}"  
+        subject = f"Welcome to the {get_app_info()['title']}"  
         context = {
             "username": new_user.username,
             "email": new_user.email,

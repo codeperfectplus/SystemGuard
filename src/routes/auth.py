@@ -154,7 +154,7 @@ def signup():
             send_smtp_email(admin_emails_with_alerts, subject, email_body, is_html=True)
 
         # Send email to the new user
-        subject = f"Welcome to the {get_app_info()["title"]}"
+        subject = f"Welcome to the {get_app_info()['title']}"
         context = {
             "username": new_user.username,
             "email": new_user.email,

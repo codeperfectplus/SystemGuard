@@ -50,10 +50,10 @@ def send_smtp_email(receiver_email, subject,
             msg = MIMEMultipart()
             msg['From'] = EMAIL_FROM  # Must be a verified Elastic Email sender
             msg['To'] = email
-            msg['Subject'] = f"{get_app_info()["title"]} Alert from {system_name} ({server_name}): {subject}"
+            msg['Subject'] = f"{get_app_info()['title']} Alert from ({server_name}): {subject}"
 
             # Append message to the body
-            append_message = f"This is an automated email from the {get_app_info()["title"]} application. Please do not reply to this email."
+            append_message = f"This is an automated email from the {get_app_info()['title']} application. Please do not reply to this email."
 
             # Add HTML or plain text to the email body
             if is_html:

@@ -44,7 +44,7 @@ def general_settings():
             # If 'enable_alerts' was changed, send an email to the admins
             admin_emails_with_alerts = get_email_addresses(user_level="admin", receive_email_alerts=True)
             if admin_emails_with_alerts:
-                subject = f"{get_app_info()["title"]} Alert Status Changed"
+                subject = f"{get_app_info()['title']} Alert Status Changed"
                 context = {
                     "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "notifications_enabled": general_settings.enable_alerts,
