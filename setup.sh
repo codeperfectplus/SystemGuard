@@ -34,6 +34,9 @@ GITHUB_USER="codeperfectplus"
 GITHUB_REPO="$APP_NAME"
 GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
+NUM_OF_RELEASES=5
+
+NUM_OF_RETRIES=5
 
 # Environment variables
 CONDA_ENV_NAME="$APP_NAME_LOWER"
@@ -258,7 +261,6 @@ change_ownership() {
 # check if conda is installed or not
 check_conda() {
     local CONDA_PATHS=("$USER_HOME/miniconda3" "$USER_HOME/anaconda3" "$1")  # Allow custom path as argument
-    echo $CONDA_PATHS
     local CONDA_FOUND=false
 
     # Find Conda installation
@@ -595,9 +597,46 @@ install_from_git() {
     log "Installation complete. $APP_NAME is ready to use."
 }
 
+# Function to fetch and display GitHub releases
+fetch_github_releases() {
+    local url="https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases"
+
+    # Check if jq is installed
+    if ! command -v jq &> /dev/null; then
+        echo "Error: jq is not installed. Please install jq to use this function."
+        return 1
+    fi
+
+    # Fetch releases
+    response=$(curl -s "$url")
+
+    # Check if curl command was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to fetch releases from GitHub."
+        return 1
+    fi
+
+    # Check if response contains a valid JSON
+    if ! echo "$response" | jq . > /dev/null 2>&1; then
+        echo "Error: Failed to parse JSON response from GitHub."
+        return 1
+    fi
+
+    # Display releases with newest first
+    # Display releases with newest first in tabular format
+    echo "--------------------------------------------"
+    echo "Latest releases for $APP_NAME:"
+    echo "--------------------------------------------"
+    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 | awk -F'\t' 'BEGIN { printf "%-15s %-20s\n", "Tag Name", "Published At" } { printf "%-15s %-20s\n", $1, $2 }' | head -n $NUM_OF_RELEASES
+    echo "--------------------------------------------"
+    # Exit with status code 0
+    return 0
+}
+
 # install the latest version of APP from the release
 install_from_release() {
-    echo "Enter the version of $APP_NAME to install (e.g., v1.0.0 or 'latest' for the latest version):"
+    fetch_github_releases
+    echo "Enter the tag name of the release to install (e.g., v1.0.3) or 'latest' for the latest release:"
     read -r VERSION
 
     [ "$VERSION" == "latest" ] && fetch_latest_version
@@ -967,7 +1006,6 @@ show_help() {
     echo "                             Shows information about all available options and how to use them."
 }
 
-
 # Parse command-line options
 for arg in "$@"; do
     case $arg in
@@ -986,6 +1024,7 @@ for arg in "$@"; do
         --check-conda) check_conda; exit 0 ;;
         --install-latest) ACTION="install_latest" ;;
         --open-app) open_browser; exit 0 ;;
+        --fetch-github-releases) fetch_github_releases; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -1008,5 +1047,6 @@ case $ACTION in
     install_latest) install_latest ;;
     update_dependencies) update_dependencies ;;
     open_browser) open_browser ;;
+    fetch_github_releases) fetch_github_releases ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
