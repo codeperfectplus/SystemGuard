@@ -144,3 +144,258 @@ body {
     }
 }
 
+/* General Card Styles */
+.card {
+    min-height: 150px; /* Ensures consistent card height */
+    background-size: cover; /* Ensure the image covers the entire card */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+    background-position: center center; /* Center the image */
+    color: #fff; /* Adjust text color for better contrast */
+    border: none; /* Remove default border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+    position: relative; /* Allows positioning for the pseudo-element */
+}
+
+/* Specific Background Colors */
+.card.bg-basic {
+    background-color: var(--color-primary); /* Bright blue for basic info */
+}
+
+.card.bg-username {
+    background-color: var(--color-username); /* Bright blue for username */
+}
+
+.card.bg-ipv4 {
+    background-color: var(--color-ip); /* Bright blue for IP address */
+}
+
+.card.bg-cpu {
+    background-color: var(--color-cpu); /* Red for CPU */
+}
+
+.card.bg-boot {
+    background-color: var(--color-boot); /* Green for boot time */
+}
+
+.card.bg-connection {
+    background-color: var(--color-connection); /* Red for connection */
+}
+
+.card.bg-dashboard-memory {
+    background-color: var(--color-bg-dashboard-memory); /* Green for memory card */
+}
+
+.card.bg-cpu-usage {
+    background-color: var(--color-cpu-usage); /* Yellow for CPU usage */
+}
+
+.card.bg-memory {
+    background-color: var(--color-memory); /* Purple for memory usage */
+}
+
+.card.bg-disk {
+    background-color: var(--color-disk); /* Gray for disk usage */
+}
+
+.card.bg-uptime {
+    background-color: var(--color-uptime); /* Cyan for uptime */
+}
+
+.card.bg-network {
+    background-color: var(--color-network); /* Bright blue for network */
+}
+
+.card.bg-speedtest {
+    background-color: var(--color-speedtest); /* Bright blue for speedtest */
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center-aligns the content */
+}
+
+.card-title {
+    font-size: 1.25rem; /* Adjusts font size for titles */
+}
+
+.card-text {
+    font-size: 1.5rem; /* Adjusts font size for text */
+}
+
+/* Battery Card Styles */
+.battery-card {
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    color: #fff;
+}
+
+.battery-card[data-battery="100"] {
+    background: linear-gradient(135deg, #76c7c0, #4caf50);
+}
+
+.battery-card[data-battery="75"] {
+    background: linear-gradient(135deg, #76c7c0, #ffeb3b);
+}
+
+.battery-card[data-battery="50"] {
+    background: linear-gradient(135deg, #fbc02d, #ff9800);
+}
+
+.battery-card[data-battery="25"] {
+    background: linear-gradient(135deg, #ff7043, #f44336);
+}
+
+.battery-card[data-battery="0"] {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: #fff;
+}
+
+/* The hover effect still applies */
+.battery-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: #fff;
+}
+
+/* Card containing CPU core visualization */
+.card.bg-cpu {
+    position: relative;
+}
+
+.cpu-core-visualization {
+    display: flex;
+    gap: 0.5rem; /* Space between bars */
+    margin-top: 1rem;
+    justify-content: center; /* Center-align bars */
+}
+
+
+/* Individual bar representing a CPU core */
+.cpu-core-bar {
+    width: 10px; /* Width of each bar */
+    height: 10px; /* Height of each bar */
+    background-color: #ffffff; /* Bar color */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+/* Card Red Bottom Effect */
+.card::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10px; /* Height of the red effect */
+    border-radius: 0 0 10px 10px; /* Match the card's border radius */
+    z-index: 1; /* Ensure it's on top of the card content */
+}
+
+.cpu-core-bar:hover {
+    background-color: var(--color-cpu); /* Red color on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); /* Slightly larger shadow */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    filter: brightness(1.2); /* Brighten the bar */
+
+}
+
+/* General Card Hover Effect */
+.card:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Specific Background Colors with Hover Effects */
+
+/* User-related info */
+.card.bg-username:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-username);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Boot time */
+.card.bg-boot:hover {
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-boot);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Memory Use */
+.card.bg-dashboard-memory:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-bg-dashboard-memory);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Network info */
+.card.bg-connection:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-connection);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* CPU-related info */
+.card.bg-cpu:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-cpu);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Battery Card Styles */
+.battery-card:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* CPU usage */
+.card.bg-cpu-usage:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-cpu-usage);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Memory usage */
+.card.bg-memory:hover {
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-memory);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Disk usage */
+.card.bg-disk:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-disk);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Uptime */
+.card.bg-uptime:hover {
+    transform: translateX(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-uptime);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Network statistics */
+.card.bg-network:hover {
+    transform: translateY(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-network);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+/* Speedtest */
+.card.bg-speedtest:hover {
+    transform: translateZ(-10px); /* Slight lift effect */
+    box-shadow: 0 10px 20px var(--color-speedtest);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}

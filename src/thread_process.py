@@ -14,6 +14,8 @@ from src.utils import render_template_from_file, ROOT_DIR
 
 # Dictionary to track the last known status of each website
 website_status = {}
+# Flag to check if logging is already scheduled
+is_logging_scheduled = False
 
 def send_mail(website_name, status, email_adress, email_alerts_enabled):
     """
@@ -106,6 +108,7 @@ def monitor_settings():
     Monitors application general settings for changes and controls system logging dynamically.
     This function runs periodically to check for updates to logging settings.
     """
+    global is_logging_scheduled
     with app.app_context():
         try:
             # Fetch the general settings
@@ -115,9 +118,15 @@ def monitor_settings():
             is_logging_system_info = general_settings.is_logging_system_info if general_settings else False
             if is_logging_system_info:
                 logger.info("System logging enabled. Starting system info logging.")
-                Timer(0, log_system_info).start()
+                
+                # Schedule logging only if not already scheduled
+                if not is_logging_scheduled:
+                    logger.debug("Scheduling system info logging.")
+                    Timer(0, log_system_info).start()
+                    is_logging_scheduled = True
             else:
                 logger.info("System logging disabled. Stopping system info logging.")
+                is_logging_scheduled = False  # Reset the flag if logging is disabled
 
             # Check settings periodically (every 10 seconds)
             Timer(10, monitor_settings).start()
@@ -130,6 +139,7 @@ def log_system_info():
     Logs system information at regular intervals based on the general settings.
     This function checks if logging is still active before each logging event.
     """
+    global is_logging_scheduled
     with app.app_context():
         try:
             # Fetch the general settings to check if logging is enabled
@@ -138,6 +148,7 @@ def log_system_info():
 
             if not is_logging_system_info:
                 logger.info("System info logging has been stopped.")
+                is_logging_scheduled = False  # Reset the flag if logging stops
                 return
 
             log_system_info_to_db()
@@ -148,6 +159,7 @@ def log_system_info():
 
         except Exception as e:
             logger.error(f"Error during system info logging: {e}", exc_info=True)
+            is_logging_scheduled = False  # Reset the flag in case of an error
 
 def log_system_info_to_db():
     """

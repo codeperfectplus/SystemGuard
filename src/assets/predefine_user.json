@@ -4,7 +4,7 @@
         "email": "admin@gmail.com",
         "password": "admin",
         "user_level": "admin",
-        "profession": "developer",
+        "profession": "Software Developer",
         "receive_email_alerts": true
     },
     {
@@ -12,7 +12,7 @@
         "email": "manager@gmail.com",
         "password": "manager",
         "user_level": "user",
-        "profession": "manager",
+        "profession": "System Administrator",
         "receive_email_alerts": true
     }
 ]

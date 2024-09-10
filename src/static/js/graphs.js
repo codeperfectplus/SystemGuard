@@ -58,23 +58,25 @@ function formatDate(dateString, currentTime) {
     const diffYears = now.getFullYear() - date.getUTCFullYear();
 
     // Determine the label based on time differences
-    if (diffDays === 0) {
-        return `Today ${hours}:${minutes}`;
-    } else if (diffDays === 1) {
-        return `Yesterday ${hours}:${minutes}`;
-    } else if (diffDays <= 3) {
-        return `${diffDays} Days Ago ${hours}:${minutes}`;
-    } else if (diffDays <= 7) {
-        return `${Math.ceil(diffDays / 7)} Week${diffDays > 7 ? 's' : ''} Ago ${hours}:${minutes}`;
-    } else if (diffDays <= 30) {
-        return `${Math.ceil(diffDays / 7)} Weeks Ago ${hours}:${minutes}`;
-    } else if (diffMonths < 12) {
-        return `${diffMonths} Month${diffMonths > 1 ? 's' : ''} Ago ${hours}:${minutes}`;
-    } else if (diffYears < 2) {
-        return `Last Year ${hours}:${minutes}`;
-    } else {
-        return `${year}/${month}/${day} ${hours}:${minutes}`;
-    }
+    // if (diffDays === 0) {
+    //     return `Today ${hours}:${minutes}`;
+    // } else if (diffDays === 1) {
+    //     return `Yesterday ${hours}:${minutes}`;
+    // } else if (diffDays <= 3) {
+    //     return `${diffDays} Days Ago ${hours}:${minutes}`;
+    // } else if (diffDays <= 7) {
+    //     return `${Math.ceil(diffDays / 7)} Week${diffDays > 7 ? 's' : ''} Ago ${hours}:${minutes}`;
+    // } else if (diffDays <= 30) {
+    //     return `${Math.ceil(diffDays / 7)} Weeks Ago ${hours}:${minutes}`;
+    // } else if (diffMonths < 12) {
+    //     return `${diffMonths} Month${diffMonths > 1 ? 's' : ''} Ago ${hours}:${minutes}`;
+    // } else if (diffYears < 2) {
+    //     return `Last Year ${hours}:${minutes}`;
+    // } else {
+    //     return `${year}/${month}/${day} ${hours}:${minutes}`;
+    // }
+
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
 function displayTimeAndTimeZone(currentTime, timeZoneName) {

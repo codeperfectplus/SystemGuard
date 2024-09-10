@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import SystemInformation, UserDashboardSettings
 from src.utils import _get_system_info
+from datetime import datetime, timedelta
 import gc
 
 api_bp = blueprints.Blueprint("api", __name__)
@@ -16,10 +17,6 @@ def cpu_percent_api():
         return jsonify(system_info), 200
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching the system information", "details": str(e)}), 500
-
-
-from flask import request
-from datetime import datetime, timedelta
 
 @app.route('/api/graphs_data', methods=['GET'])
 @login_required
@@ -112,7 +109,6 @@ def graph_data_api():
 @login_required
 def manage_refresh_interval():
     try:
-        # Get refresh interval (GET request)
         if request.method == 'GET':
             settings = UserDashboardSettings.query.filter_by(user_id=current_user.id).first()
             if not settings:
