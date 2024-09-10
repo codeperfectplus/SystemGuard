@@ -4,9 +4,8 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
 
-# Retrieve the home directory of the current user
-USER_HOME=$(get_user_home)
-USER_NAME=$(basename "$USER_HOME")
+USER_NAME=$(logname)
+USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
@@ -56,7 +55,7 @@ fi
 generate_ascii_art() {
   local text="$1"
   local color_code="$2"
-  
+
   # Define color codes with default to reset if not specified
   local color_reset="\033[0m"
   local color="$color_reset"
@@ -134,7 +133,7 @@ generate_ascii_art "CodePerfectPlus" "yellow"
 check_dependencies() {
     # List of required dependencies
     local dependencies=(git curl wget unzip iptables)
-    
+
     # Check if `apt-get` is available
     if ! command -v apt-get &> /dev/null; then
         log "ERROR" "This script requires apt-get but it is not available."
@@ -143,7 +142,7 @@ check_dependencies() {
 
     # Array to keep track of missing dependencies
     local missing_dependencies=()
-    
+
     # Check each dependency
     for cmd in "${dependencies[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
@@ -166,21 +165,6 @@ check_dependencies() {
         log "All required dependencies are already installed."
     fi
 }
-
-get_user_home() {
-    if [ -n "$SUDO_USER" ]; then
-        # When using sudo, SUDO_USER gives the original user who invoked sudo
-        TARGET_USER="$SUDO_USER"
-    else
-        # If not using sudo, use LOGNAME to find the current user
-        TARGET_USER="$LOGNAME"
-    fi
-    
-    # Get the home directory of the target user
-    USER_HOME=$(eval echo ~$TARGET_USER)
-    echo "$USER_HOME"
-}
-
 
 # Function to create a directory if it does not exist
 create_and_own_dir() {
@@ -245,7 +229,7 @@ prompt_user() {
 # set the auto update variable
 set_auto_update() {
     var_name=$1
-    prompt_user # Prompt user for input  
+    prompt_user # Prompt user for input
     # Validate input
     if ! validate_choice "$user_choice"; then
         return 1
@@ -272,12 +256,13 @@ change_ownership() {
 
 # check if conda is installed or not
 check_conda() {
-    CONDA_PATHS=("/home/$USER_NAME/miniconda3" "/home/$USER_NAME/anaconda3")
-    CONDA_FOUND=false
+    local CONDA_PATHS=("$USER_HOME/miniconda3" "$USER_HOME/anaconda3" "$1")  # Allow custom path as argument
+    echo $CONDA_PATHS
+    local CONDA_FOUND=false
 
     # Find Conda installation
     for CONDA_PATH in "${CONDA_PATHS[@]}"; do
-        if [ -d "$CONDA_PATH" ]; then
+        if [ -n "$CONDA_PATH" ] && [ -d "$CONDA_PATH" ]; then  # Check if the path is non-empty and exists
             CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
             CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
             CONDA_FOUND=true
@@ -286,10 +271,11 @@ check_conda() {
     done
 
     if [ "$CONDA_FOUND" = false ]; then
-        log "ERROR" "Conda not found. Please install Conda or check your Conda paths."
+        echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
         exit 1
     fi
-    echo "Conda executable: $CONDA_EXECUTABLE"
+
+    echo "Conda found at: $CONDA_EXECUTABLE"
 }
 
 # Function to add a cron job with error handling
@@ -337,19 +323,19 @@ add_cron_job() {
     fi
 
     rm "$temp_cron"
-    log "INFO" "Cron job added successfully" 
+    log "INFO" "Cron job added successfully"
     # log $cron_job
 }
 
 # Function to clean up all backups
 cleanup_backups() {
     log "INFO" "Cleaning up all backups in $BACKUP_DIR..."
-    
+
     # Check if the backup directory exists
     if [ -d "$BACKUP_DIR" ]; then
         # List all items in the backup directory
         local backups=( $(ls -A "$BACKUP_DIR") )
-        
+
         # Check if there are any backups to remove
         if [ ${#backups[@]} -gt 0 ]; then
             # Loop through each item and remove it
@@ -395,7 +381,7 @@ backup_configs() {
 # Restore function to restore from a backup
 restore() {
     log "Starting restore process..."
-    
+
     # List available backups
     if [ -d "$BACKUP_DIR" ]; then
         echo "Available backups:"
@@ -407,7 +393,7 @@ restore() {
                 echo "Invalid selection. Please try again."
             fi
         done
-        
+
         # Confirm restoration
         echo "Are you sure you want to restore this backup? This will overwrite the current installation. (y/n)"
         read CONFIRM
@@ -415,13 +401,13 @@ restore() {
             log "WARNING" "Restore aborted by user."
             exit 0
         fi
-        
+
         # Remove existing installation
         if [ -d "$EXTRACT_DIR" ]; then
             rm -rf "$EXTRACT_DIR"
             log "Old installation removed."
         fi
-        
+
         # Restore selected backup
         cp -r "$BACKUP" "$EXTRACT_DIR"
         log "Restore completed from backup: $BACKUP"
@@ -435,7 +421,7 @@ install_executable() {
     # Use $0 to get the full path of the currently running script
     # CURRENT_SCRIPT=$(realpath "$0")
     cd $EXTRACT_DIR/$APP_NAME-*/
-    CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT  
+    CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT
     # Verify that the script exists before attempting to copy
     if [ -f "$CURRENT_SCRIPT" ]; then
         log "Installing executable to /usr/local/bin/systemguard-installer..."
@@ -468,18 +454,40 @@ remove_cronjob () {
 # remove previous installation of cron jobs and SystemGuard
 remove_previous_installation() {
     remove_extract_dir
-    remove_cronjob 
+    remove_cronjob
 }
 
 # Function to fetch the latest version of SystemGuard from GitHub releases
 fetch_latest_version() {
     log "Fetching the latest version of $APP_NAME from GitHub..."
-    VERSION=$(curl -s https://api.github.com/repos/$GIT_USER/$GIT_REPO/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
-    if [ -z "$VERSION" ]; then
-        log "ERROR" "Unable to fetch the latest version. Please try again or specify a version manually."
+
+    # Fetch the latest version from GitHub
+    API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
+    echo "API URL: $API_URL"
+    RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/latest_version.json "$API_URL")
+    HTTP_CODE="${RESPONSE: -3}"  # Extract HTTP status code
+
+    # Check for HTTP errors
+    if [ "$HTTP_CODE" -ne 200 ]; then
+        if [ "$HTTP_CODE" -eq 403 ]; then
+            log "ERROR" "GitHub API rate limit exceeded. Try again later or provide a GitHub token."
+        else
+            log "ERROR" "Failed to fetch the latest version. HTTP status code: $HTTP_CODE."
+        fi
         exit 1
     fi
+
+    # Parse the version from the JSON response
+    VERSION=$(grep -Po '"tag_name": "\K.*?(?=")' /tmp/latest_version.json)
+
+    # Check if a version was found
+    if [ -z "$VERSION" ]; then
+        log "ERROR" "Unable to extract the version from the GitHub API response."
+        exit 1
+    fi
+
     log "Latest version found: $VERSION"
+    echo "$VERSION"
 }
 
 # Function to download a release from a given URL
@@ -516,7 +524,7 @@ install_from_git() {
     # Remove any previous installations
     remove_previous_installation
 
-    
+
     echo ""
     echo "Select the version of $APP_NAME to install:"
     echo "|------------------------------------------------------------------------------|"
@@ -549,14 +557,12 @@ install_from_git() {
     esac
 
     # Construct the full Git URL with branch
-    FULL_GIT_URL="https://github.com/codeperfectplus/SystemGuard.git -b $BRANCH"
+    FULL_GIT_URL="$GITHUB_URL -b $BRANCH"
 
     set_auto_update "systemguard_auto_update"
-    
+
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
-    check_conda # check if conda is installed
-    
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 30
@@ -567,9 +573,9 @@ install_from_git() {
     install_conda_env # if conda is installed then install the conda environment
 
     # Change to the installation directory
-    cd "$GIT_INSTALL_DIR" || { 
-        log "ERROR" "Failed to navigate to the installation directory."; 
-        exit 1; 
+    cd "$GIT_INSTALL_DIR" || {
+        log "ERROR" "Failed to navigate to the installation directory.";
+        exit 1;
     }
 
     log "Setting up $APP_NAME from Git repository..."
@@ -595,7 +601,7 @@ install_from_release() {
 
     [ "$VERSION" == "latest" ] && fetch_latest_version
 
-    ZIP_URL="$GIT_URL/archive/refs/tags/$VERSION.zip"
+    ZIP_URL="$GITHUB_URL/archive/refs/tags/$VERSION.zip"
     log "Installing $APP_NAME version $VERSION..."
 
     download_release "$ZIP_URL" "$DOWNLOAD_DIR/systemguard.zip"
@@ -610,7 +616,6 @@ install_from_release() {
     rm "$DOWNLOAD_DIR/systemguard.zip"
     log "Extraction completed."
 
-    check_conda # check if conda is installed
     install_conda_env # if conda is installed then install the conda environment
 
     install_executable
@@ -618,7 +623,6 @@ install_from_release() {
 
     change_ownership "$EXTRACT_DIR"
     log "$APP_NAME version $VERSION installed successfully!"
-    log "Server may take a few minutes to start. If you face any issues, try restarting the server."
 }
 
 display_credentials() {
@@ -627,9 +631,40 @@ display_credentials() {
     log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
 }
 
+timer() {
+    local duration=$1
+    for i in {1..50}; do
+        echo -n "$i "
+        sleep 1
+        echo -ne "\r" # Delete previous number to show next
+    done
+}
+
+open_browser() {
+    log "Please use the above credentials to login to the SystemGuard server."
+    log "If you face server server issues, run 'sudo systemguard-installer --fix' to fix the installation."
+    log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
+    # show timer for 50 seconds
+    timer 50
+    
+    if [ "$(id -u)" = "0" ]; then
+        sudo -u "$SUDO_USER" xdg-open "$HOST_URL" &  # Linux with xdg-open
+    else
+        # If running as a normal user, use xdg-open or open (for macOS)
+        if command -v xdg-open &> /dev/null; then
+            xdg-open "$HOST_URL" &
+        elif command -v open &> /dev/null; then
+            open "$HOST_URL" &
+        else
+            log "ERROR" "Unable to open the browser. Please open the browser and navigate to $HOST_URL."
+        fi
+    fi
+}
+
 # Install function
 install() {
     check_dependencies
+    check_conda # check if conda is installed
     log "Starting installation of $APP_NAME..."
     create_and_own_dir "$EXTRACT_DIR"
     echo ""
@@ -656,7 +691,7 @@ install() {
 	stop_server
 	generate_ascii_art "SystemGuard Installed" "green"
     display_credentials
-
+    open_browser
 }
 # Uninstall function
 uninstall() {
@@ -675,7 +710,7 @@ load_test() {
         log "Load test aborted by user."
         exit 0
     fi
-    
+
     # Check if Locust is installed
     if ! command -v locust &> /dev/null
     then
@@ -693,14 +728,14 @@ load_test() {
 # Check if SystemGuard is installed
 check_status() {
     log "Checking $APP_NAME status..."
-    
+
     if [ -d "$EXTRACT_DIR" ]; then
         log "$APP_NAME is installed at $EXTRACT_DIR."
     else
         log "$APP_NAME is not installed."
     fi
 
-    
+
     if $crontab_cmd '-l' | grep -q "$CRON_PATTERN"; then
         log "Cron job for $APP_NAME is set."
     else
@@ -715,7 +750,7 @@ health_check() {
     local sleep_time=30
     local max_retries=5
     local retries=0
-    
+
     # Check if HOST_URL is set
     if [[ -z "$HOST_URL" ]]; then
         log "ERROR" "HOST_URL is not set. Exiting."
@@ -724,10 +759,10 @@ health_check() {
 
     while (( retries < max_retries )); do
         log "Performing health check on $HOST_URL..."
-        
+
         # Get the HTTP response code
         response_code=$(curl -s -o /dev/null -w "%{http_code}" "$HOST_URL")
-        
+
         # Check if the response code indicates success
         if [[ $response_code -eq 200 || $response_code -eq 302 ]]; then
             log "Health check successful: $HOST_URL is up and running."
@@ -740,7 +775,7 @@ health_check() {
             sleep "$sleep_time"
         fi
     done
-    
+
     # If max retries are reached, log the failure and exit with an error
     log "ERROR" "Max retries reached. $HOST_URL is still not responding. Exiting with error."
     generate_ascii_art "SystemGuard is DOWN" "red"
@@ -754,7 +789,7 @@ show_server_logs() {
     echo ""
     echo "--- Server Logs ---"
     echo ""
-    
+
     cd $EXTRACT_DIR/$APP_NAME-*/
     log_file=$(find . -name "app_debug.log" | head -n 1)
     echo "log file: $log_file"
@@ -772,7 +807,7 @@ show_installer_logs() {
     echo ""
     echo "--- Installer Logs ---"
     echo ""
-    
+
     if [ -f "$LOG_FILE" ]; then
         log "Installer log file: $LOG_FILE"
         tail -100f "$LOG_FILE"
@@ -786,7 +821,7 @@ update_dependencies() {
     check_conda
     source "$CONDA_SETUP_SCRIPT"
     conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
-    
+
     # Check for missing dependencies
     log "INFO" "Checking for missing dependencies..."
     cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
@@ -824,7 +859,7 @@ install_conda_env() {
 
 
 # stop flask server
-stop_server_helper() {    
+stop_server_helper() {
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
         kill -9 $(lsof -t -i:5050)
         log "Server stopped successfully."
@@ -873,6 +908,7 @@ install_latest() {
     fi
 }
 
+
 # Display help
 show_help() {
     echo "$APP_NAME Installer"
@@ -880,53 +916,53 @@ show_help() {
     echo "Usage: $EXECUTABLE_APP_NAME [options]"
     echo ""
     echo "Options:"
-    echo "  --install           Install $APP_NAME and set up all necessary dependencies."
-    echo "                      This will configure the environment and start the application."
+    echo "  --install                  Install $APP_NAME and set up all necessary dependencies."
+    echo "                             This will configure the environment and start the application."
     echo ""
-    echo "  --uninstall         Uninstall $APP_NAME completely."
-    echo "                      This will remove the application and all associated files."
+    echo "  --uninstall                Uninstall $APP_NAME completely."
+    echo "                             This will remove the application and all associated files."
     echo ""
-    echo "  --fix               Fix the $APP_NAME installation errors."
-    echo "                      This will fix any issues with the installation and restart the server."
-    echo ""   
-    echo "  --restore           Restore $APP_NAME from a backup."
-    echo "                      Use this option to recover data or settings from a previous backup."
+    echo "  --fix                      Fix the $APP_NAME installation errors."
+    echo "                             This will fix any issues with the installation and restart the server."
     echo ""
-    echo "  --load-test         Start Locust load testing for $APP_NAME."
-    echo "                      This will initiate performance testing to simulate multiple users."
+    echo "  --restore                  Restore $APP_NAME from a backup."
+    echo "                             Use this option to recover data or settings from a previous backup."
     echo ""
-    echo "  --status            Check the status of $APP_NAME installation."
-    echo "                      Displays whether $APP_NAME is installed, running, or if there are any issues."
+    echo "  --load-test                Start Locust load testing for $APP_NAME."
+    echo "                             This will initiate performance testing to simulate multiple users."
     echo ""
-    echo "  --health-check      Perform a health check on $HOST_URL."
-    echo "                      Verifies that the application is running correctly and responding to requests."
+    echo "  --status                   Check the status of $APP_NAME installation."
+    echo "                             Displays whether $APP_NAME is installed, running, or if there are any issues."
     echo ""
-    echo "  --clean-backups     Clean up all backups of $APP_NAME."
-    echo "                      This will delete all saved backup files to free up space."
+    echo "  --health-check             Perform a health check on $HOST_URL."
+    echo "                             Verifies that the application is running correctly and responding to requests."
     echo ""
-    echo "  --logs              Show server logs for $APP_NAME."
-    echo "                      Displays the latest server logs, which can help in troubleshooting issues."
-    echo "                      Press Ctrl+C to exit the log viewing session."
+    echo "  --clean-backups            Clean up all backups of $APP_NAME."
+    echo "                             This will delete all saved backup files to free up space."
     echo ""
-    echo " --installation-logs  Show installer logs for $APP_NAME."
-    echo "                      Displays the logs generated during the installation process."
-    echo "                      Press Ctrl+C to exit the log viewing session."
+    echo "  --logs                     Show server logs for $APP_NAME."
+    echo "                             Displays the latest server logs, which can help in troubleshooting issues."
+    echo "                             Press Ctrl+C to exit the log viewing session."
     echo ""
-    echo "  --server-stop       Stop the $APP_NAME server."
-    echo "                      This will stop the running server instance."
+    echo " --installation-logs         Show installer logs for $APP_NAME."
+    echo "                             Displays the logs generated during the installation process."
+    echo "                             Press Ctrl+C to exit the log viewing session."
     echo ""
-    echo " --install-latest     Update the code to the latest version."
-    echo "                      This will pull the latest code from the Git repository."
+    echo "  --stop-server              Stop the $APP_NAME server."
+    echo "                             This will stop the running server instance."
+    echo ""
+    echo " --install-latest            Update the code to the latest version."
+    echo "                             This will pull the latest code from the Git repository."
     echo ""
     echo ""
-    echo " --check-conda        Check if Conda is installed and available."
-    echo "                      This will verify the presence of Conda and display the installation path."
+    echo " --check-conda               Check if Conda is installed and available."
+    echo "                             This will verify the presence of Conda and display the installation path."
     echo ""
-    echo " --update-dependencies Update the dependencies for $APP_NAME."
-    echo "                      This will install any missing dependencies required for the application."
+    echo " --update-dependencies       Update the dependencies for $APP_NAME."
+    echo "                             This will install any missing dependencies required for the application."
     echo ""
-    echo "  --help              Display this help message."
-    echo "                      Shows information about all available options and how to use them."
+    echo "  --help                     Display this help message."
+    echo "                             Shows information about all available options and how to use them."
 }
 
 
@@ -942,11 +978,12 @@ for arg in "$@"; do
         --clean-backups) ACTION="cleanup_backups" ;;
         --logs) show_server_logs; exit 0 ;;
         --installation-logs) show_installer_logs; exit 0 ;;
-        --server-stop) stop_server; exit 0 ;;
+        --stop-server) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
         --update-dependencies) update_dependencies; exit 0 ;;
         --check-conda) check_conda; exit 0 ;;
         --install-latest) ACTION="install_latest" ;;
+        --open-app) open_browser; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -968,5 +1005,6 @@ case $ACTION in
     check-conda) check_conda ;;
     install_latest) install_latest ;;
     update_dependencies) update_dependencies ;;
+    open_browser) open_browser ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
