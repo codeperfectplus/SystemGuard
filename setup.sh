@@ -642,7 +642,7 @@ timer() {
 }
 
 open_browser() {
-    log "If you face server server issues, run 'sudo $$APP_NAME_LOWER-installer --fix' to fix the installation."
+    log "If you face server server issues, run 'sudo $APP_NAME_LOWER-installer --fix' to fix the installation."
     log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
     # show timer for 50 seconds
     timer 50

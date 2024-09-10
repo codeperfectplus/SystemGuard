@@ -10,7 +10,7 @@ APP_NAME = "SystemGuard"
 DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
 AUTHOR = "Deepak Raj"
 YEAR = "2024"
-VERSION = "1.0.4-pre-release"
+VERSION = "v1.0.4-pre-release"
 PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
 
