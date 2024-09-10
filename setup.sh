@@ -4,15 +4,13 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$USER
-echo $USER_NAME
-echo $HOME
 if [ "$(whoami)" = "root" ]; then
-    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | head -n 1)
 else
     USER_NAME=$(whoami)
 fi
-echo $USER_NAME
+
+echo "Welcome on board $USER_NAME"
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -29,7 +27,7 @@ EXECUTABLE="/usr/local/bin/$APP_NAME_LOWER-installer"
 # Application-related file paths
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
-FLASK_LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-flask.log"
+FLASK_LOG_FILE="$LOG_DIR/flask.log"
 
 # Backup settings
 NUM_BACKUPS=5
