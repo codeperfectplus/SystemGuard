@@ -4,7 +4,15 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$(logname)
+USER_NAME=$USER
+echo $USER_NAME
+echo $HOME
+if [ "$(whoami)" = "root" ]; then
+    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+else
+    USER_NAME=$(whoami)
+fi
+echo $USER_NAME
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -874,8 +882,8 @@ update_dependencies() {
 
     log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
 
-    # Install dependencies silently
-    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" > /dev/null 2>&1 || {
+    # Install dependencies
+    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" || {
         log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
         exit 1
     }
@@ -1050,3 +1058,4 @@ case $ACTION in
     fetch_github_releases) fetch_github_releases ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
+
