@@ -4,12 +4,7 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-if [ "$(whoami)" = "root" ]; then
-    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | head -n 1)
-else
-    USER_NAME=$(whoami)
-fi
-
+USER_NAME=$(logname)
 echo "Welcome on board $USER_NAME"
 USER_HOME=/home/$USER_NAME
 
@@ -283,8 +278,6 @@ check_conda() {
         echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
         exit 1
     fi
-
-    echo "Conda found at: $CONDA_EXECUTABLE"
 }
 
 # Function to add a cron job with error handling
@@ -472,7 +465,6 @@ fetch_latest_version() {
 
     # Fetch the latest version from GitHub
     API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
-    echo "API URL: $API_URL"
     RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/latest_version.json "$API_URL")
     HTTP_CODE="${RESPONSE: -3}"  # Extract HTTP status code
 
