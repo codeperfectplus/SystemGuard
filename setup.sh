@@ -279,6 +279,7 @@ check_conda() {
         echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
         exit 1
     fi
+    echo "Conda found at: $CONDA_EXECUTABLE"
 }
 
 # Function to add a cron job with error handling
@@ -727,7 +728,6 @@ install() {
             exit 1
             ;;
     esac
-	stop_server
 	generate_ascii_art "$APP_NAME Installed" "green"
     display_credentials
     open_browser
@@ -884,14 +884,30 @@ update_dependencies() {
 
 # Function to install Conda environment and dependencies
 install_conda_env() {
-    log "Checking conda environment $CONDA_ENV_NAME..."
-    if ! "$CONDA_EXECUTABLE" env list | grep -q "$CONDA_ENV_NAME"; then
-        log "Creating Conda environment $CONDA_ENV_NAME..."
-        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.11 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
-        # install the dependencies
+    # Check if Conda is available
+    check_conda
+
+    # Log the environment checking process
+    log "INFO" "Checking Conda environment $CONDA_ENV_NAME..."
+
+    # Full path to the environment to be checked
+    ENV_PATH="$("$CONDA_EXECUTABLE" info --base)/envs/$CONDA_ENV_NAME"
+
+    # Check if the environment already exists
+    if ! sudo -u "$SUDO_USER" bash -c "[ -d '$ENV_PATH' ]"; then
+        log "INFO" "Creating Conda environment $CONDA_ENV_NAME..."
+
+        # Create the Conda environment as the original user
+        sudo -u "$SUDO_USER" bash -c "$CONDA_EXECUTABLE create -n $CONDA_ENV_NAME python=3.11 -y" || {
+            log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1;
+        }
+
+        # Call the update_dependencies function to install dependencies
         update_dependencies
     else
-        log "Conda environment $CONDA_ENV_NAME already exists."
+        log "INFO" "Conda environment $CONDA_ENV_NAME already exists."
+
+        # Update dependencies in the existing environment
         update_dependencies
     fi
 }
@@ -1024,6 +1040,7 @@ for arg in "$@"; do
         --install-latest) ACTION="install_latest" ;;
         --open-app) open_browser; exit 0 ;;
         --fetch-github-releases) fetch_github_releases; exit 0 ;;
+        --install-conda-env) install_conda_env; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -1047,6 +1064,7 @@ case $ACTION in
     update_dependencies) update_dependencies ;;
     open_browser) open_browser ;;
     fetch_github_releases) fetch_github_releases ;;
+    install_conda_env) install_conda_env ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
 
