@@ -4,13 +4,7 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-if [ "$(whoami)" = "root" ]; then
-    USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | head -n 1)
-else
-    USER_NAME=$(whoami)
-fi
-
-echo "Welcome on board $USER_NAME"
+USER_NAME=$(logname)
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -29,8 +23,7 @@ HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
 FLASK_LOG_FILE="$LOG_DIR/flask.log"
 
-# Backup settings
-NUM_BACKUPS=5
+
 
 # Cron job pattern
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
@@ -41,8 +34,10 @@ GITHUB_REPO="$APP_NAME"
 GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
 NUM_OF_RELEASES=5
-
 NUM_OF_RETRIES=5
+
+# Backup settings
+NUM_BACKUPS=5
 
 # Environment variables
 CONDA_ENV_NAME="$APP_NAME_LOWER"
@@ -138,11 +133,12 @@ generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
+echo "Welcome on board: Mr. $(echo "$USER_NAME" | sed 's/.*/\u&/')"
 
 # function to check for required dependencies
 check_dependencies() {
     # List of required dependencies
-    local dependencies=(git curl wget unzip iptables)
+    local dependencies=(git curl wget unzip iptables figlet)
 
     # Check if `apt-get` is available
     if ! command -v apt-get &> /dev/null; then
@@ -283,8 +279,6 @@ check_conda() {
         echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
         exit 1
     fi
-
-    echo "Conda found at: $CONDA_EXECUTABLE"
 }
 
 # Function to add a cron job with error handling
@@ -472,7 +466,6 @@ fetch_latest_version() {
 
     # Fetch the latest version from GitHub
     API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
-    echo "API URL: $API_URL"
     RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/latest_version.json "$API_URL")
     HTTP_CODE="${RESPONSE: -3}"  # Extract HTTP status code
 
