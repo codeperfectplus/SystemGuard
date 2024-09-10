@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# SystemGuard Installer Script
+# App Installer Script
 # ----------------------------
-# This script installs, uninstalls, backs up, restores SystemGuard, and includes load testing using Locust.
+# This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
 USER_NAME=$(logname)
 USER_HOME=/home/$USER_NAME
@@ -10,23 +10,24 @@ USER_HOME=/home/$USER_NAME
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
 APP_NAME="SystemGuard"
-EXTRACT_DIR="$USER_HOME/.systemguard"
+APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
+EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
 GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
 LOG_DIR="$USER_HOME/logs"
-LOG_FILE="$LOG_DIR/systemguard-installer.log"
-BACKUP_DIR="$USER_HOME/.systemguard_backup"
-EXECUTABLE="/usr/local/bin/systemguard-installer"
+LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-installer.log"
+BACKUP_DIR="$USER_HOME/.$APP_NAME_LOWER-backup"
+EXECUTABLE="/usr/local/bin/$APP_NAME_LOWER-installer"
 
 # Application-related file paths
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
-FLASK_LOG_FILE="$LOG_DIR/systemguard_flask.log"
+FLASK_LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-flask.log"
 
 # Backup settings
 NUM_BACKUPS=5
 
-# Cron job pattern for SystemGuard
-CRON_PATTERN=".systemguard/${APP_NAME}-.*/src/scripts/dashboard.sh"
+# Cron job pattern
+CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
 
 # GitHub repository details
 GITHUB_USER="codeperfectplus"
@@ -35,12 +36,12 @@ GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
 
 # Environment variables
-CONDA_ENV_NAME="systemguard"
+CONDA_ENV_NAME="$APP_NAME_LOWER"
 ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
 
-# SystemGuard authentication
-SYSTEMGUARD_USER="admin"
-SYSTEMGUARD_PASS="admin"
+# authentication
+ADMIN_LOGIN="admin"
+ADMIN_PASSWORD="admin"
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
@@ -124,7 +125,7 @@ log() {
 }
 
 # introductary message
-generate_ascii_art "SystemGuard" "yellow"
+generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
@@ -221,7 +222,7 @@ update_env_variable() {
 }
 
 prompt_user() {
-    echo "Do you want to enable $var_name? (true/false) This will enable automatic updates for SystemGuard."
+    echo "Do you want to enable $var_name? (true/false) This will enable automatic updates for $APP_NAME."
     read -p "Enter your choice (true/false): " user_choice
     echo "$user_choice"
 }
@@ -284,7 +285,7 @@ add_cron_job() {
     # Define log directory and cron job command
     local log_dir="$USER_HOME/logs"
     local script_path=$(find "$EXTRACT_DIR" -name dashboard.sh)
-    local cron_job="* * * * * /bin/bash $script_path >> $log_dir/systemguard_cron.log 2>&1"
+    local cron_job="* * * * * /bin/bash $script_path >> $log_dir/$APP_NAME_LOWER-cron.log 2>&1"
 
     # Create log directory with error handling
     if [ $? -ne 0 ]; then
@@ -424,7 +425,7 @@ install_executable() {
     CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT
     # Verify that the script exists before attempting to copy
     if [ -f "$CURRENT_SCRIPT" ]; then
-        log "Installing executable to /usr/local/bin/systemguard-installer..."
+        log "Installing executable to /usr/local/bin/$APP_NAME_LOWER-installer..."
         cp "$CURRENT_SCRIPT" "$EXECUTABLE"
         log "Executable installed successfully."
     else
@@ -451,13 +452,13 @@ remove_cronjob () {
         log "No previous cron jobs found."
     fi
 }
-# remove previous installation of cron jobs and SystemGuard
+# remove previous installation of cron jobs
 remove_previous_installation() {
     remove_extract_dir
     remove_cronjob
 }
 
-# Function to fetch the latest version of SystemGuard from GitHub releases
+# Function to fetch the latest version from GitHub releases
 fetch_latest_version() {
     log "Fetching the latest version of $APP_NAME from GitHub..."
 
@@ -502,7 +503,7 @@ download_release() {
     log "Download completed successfully."
 }
 
-# Function to setup the cron job for SystemGuard
+# Function to setup the cron job
 setup_cron_job() {
     log "Preparing cron job script..."
     add_cron_job
@@ -514,7 +515,7 @@ setup_cron_job() {
     fi
 }
 
-# Function to install SystemGuard from Git repository
+# Function to install from Git repository
 install_from_git() {
     log "Starting installation of $APP_NAME from Git repository..."
 
@@ -559,7 +560,7 @@ install_from_git() {
     # Construct the full Git URL with branch
     FULL_GIT_URL="$GITHUB_URL -b $BRANCH"
 
-    set_auto_update "systemguard_auto_update"
+    set_auto_update "$APP_NAME_LOWER-AUTO-UPDATE"
 
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
@@ -594,7 +595,7 @@ install_from_git() {
     log "Installation complete. $APP_NAME is ready to use."
 }
 
-# install the latest version of SystemGuard from the release
+# install the latest version of APP from the release
 install_from_release() {
     echo "Enter the version of $APP_NAME to install (e.g., v1.0.0 or 'latest' for the latest version):"
     read -r VERSION
@@ -604,7 +605,7 @@ install_from_release() {
     ZIP_URL="$GITHUB_URL/archive/refs/tags/$VERSION.zip"
     log "Installing $APP_NAME version $VERSION..."
 
-    download_release "$ZIP_URL" "$DOWNLOAD_DIR/systemguard.zip"
+    download_release "$ZIP_URL" "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
 
     backup_configs
     remove_previous_installation
@@ -612,8 +613,8 @@ install_from_release() {
     log "Setting up installation directory..."
 
     log "Extracting $APP_NAME package..."
-    unzip -q "$DOWNLOAD_DIR/systemguard.zip" -d "$EXTRACT_DIR"
-    rm "$DOWNLOAD_DIR/systemguard.zip"
+    unzip -q "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip" -d "$EXTRACT_DIR"
+    rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
     log "Extraction completed."
 
     install_conda_env # if conda is installed then install the conda environment
@@ -627,8 +628,8 @@ install_from_release() {
 
 display_credentials() {
     log "INFO" "You can now login to the server using the following credentials:"
-    log "INFO" "Username: $SYSTEMGUARD_USERNAME"
-    log "INFO" "Password: $SYSTEMGUARD_PASSWORD"
+    log "INFO" "Username: $ADMIN_LOGIN"
+    log "INFO" "Password: $ADMIN_PASSWORD"
 }
 
 timer() {
@@ -641,7 +642,7 @@ timer() {
 }
 
 open_browser() {
-    log "If you face server server issues, run 'sudo systemguard-installer --fix' to fix the installation."
+    log "If you face server server issues, run 'sudo $$APP_NAME_LOWER-installer --fix' to fix the installation."
     log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
     # show timer for 50 seconds
     timer 50
@@ -667,11 +668,12 @@ install() {
     log "Starting installation of $APP_NAME..."
     create_and_own_dir "$EXTRACT_DIR"
     echo ""
-    echo "Do you want to install from a Git repository or a specific release?"
-    echo "|----------------------------------------------------|"
-    echo "|           1. Git repository                        |"
-    echo "|           2. Release                               |"
-    echo "|----------------------------------------------------|"
+    echo "Would you like to install from a Git repository or a specific release?"
+    echo "For production use, it is recommended to install from a release."
+    echo "|------------------------------------------------------------|"
+    echo "|       1. Git Repository (Pre-Release Version)              |"
+    echo "|       2. Release (More Stable Version)                     |"
+    echo "|------------------------------------------------------------|"
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
 
@@ -688,7 +690,7 @@ install() {
             ;;
     esac
 	stop_server
-	generate_ascii_art "SystemGuard Installed" "green"
+	generate_ascii_art "$APP_NAME Installed" "green"
     display_credentials
     open_browser
 }
@@ -697,7 +699,7 @@ uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
 	stop_server
-	generate_ascii_art "SystemGuard Uninstalled" "red"
+	generate_ascii_art "$APP_NAME Uninstalled" "red"
 }
 
 # Load test function to start Locust server
@@ -724,7 +726,7 @@ load_test() {
     locust -f "$LOCUST_FILE" --host="$HOST_URL"
 }
 
-# Check if SystemGuard is installed
+# Check if APP is installed
 check_status() {
     log "Checking $APP_NAME status..."
 
@@ -765,7 +767,7 @@ health_check() {
         # Check if the response code indicates success
         if [[ $response_code -eq 200 || $response_code -eq 302 ]]; then
             log "Health check successful: $HOST_URL is up and running."
-            generate_ascii_art "SystemGuard is UP" "green"
+            generate_ascii_art "$APP_NAME is UP" "green"
             exit 0
         else
             ((retries++))
@@ -777,7 +779,7 @@ health_check() {
 
     # If max retries are reached, log the failure and exit with an error
     log "ERROR" "Max retries reached. $HOST_URL is still not responding. Exiting with error."
-    generate_ascii_art "SystemGuard is DOWN" "red"
+    generate_ascii_art "$APP_NAME is DOWN" "red"
     exit 1
 }
 
@@ -888,7 +890,7 @@ install_latest() {
         log "Fetching the server for the latest version..."
         # sleep 3 seconds
         # some kind of animation of fetching the latest code
-        echo -n "connecting to the SystemGuard server"
+        echo -n "connecting to the $APP_NAME server"
         for i in {1..3}; do
             echo -n "..."
             sleep 1

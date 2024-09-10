@@ -6,6 +6,14 @@ wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/se
 chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 ```
 
+| version | support | release |
+| ------- | ------ | ------ |
+| 1.0.4   | not released | ✅ | 
+| 1.0.3   | yes    | ✅ |
+| 1.0.2   | no     | ✅|
+| 1.0.1   | no     |✅|
+| 1.0.0   | no     |✅|
+
 ### To install the SystemGuard app, run the following command:
 
 ```bash
