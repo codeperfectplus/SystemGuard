@@ -562,7 +562,7 @@ install_from_git() {
     # Construct the full Git URL with branch
     FULL_GIT_URL="$GITHUB_URL -b $BRANCH"
 
-    set_auto_update "$sg_auto_update"
+    set_auto_update "sg_auto_update"
 
     log "Cloning the $APP_NAME repository from GitHub..."
     create_and_own_dir "$GIT_INSTALL_DIR"
