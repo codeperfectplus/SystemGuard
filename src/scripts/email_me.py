@@ -8,6 +8,7 @@ from flask import redirect, url_for, flash
 from src.config import app
 from src.logger import logger
 from src.models import GeneralSettings, SMTPSettings
+from src.config import get_app_info
 
 system_name = os.uname().sysname
 
@@ -49,10 +50,10 @@ def send_smtp_email(receiver_email, subject,
             msg = MIMEMultipart()
             msg['From'] = EMAIL_FROM  # Must be a verified Elastic Email sender
             msg['To'] = email
-            msg['Subject'] = f"SystemGuard Alert from {system_name} ({server_name}): {subject}"
+            msg['Subject'] = f"{get_app_info()['title']} Alert from ({server_name}): {subject}"
 
             # Append message to the body
-            append_message = "This is an automated email from the SystemGuard application. Please do not reply to this email."
+            append_message = f"This is an automated email from the {get_app_info()['title']} application. Please do not reply to this email."
 
             # Add HTML or plain text to the email body
             if is_html:

@@ -84,3 +84,8 @@ def send_email_page():
         return redirect(url_for('send_email_page'))
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
+
+
+@app.route("/about")
+def about():
+    return render_template("other/about.html")

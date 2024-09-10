@@ -9,6 +9,7 @@ from src.models import UserProfile, UserDashboardSettings, UserCardSettings, Pag
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
 from src.routes.helper import get_email_addresses
+from src.config import get_app_info
 
 user_bp = blueprints.Blueprint('user', __name__)
 
@@ -54,7 +55,7 @@ def create_user():
             send_smtp_email(admin_email_address, subject, email_body, is_html=True)
 
         # Send welcome email to new user
-        subject = "Welcome to the systemGuard"  
+        subject = f"Welcome to the {get_app_info()['title']}"  
         context = {
             "username": new_user.username,
             "email": new_user.email,

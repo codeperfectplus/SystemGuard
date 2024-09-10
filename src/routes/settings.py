@@ -8,6 +8,7 @@ from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
 from src.routes.helper import get_email_addresses
+from src.config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
@@ -29,10 +30,8 @@ def user_settings():
 def general_settings():
     # Retrieve user-specific settings from DB
     general_settings = GeneralSettings.query.filter_by().first()
-
     # Store the current state of the 'enable_alerts' setting
     current_alert_status = general_settings.enable_alerts
-
     if request.method == 'POST':
         # Update the settings from the form
         general_settings.timezone = request.form.get('timezone')
@@ -45,11 +44,12 @@ def general_settings():
             # If 'enable_alerts' was changed, send an email to the admins
             admin_emails_with_alerts = get_email_addresses(user_level="admin", receive_email_alerts=True)
             if admin_emails_with_alerts:
-                subject = "SystemGuard Alert Status Changed"
+                subject = f"{get_app_info()['title']} Alert Status Changed"
                 context = {
                     "current_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "notifications_enabled": general_settings.enable_alerts,
-                    "current_user": current_user.username
+                    "current_user": current_user.username,
+                    "title": get_app_info()["title"],
                 }
                 notification_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/notification_alert.html")
                 email_body = render_template_from_file(notification_alert_template, **context)

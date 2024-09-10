@@ -9,7 +9,7 @@
     <h1>Dashboard Groups</h1>
     <div class="card-container">
         <a href="{{ url_for('dashboard') }}" class="card">
-            <h2>SystemGuard</h2>
+            <h2>{{title}}</h2>
             <p>In-depth system monitoring and management</p>
         </a>
         {% for group in groups %}

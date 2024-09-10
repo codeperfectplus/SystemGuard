@@ -6,113 +6,162 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.scripts.email_me import send_smtp_email
 from src.config import app, db
-from src.models import UserProfile, UserCardSettings, PageToggleSettings, UserDashboardSettings
+from src.models import (
+    UserProfile,
+    UserCardSettings,
+    PageToggleSettings,
+    UserDashboardSettings,
+)
 from src.utils import render_template_from_file, ROOT_DIR
 from src.routes.helper import get_email_addresses
+from src.config import get_app_info
 
-auth_bp = blueprints.Blueprint('auth', __name__)
+auth_bp = blueprints.Blueprint("auth", __name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return UserProfile.query.get(int(user_id))
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
         user = UserProfile.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
             receiver_email = current_user.email
-            admin_emails_with_alerts = get_email_addresses(user_level='admin', receive_email_alerts=True)
+            admin_emails_with_alerts = get_email_addresses(
+                user_level="admin", receive_email_alerts=True
+            )
             if admin_emails_with_alerts:
                 if receiver_email in admin_emails_with_alerts:
                     admin_emails_with_alerts.remove(receiver_email)
                 if admin_emails_with_alerts:
-                    context = {"username": current_user.username, "login_time": datetime.datetime.now()}
+                    context = {
+                        "username": current_user.username,
+                        "login_time": datetime.datetime.now(),
+                        "title": get_app_info()["title"]
+                    }
 
-                    login_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/admin_login_alert.html")
-                    email_body = render_template_from_file(login_alert_template, **context)
+                    login_alert_template = os.path.join(
+                        ROOT_DIR, "src/templates/email_templates/admin_login_alert.html"
+                    )
+                    print(login_alert_template)
+                    email_body = render_template_from_file(
+                        login_alert_template, **context
+                    )
 
-                    send_smtp_email(admin_emails_with_alerts, 'Login Alert', email_body, is_html=True)
+                    send_smtp_email(
+                        admin_emails_with_alerts,
+                        "Login Alert",
+                        email_body,
+                        is_html=True,
+                    )
 
             # log in alert to user
             if receiver_email:
-                context = {"username": current_user.username, "login_time": datetime.datetime.now()}
+                context = {
+                    "username": current_user.username,
+                    "login_time": datetime.datetime.now(),
+                }
 
-                login_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/login.html") 
-                email_body = render_template_from_file(login_message_template, **context)
-                
-                send_smtp_email(receiver_email, 'Login Alert', email_body, is_html=True)
-            return redirect(url_for('dashboard'))
-        flash('Invalid username or password', 'danger')
-    return render_template('auths/login.html')
+                login_message_template = os.path.join(
+                    ROOT_DIR, "src/templates/email_templates/login.html"
+                )
+                email_body = render_template_from_file(
+                    login_message_template, **context
+                )
 
-@app.route('/logout')
+                send_smtp_email(receiver_email, "Login Alert", email_body, is_html=True)
+            return redirect(url_for("dashboard"))
+        flash("Invalid username or password", "danger")
+    return render_template("auths/login.html")
+
+
+@app.route("/logout")
 def logout():
     receiver_email = current_user.email
     if receiver_email:
-        context = {"username": current_user.username}
-        logout_message_template = os.path.join(ROOT_DIR, "src/templates/email_templates/logout.html")
+        context = {"username": current_user.username,
+                   "title": get_app_info()["title"]
+                   }
+        logout_message_template = os.path.join(
+            ROOT_DIR, "src/templates/email_templates/logout.html"
+        )
         email_body = render_template_from_file(logout_message_template, **context)
-        send_smtp_email(receiver_email, 'Logout Alert', email_body, is_html=True)
+        send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
-@app.route('/signup', methods=['GET', 'POST'])
+
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
-        user_level = request.form.get('user_level', 'user')  # Default to 'user' if not provided
-        receive_email_alerts = 'receive_email_alerts' in request.form  # Checkbox is either checked or not
-        profession = request.form.get('profession', None)
+    if request.method == "POST":
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
+        user_level = request.form.get(
+            "user_level", "user"
+        )  # Default to 'user' if not provided
+        receive_email_alerts = (
+            "receive_email_alerts" in request.form
+        )  # Checkbox is either checked or not
+        profession = request.form.get("profession", None)
 
         if password != confirm_password:
-            flash('Passwords do not match')
-            return redirect(url_for('signup'))
+            flash("Passwords do not match")
+            return redirect(url_for("signup"))
 
         existing_user = UserProfile.query.filter_by(username=username).first()
         if existing_user:
-            flash('Username already exists')
-            return redirect(url_for('signup'))
+            flash("Username already exists")
+            return redirect(url_for("signup"))
 
         hashed_password = generate_password_hash(password)
-        new_user = UserProfile(username=username, 
-                        email=email, 
-                        password=hashed_password, 
-                        user_level=user_level, 
-                        receive_email_alerts=receive_email_alerts,
-                        profession=profession)
-        
+        new_user = UserProfile(
+            username=username,
+            email=email,
+            password=hashed_password,
+            user_level=user_level,
+            receive_email_alerts=receive_email_alerts,
+            profession=profession,
+        )
+
         # Get Admin Emails with Alerts Enabled:
-        admin_emails_with_alerts = get_email_addresses(user_level='admin', receive_email_alerts=True)
+        admin_emails_with_alerts = get_email_addresses(
+            user_level="admin", receive_email_alerts=True
+        )
         if admin_emails_with_alerts:
             subject = "New User Alert"
             context = {
                 "username": new_user.username,
                 "email": new_user.email,
                 "registration_time": datetime.datetime.now(),
-                "user_level": new_user.user_level
+                "user_level": new_user.user_level,
             }
-            new_user_alert_template = os.path.join(ROOT_DIR, "src/templates/email_templates/new_user_alert.html")
+            new_user_alert_template = os.path.join(
+                ROOT_DIR, "src/templates/email_templates/new_user_alert.html"
+            )
             email_body = render_template_from_file(new_user_alert_template, **context)
             send_smtp_email(admin_emails_with_alerts, subject, email_body, is_html=True)
-            
+
         # Send email to the new user
-        subject = "Welcome to the systemGuard"  
+        subject = f"Welcome to the {get_app_info()['title']}"
         context = {
             "username": new_user.username,
             "email": new_user.email,
         }
-        welcome_template = os.path.join(ROOT_DIR, "src/templates/email_templates/welcome.html")
+        welcome_template = os.path.join(
+            ROOT_DIR, "src/templates/email_templates/welcome.html"
+        )
         email_body = render_template_from_file(welcome_template, **context)
         send_smtp_email(email, subject, email_body, is_html=True)
 
@@ -122,7 +171,7 @@ def signup():
         db.session.add(UserCardSettings(user_id=new_user.id))
         db.session.add(PageToggleSettings(user_id=new_user.id))
         db.session.commit()
-        flash('Account created successfully, please log in.')
-        return redirect(url_for('login'))
+        flash("Account created successfully, please log in.")
+        return redirect(url_for("login"))
 
-    return render_template('auths/signup.html')
+    return render_template("auths/signup.html")

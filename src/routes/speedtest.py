@@ -6,8 +6,10 @@ from src.config import app, db
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
+from src.config import get_app_info
 
 speedtest_bp = Blueprint("speedtest", __name__)
+
 
 @app.route("/speedtest")
 @login_required
@@ -19,14 +21,14 @@ def speedtest():
     cooldown_threshold_time = datetime.datetime.now() - datetime.timedelta(
         minutes=speedtest_cooldown_duration
     )
-    
+
     recent_speedtest_results = NetworkSpeedTestResult.query.filter(
         NetworkSpeedTestResult.timestamp > cooldown_threshold_time
     ).all()
 
     if len(recent_speedtest_results) < required_speedtest_count:
         current_speedtest_result = run_speedtest()
-        
+
         if current_speedtest_result["status"] == "Error":
             return render_template(
                 "error/speedtest_error.html", error=current_speedtest_result["message"]
@@ -43,7 +45,10 @@ def speedtest():
 
             receiver_email = current_user.email
             subject = "Speedtest Result"
-            context = {"speedtest_result": current_speedtest_result}
+            context = {
+                "speedtest_result": current_speedtest_result,
+                "title": get_app_info()["title"],
+            }
             speedtest_result_template = os.path.join(
                 ROOT_DIR, "src/templates/email_templates/speedtest_result.html"
             )

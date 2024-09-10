@@ -2,9 +2,9 @@ from src.config import app
 from src import routes
 from src.thread_process import monitor_settings, start_website_monitoring
 
- # background thread to monitor system settings changes
+# background thread to monitor system settings changes
 # monitor_settings()  # Starts monitoring for system logging changes
-start_website_monitoring()  # Starts pinging active websites
+# start_website_monitoring()  # Starts pinging active websites
 
 if __name__ == "__main__":
 

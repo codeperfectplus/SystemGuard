@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 <div class="settings-container">
-    <h1 class="settings-title">SystemGuard Settings
+    <h1 class="settings-title">{{title}} Settings
         <i class="fas fa-cogs"></i>
     </h1>
 
@@ -50,6 +50,12 @@
         </a>
         <a href="{{ url_for('send_email_page') }}" class="btn btn-primary">
             <i class="fas fa-envelope"></i> Send Email
+        </a>
+    </div>
+
+    <div class="settings-buttons">
+        <a href="{{ url_for('about') }}" class="btn btn-primary">
+            <i class="fas fa-info-circle"></i> About {{ title }}
         </a>
     </div>
 

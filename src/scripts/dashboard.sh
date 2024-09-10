@@ -55,14 +55,15 @@ PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
 FLASK_PORT="${FLASK_PORT:-5050}"
-LOG_FILE="/home/$(whoami)/logs/systemguard_flask.log"
+APP_NAME="systemguard"
+LOG_FILE="/home/$(whoami)/logs/flask.log"
 USERNAME="$(whoami)"
-CONDA_ENV_NAME="systemguard"
+CONDA_ENV_NAME=$APP_NAME
 GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
 
-# Fetch systemguard_auto_update from bashrc
-systemguard_auto_update=$(grep -E "^export systemguard_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
-echo "auto-update:" $systemguard_auto_update
+# Fetch from bashrc for auto-update
+auto_update=$(grep -E "^export sg_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
+echo "auto-update:" $auto_update
 # 
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
@@ -171,7 +172,7 @@ fetch_latest_changes() {
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     log_message "Flask app is not running. Checking repository and starting it..."
-    [ "$systemguard_auto_update" = true ] &&
+    [ "$$APP_NAME-AUTO-UPDATE" = true ] &&
     fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command

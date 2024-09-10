@@ -5,62 +5,94 @@ from src.logger import logger
 
 app = Flask(__name__)
 
+# Application Metadata
+APP_NAME = "SystemGuard"
+DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
+AUTHOR = "Deepak Raj"
+YEAR = "2024"
+VERSION = "v1.0.4-pre-release"
+PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
+CONTACT_EMAIL = ""
+
 # Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///systemguard.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{APP_NAME.lower()}.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
+
+# Define global variables for templates
+app.jinja_env.globals.update(
+    title=APP_NAME,
+    description=DESCRIPTION,
+    author=AUTHOR,
+    year=YEAR,
+    version=VERSION,
+    project_url=PROJECT_URL,
+    contact_email=CONTACT_EMAIL,
+)
+
+def get_app_info():
+    """Retrieve application metadata."""
+    return {
+        "title": APP_NAME,
+        "description": DESCRIPTION,
+        "author": AUTHOR,
+        "year": YEAR,
+        "version": VERSION,
+        "project_url": PROJECT_URL,
+        "contact_email": CONTACT_EMAIL,
+    }
 
 # Initialize the database
 db = SQLAlchemy(app)
 
 @app.cli.command("run")
 def server_start():
+    """Log server start."""
     logger.info("Server started")
 
-# 403 forbidden
+# Error Handlers
 @app.errorhandler(403)
 def forbidden(e):
-    """ 
-    This function is called when a user tries to access a resource that they are not allowed to access.
-    """
+    """Handle 403 Forbidden error."""
     return render_template("error/403.html"), 403
 
-# not found page
 @app.errorhandler(404)
 def page_not_found(e):
+    """Handle 404 Not Found error."""
     return render_template("error/404.html"), 404
 
-# 405 method not allowed
 @app.errorhandler(405)
 def method_not_allowed(e):
+    """Handle 405 Method Not Allowed error."""
     return "Method not allowed", 405
 
-# internal server error 500
 @app.errorhandler(500)
 def internal_server_error(e):
+    """Handle 500 Internal Server Error."""
     return "Internal server error", 500
 
-# 502
 @app.errorhandler(502)
 def bad_gateway(e):
+    """Handle 502 Bad Gateway error."""
     return "Bad gateway", 502
 
-# 503
 @app.errorhandler(503)
 def service_unavailable(e):
+    """Handle 503 Service Unavailable error."""
     return "Service unavailable", 503
 
 class CustomError(Exception):
+    """Custom exception for application-specific errors."""
     pass
 
-
-
-# Purpose: Run functions before or after each request, useful for tasks like logging, performance monitoring, or pre-processing requests
+# Optional: Request hooks
 # @app.before_request
 # def before_request_func():
+#     """Function to run before each request."""
 #     logger.info("This function runs before each request.")
 
 # @app.after_request
 # def after_request_func(response):
+#     """Function to run after each request."""
 #     logger.info("This function runs after each request.")
 #     return response
