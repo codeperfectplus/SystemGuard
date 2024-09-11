@@ -4,8 +4,28 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
+# USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
+USER_NAME=$USER
+echo $USER_NAME
+echo $HOME
+if [ "$(whoami)" = "root" ]; then
+    # LOGNAME_USER=$(logname)
+    # echo $LOGNAME_USER
+    # if [ "$LOGNAME_USER" = "logname: no login name" ]; then
+    LOGNAME_USER=$(logname 2>/dev/null)  # Redirect any error output to /dev/null
+    if [ $? -ne 0 ]; then  # Check if the exit status of the last command is not 0
+        echo "No login name found. Using fallback method."
+        # use head -n 1 for native linux. tail -n 1 works with wsl.
+        USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+    else
+        USER_NAME=$LOGNAME_USER
+    fi
+else
+    USER_NAME=$(whoami)
+fi
+echo $USER_NAME
 USER_HOME=/home/$USER_NAME
+
 
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
@@ -48,10 +68,10 @@ set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
 # run this script with sudo
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run this program with sudo, exiting..."
-    exit 1
-fi
+# if [ "$EUID" -ne 0 ]; then
+#     echo "Please run this program with sudo, exiting..."
+#     exit 1
+# fi
 
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
@@ -634,6 +654,16 @@ install_from_release() {
     log "$APP_NAME version $VERSION installed successfully!"
 }
 
+install_from_source_code() {
+    backup_configs
+    remove_previous_installation
+    log "Using the current folder as the installation directory..."
+    install_using_setup_file_in_cwd
+    setup_cron_job
+    log "$APP_NAME version $VERSION installed successfully!"
+}
+
+
 display_credentials() {
     log "INFO" "You can now login to the server using the following credentials:"
     log "INFO" "Username: $ADMIN_LOGIN"
@@ -690,6 +720,9 @@ install() {
             ;;
         2)
             install_from_release
+            ;;
+        3)
+            install_from_source_code
             ;;
         *)
             log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."
