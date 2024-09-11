@@ -840,7 +840,6 @@ stop_server() {
 
 # fix the server
 fix() {
-    update_dependencies
     log "Fixing $APP_NAME server..."
     stop_server
     open_browser
@@ -939,7 +938,6 @@ for arg in "$@"; do
         --installation-logs) show_installer_logs; exit 0 ;;
         --stop-server) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
-        --update-dependencies) update_dependencies; exit 0 ;;
         --install-latest) ACTION="install_latest" ;;
         --open-app) open_browser; exit 0 ;;
         --fetch-github-releases) fetch_github_releases; exit 0 ;;
@@ -962,7 +960,6 @@ case $ACTION in
     installation-logs) show_installer_logs ;;
     fix) fix ;;
     install_latest) install_latest ;;
-    update_dependencies) update_dependencies ;;
     open_browser) open_browser ;;
     fetch_github_releases) fetch_github_releases ;;
     *) echo "No action specified. Use --help for usage information." ;;
