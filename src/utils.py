@@ -185,9 +185,13 @@ def get_cpu_temp():
     
     try:
         temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
+        current_temp = temp.get('current', 'N/A')
+        high_temp = temp.get('high', 'N/A')
+        critical_temp = temp.get('critical', 'N/A')
+        return (current_temp, high_temp, critical_temp)
     except Exception:
         return ("N/A", "N/A", "N/A")
-    return temp.current, temp.high, temp.critical
+
 
 def get_top_processes(number=5):
     """Get the top processes by memory usage.
