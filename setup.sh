@@ -4,7 +4,7 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$(logname)
+USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
 USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
@@ -23,8 +23,6 @@ HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
 FLASK_LOG_FILE="$LOG_DIR/flask.log"
 
-
-
 # Cron job pattern
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
 
@@ -40,7 +38,6 @@ NUM_OF_RETRIES=5
 NUM_BACKUPS=5
 
 # Environment variables
-CONDA_ENV_NAME="$APP_NAME_LOWER"
 ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
 
 # authentication
@@ -260,27 +257,6 @@ change_ownership() {
     fi
 }
 
-# check if conda is installed or not
-check_conda() {
-    local CONDA_PATHS=("$USER_HOME/miniconda3" "$USER_HOME/anaconda3" "$1")  # Allow custom path as argument
-    local CONDA_FOUND=false
-
-    # Find Conda installation
-    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
-        if [ -n "$CONDA_PATH" ] && [ -d "$CONDA_PATH" ]; then  # Check if the path is non-empty and exists
-            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
-            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
-            CONDA_FOUND=true
-            break
-        fi
-    done
-
-    if [ "$CONDA_FOUND" = false ]; then
-        echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
-        exit 1
-    fi
-    echo "Conda found at: $CONDA_EXECUTABLE"
-}
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -300,7 +276,7 @@ add_cron_job() {
     # Temporarily store current crontab to avoid overwriting on error
     local temp_cron=$(mktemp)
     if [ $? -ne 0 ]; then
-        log "CRITICAL "Failed to create temporary file for crontab."
+        log "CRITICAL" "Failed to create temporary file for crontab."
         exit 1
     fi
 
@@ -313,7 +289,7 @@ add_cron_job() {
 
     # Ensure the cron job does not already exist
     if grep -Fxq "$cron_job" "$temp_cron"; then
-        log "Cron "job already exists: $cron_job"
+        log "Cron job already exists: $cron_job"
         rm "$temp_cron"
         exit 0
     fi
@@ -422,8 +398,6 @@ restore() {
 
 # Function to install the script as an executable
 install_executable() {
-    # Use $0 to get the full path of the currently running script
-    # CURRENT_SCRIPT=$(realpath "$0")
     cd $EXTRACT_DIR/$APP_NAME-*/
     CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT
     # Verify that the script exists before attempting to copy
@@ -527,7 +501,6 @@ install_from_git() {
     # Remove any previous installations
     remove_previous_installation
 
-
     echo ""
     echo "Select the version of $APP_NAME to install:"
     echo "|------------------------------------------------------------------------------|"
@@ -572,8 +545,6 @@ install_from_git() {
     fi
 
     log "Repository cloned successfully."
-
-    install_conda_env # if conda is installed then install the conda environment
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || {
@@ -656,8 +627,6 @@ install_from_release() {
     rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
     log "Extraction completed."
 
-    install_conda_env # if conda is installed then install the conda environment
-
     install_executable
     setup_cron_job
 
@@ -703,7 +672,6 @@ open_browser() {
 # Install function
 install() {
     check_dependencies
-    check_conda # check if conda is installed
     log "Starting installation of $APP_NAME..."
     create_and_own_dir "$EXTRACT_DIR"
     echo ""
@@ -855,64 +823,6 @@ show_installer_logs() {
     fi
 }
 
-update_dependencies() {
-    # Activate Conda environment
-    check_conda
-    source "$CONDA_SETUP_SCRIPT"
-    conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
-
-    # Check for missing dependencies
-    log "INFO" "Checking for missing dependencies..."
-    cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
-    REQUIREMENTS_FILE="requirements.txt"
-
-    if [ ! -f "$REQUIREMENTS_FILE" ]; then
-        log "ERROR" "Requirements file $REQUIREMENTS_FILE not found."
-        exit 1
-    fi
-
-    log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
-
-    # Install dependencies
-    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" || {
-        log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
-        exit 1
-    }
-
-    log "INFO" "Dependencies installation complete."
-}
-
-# Function to install Conda environment and dependencies
-install_conda_env() {
-    # Check if Conda is available
-    check_conda
-
-    # Log the environment checking process
-    log "INFO" "Checking Conda environment $CONDA_ENV_NAME..."
-
-    # Full path to the environment to be checked
-    ENV_PATH="$("$CONDA_EXECUTABLE" info --base)/envs/$CONDA_ENV_NAME"
-
-    # Check if the environment already exists
-    if ! sudo -u "$SUDO_USER" bash -c "[ -d '$ENV_PATH' ]"; then
-        log "INFO" "Creating Conda environment $CONDA_ENV_NAME..."
-
-        # Create the Conda environment as the original user
-        sudo -u "$SUDO_USER" bash -c "$CONDA_EXECUTABLE create -n $CONDA_ENV_NAME python=3.11 -y" || {
-            log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1;
-        }
-
-        # Call the update_dependencies function to install dependencies
-        update_dependencies
-    else
-        log "INFO" "Conda environment $CONDA_ENV_NAME already exists."
-
-        # Update dependencies in the existing environment
-        update_dependencies
-    fi
-}
-
-
 # stop flask server
 stop_server_helper() {
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
@@ -1011,12 +921,6 @@ show_help() {
     echo "                             This will pull the latest code from the Git repository."
     echo ""
     echo ""
-    echo " --check-conda               Check if Conda is installed and available."
-    echo "                             This will verify the presence of Conda and display the installation path."
-    echo ""
-    echo " --update-dependencies       Update the dependencies for $APP_NAME."
-    echo "                             This will install any missing dependencies required for the application."
-    echo ""
     echo "  --help                     Display this help message."
     echo "                             Shows information about all available options and how to use them."
 }
@@ -1036,11 +940,9 @@ for arg in "$@"; do
         --stop-server) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
         --update-dependencies) update_dependencies; exit 0 ;;
-        --check-conda) check_conda; exit 0 ;;
         --install-latest) ACTION="install_latest" ;;
         --open-app) open_browser; exit 0 ;;
         --fetch-github-releases) fetch_github_releases; exit 0 ;;
-        --install-conda-env) install_conda_env; exit 0 ;;
         --help) show_help; exit 0 ;;
         *) echo "Unknown option: $arg"; show_help; exit 1 ;;
     esac
@@ -1059,12 +961,9 @@ case $ACTION in
     logs) show_server_logs ;;
     installation-logs) show_installer_logs ;;
     fix) fix ;;
-    check-conda) check_conda ;;
     install_latest) install_latest ;;
     update_dependencies) update_dependencies ;;
     open_browser) open_browser ;;
     fetch_github_releases) fetch_github_releases ;;
-    install_conda_env) install_conda_env ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-

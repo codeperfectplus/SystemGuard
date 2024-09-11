@@ -63,7 +63,7 @@ GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this i
 
 # Fetch from bashrc for auto-update
 auto_update=$(grep -E "^export sg_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
-echo "auto-update:" $auto_update
+echo "SystemGuard Auto Update: $auto_update"
 # 
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
@@ -95,6 +95,17 @@ fi
 
 # Initialize Conda
 source "$CONDA_SETUP_SCRIPT"
+
+# Check if the Conda environment exists and create it if not
+if ! conda info --envs | awk '{print $1}' | grep -q "^$CONDA_ENV_NAME$"; then
+    log_message "Conda environment '$CONDA_ENV_NAME' not found. Creating it..."
+    conda create -n "$CONDA_ENV_NAME" python=3.10 -y
+
+    log_message "Activating Conda environment '$CONDA_ENV_NAME' and installing requirements."
+    conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
+else
+    log_message "Activating existing Conda environment '$CONDA_ENV_NAME'."
+fi
 
 # Export Flask environment variables
 export FLASK_APP="$FLASK_APP_PATH"
