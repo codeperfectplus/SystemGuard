@@ -33,6 +33,7 @@ APP_NAME="SystemGuard"
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
 GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
+SOURCE_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-source"
 LOG_DIR="$USER_HOME/logs"
 LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-installer.log"
 BACKUP_DIR="$USER_HOME/.$APP_NAME_LOWER-backup"
@@ -189,17 +190,23 @@ check_dependencies() {
     fi
 }
 
+# Function to change ownership of a directory and its subdirectories
+own_dir() {
+    local dir="$1"
+    chown -R "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory and its contents: $dir"; exit 11; }
+}
+
 # Function to create a directory if it does not exist
-create_and_own_dir() {
+create_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 10; }
-        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 11; }
+        own_dir "$dir" # Call own_dir to change ownership after creation
     fi
 }
 
-create_and_own_dir "$LOG_DIR"
-create_and_own_dir "$BACKUP_DIR"
+create_dir "$LOG_DIR"
+create_dir "$BACKUP_DIR"
 
 # Function to handle errors
 handle_error() {
@@ -558,7 +565,7 @@ install_from_git() {
     set_auto_update "sg_auto_update"
 
     log "Cloning the $APP_NAME repository from GitHub..."
-    create_and_own_dir "$GIT_INSTALL_DIR"
+    create_dir "$GIT_INSTALL_DIR"
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 30
@@ -654,6 +661,14 @@ install_from_release() {
     log "$APP_NAME version $VERSION installed successfully!"
 }
 
+install_using_setup_file_in_cwd() {
+    # copy the code base from the current directory to the $SOURCE_INSTALL_DIR
+    # make directory if not exists
+    create_dir "$SOURCE_INSTALL_DIR"
+    cp -r ./* "$SOURCE_INSTALL_DIR" || { log "ERROR" "Failed to copy the code to the installation directory."; exit 1; }
+    own_dir "$SOURCE_INSTALL_DIR"
+}
+
 install_from_source_code() {
     backup_configs
     remove_previous_installation
@@ -662,7 +677,6 @@ install_from_source_code() {
     setup_cron_job
     log "$APP_NAME version $VERSION installed successfully!"
 }
-
 
 display_credentials() {
     log "INFO" "You can now login to the server using the following credentials:"
@@ -703,13 +717,14 @@ open_browser() {
 install() {
     check_dependencies
     log "Starting installation of $APP_NAME..."
-    create_and_own_dir "$EXTRACT_DIR"
+    create_dir "$EXTRACT_DIR"
     echo ""
     echo "Would you like to install from a Git repository or a specific release?"
     echo "For production use, it is recommended to install from a release."
     echo "|------------------------------------------------------------|"
     echo "|       1. Git Repository (Pre-Release Version)              |"
     echo "|       2. Release (More Stable Version)                     |"
+    echo "|       3. Source Code (Current Directory)                   |"
     echo "|------------------------------------------------------------|"
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD

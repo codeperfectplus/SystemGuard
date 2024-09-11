@@ -182,10 +182,11 @@ def get_cpu_temp():
     Returns:
         tuple: Current CPU temperature, high temperature, and critical temperature.
     """
+    
     try:
         temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
-    except Exception as e:
-        temp = {'current_temp': 'N/A', 'high_temp': 'N/A', 'critical_temp': 'N/A'}
+    except Exception:
+        return ("N/A", "N/A", "N/A")
     return temp.current, temp.high, temp.critical
 
 def get_top_processes(number=5):
