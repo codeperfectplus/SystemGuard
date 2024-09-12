@@ -26,13 +26,15 @@ def time_ago(ping_time, current_time):
     # Calculate the difference in seconds
     time_diff = (current_time - ping_time).total_seconds()
     
-    if time_diff <= 120:  # Less than or equal to 2 minutes
-        if time_diff <= 60:
-            return f"{int(time_diff)} seconds ago"
+    if time_diff <= 60:
+        return f"{int(time_diff)} seconds ago"
+    if time_diff <= 3600:
         return f"{int(time_diff // 60)} min ago"
-    
-    # Fallback to formatted datetime if over 2 minutes
-    return ping_time.strftime('%Y-%m-%d %H:%M:%S')
+    if time_diff <= 86400:
+        return f"{int(time_diff // 3600)} hours ago"
+    else:
+        # Fallback to formatted datetime if over a day
+        return ping_time.strftime('%Y-%m-%d %H:%M:%S')
 
 # Route to view and add websites
 @app.route('/monitor_websites')

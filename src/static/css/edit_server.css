@@ -1,16 +1,64 @@
-/* edit_server.css */
+/* Basic reset and font settings */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Container styling */
 .container {
-    margin-top: 50px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.form-group {
-    margin-bottom: 1rem;
+/* Form container styling */
+.bg-white {
+    background-color: #ffffff;
 }
 
+.p-4 {
+    padding: 1.5rem;
+}
+
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.shadow-sm {
+    box-shadow: 0 0 0.125rem rgba(0, 0, 0, 0.2);
+}
+
+/* Form element styling */
 .form-label {
-    font-weight: bold;
+    font-weight: 600;
+    color: #333;
 }
 
-.btn-success {
-    margin-top: 20px;
+.form-control {
+    border-radius: 0.25rem;
+    box-shadow: none;
+}
+
+.form-check-input {
+    margin-top: 0.3rem;
+}
+
+.btn {
+    border-radius: 0.25rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
 }
