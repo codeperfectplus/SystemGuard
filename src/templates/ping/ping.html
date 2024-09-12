@@ -30,7 +30,7 @@
             <th>Status Code</th>
             <th>Ping Status</th>
             <th>Email Alerts</th>
-            <th>Last Ping Time</th>
+            <th>Last Ping</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -49,7 +49,7 @@
                     Email not found
                 {% endif %}
             </td>
-            <td>{{ website.last_ping_time.strftime('%Y-%m-%d %H:%M:%S') if website.last_ping_time else 'Never' }}</td>
+            <td>{{ website.last_ping_time_ago if website.last_ping_time_ago else 'Never' }}</td>
             <td class="table-actions">
                 <a href="/toggle_ping_status/{{ website.id }}">{{ 'Stop Pinging' if website.is_ping_active else 'Start
                     Pinging' }}</a>

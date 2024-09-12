@@ -8,11 +8,40 @@ import requests
 
 ping_bp = blueprints.Blueprint('ping', __name__)
 
+def time_ago(ping_time, current_time):
+    """
+    Calculate the time difference between the current time and the ping time.
+    Return a human-readable format like '1 min ago' or '30 seconds ago'.
+    
+    Args:
+        ping_time (datetime): The last ping time.
+        current_time (datetime): The current time.
+    
+    Returns:
+        str: A formatted string representing the time ago.
+    """
+    if not ping_time:
+        return "Never"
+
+    # Calculate the difference in seconds
+    time_diff = (current_time - ping_time).total_seconds()
+    
+    if time_diff <= 120:  # Less than or equal to 2 minutes
+        if time_diff <= 60:
+            return f"{int(time_diff)} seconds ago"
+        return f"{int(time_diff // 60)} min ago"
+    
+    # Fallback to formatted datetime if over 2 minutes
+    return ping_time.strftime('%Y-%m-%d %H:%M:%S')
+
 # Route to view and add websites
 @app.route('/monitor_websites')
 @login_required
 def monitor_websites():
     websites = MonitoredWebsite.query.all()
+    current_time = datetime.datetime.now()
+    for website in websites:
+        website.last_ping_time_ago = time_ago(website.last_ping_time, current_time)
     return render_template('ping/ping.html', websites=websites)
 
 # Route to add a website
