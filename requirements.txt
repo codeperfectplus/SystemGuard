@@ -18,5 +18,5 @@ flask-session==0.8.0     # Server-side session handling for Flask
 # File system monitoring and watching
 watchdog==5.0.2
 
-# 
-requests
+# python requests library for making HTTP requests
+requests==2.32.3
