@@ -26,49 +26,34 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 ## Installation 🛠️
 
-check the [Installation.md](/src/docs/installation.md) file for installation instructions.
+Check the [Installation.md](/src/docs/installation.md) file for installation instructions.
 
+## How does installation work? 🤔
+
+The installation process is straightforward and can be completed in a few steps. The user needs to run a bash script that installs the required dependencies, sets up the database, create a conda environment, and add flask server to the cron job. The user can then access the SystemGuard web interface by visiting the server's IP address or domain name.
 
 ## Email Feature 📧
 
-| Email Alert | Is implemented | who will get the email |
-| ----------- | -------------- | ---------------------- |
-| Process Killed | Yes | Logged User |
-| Login | Yes | Admin User and Logged User |
-| Logout | Yes | Logged User |
-| Signup | Yes | Admin User & signed up User |
-| Create User | Yes | Admin User & Created User |
-| Delete User | No | Admin User & Deleted User |
-| Speed Test | Yes | Logged User |
-| Server Up | Yes | Admin User |
-| Notification Settings Change | Yes | Admin User |
-| Signup | Yes(few changes required) | Admin User & Logged User |
-| Website Monitoring | Yes | Input Email |
-| Server Down | No | Admin User |
-| Server Up | No | Admin User |
-
+| Email Alert                  | Is implemented            | who will get the email      |
+| ---------------------------- | ------------------------- | --------------------------- |
+| Process Killed               | Yes                       | Logged User                 |
+| Login                        | Yes                       | Admin User and Logged User  |
+| Logout                       | Yes                       | Logged User                 |
+| Signup                       | Yes                       | Admin User & signed up User |
+| Create User                  | Yes                       | Admin User & Created User   |
+| Delete User                  | No                        | Admin User & Deleted User   |
+| Speed Test                   | Yes                       | Logged User                 |
+| Server Up                    | Yes                       | Admin User                  |
+| Notification Settings Change | Yes                       | Admin User                  |
+| Signup                       | Yes(few changes required) | Admin User & Logged User    |
+| Website Monitoring           | Yes                       | Input Email                 |
+| Server Down                  | No                        | Admin User                  |
+| Server Up                    | No                        | Admin User                  |
 
 ## Product Screenshots 📸
 
-### HomePage
+Check the product screenshots [here](/src/docs/README.md).
 
-![HomePage](/src/static/images/dashboard.png)
-
-### CPU Stats
-
-![CPU Stats](/src/static/images/cpu.png)
-
-### Memory Stats
-
-![Memory Stats](/src/static/images/memory.png)
-
-### Disk Stats
-
-![Disk Stats](/src/static/images/disk.png)
-
-### Speed Test
-
-![Speed Test](/src/static/images/speedtest.png)
 
 ## Why not use a Docker image?
 
@@ -76,16 +61,20 @@ A Docker image has not been created for this project because it requires access 
 
 ## Upcoming Features 📅
 
-- Receive notifications when system metrics cross predefined thresholds.
-- Customizable dashboards for personalized server monitoring.
-- Plugin support to enhance and extend SystemGuard's functionality.
-- Generate and manage server logs for better tracking and troubleshooting.
-- Monitor disk read/write speeds for performance insights.
-- Check the current firewall status to ensure security.
-- A dedicated website monitoring page for tracking uptime and performance.
-- Track and save total network data sent/received in the database for data usage monitoring.
-- Improve website monitor, save data in database with timestamp to show the history of the website.
-- Key-combinding to navigate through the website.
+| Feature                                                                 | Stattus |
+| ----------------------------------------------------------------------- | ------- |
+| Receive notifications when system metrics cross predefined thresholds   | pending |
+| Customizable dashboards for personalized server monitoring              | pending |
+| Plugin support to enhance and extend SystemGuard's functionality        | pending |
+| Generate and manage server logs for better tracking and troubleshooting | pending |
+| Monitor disk read/write speeds for performance insights                 | pending |
+| Check the current firewall status to ensure security                    | pending |
+| A dedicated website monitoring page for tracking uptime and performance | pending |
+| Track and save total network data sent/received in the database         | pending |
+| Improve website monitor, save data in database with timestamp           | pending |
+| Key-combinding to navigate through the website                          | pending |
+| Support for more server stats like GPU, etc.                            | pending |
+| Support for more Linux distros                                          | pending |
 
 ## Learnings 📖
 
@@ -98,10 +87,10 @@ A Docker image has not been created for this project because it requires access 
 
 ## Acknowledgments
 
-| Project        | License             | Repository                                      |
-| -------------- | ------------------- | ----------------------------------------------- |
-| `speedtest-cli`| Apache License 2.0  | [GitHub repository](https://github.com/sivel/speedtest-cli) |
-| `psutil`       | BSD 3-Clause License| [GitHub repository](https://github.com/giampaolo/psutil) |
-| `flask`        | BSD 3-Clause License| [GitHub repository](https://github.com/pallets/flask) |
-| `chart.js`     | MIT License         | [GitHub repository](https://github.com/chartjs/Chart.js) |
+| Project         | License              | Repository                                                  |
+| --------------- | -------------------- | ----------------------------------------------------------- |
+| `speedtest-cli` | Apache License 2.0   | [GitHub repository](https://github.com/sivel/speedtest-cli) |
+| `psutil`        | BSD 3-Clause License | [GitHub repository](https://github.com/giampaolo/psutil)    |
+| `flask`         | BSD 3-Clause License | [GitHub repository](https://github.com/pallets/flask)       |
+| `chart.js`      | MIT License          | [GitHub repository](https://github.com/chartjs/Chart.js)    |
 

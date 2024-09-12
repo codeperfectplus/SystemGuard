@@ -4,8 +4,25 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-USER_NAME=$(logname)
+# USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
+USER_NAME=$USER
+if [ "$(whoami)" = "root" ]; then
+    # LOGNAME_USER=$(logname)
+    # echo $LOGNAME_USER
+    # if [ "$LOGNAME_USER" = "logname: no login name" ]; then
+    LOGNAME_USER=$(logname 2>/dev/null)  # Redirect any error output to /dev/null
+    if [ $? -ne 0 ]; then  # Check if the exit status of the last command is not 0
+        echo "No login name found. Using fallback method."
+        # use head -n 1 for native linux. tail -n 1 works with wsl.
+        USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+    else
+        USER_NAME=$LOGNAME_USER
+    fi
+else
+    USER_NAME=$(whoami)
+fi
 USER_HOME=/home/$USER_NAME
+
 
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
@@ -13,6 +30,7 @@ APP_NAME="SystemGuard"
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
 GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
+SOURCE_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-source"
 LOG_DIR="$USER_HOME/logs"
 LOG_FILE="$LOG_DIR/$APP_NAME_LOWER-installer.log"
 BACKUP_DIR="$USER_HOME/.$APP_NAME_LOWER-backup"
@@ -22,8 +40,6 @@ EXECUTABLE="/usr/local/bin/$APP_NAME_LOWER-installer"
 HOST_URL="http://localhost:5050"
 INSTALLER_SCRIPT="setup.sh"
 FLASK_LOG_FILE="$LOG_DIR/flask.log"
-
-
 
 # Cron job pattern
 CRON_PATTERN=".$APP_NAME_LOWER/${APP_NAME}-.*/src/scripts/dashboard.sh"
@@ -40,7 +56,6 @@ NUM_OF_RETRIES=5
 NUM_BACKUPS=5
 
 # Environment variables
-CONDA_ENV_NAME="$APP_NAME_LOWER"
 ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
 
 # authentication
@@ -51,10 +66,10 @@ set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
 # run this script with sudo
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run this program with sudo, exiting..."
-    exit 1
-fi
+# if [ "$EUID" -ne 0 ]; then
+#     echo "Please run this program with sudo, exiting..."
+#     exit 1
+# fi
 
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
@@ -133,7 +148,8 @@ generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
-echo "Welcome on board: Mr. $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+echo "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+
 
 # function to check for required dependencies
 check_dependencies() {
@@ -172,17 +188,23 @@ check_dependencies() {
     fi
 }
 
+# Function to change ownership of a directory and its subdirectories
+own_dir() {
+    local dir="$1"
+    chown -R "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory and its contents: $dir"; exit 11; }
+}
+
 # Function to create a directory if it does not exist
-create_and_own_dir() {
+create_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 10; }
-        chown "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory: $dir"; exit 11; }
+        own_dir "$dir" # Call own_dir to change ownership after creation
     fi
 }
 
-create_and_own_dir "$LOG_DIR"
-create_and_own_dir "$BACKUP_DIR"
+create_dir "$LOG_DIR"
+create_dir "$BACKUP_DIR"
 
 # Function to handle errors
 handle_error() {
@@ -199,56 +221,64 @@ else
     crontab_cmd="crontab"
 fi
 
-# Function to validate the user input
-validate_choice() {
-    local choice="$1"
-    if [[ "$choice" != "true" && "$choice" != "false" ]]; then
-        echo "Invalid input. Please enter 'true' or 'false'."
-        return 1
-    fi
-    return 0
-}
-
-update_env_variable() {
-    local var_name="$1"
-    local var_value="$2"
-
-    # Check if the variable already exists in the environment file
-    if grep -q "^export $var_name=" "$ENV_FILE"; then
-        # Update existing entry
-        sed -i "s/^export $var_name=.*/export $var_name=$var_value/" "$ENV_FILE"
-    else
-        # Add new entry
-        echo "export $var_name=$var_value" >> "$ENV_FILE"
-    fi
-
-    # Notify user of change
-    echo "$var_name set to $var_value in $ENV_FILE."
-}
-
+# Function to create a environment variable in the .bashrc file
 prompt_user() {
-    echo "Do you want to enable $var_name? (true/false) This will enable automatic updates for $APP_NAME."
-    read -p "Enter your choice (true/false): " user_choice
-    echo "$user_choice"
+    echo "Do you want to enable $var_name for automatic updates for $APP_NAME?"
+    echo "1) Yes (Enable automatic updates)"
+    echo "2) No (Disable automatic updates)"
+    read -p "Enter your choice (1 or 2): " user_choice
+    
+    # Convert the user's choice to true/false
+    case "$user_choice" in
+        1)
+            user_choice="true"
+            ;;
+        2)
+            user_choice="false"
+            ;;
+        *)
+            echo "Invalid choice. Please enter 1 or 2."
+            return 1
+            ;;
+    esac
 }
 
-# set the auto update variable
+# Function to update the environment variable in the env file
+update_env_variable() {
+    var_name=$1
+    var_value=$2
+    
+    # Ensure the environment file exists
+    touch "$ENV_FILE"
+    
+    # Update or add the variable in the environment file
+    if grep -q "^$var_name=" "$ENV_FILE"; then
+        # Replace existing variable
+        sed -i "s/^$var_name=.*/$var_name=$var_value/" "$ENV_FILE"
+    else
+        # Add new variable
+        echo "$var_name=$var_value" >> "$ENV_FILE"
+    fi
+}
+
+# Function to set the auto update variable
 set_auto_update() {
     var_name=$1
     prompt_user # Prompt user for input
-    # Validate input
-    if ! validate_choice "$user_choice"; then
+    
+    # If prompt_user returned an error (invalid choice), exit early
+    if [ $? -ne 0 ]; then
         return 1
     fi
-    # Update environment variable
+    
+    # Update the environment variable with the user's choice
     update_env_variable "$var_name" "$user_choice"
-    # Reload environment file
+    
+    # Reload the environment file to apply changes
     source "$ENV_FILE"
 }
 
 # this function will change the ownership of the directory
-# from root to the user, as the script is run as root
-# and the installation directory should be owned by the user
 change_ownership() {
     local directory="$1"
     if [ -d "$directory" ]; then
@@ -260,26 +290,6 @@ change_ownership() {
     fi
 }
 
-# check if conda is installed or not
-check_conda() {
-    local CONDA_PATHS=("$USER_HOME/miniconda3" "$USER_HOME/anaconda3" "$1")  # Allow custom path as argument
-    local CONDA_FOUND=false
-
-    # Find Conda installation
-    for CONDA_PATH in "${CONDA_PATHS[@]}"; do
-        if [ -n "$CONDA_PATH" ] && [ -d "$CONDA_PATH" ]; then  # Check if the path is non-empty and exists
-            CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
-            CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
-            CONDA_FOUND=true
-            break
-        fi
-    done
-
-    if [ "$CONDA_FOUND" = false ]; then
-        echo "ERROR: Conda not found. Please install Conda or check your Conda paths."
-        exit 1
-    fi
-}
 
 # Function to add a cron job with error handling
 add_cron_job() {
@@ -299,7 +309,7 @@ add_cron_job() {
     # Temporarily store current crontab to avoid overwriting on error
     local temp_cron=$(mktemp)
     if [ $? -ne 0 ]; then
-        log "CRITICAL "Failed to create temporary file for crontab."
+        log "CRITICAL" "Failed to create temporary file for crontab."
         exit 1
     fi
 
@@ -312,7 +322,7 @@ add_cron_job() {
 
     # Ensure the cron job does not already exist
     if grep -Fxq "$cron_job" "$temp_cron"; then
-        log "Cron "job already exists: $cron_job"
+        log "Cron job already exists: $cron_job"
         rm "$temp_cron"
         exit 0
     fi
@@ -421,8 +431,6 @@ restore() {
 
 # Function to install the script as an executable
 install_executable() {
-    # Use $0 to get the full path of the currently running script
-    # CURRENT_SCRIPT=$(realpath "$0")
     cd $EXTRACT_DIR/$APP_NAME-*/
     CURRENT_SCRIPT=$(pwd)/$INSTALLER_SCRIPT
     # Verify that the script exists before attempting to copy
@@ -526,7 +534,6 @@ install_from_git() {
     # Remove any previous installations
     remove_previous_installation
 
-
     echo ""
     echo "Select the version of $APP_NAME to install:"
     echo "|------------------------------------------------------------------------------|"
@@ -564,15 +571,13 @@ install_from_git() {
     set_auto_update "sg_auto_update"
 
     log "Cloning the $APP_NAME repository from GitHub..."
-    create_and_own_dir "$GIT_INSTALL_DIR"
+    create_dir "$GIT_INSTALL_DIR"
     if ! git clone $FULL_GIT_URL "$GIT_INSTALL_DIR"; then
         log "ERROR" "Failed to clone the repository. Please check your internet connection and the branch name, and try again."
         exit 30
     fi
 
     log "Repository cloned successfully."
-
-    install_conda_env # if conda is installed then install the conda environment
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || {
@@ -655,12 +660,27 @@ install_from_release() {
     rm "$DOWNLOAD_DIR/$APP_NAME_LOWER.zip"
     log "Extraction completed."
 
-    install_conda_env # if conda is installed then install the conda environment
-
     install_executable
     setup_cron_job
 
     change_ownership "$EXTRACT_DIR"
+    log "$APP_NAME version $VERSION installed successfully!"
+}
+
+install_using_setup_file_in_cwd() {
+    # copy the code base from the current directory to the $SOURCE_INSTALL_DIR
+    # make directory if not exists
+    create_dir "$SOURCE_INSTALL_DIR"
+    cp -r ./* "$SOURCE_INSTALL_DIR" || { log "ERROR" "Failed to copy the code to the installation directory."; exit 1; }
+    own_dir "$SOURCE_INSTALL_DIR"
+}
+
+install_from_source_code() {
+    backup_configs
+    remove_previous_installation
+    log "Using the current folder as the installation directory..."
+    install_using_setup_file_in_cwd
+    setup_cron_job
     log "$APP_NAME version $VERSION installed successfully!"
 }
 
@@ -672,19 +692,19 @@ display_credentials() {
 
 timer() {
     local duration=$1
-    for i in {1..50}; do
+    for ((i=1; i<=duration; i++)); do
         echo -n "$i "
         sleep 1
         echo -ne "\r" # Delete previous number to show next
     done
+    echo -ne "\n" # Move to the next line after the timer completes
 }
 
 open_browser() {
     log "If you face server server issues, run 'sudo $APP_NAME_LOWER-installer --fix' to fix the installation."
-    log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
-    # show timer for 50 seconds
-    timer 50
-    
+    log "Server is opening in the default browser..., waiting for 5 seconds."
+    timer 5
+
     if [ "$(id -u)" = "0" ]; then
         sudo -u "$SUDO_USER" xdg-open "$HOST_URL" &  # Linux with xdg-open
     else
@@ -702,15 +722,15 @@ open_browser() {
 # Install function
 install() {
     check_dependencies
-    check_conda # check if conda is installed
     log "Starting installation of $APP_NAME..."
-    create_and_own_dir "$EXTRACT_DIR"
+    create_dir "$EXTRACT_DIR"
     echo ""
     echo "Would you like to install from a Git repository or a specific release?"
     echo "For production use, it is recommended to install from a release."
     echo "|------------------------------------------------------------|"
     echo "|       1. Git Repository (Pre-Release Version)              |"
     echo "|       2. Release (More Stable Version)                     |"
+    echo "|       3. Source Code (Current Directory)                   |"
     echo "|------------------------------------------------------------|"
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
@@ -722,14 +742,19 @@ install() {
         2)
             install_from_release
             ;;
+        3)
+            install_from_source_code
+            ;;
         *)
             log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."
             exit 1
             ;;
     esac
-	stop_server
 	generate_ascii_art "$APP_NAME Installed" "green"
     display_credentials
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
+    sudo -u "$USER_NAME" bash "$dashboard_script_path" &> /dev/null
     open_browser
 }
 # Uninstall function
@@ -855,48 +880,6 @@ show_installer_logs() {
     fi
 }
 
-update_dependencies() {
-    # Activate Conda environment
-    check_conda
-    source "$CONDA_SETUP_SCRIPT"
-    conda activate "$CONDA_ENV_NAME" || { log "ERROR" "Failed to activate Conda environment $CONDA_ENV_NAME"; exit 1; }
-
-    # Check for missing dependencies
-    log "INFO" "Checking for missing dependencies..."
-    cd $EXTRACT_DIR/$APP_NAME-*/ || { log "ERROR" "Failed to change directory to $EXTRACT_DIR/$APP_NAME-*/"; exit 1; }
-    REQUIREMENTS_FILE="requirements.txt"
-
-    if [ ! -f "$REQUIREMENTS_FILE" ]; then
-        log "ERROR" "Requirements file $REQUIREMENTS_FILE not found."
-        exit 1
-    fi
-
-    log "INFO" "Installing dependencies from $REQUIREMENTS_FILE..."
-
-    # Install dependencies
-    sudo -u "$SUDO_USER" bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && pip install -r $EXTRACT_DIR/$APP_NAME-*/$REQUIREMENTS_FILE" || {
-        log "ERROR" "Failed to install dependencies from $REQUIREMENTS_FILE."
-        exit 1
-    }
-
-    log "INFO" "Dependencies installation complete."
-}
-
-# Function to install Conda environment and dependencies
-install_conda_env() {
-    log "Checking conda environment $CONDA_ENV_NAME..."
-    if ! "$CONDA_EXECUTABLE" env list | grep -q "$CONDA_ENV_NAME"; then
-        log "Creating Conda environment $CONDA_ENV_NAME..."
-        "$CONDA_EXECUTABLE" create -n "$CONDA_ENV_NAME" python=3.11 -y || { log "ERROR" "Failed to create Conda environment $CONDA_ENV_NAME"; exit 1; }
-        # install the dependencies
-        update_dependencies
-    else
-        log "Conda environment $CONDA_ENV_NAME already exists."
-        update_dependencies
-    fi
-}
-
-
 # stop flask server
 stop_server_helper() {
     if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
@@ -914,7 +897,6 @@ stop_server() {
 
 # fix the server
 fix() {
-    update_dependencies
     log "Fixing $APP_NAME server..."
     stop_server
     open_browser
@@ -995,12 +977,6 @@ show_help() {
     echo "                             This will pull the latest code from the Git repository."
     echo ""
     echo ""
-    echo " --check-conda               Check if Conda is installed and available."
-    echo "                             This will verify the presence of Conda and display the installation path."
-    echo ""
-    echo " --update-dependencies       Update the dependencies for $APP_NAME."
-    echo "                             This will install any missing dependencies required for the application."
-    echo ""
     echo "  --help                     Display this help message."
     echo "                             Shows information about all available options and how to use them."
 }
@@ -1019,8 +995,6 @@ for arg in "$@"; do
         --installation-logs) show_installer_logs; exit 0 ;;
         --stop-server) stop_server; exit 0 ;;
         --fix) fix; exit 0 ;;
-        --update-dependencies) update_dependencies; exit 0 ;;
-        --check-conda) check_conda; exit 0 ;;
         --install-latest) ACTION="install_latest" ;;
         --open-app) open_browser; exit 0 ;;
         --fetch-github-releases) fetch_github_releases; exit 0 ;;
@@ -1042,11 +1016,8 @@ case $ACTION in
     logs) show_server_logs ;;
     installation-logs) show_installer_logs ;;
     fix) fix ;;
-    check-conda) check_conda ;;
     install_latest) install_latest ;;
-    update_dependencies) update_dependencies ;;
     open_browser) open_browser ;;
     fetch_github_releases) fetch_github_releases ;;
     *) echo "No action specified. Use --help for usage information." ;;
 esac
-

@@ -1,3 +1,5 @@
+# deprecated file
+
 import os
 import datetime
 from threading import Timer
@@ -121,6 +123,33 @@ def ping_website(website):
                 updated_website.ping_interval, ping_website, args=[updated_website]
             ).start()
 
+def start_website_monitoring():
+    """
+    Periodically pings monitored websites based on individual ping intervals.
+    """
+    with app.app_context():
+        try:
+            while True:
+                active_websites = MonitoredWebsite.query.filter_by(
+                    is_ping_active=True
+                ).all()
+                if not active_websites:
+                    logger.info("No active websites to monitor.")
+                else:
+                    for website in active_websites:
+                        # Start pinging each website individually based on its ping interval
+                        Timer(0, ping_website, args=[website]).start()
+
+                # Check for active websites periodically (every 30 seconds)
+                Timer(30, start_website_monitoring).start()
+                break  # Break out of the loop to avoid creating a new thread infinitely
+
+        except SQLAlchemyError as db_err:
+            logger.error(
+                f"Database error during website monitoring: {db_err}", exc_info=True
+            )
+        except Exception as e:
+            logger.error(f"Error during website monitoring: {e}", exc_info=True)
 
 def monitor_settings():
     """
@@ -217,30 +246,3 @@ def log_system_info_to_db():
             logger.error(f"Failed to log system information: {e}", exc_info=True)
 
 
-def start_website_monitoring():
-    """
-    Periodically pings monitored websites based on individual ping intervals.
-    """
-    with app.app_context():
-        try:
-            while True:
-                active_websites = MonitoredWebsite.query.filter_by(
-                    is_ping_active=True
-                ).all()
-                if not active_websites:
-                    logger.info("No active websites to monitor.")
-                else:
-                    for website in active_websites:
-                        # Start pinging each website individually based on its ping interval
-                        Timer(0, ping_website, args=[website]).start()
-
-                # Check for active websites periodically (every 30 seconds)
-                Timer(30, start_website_monitoring).start()
-                break  # Break out of the loop to avoid creating a new thread infinitely
-
-        except SQLAlchemyError as db_err:
-            logger.error(
-                f"Database error during website monitoring: {db_err}", exc_info=True
-            )
-        except Exception as e:
-            logger.error(f"Error during website monitoring: {e}", exc_info=True)

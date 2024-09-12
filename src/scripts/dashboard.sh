@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# if run with sudo, exit
+if [ "$EUID" -eq 0 ]; then
+    echo "Please run this script as a non-root user."
+    exit 1
+fi
+
 # Function to log messages with timestamps
 log_message() {
     # Check if the level is passed; if not, set it to "INFO" as default.
@@ -60,11 +66,40 @@ LOG_FILE="/home/$(whoami)/logs/flask.log"
 USERNAME="$(whoami)"
 CONDA_ENV_NAME=$APP_NAME
 GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
+ENV_FILE="/home/$(whoami)/.bashrc"
 
+# Export Flask environment variables
+export FLASK_APP="$FLASK_APP_PATH"
+export FLASK_ENV=production
+export FLASK_RUN_PORT="$FLASK_PORT"
+export FLASK_RUN_HOST="0.0.0.0"
+
+# Function to fetch the value of an environment variable from a file
+fetch_env_variable() {
+    var_name=$1       # The name of the environment variable to fetch
+    # Check if the environment file exists
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "Error: Environment file '$ENV_FILE' not found."
+        return 1
+    fi
+
+    # Fetch the value of the environment variable
+    var_value=$(grep -E "^${var_name}=" "$ENV_FILE" | sed -E "s/^${var_name}=(.*)/\1/")
+
+    # Check if the variable was found and has a value
+    if [ -z "$var_value" ]; then
+        echo "Error: Variable '$var_name' not found in '$ENV_FILE'."
+        return 1
+    fi
+
+    # Print the value of the environment variable
+    echo "$var_value"
+}
+
+auto_update=$(fetch_env_variable "sg_auto_update")
 # Fetch from bashrc for auto-update
-auto_update=$(grep -E "^export sg_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
-echo "auto-update:" $auto_update
-# 
+echo "Auto update for $APP_NAME is set to $auto_update"
+
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
 mkdir -p "$LOG_DIR"
@@ -78,6 +113,7 @@ for CONDA_PATH in "${CONDA_PATHS[@]}"; do
         CONDA_FOUND=true
         CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
         CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
+        source "$CONDA_SETUP_SCRIPT" &> /dev/null
         break
     fi
 done
@@ -93,12 +129,16 @@ if [ ! -f "$CONDA_SETUP_SCRIPT" ]; then
     exit 1
 fi
 
-# Initialize Conda
-source "$CONDA_SETUP_SCRIPT"
+# Check if the Conda environment exists and create it if not
+if ! conda info --envs | awk '{print $1}' | grep -q "^$CONDA_ENV_NAME$"; then
+    log_message "Conda environment '$CONDA_ENV_NAME' not found. Creating it..."
+    conda create -n "$CONDA_ENV_NAME" python=3.10 -y
 
-# Export Flask environment variables
-export FLASK_APP="$FLASK_APP_PATH"
-export FLASK_ENV=production
+    log_message "Activating Conda environment '$CONDA_ENV_NAME' and installing requirements."
+    conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
+else
+    log_message "Activating existing Conda environment '$CONDA_ENV_NAME'."
+fi
 
 fetch_latest_changes() {
     local project_dir="$1"
@@ -166,13 +206,12 @@ fetch_latest_changes() {
         # Return to the original directory
         popd > /dev/null
     fi
-
 }
 
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     log_message "Flask app is not running. Checking repository and starting it..."
-    [ "$$APP_NAME-AUTO-UPDATE" = true ] &&
+    [ "$auto_update" = true ] &&
     fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command

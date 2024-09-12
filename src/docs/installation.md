@@ -13,7 +13,7 @@ To install Miniconda3, run the following commands:
 ```bash
 # Install Miniconda3
 wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
-chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
+chmod +x install_miniconda.sh && ./install_miniconda.sh
 ```
 
 ### Installation Steps
@@ -22,8 +22,15 @@ chmod +x install_miniconda.sh && sudo ./install_miniconda.sh
 
 ```bash
 sudo apt-get update
-sudo apt-get install git curl wget unzip iptables figlet
+sudo apt-get install git curl wget unzip iptables figlet jq
 ```
+
+- curl: For downloading files from the internet.
+- wget: For downloading files from the internet.
+- unzip: For extracting zip files.
+- iptables: For managing firewall rules.
+- figlet: For displaying ASCII art text.
+- jq: For processing JSON data.
 
 2. Download and set up the SystemGuard installer:
 

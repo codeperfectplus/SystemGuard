@@ -1,26 +1,36 @@
 {% extends 'base/base.html' %}
+
 {% block title %}Edit Website{% endblock %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_website.css') }}">
 {% endblock %}
+
 {% block content %}
-<h1>Edit Website</h1>
-<!-- Form to edit the website -->
-<form action="/edit_monitored_website/{{ website.id }}" method="POST">
-    <label for="name">Website URL:</label>
-    <input type="text" name="name" value="{{ website.name }}" required>
-    
-    <label for="ping_interval">Ping Period (seconds):</label>
-    <input type="number" name="ping_interval" value="{{ website.ping_interval }}" required>
-
-    <label for="email">Email Address:</label>
-    <input type="email" name="email_address" value="{{ website.email_address }}">
-
-    <label for="email_alerts_enabled">Email Alerts Enabled:</label>
-    <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled" {% if website.email_alerts_enabled %}checked{% endif %}>
-    
-    <button type="submit">Update Website</button>
-</form>
-
-<a href="{{ url_for('monitor_websites') }}">Back to Website List</a>
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Update Website Details</h1>
+    <div class="bg-white p-4 rounded shadow-sm">
+        <!-- Form to edit the website -->
+        <form action="/edit_monitored_website/{{ website.id }}" method="POST">
+            <div class="form-group mb-3">
+                <label for="name" class="form-label">Website URL:</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ website.name }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="ping_interval" class="form-label">Ping Period (seconds):</label>
+                <input type="number" id="ping_interval" name="ping_interval" class="form-control" value="{{ website.ping_interval }}" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="email_address" class="form-label">Email Address:</label>
+                <input type="email" id="email_address" name="email_address" class="form-control" value="{{ website.email_address }}">
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" id="email_alerts_enabled" name="email_alerts_enabled" class="form-check-input" {% if website.email_alerts_enabled %}checked{% endif %}>
+                <label for="email_alerts_enabled" class="form-check-label">Email Alerts Enabled</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Website</button>
+        </form>
+    </div>
+    <a href="{{ url_for('monitor_websites') }}" class="btn btn-secondary mt-3">Back to Website List</a>
+</div>
 {% endblock %}
