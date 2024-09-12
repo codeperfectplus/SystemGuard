@@ -62,7 +62,16 @@ with app.app_context():
 @app.context_processor
 def inject_settings():
     if current_user.is_anonymous:
-        return dict(user_dashboard_settings=None, card_settings=None, page_toggles_settings=None, general_settings=None)
+        user_dashboard_settings = UserDashboardSettings(user_id=0)
+        card_settings = None
+        page_toggles_settings = None
+        general_settings = None
+        return dict(
+            user_dashboard_settings=user_dashboard_settings,
+            card_settings=card_settings,
+            page_toggles_settings=page_toggles_settings,
+            general_settings=general_settings,
+        )
     general_settings = GeneralSettings.query.first()
     card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()
     user_dashboard_settings = UserDashboardSettings.query.filter_by(
