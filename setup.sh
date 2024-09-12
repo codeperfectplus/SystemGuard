@@ -6,8 +6,6 @@
 
 # USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
 USER_NAME=$USER
-echo $USER_NAME
-echo $HOME
 if [ "$(whoami)" = "root" ]; then
     # LOGNAME_USER=$(logname)
     # echo $LOGNAME_USER
@@ -23,7 +21,6 @@ if [ "$(whoami)" = "root" ]; then
 else
     USER_NAME=$(whoami)
 fi
-echo $USER_NAME
 USER_HOME=/home/$USER_NAME
 
 
@@ -151,7 +148,8 @@ generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
-echo "Welcome on board: Mr. $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+echo "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+
 
 # function to check for required dependencies
 check_dependencies() {
@@ -694,19 +692,19 @@ display_credentials() {
 
 timer() {
     local duration=$1
-    for i in {1..50}; do
+    for ((i=1; i<=duration; i++)); do
         echo -n "$i "
         sleep 1
         echo -ne "\r" # Delete previous number to show next
     done
+    echo -ne "\n" # Move to the next line after the timer completes
 }
 
 open_browser() {
     log "If you face server server issues, run 'sudo $APP_NAME_LOWER-installer --fix' to fix the installation."
-    log "Server may take 1-2 minutes to start. Opening the browser in 50 seconds..."
-    # show timer for 50 seconds
-    timer 50
-    
+    log "Server is opening in the default browser..., waiting for 5 seconds."
+    timer 5
+
     if [ "$(id -u)" = "0" ]; then
         sudo -u "$SUDO_USER" xdg-open "$HOST_URL" &  # Linux with xdg-open
     else
@@ -754,6 +752,9 @@ install() {
     esac
 	generate_ascii_art "$APP_NAME Installed" "green"
     display_credentials
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
+    sudo -u "$USER_NAME" bash "$dashboard_script_path" &> /dev/null
     open_browser
 }
 # Uninstall function
