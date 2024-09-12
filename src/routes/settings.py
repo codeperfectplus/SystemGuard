@@ -1,6 +1,8 @@
 import os
+import time
 import datetime
-from flask import render_template, request, flash, blueprints, redirect, url_for
+import subprocess
+from flask import render_template, request, flash, blueprints, redirect, url_for, Response, session
 
 from src.config import app, db
 from src.models import UserCardSettings, UserDashboardSettings, UserProfile, GeneralSettings, PageToggleSettings
@@ -112,3 +114,54 @@ def settings():
         return render_template("error/403.html")
 
     return render_template("settings/settings.html", settings=settings)
+
+def check_sudo_password(sudo_password):
+    """
+    Verify the given sudo password by executing a harmless sudo command.
+    If the password is correct, it returns True. Otherwise, returns False.
+
+    :param sudo_password: The user's sudo password to validate.
+    :return: True if the password is correct, otherwise False.
+    """
+    try:
+        # Test if the sudo password is valid by running a safe sudo command
+        result = subprocess.run(
+            ['sudo', '-S', 'true'],
+            input=f'{sudo_password}\n',
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        return result.returncode == 0
+    
+    except Exception as e:
+        # Log any exception that occurs while validating the sudo password
+        return False, str(e)
+
+@app.route('/control', methods=['GET', 'POST'])
+def control():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        sudo_password = request.form.get('sudo_password', '')
+
+        if action == 'shutdown':
+            command = ['sudo', '-S', 'shutdown', '-h', 'now']
+            success_message = "Server is shutting down..."
+            error_message = "Failed to shutdown: {}"
+        elif action == 'reboot':
+            command = ['sudo', '-S', 'reboot']
+            success_message = "Server is rebooting..."
+            error_message = "Failed to reboot: {}"
+        else:
+            flash("Invalid action!", 'danger')
+            return redirect(url_for('control'))
+
+        try:
+            # Execute the command with the sudo password
+            result = subprocess.run(command, input=sudo_password.encode(), check=True, capture_output=True, text=True)
+            flash(success_message, 'info')
+        except subprocess.CalledProcessError as e:
+            flash(error_message.format(e), 'danger')
+
+    # Render the control form on GET request
+    return render_template("settings/control.html")

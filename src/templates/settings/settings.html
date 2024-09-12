@@ -1,12 +1,13 @@
 {% extends 'base/base.html' %}
-{% block title %}Settings{% endblock %}
+{% block title %}Control Panel{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 {% block content %}
 <div class="settings-container">
-    <h1 class="settings-title">{{title}} Settings
+    <h1 class="settings-title">
+        {{title}} Control Panel
         <i class="fas fa-cogs"></i>
     </h1>
 
@@ -16,13 +17,13 @@
             <i class="fas fa-users"></i> All Users
         </a>
         <a href="{{ url_for('create_user') }}" class="btn btn-primary">
-            <i class="fas fa-users"></i> Create User
+            <i class="fas fa-user-plus"></i> Create User
         </a>
     </div>  
     
     <div class="settings-buttons">
         <a href="{{ url_for('smtp_config') }}" class="btn btn-primary">
-            <i class="fas fa-key"></i> Smtp Configuration
+            <i class="fas fa-key"></i> SMTP Configuration
         </a>
         <a href="{{ url_for('general_settings') }}" class="btn btn-primary">
             <i class="fas fa-cogs"></i> General Settings
@@ -31,7 +32,7 @@
 
     <div class="settings-buttons">
         <a href="{{ url_for('user_settings') }}" class="btn btn-primary">
-            <i class="fa-solid fa-user"></i> User Settings
+            <i class="fa-solid fa-user-cog"></i> User Settings
         </a>
         <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary">
             <i class="fas fa-toggle-on"></i> Page Toggles
@@ -52,6 +53,13 @@
             <i class="fas fa-envelope"></i> Send Email
         </a>
     </div>
+
+    <div class="settings-buttons">
+        <a href="{{ url_for('control') }}" class="btn btn-primary">
+            <i class="fas fa-power-off"></i> Control Server
+        </a>
+    </div>
+
 
     <div class="settings-buttons">
         <a href="{{ url_for('about') }}" class="btn btn-primary">
