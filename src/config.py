@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
@@ -18,8 +19,13 @@ CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
 
+HOME_DIR = os.path.expanduser("~")
+DB_DIR = os.path.join(HOME_DIR, ".database")
+os.makedirs(DB_DIR, exist_ok=True)
+# systemguard path = /home/user/.database/systemguard.db
+
 # Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{APP_NAME.lower()}.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 
