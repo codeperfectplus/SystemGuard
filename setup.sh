@@ -314,10 +314,17 @@ add_cron_job() {
     fi
 
     # List the current crontab
-    if ! $crontab_cmd -l 2>/dev/null > "$temp_cron"; then
-        log "CRITICAL" "Unable to list current crontab."
-        rm "$temp_cron"
-        exit 1
+    if ! $crontab_cmd -l > "$temp_cron"  2>&1; then
+        # Handle empty cron file error
+        if grep -q "no crontab for" "$temp_cron" 2>/dev/null; then
+            grep -v "no crontab for" "$temp_cron" > "${temp_cron}.clean"
+            mv "${temp_cron}.clean" "$temp_cron"
+            log "No crontab for user $USER_NAME."
+        else 
+            log "CRITICAL" "Unable to list current crontab. hello"
+            rm "$temp_cron"
+            exit 1
+        fi
     fi
 
     # Ensure the cron job does not already exist
