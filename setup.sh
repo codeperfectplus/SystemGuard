@@ -223,56 +223,64 @@ else
     crontab_cmd="crontab"
 fi
 
-# Function to validate the user input
-validate_choice() {
-    local choice="$1"
-    if [[ "$choice" != "true" && "$choice" != "false" ]]; then
-        echo "Invalid input. Please enter 'true' or 'false'."
-        return 1
-    fi
-    return 0
-}
-
-update_env_variable() {
-    local var_name="$1"
-    local var_value="$2"
-
-    # Check if the variable already exists in the environment file
-    if grep -q "^export $var_name=" "$ENV_FILE"; then
-        # Update existing entry
-        sed -i "s/^export $var_name=.*/export $var_name=$var_value/" "$ENV_FILE"
-    else
-        # Add new entry
-        echo "export $var_name=$var_value" >> "$ENV_FILE"
-    fi
-
-    # Notify user of change
-    echo "$var_name set to $var_value in $ENV_FILE."
-}
-
+# Function to create a environment variable in the .bashrc file
 prompt_user() {
-    echo "Do you want to enable $var_name? (true/false) This will enable automatic updates for $APP_NAME."
-    read -p "Enter your choice (true/false): " user_choice
-    echo "$user_choice"
+    echo "Do you want to enable $var_name for automatic updates for $APP_NAME?"
+    echo "1) Yes (Enable automatic updates)"
+    echo "2) No (Disable automatic updates)"
+    read -p "Enter your choice (1 or 2): " user_choice
+    
+    # Convert the user's choice to true/false
+    case "$user_choice" in
+        1)
+            user_choice="true"
+            ;;
+        2)
+            user_choice="false"
+            ;;
+        *)
+            echo "Invalid choice. Please enter 1 or 2."
+            return 1
+            ;;
+    esac
 }
 
-# set the auto update variable
+# Function to update the environment variable in the env file
+update_env_variable() {
+    var_name=$1
+    var_value=$2
+    
+    # Ensure the environment file exists
+    touch "$ENV_FILE"
+    
+    # Update or add the variable in the environment file
+    if grep -q "^$var_name=" "$ENV_FILE"; then
+        # Replace existing variable
+        sed -i "s/^$var_name=.*/$var_name=$var_value/" "$ENV_FILE"
+    else
+        # Add new variable
+        echo "$var_name=$var_value" >> "$ENV_FILE"
+    fi
+}
+
+# Function to set the auto update variable
 set_auto_update() {
     var_name=$1
     prompt_user # Prompt user for input
-    # Validate input
-    if ! validate_choice "$user_choice"; then
+    
+    # If prompt_user returned an error (invalid choice), exit early
+    if [ $? -ne 0 ]; then
         return 1
     fi
-    # Update environment variable
+    
+    # Update the environment variable with the user's choice
     update_env_variable "$var_name" "$user_choice"
-    # Reload environment file
+    
+    # Reload the environment file to apply changes
     source "$ENV_FILE"
 }
 
 # this function will change the ownership of the directory
-# from root to the user, as the script is run as root
-# and the installation directory should be owned by the user
 change_ownership() {
     local directory="$1"
     if [ -d "$directory" ]; then

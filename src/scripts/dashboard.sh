@@ -60,11 +60,34 @@ LOG_FILE="/home/$(whoami)/logs/flask.log"
 USERNAME="$(whoami)"
 CONDA_ENV_NAME=$APP_NAME
 GIT_REMOTE_URL="https://github.com/codeperfectplus/SystemDashboard" # Set this if you want to add a remote
+ENV_FILE="/home/$(whoami)/.bashrc"
 
+# Function to fetch the value of an environment variable from a file
+fetch_env_variable() {
+    var_name=$1       # The name of the environment variable to fetch
+    # Check if the environment file exists
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "Error: Environment file '$ENV_FILE' not found."
+        return 1
+    fi
+
+    # Fetch the value of the environment variable
+    var_value=$(grep -E "^${var_name}=" "$ENV_FILE" | sed -E "s/^${var_name}=(.*)/\1/")
+
+    # Check if the variable was found and has a value
+    if [ -z "$var_value" ]; then
+        echo "Error: Variable '$var_name' not found in '$ENV_FILE'."
+        return 1
+    fi
+
+    # Print the value of the environment variable
+    echo "$var_value"
+}
+
+auto_update=$(fetch_env_variable "sg_auto_update")
 # Fetch from bashrc for auto-update
-auto_update=$(grep -E "^export sg_auto_update=" /home/$(whoami)/.bashrc | cut -d'=' -f2)
-echo "SystemGuard Auto Update: $auto_update"
-# 
+echo "Auto update for $APP_NAME is set to $auto_update"
+
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"
 mkdir -p "$LOG_DIR"
@@ -177,13 +200,12 @@ fetch_latest_changes() {
         # Return to the original directory
         popd > /dev/null
     fi
-
 }
 
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
     log_message "Flask app is not running. Checking repository and starting it..."
-    [ "$$APP_NAME-AUTO-UPDATE" = true ] &&
+    [ "$auto_update" = true ] &&
     fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command
