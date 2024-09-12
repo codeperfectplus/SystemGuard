@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+{% block title %} Security Scan {% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scan.css') }}">
+{% endblock %}
+{% block content %}
+    <h2 class="scan-header">Scan for Devices</h1>
+    <form action="/scan" method="post">
+        <button type="submit" id="scan_network" name="scan_network">Scan Subnet for Devices</button>
+    </form>
+
+    <h2 class="scan-header">Nmap Port Scanner</h1>
+    <form action="/scan" method="post">
+        <label for="ip_address">Enter IP Address:</label>
+        <input type="text" id="ip_address" name="ip_address" required value="{{system_ip_address}}">
+        <button type="submit" id="scan_ports", name="scan_ports">Scan Ports</button>
+    </form>
+
+    <!-- results for network scan -->
+    {% if network_result %}
+    <h1 style="text-align: center;">Nmap Scan Results</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Device Name</th>
+                <th>IP Address</th>
+                <th>Latency</th>
+                <th>Ports Searched</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in network_result %}
+            <tr>
+                <td>{{ result.device }}</td>
+                <td>{{ result.ip }}</td>
+                <td>{{ result.latency }}</td>
+                <td>{{ result.ports_searched }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- results for port scan -->
+    {% if port_results %}
+    <h1>Scan Results for {{ ip_address }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Port</th>
+                <th>State</th>
+                <th>Service</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in port_results %}
+            <tr>
+                <td>{{ result.port }}</td>
+                <td>{{ result.state }}</td>
+                <td>{{ result.service }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endblock %}

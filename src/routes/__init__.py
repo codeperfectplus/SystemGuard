@@ -17,3 +17,4 @@ from src.routes.ping import ping_bp
 from src.routes.firewall import firewall_bp
 from src.routes.health import health_bp
 from src.routes.api import api_bp
+from src.routes.experimental import experimental_bp
