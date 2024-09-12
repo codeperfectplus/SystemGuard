@@ -2,7 +2,7 @@ import psutil
 from flask import render_template, blueprints, flash
 from flask_login import login_required
 from src.config import app
-from src.utils import get_established_connections
+from src.utils import get_established_connections, get_ip_address
 from src.models import  PageToggleSettings
 
 network_info_bp = blueprints.Blueprint("network_stats", __name__)
@@ -15,7 +15,8 @@ def network_stats():
         flash("You do not have permission to view this page.", "danger")
         return render_template("error/403.html")
     net_io = psutil.net_io_counters()
-    ipv4_ip, ipv6_ip = get_established_connections()
+    _, ipv6_ip = get_established_connections()
+    ipv4_ip = get_ip_address()
     system_info = {
         "network_sent": round(net_io.bytes_sent / (1024**2), 2),  # In MB
         "network_received": round(net_io.bytes_recv / (1024**2), 2),  # In MB

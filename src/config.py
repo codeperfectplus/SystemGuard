@@ -2,6 +2,8 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 from src.logger import logger
+from src.helper import get_system_node_name, get_ip_address
+# from src.utils import get_ip_address, get_system_node_name
 
 app = Flask(__name__)
 
@@ -13,6 +15,8 @@ YEAR = "2024"
 VERSION = "v1.0.4-pre-release"
 PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
+SYSTEM_NAME = get_system_node_name()
+SYSTEM_IP_ADDRESS = get_ip_address()
 
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{APP_NAME.lower()}.db'
@@ -28,6 +32,8 @@ app.jinja_env.globals.update(
     version=VERSION,
     project_url=PROJECT_URL,
     contact_email=CONTACT_EMAIL,
+    system_name=SYSTEM_NAME,
+    system_ip_address=SYSTEM_IP_ADDRESS,
 )
 
 def get_app_info():
@@ -40,6 +46,8 @@ def get_app_info():
         "version": VERSION,
         "project_url": PROJECT_URL,
         "contact_email": CONTACT_EMAIL,
+        "system_name": SYSTEM_NAME,
+        "system_ip_address": SYSTEM_IP_ADDRESS,
     }
 
 # Initialize the database

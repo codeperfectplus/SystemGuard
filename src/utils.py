@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from src.logger import logger
 from src.models import GeneralSettings
+from src.helper import get_system_node_name, get_ip_address
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -76,7 +77,7 @@ def get_flask_memory_usage():
     except Exception as e:
         logger.info(f"Error getting memory usage: {e}")
         return None
-
+    
 def get_established_connections():
     """ 
     Get the first available IPv4 and IPv6 addresses of established network connections.
@@ -175,21 +176,32 @@ def cpu_usage_percent():
     return psutil.cpu_percent(interval=1)
 
 def get_cpu_temp():
-    """Get the current CPU temperature, high temperature, and critical temperature.
-    ---
-    Parameters:
-    ---
+    """
+    Get the current CPU temperature, high temperature, and critical temperature.
+
     Returns:
         tuple: Current CPU temperature, high temperature, and critical temperature.
     """
-    
     try:
-        temp = psutil.sensors_temperatures().get('coretemp', [{'current': 'N/A'}])[0]
-        current_temp = temp.get('current', 'N/A')
-        high_temp = temp.get('high', 'N/A')
-        critical_temp = temp.get('critical', 'N/A')
-        return (current_temp, high_temp, critical_temp)
-    except Exception:
+        # Fetch temperatures for sensors labeled 'coretemp'
+        temps = psutil.sensors_temperatures().get('coretemp')
+        
+        # Check if we have temperatures data
+        if temps:
+            temp = temps[0]  # Get the first sensor's readings
+            
+            # Extract current, high, and critical temperatures
+            current_temp = getattr(temp, 'current', 'N/A')
+            high_temp = getattr(temp, 'high', 'N/A')
+            critical_temp = getattr(temp, 'critical', 'N/A')
+            
+            return (current_temp, high_temp, critical_temp)
+        else:
+            # If no 'coretemp' sensors found, return 'N/A'
+            return ("N/A", "N/A", "N/A")
+    
+    except Exception as e:
+        logger.warning(f"Error getting CPU temperature: {e}")
         return ("N/A", "N/A", "N/A")
 
 
@@ -355,16 +367,6 @@ def get_cached_value(key, fresh_value_func):
 
     return fresh_value
 
-def get_system_node_name():
-    """ 
-    Get the system node name.
-    ---
-    Parameters:
-    ---
-    Returns:
-        str: System node name
-    """
-    return os.uname().nodename
 
 def _get_system_info():
     """ Get system information with caching for certain values and fresh data for others. 
@@ -414,7 +416,7 @@ def get_system_info():
         dict: System information dictionary with various system metrics.
     """
     username = get_cached_value('username', get_system_node_name)
-    ipv4_dict = get_cached_value('ipv4', lambda: get_established_connections()[0])
+    ipv4_address = get_cached_value('ipv4', lambda: get_ip_address())
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
     current_server_time = datetime.datetime.now()
@@ -426,7 +428,7 @@ def get_system_info():
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,
-        'ipv4_connections': ipv4_dict,
+        'ipv4_connections': ipv4_address,
         'timestamp': datetime.datetime.now(),
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'timestamp': current_server_time
