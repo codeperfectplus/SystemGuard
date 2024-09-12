@@ -21,42 +21,49 @@ with app.app_context():
     logger.info("Creating tables")
     db.create_all()
 
-    # initialize default dashboard user_dashboard_settings for users
+    # Load predefined users from JSON file and add them to the database if not already present
+    pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
+    try:
+        with open(pre_defined_users_json, "r") as file:
+            pre_defined_users = json.load(file)
+
+        for user_data in pre_defined_users:
+            if not UserProfile.query.filter_by(user_level=user_data["user_level"]).first():
+                hashed_password = generate_password_hash(user_data["password"])
+                user = UserProfile(
+                    username=user_data["username"],
+                    email=user_data["email"],
+                    password=hashed_password,
+                    user_level=user_data["user_level"],
+                    receive_email_alerts=user_data["receive_email_alerts"],
+                    profession=user_data["profession"],
+                )
+
+                db.session.add(user)
+                db.session.commit()
+                logger.info(f"Added predefined user: {user_data['username']}")
+
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.error(f"Error loading predefined users: {e}")
+
+    # Initialize default dashboard settings for all users
     users = UserProfile.query.all()
     for user in users:
         if not user.dashboard_settings:
+            # Initialize settings with defaults if not set
             db.session.add(UserDashboardSettings(user_id=user.id))
             db.session.add(UserCardSettings(user_id=user.id))
             db.session.add(PageToggleSettings(user_id=user.id))
-            
-            db.session.commit()
-            logger.info("Initial card data added.")
-            db.session.commit()
 
-    pre_defined_users_json = os.path.join(ROOT_DIR, "src/assets/predefine_user.json")
-    with open(pre_defined_users_json, "r") as file:
-        pre_defined_users = json.load(file)
-    for user in pre_defined_users:
-        if not UserProfile.query.filter_by(user_level=user["user_level"]).first():
-            hashed_password = generate_password_hash(user["password"])
-            user = UserProfile(
-                username=user["username"],
-                email=user["email"],
-                password=hashed_password,
-                user_level=user["user_level"],
-                receive_email_alerts=user["receive_email_alerts"],
-                profession=user["profession"],
-            )
+            db.session.commit()  # Commit once per user
+            logger.info(f"Initial settings data added for user ID: {user.id}")
 
-            db.session.add(user)
-            db.session.commit()
-
-    # Initialize default user_dashboard_settings
+    # Initialize default general settings if not present
     general_settings = GeneralSettings.query.first()
     if not general_settings:
         db.session.add(GeneralSettings())
         db.session.commit()
-
+        logger.info("General settings initialized.")
 
 # ibject for all templates
 @app.context_processor

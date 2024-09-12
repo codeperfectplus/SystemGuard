@@ -1,5 +1,5 @@
 import datetime
-from flask import render_template, blueprints, jsonify
+from flask import render_template, blueprints, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 
 from src.config import app
@@ -11,7 +11,11 @@ dashboard_bp = blueprints.Blueprint("dashboard", __name__)
 @app.route("/", methods=["GET"])
 @login_required
 def dashboard():
-    user_dashboard_settings = UserDashboardSettings.query.first()
+    # if user is not authenticated, redirect to login page
+    if not current_user.is_authenticated:
+        return redirect(url_for("login"))
+    user_id = current_user.id if current_user.is_authenticated else 0
+    user_dashboard_settings = UserDashboardSettings.query.filter_by(user_id=user_id).first()
     system_info = get_system_info()
 
     # Fetch the last speedtest result
