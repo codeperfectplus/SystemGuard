@@ -198,11 +198,11 @@ def get_cpu_temp():
             return (current_temp, high_temp, critical_temp)
         else:
             # If no 'coretemp' sensors found, return 'N/A'
-            return ("N/A", "N/A", "N/A")
+            return (0, 0, 0)
     
     except Exception as e:
         logger.warning(f"Error getting CPU temperature: {e}")
-        return ("N/A", "N/A", "N/A")
+        return (0, 0, 0)
 
 
 def get_top_processes(number=5):
@@ -394,7 +394,7 @@ def _get_system_info():
         'memory_percent': round(memory_info.percent, 2),
         'disk_percent': round(disk_info.percent, 2),
         'network_sent': network_sent,
-        'battery_percent': round(battery_info.percent, 1) if battery_info else "N/A",
+        'battery_percent': round(battery_info.percent, 1) if battery_info else 0,
         'network_received': network_received,
         "network_stats" : f"D: {network_received} MB / U: {network_sent} MB",
         'dashboard_memory_usage': get_flask_memory_usage(),
