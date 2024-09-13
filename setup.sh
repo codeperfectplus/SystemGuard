@@ -290,7 +290,6 @@ change_ownership() {
     fi
 }
 
-
 # Function to add a cron job with error handling
 add_cron_job() {
 
@@ -932,7 +931,6 @@ install_latest() {
         log "Please install the code from the git repository to update the code."
     fi
 }
-
 
 # Display help
 show_help() {
