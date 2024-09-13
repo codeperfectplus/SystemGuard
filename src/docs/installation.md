@@ -150,7 +150,7 @@ systemguard-installer --help
 
 | Version    | Release Date | Status      | Key Features                                        |
 | ---------- | ------------ | ----------- | --------------------------------------------------- |
-| v1.0.4     | 13/09/2024   | Stable      | Stable version of pre-release features, stability   |
+| v1.0.4     | 13/09/2024   | Stable      | Stable version of pre-release features              |
 | v1.0.4-pre | 10/09/2024   | Pre-release | Auto-update, website monitoring, graph improvements |
 | v1.0.3     | 05/09/2024   | Stable      | Performance optimization, CPU graphs, bug fixes     |
 | v1.0.2     | 02/09/2024   | Deprecated  | Minor fixes, initial graph improvements             |
