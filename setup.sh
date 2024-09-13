@@ -62,6 +62,11 @@ ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
 ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
 
+# colors for the script
+color_prompt="\033[1;36m"  # Cyan for the prompt
+color_option="\033[37m"  # Blue for options
+color_reset="\033[0m"      # Reset to default
+
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
@@ -148,8 +153,30 @@ generate_ascii_art "$APP_NAME" "yellow"
 generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
+
 echo "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
 
+color_border="\033[1;36m"   # Cyan for borders
+color_message="\033[1;32m"  # Green for the message
+color_reset="\033[0m"       # Reset to default
+
+welcome_message() {
+    # # Define color variables
+    # color_border="\033[1;36m"   # Cyan for borders
+    # color_message="\033[1;32m"  # Green for the message
+    # color_reset="\033[0m"       # Reset to default
+
+    welcome_message="Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+    padding=4
+    message_length=$((${#welcome_message} + $padding * 2))
+
+    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $message_length))┐${color_reset}"
+    echo -e "${color_border}│${color_reset}$(printf '%*s' $padding)${color_message}${welcome_message}$(printf '%*s' $padding)${color_reset}${color_border}│${color_reset}"
+    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $message_length))┘${color_reset}"
+
+}
+# Display the welcome message
+welcome_message
 
 # function to check for required dependencies
 check_dependencies() {
@@ -223,9 +250,18 @@ fi
 
 # Function to create a environment variable in the .bashrc file
 prompt_user() {
-    echo "Do you want to enable $var_name for automatic updates for $APP_NAME?"
-    echo "1) Yes (Enable automatic updates)"
-    echo "2) No (Disable automatic updates)"
+    # Display the prompt with improved formatting
+    echo ""
+    echo -e "${color_prompt}┌─────────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_prompt}│${color_reset} Do you want to enable automatic updates for ${color_message}${APP_NAME}${color_reset}?        ${color_prompt}│${color_reset}"
+    echo -e "${color_prompt}│${color_reset} This will allow ${APP_NAME} to check for updates automatically. ${color_prompt}│${color_reset}"
+    echo -e "${color_prompt}└─────────────────────────────────────────────────────────────────┘${color_reset}"
+    echo ""
+    echo -e "${color_prompt}┌──────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_prompt}│     ${color_reset} ${color_message}1) Yes (Enable automatic updates)                   ${color_prompt}│${color_reset}"
+    echo -e "${color_prompt}│     ${color_reset} ${color_message}2) No (Disable automatic updates)                   ${color_prompt}│${color_reset}"
+    echo -e "${color_prompt}└──────────────────────────────────────────────────────────┘${color_reset}"
+    echo ""
     read -p "Enter your choice (1 or 2): " user_choice
     
     # Convert the user's choice to true/false
@@ -535,14 +571,18 @@ install_from_git() {
 
     # Remove any previous installations
     remove_previous_installation
-
     echo ""
-    echo "Select the version of $APP_NAME to install:"
-    echo "|------------------------------------------------------------------------------|"
-    echo "|  1. Production (stable)  ->       Recommended for most users                 |"
-    echo "|  2. Development (dev)    ->       Latest features, may be unstable           |"
-    echo "|  3. Specify a branch     ->       Enter the branch/tag name when prompted    |"
-    echo "|------------------------------------------------------------------------------|"
+    echo ""
+    echo -e "${color_border}┌──────────────────────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_border}│${color_reset}  \033[1mSelect the version of $APP_NAME to install:\033[0m                               ${color_border}│${color_reset}"
+    echo -e "${color_border}└──────────────────────────────────────────────────────────────────────────────┘${color_reset}"
+    echo ""
+    echo -e "${color_border}┌──────────────────────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_border}│${color_reset}  ${color_message}1. Production (stable)${color_reset}     ->   Recommended for most users                ${color_border}  │${color_reset}"
+    echo -e "${color_border}│${color_reset}  ${color_message}2. Development (dev)${color_reset}       ->   Latest features, may be unstable        ${color_border}    │${color_reset}"
+    echo -e "${color_border}│${color_reset}  ${color_message}3. Specify a branch${color_reset}        ->   Enter the branch/tag name when prompted ${color_border}    │${color_reset}"
+    echo -e "${color_border}└──────────────────────────────────────────────────────────────────────────────┘${color_reset}"
+    echo ""
     echo "Enter the number of your choice:"
     read -r VERSION
 
@@ -630,11 +670,23 @@ fetch_github_releases() {
 
     # Display releases with newest first
     # Display releases with newest first in tabular format
-    echo "--------------------------------------------"
-    echo "Latest releases for $APP_NAME:"
-    echo "--------------------------------------------"
-    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 | awk -F'\t' 'BEGIN { printf "%-15s %-20s\n", "Tag Name", "Published At" } { printf "%-15s %-20s\n", $1, $2 }' | head -n $NUM_OF_RELEASES
-    echo "--------------------------------------------"
+    # Define color variables
+    color_header="\033[1;36m"  # Cyan for headers
+    color_reset="\033[0m"      # Reset to default
+    color_content="\033[1;34m" # Blue for content
+
+    echo -e "${color_header}┌──────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_header}│${color_reset} Latest releases for ${APP_NAME}:${color_reset}                             ${color_header}│${color_reset}"
+    echo -e "${color_header}├──────────────────────────────────────────────────────────────┤${color_reset}"
+    echo -e "${color_header}│${color_reset}  ${color_message}%-3s %-15s %-20s${color_reset}                 ${color_header}│" | awk '{printf $0, "Sr.No.", "Tag Name", "Published At"}'
+    echo -e ""
+
+    # Fetch and display release data
+    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 | \
+        awk -F'\t' -v color="$color_option" -v reset="$color_header" \
+        '{ printf "│  "color "%-3d %-15s %-20s" reset "                    │\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES
+
+    echo -e "${color_header}└──────────────────────────────────────────────────────────────┘${color_reset}"
     # Exit with status code 0
     return 0
 }
@@ -688,9 +740,19 @@ install_from_source_code() {
 
 display_credentials() {
     log "INFO" "You can now login to the server using the following credentials:"
-    log "INFO" "Username: $ADMIN_LOGIN"
-    log "INFO" "Password: $ADMIN_PASSWORD"
+    local color_reset="\033[0m"
+    local color_username="\033[1;34m"  # Blue
+    local color_password="\033[1;32m"  # Green
+    local color_border="\033[1;36m"    # Cyan for borders
+
+    echo ""
+    echo -e "${color_border}┌───────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_border}│${color_reset}   ${color_username}Username: ${ADMIN_LOGIN}${color_reset}                              ${color_border}│${color_reset}"
+    echo -e "${color_border}│${color_reset}   ${color_password}Password: ${ADMIN_PASSWORD}${color_reset}                              ${color_border}│${color_reset}"
+    echo -e "${color_border}└───────────────────────────────────────────────────────────────┘${color_reset}"
+    echo ""
 }
+
 
 timer() {
     local duration=$1
@@ -721,28 +783,40 @@ open_browser() {
     fi
 }
 
+start_server() {
+    log "Starting $APP_NAME server..."
+    display_credentials
+    cd $EXTRACT_DIR/$APP_NAME-*/
+    dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
+    sudo -u "$USER_NAME" bash "$dashboard_script_path" &> /dev/null
+}
+
 # Install function
 install() {
     check_dependencies
     log "Starting installation of $APP_NAME..."
     create_dir "$EXTRACT_DIR"
     echo ""
-    echo "Would you like to install from a Git repository or a specific release?"
-    echo "For production use, it is recommended to install from a release."
-    echo "|------------------------------------------------------------|"
-    echo "|       1. Git Repository (Pre-Release Version)              |"
-    echo "|       2. Release (More Stable Version)                     |"
-    echo "|       3. Source Code (Current Directory)                   |"
-    echo "|------------------------------------------------------------|"
+    echo ""
+    echo -e "${color_border}┌────────────────────────────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_border}│${color_reset}       ${color_message}Would you like to install from a Git repository or a specific release?${color_reset}       ${color_border}│${color_reset}"
+    echo -e "${color_border}│${color_reset}       ${color_message}For production use, it is recommended to install from a release.${color_reset}             ${color_border}│${color_reset}"
+    echo -e "${color_border}└────────────────────────────────────────────────────────────────────────────────────┘${color_reset}"
+    echo -e "${color_border}┌───────────────────────────────────────────────────────────────┐${color_reset}"
+    echo -e "${color_border}│${color_reset}       ${color_message}1. Release (More Stable Version)${color_reset}                     ${color_border}   │${color_reset}"
+    echo -e "${color_border}│${color_reset}       ${color_message}2. Git Repository (Pre-Release Version)${color_reset}              ${color_border}   │${color_reset}"
+    echo -e "${color_border}│${color_reset}       ${color_message}3. Source Code (Current Directory)${color_reset}                   ${color_border}   │${color_reset}"
+    echo -e "${color_border}└───────────────────────────────────────────────────────────────┘${color_reset}"
+
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
 
     case $INSTALL_METHOD in
         1)
-            install_from_git
+            install_from_release
             ;;
         2)
-            install_from_release
+            install_from_git
             ;;
         3)
             install_from_source_code
@@ -753,10 +827,7 @@ install() {
             ;;
     esac
 	generate_ascii_art "$APP_NAME Installed" "green"
-    display_credentials
-    cd $EXTRACT_DIR/$APP_NAME-*/
-    dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
-    sudo -u "$USER_NAME" bash "$dashboard_script_path" &> /dev/null
+    start_server
     open_browser
 }
 # Uninstall function
@@ -899,8 +970,9 @@ stop_server() {
 
 # fix the server
 fix() {
-    log "Fixing $APP_NAME server..."
+    log "Fixing $APP_NAME server..."    
     stop_server
+    start_server
     open_browser
 }
 
