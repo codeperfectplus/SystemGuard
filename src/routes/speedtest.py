@@ -10,7 +10,6 @@ from src.config import get_app_info
 
 speedtest_bp = Blueprint("speedtest", __name__)
 
-
 @app.route("/speedtest")
 @login_required
 def speedtest():
@@ -56,7 +55,7 @@ def speedtest():
             send_smtp_email(receiver_email, subject, email_body, is_html=True)
 
             return render_template(
-                "speedtest_result.html",
+                "other/speedtest_result.html",
                 speedtest_result=current_speedtest_result,
                 source="Actual Test",
             )
@@ -70,7 +69,7 @@ def speedtest():
         )
 
         return render_template(
-            "speedtest_result.html",
+            "other/speedtest_result.html",
             speedtest_result=latest_speedtest_record,
             source="Database",
             next_test_time=next_test_time,

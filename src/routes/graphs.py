@@ -8,4 +8,4 @@ graphs_bp = blueprints.Blueprint("graphs", __name__)
 @app.route('/graphs')
 @login_required
 def graphs():
-    return render_template('graphs.html')
+    return render_template('graphs/graphs.html')

@@ -23,74 +23,36 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Option to download historical data in CSV format for detailed analysis (upcoming feature).
 - Server status monitoring with alerts for server downtime or recovery (upcoming feature).
 
+## Get started 🛠️
 
-## Installation 🛠️
-
-Check the [Installation.md](/src/docs/installation.md) file for installation instructions.
+- Check the [Installation.md](/src/docs/installation.md) file for installation instructions.
 
 ## Release Notes 📝
 
-Check the [Release Notes](/src/docs/Release.md) file for the latest updates.
-Check the [Release Instructions](/src/docs/release_instrunctions.md) file for the release process.
+- Check the [Release Notes](/src/docs/Release.md) file for the latest updates.
+- Check the [Release Instructions](/src/docs/release_instrunctions.md) file for the release process.
 
 ## How does installation work? 🤔
 
 The installation process is straightforward and can be completed in a few steps. The user needs to run a bash script that installs the required dependencies, sets up the database, create a conda environment, and add flask server to the cron job. The user can then access the SystemGuard web interface by visiting the server's IP address or domain name.
 
-## Email Feature 📧
-
-| Email Alert                  | Is implemented            | who will get the email      |
-| ---------------------------- | ------------------------- | --------------------------- |
-| Process Killed               | Yes                       | Logged User                 |
-| Login                        | Yes                       | Admin User and Logged User  |
-| Logout                       | Yes                       | Logged User                 |
-| Signup                       | Yes                       | Admin User & signed up User |
-| Create User                  | Yes                       | Admin User & Created User   |
-| Delete User                  | No                        | Admin User & Deleted User   |
-| Speed Test                   | Yes                       | Logged User                 |
-| Server Up                    | Yes                       | Admin User                  |
-| Notification Settings Change | Yes                       | Admin User                  |
-| Signup                       | Yes(few changes required) | Admin User & Logged User    |
-| Website Monitoring           | Yes                       | Input Email                 |
-| Server Down                  | No                        | Admin User                  |
-| Server Up                    | No                        | Admin User                  |
-
 ## Product Screenshots 📸
 
 Check the product screenshots [here](/src/docs/README.md).
 
-
-## Why not use a Docker image?
+## Why not use a Docker image? 🐳
 
 A Docker image has not been created for this project because it requires access to the host machine in order to retrieve server stats. Therefore, it is not possible to obtain server stats from within a Docker container.
 
-## Upcoming Features 📅
+## Contributing 🤝
 
-| Feature                                                                 | Stattus |
-| ----------------------------------------------------------------------- | ------- |
-| Receive notifications when system metrics cross predefined thresholds   | pending |
-| Customizable dashboards for personalized server monitoring              | pending |
-| Plugin support to enhance and extend SystemGuard's functionality        | pending |
-| Generate and manage server logs for better tracking and troubleshooting | pending |
-| Monitor disk read/write speeds for performance insights                 | pending |
-| Check the current firewall status to ensure security                    | pending |
-| A dedicated website monitoring page for tracking uptime and performance | pending |
-| Track and save total network data sent/received in the database         | pending |
-| Improve website monitor, save data in database with timestamp           | pending |
-| Key-combinding to navigate through the website                          | pending |
-| Support for more server stats like GPU, etc.                            | pending |
-| Support for more Linux distros                                          | pending |
+Contributions are always welcome! Please read the [contribution guidelines](/CONTRIBUTING.md) first.
 
-## Learnings 📖
+## License 📝
 
-- How to use the `psutil` library to retrieve system stats.
-- How to use multiple Flask routes to display different pages.
-- How to use multi-threading to run a function in the background.
-- How to use the `chart.js` library to display charts on a webpage.
-- How to use the `flask-login` library to manage user sessions.
-- How to use the `flask-mail` library to send emails in Flask.
+This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
 
-## Acknowledgments
+## Acknowledgments 
 
 | Project         | License              | Repository                                                  |
 | --------------- | -------------------- | ----------------------------------------------------------- |
@@ -98,4 +60,3 @@ A Docker image has not been created for this project because it requires access 
 | `psutil`        | BSD 3-Clause License | [GitHub repository](https://github.com/giampaolo/psutil)    |
 | `flask`         | BSD 3-Clause License | [GitHub repository](https://github.com/pallets/flask)       |
 | `chart.js`      | MIT License          | [GitHub repository](https://github.com/chartjs/Chart.js)    |
-

@@ -22,11 +22,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return UserProfile.query.get(int(user_id))
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -103,7 +101,6 @@ def logout():
         send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
     logout_user()
     return redirect(url_for("login"))
-
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
