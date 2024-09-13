@@ -23,24 +23,23 @@ chmod +x install_miniconda.sh && ./install_miniconda.sh
 ```bash
 # debian based distros
 sudo apt-get update
-sudo apt-get install git curl wget unzip iptables figlet jq
+sudo apt-get install git curl wget unzip iptables jq
 ```
 
 ```bash
 sudo dnf update -y
-sudo dnf install -y git curl wget unzip iptables figlet jq
+sudo dnf install -y git curl wget unzip iptables jq
 ```
 
 ```bash
 sudo yum update -y
-sudo yum install -y git curl wget unzip iptables figlet jq
+sudo yum install -y git curl wget unzip iptables jq
 ```
 
 - curl: For downloading files from the internet.
 - wget: For downloading files from the internet.
 - unzip: For extracting zip files.
 - iptables: For managing firewall rules.
-- figlet: For displaying ASCII art text.
 - jq: For processing JSON data.
 
 2. Download and set up the SystemGuard installer:

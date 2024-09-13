@@ -90,29 +90,6 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Function to generate colored ASCII art from text using figlet
-generate_ascii_art() {
-    local text="$1"
-    local color_code="$2"
-
-    # Define color codes with default to reset if not specified
-    local color_reset="\033[0m"
-    local color="$color_reset"
-
-    case "$color_code" in
-    red) color=$color_red ;;         # Red
-    green) color=$color_green ;;     # Green
-    yellow) color=$color_yellow ;;   # Yellow
-    blue) color=$color_blue ;;       # Blue
-    magenta) color=$color_magenta ;; # Magenta
-    cyan) color=$color_cyan ;;       # Cyan
-    white) color=$color_white ;;     # White
-    *) color="$color_reset" ;;       # Default to no color
-    esac
-
-    # Print the ASCII art with color
-    echo -e "${color}$(figlet "$text")${color_reset}"
-}
 
 log() {
     # Check if the level is passed; if not, set it to "INFO" as default.
@@ -259,7 +236,7 @@ install_dependencies() {
 # Function to check for required dependencies
 check_dependencies() {
     # List of required dependencies
-    local dependencies=(git curl wget unzip iptables figlet)
+    local dependencies=(git curl wget unzip iptables)
 
     # Detect the package manager
     local manager
@@ -862,7 +839,6 @@ install() {
         exit 1
         ;;
     esac
-    generate_ascii_art "$APP_NAME Installed" "green"
     start_server
     message_box "The $APP_NAME server is running at $HOST_URL" 0
     # open_browser
@@ -873,7 +849,6 @@ uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
     stop_server
-    generate_ascii_art "$APP_NAME Uninstalled" "red"
 }
 
 # Load test function to start Locust server
@@ -939,7 +914,6 @@ health_check() {
         # Check if the response code indicates success
         if [[ $response_code -eq 200 || $response_code -eq 302 ]]; then
             log "Health check successful: $HOST_URL is up and running."
-            generate_ascii_art "$APP_NAME is UP" "green"
             exit 0
         else
             ((retries++))
@@ -951,7 +925,6 @@ health_check() {
 
     # If max retries are reached, log the failure and exit with an error
     log "ERROR" "Max retries reached. $HOST_URL is still not responding. Exiting with error."
-    generate_ascii_art "$APP_NAME is DOWN" "red"
     exit 1
 }
 
