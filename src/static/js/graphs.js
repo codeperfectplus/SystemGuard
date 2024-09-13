@@ -11,7 +11,7 @@ function fetchDataAndRenderCharts() {
     const filterValue = document.getElementById('timeFilter').value;
     
     // Fetch data with the selected time filter
-    fetch(`/api/graphs_data?filter=${filterValue}`)
+    fetch(`/api/v1/graphs_data?filter=${filterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;

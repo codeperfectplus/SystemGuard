@@ -346,14 +346,16 @@ def get_os_info():
         "kernel_version": kernel_version
     }
 
+# TODO: cache the result to avoid reading the file every time
 def get_os_release_info():
     """
     Reads /etc/os-release and returns a dictionary with distribution information.
     """
     os_info = {}
 
-    try:
+    try:        
         with open('/etc/os-release', 'r') as file:
+            print("Reading /etc/os-release file...")
             for line in file:
                 if '=' in line:
                     key, value = line.strip().split('=', 1)
@@ -461,8 +463,10 @@ def get_system_info():
     ipv4_address = get_cached_value('ipv4', lambda: get_ip_address())
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
+    os_info = get_cached_value('os_info', get_os_info)
+    os_release_info = get_cached_value('os_release_info', get_os_release_info)
     current_server_time = datetime.datetime.now()
-
+    
     # Prepare system information dictionary
     info = {
         'username': username,
@@ -473,7 +477,9 @@ def get_system_info():
         'ipv4_connections': ipv4_address,
         'timestamp': datetime.datetime.now(),
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
-        'timestamp': current_server_time
+        'timestamp': current_server_time,
+        'os_name': os_release_info.get('os_name', 'Unknown'),
+        'os_version': os_release_info.get('os_version', 'Unknown')
     }
     # update uptime dictionary
     _info = _get_system_info()

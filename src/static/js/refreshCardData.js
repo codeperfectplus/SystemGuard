@@ -3,7 +3,7 @@ let refreshTimer; // Variable to hold the setInterval timer
 let refreshTimeout; // Variable to hold the setTimeout timer
 
 function fetchRefreshInterval() {
-    fetch('/refresh-interval')
+    fetch('/api/v1/refresh-interval')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -31,7 +31,7 @@ document.getElementById('refresh-interval').addEventListener('change', function 
     }, refreshInterval);
 
     // Send the updated refresh interval to the server
-    fetch('/refresh-interval', {
+    fetch('/api/v1/refresh-interval', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
