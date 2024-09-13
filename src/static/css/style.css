@@ -413,3 +413,6 @@ Navbar Styles
     margin-top: 0.25rem; /* Space between title and version */
 }
 
+.site-home {
+    padding-left: 1rem; /* Add padding to the left */
+}

@@ -1,9 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <a class="navbar-brand d-flex align-items-center {% if request.endpoint == 'dashboard' %}active{% endif %}" 
     href="{{ url_for('dashboard') }}">
-    <div>
+    <div class="site-home">
         <i class="fas fa-shield-alt"></i> 
         <span class="title">{{title}}</span>
+        {% if pre_release %}
+            <span class="version">Pre</span>
+        {% endif %}
     </div>
  </a>
  

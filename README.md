@@ -28,6 +28,11 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 Check the [Installation.md](/src/docs/installation.md) file for installation instructions.
 
+## Release Notes 📝
+
+Check the [Release Notes](/src/docs/Release.md) file for the latest updates.
+Check the [Release Instructions](/src/docs/release_instrunctions.md) file for the release process.
+
 ## How does installation work? 🤔
 
 The installation process is straightforward and can be completed in a few steps. The user needs to run a bash script that installs the required dependencies, sets up the database, create a conda environment, and add flask server to the cron job. The user can then access the SystemGuard web interface by visiting the server's IP address or domain name.

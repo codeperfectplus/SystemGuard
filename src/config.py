@@ -13,7 +13,8 @@ APP_NAME = "SystemGuard"
 DESCRIPTION = f"{APP_NAME} is a web application that allows you to monitor your system resources."
 AUTHOR = "Deepak Raj"
 YEAR = "2024"
-VERSION = "v1.0.4-pre-release"
+PRE_RELEASE = False
+VERSION = "v1.0.5-pre-release"
 PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
@@ -36,6 +37,7 @@ app.jinja_env.globals.update(
     author=AUTHOR,
     year=YEAR,
     version=VERSION,
+    pre_release=PRE_RELEASE,
     project_url=PROJECT_URL,
     contact_email=CONTACT_EMAIL,
     system_name=SYSTEM_NAME,
@@ -50,6 +52,7 @@ def get_app_info():
         "author": AUTHOR,
         "year": YEAR,
         "version": VERSION,
+        "pre_release": PRE_RELEASE,
         "project_url": PROJECT_URL,
         "contact_email": CONTACT_EMAIL,
         "system_name": SYSTEM_NAME,
