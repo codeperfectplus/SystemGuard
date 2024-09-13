@@ -3,21 +3,13 @@ from collections import defaultdict
 
 # Define the root directory of your project
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
-print(f"Root directory: {root_dir}")
 
 # Function to count lines in a file
 def count_lines_in_file(file_path):
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
         return sum(1 for _ in file)
 
-# Step 1: Collect all extensions in the project
-extensions = set()
-for dirpath, _, filenames in os.walk(root_dir):
-    for filename in filenames:
-        file_ext = os.path.splitext(filename)[1].lower()  # Get file extension
-        extensions.add(file_ext)
-
-# Step 2: Define a function to categorize extensions into file types
+# Function to categorize extensions into file types
 def categorize_extension(ext):
     if ext in ['.py']:
         return 'Python'
@@ -30,22 +22,33 @@ def categorize_extension(ext):
     elif ext in ['.css']:
         return 'CSS'
     else:
-        return 'Other'
+        return None  # Exclude 'Other'
 
-# Step 3: Initialize a dictionary to store line counts by file type
+# Initialize a dictionary to store line counts by file type
 line_counts = defaultdict(int)
 
-# Step 4: Walk through the directory and count lines for each categorized file type
+# Walk through the directory and count lines for each categorized file type
 for dirpath, _, filenames in os.walk(root_dir):
     for filename in filenames:
         file_ext = os.path.splitext(filename)[1].lower()  # Get file extension
-        file_path = os.path.join(dirpath, filename)
-        
         file_type = categorize_extension(file_ext)
-        line_counts[file_type] += count_lines_in_file(file_path)
+        if file_type:  # Only process known file types
+            file_path = os.path.join(dirpath, filename)
+            line_counts[file_type] += count_lines_in_file(file_path)
 
-# Print the results in a table format
-print(f"{'File Type':<10} | {'Number of Lines':<15}")
-print("-" * 30)
-for file_type, count in line_counts.items():
-    print(f"{file_type:<10} | {count:<15}")
+# Calculate total lines for percentage calculation
+total_lines = sum(line_counts.values())
+
+# Sort line counts by percentage in descending order
+sorted_line_counts = sorted(line_counts.items(), key=lambda x: (x[1] / total_lines) if total_lines > 0 else 0, reverse=True)
+
+print("## Line Counts by File Type", end='\n\n')
+# Print the results in a Markdown table format with percentages
+print("| File Type   | Number of Lines | Percentage |")
+print("|-------------|-----------------|------------|")
+for file_type, count in sorted_line_counts:
+    percentage = (count / total_lines) * 100 if total_lines > 0 else 0
+    print(f"| {file_type:<11} | {count:<15} | {percentage:>9.2f}% |")
+
+# Print the total line count
+print(f"| **Total**   | {total_lines:<15} | {'100.00%':>9} |")

@@ -14,41 +14,41 @@ log_message() {
 
     # Check if a second argument exists, indicating that the first is the level.
     if [ -z "$2" ]; then
-        message="$1"  # Only message is passed, assign the first argument to message.
-        level="INFO"  # Default level when only message is passed.
+        message="$1" # Only message is passed, assign the first argument to message.
+        level="INFO" # Default level when only message is passed.
     else
-        message="$2"  # When both level and message are passed.
+        message="$2" # When both level and message are passed.
     fi
 
     # Define colors based on log levels.
     local color_reset="\033[0m"
-    local color_debug="\033[1;34m"   # Blue
-    local color_info="\033[1;32m"    # Green
-    local color_warning="\033[1;33m" # Yellow
-    local color_error="\033[1;31m"   # Red
+    local color_debug="\033[1;34m"    # Blue
+    local color_info="\033[1;32m"     # Green
+    local color_warning="\033[1;33m"  # Yellow
+    local color_error="\033[1;31m"    # Red
     local color_critical="\033[1;41m" # Red background
 
     # Select color based on level.
     local color="$color_reset"
     case "$level" in
-        DEBUG)
-            color="$color_debug"
-            ;;
-        INFO)
-            color="$color_info"
-            ;;
-        WARNING)
-            color="$color_warning"
-            ;;
-        ERROR)
-            color="$color_error"
-            ;;
-        CRITICAL)
-            color="$color_critical"
-            ;;
-        *)
-            color="$color_reset"  # Default to no color if the level is unrecognized.
-            ;;
+    DEBUG)
+        color="$color_debug"
+        ;;
+    INFO)
+        color="$color_info"
+        ;;
+    WARNING)
+        color="$color_warning"
+        ;;
+    ERROR)
+        color="$color_error"
+        ;;
+    CRITICAL)
+        color="$color_critical"
+        ;;
+    *)
+        color="$color_reset" # Default to no color if the level is unrecognized.
+        ;;
     esac
 
     # Log the message with timestamp, level, and message content, applying the selected color.
@@ -60,6 +60,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0" 2>/dev/null || readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 FLASK_APP_PATH="${FLASK_APP_PATH:-$PROJECT_DIR/app.py}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements.txt}"
+SCRIPT_TO_CHECK_REQUIREMENTS="$SCRIPT_DIR/missing_dependcy.py"
 FLASK_PORT="${FLASK_PORT:-5050}"
 APP_NAME="systemguard"
 LOG_FILE="/home/$(whoami)/logs/flask.log"
@@ -74,9 +75,26 @@ export FLASK_ENV=production
 export FLASK_RUN_PORT="$FLASK_PORT"
 export FLASK_RUN_HOST="0.0.0.0"
 
+# function to check missing dependencies and install them
+check_missing_dependencies() {
+    chmod +x "$SCRIPT_TO_CHECK_REQUIREMENTS"
+    MISSING_PACKAGES=$(python $SCRIPT_TO_CHECK_REQUIREMENTS "$REQUIREMENTS_FILE")
+    echo "Missing packages: $MISSING_PACKAGES"
+
+    if [ "$MISSING_PACKAGES" != "All packages are installed." ]; then
+        echo "Installing missing packages..."
+        # Install each missing package
+        for package in $MISSING_PACKAGES; do
+            pip install "$package"
+        done
+    else
+        echo "All packages are installed."
+    fi
+}
+
 # Function to fetch the value of an environment variable from a file
 fetch_env_variable() {
-    var_name=$1       # The name of the environment variable to fetch
+    var_name=$1 # The name of the environment variable to fetch
     # Check if the environment file exists
     if [ ! -f "$ENV_FILE" ]; then
         echo "Error: Environment file '$ENV_FILE' not found."
@@ -113,7 +131,7 @@ for CONDA_PATH in "${CONDA_PATHS[@]}"; do
         CONDA_FOUND=true
         CONDA_EXECUTABLE="$CONDA_PATH/bin/conda"
         CONDA_SETUP_SCRIPT="$CONDA_PATH/etc/profile.d/conda.sh"
-        source "$CONDA_SETUP_SCRIPT" &> /dev/null
+        source "$CONDA_SETUP_SCRIPT" &>/dev/null
         break
     fi
 done
@@ -143,15 +161,15 @@ fi
 fetch_latest_changes() {
     local project_dir="$1"
     local git_remote_url="${2-}" # Optional remote URL if needed
-    
+
     # Check if the project directory is set and exists
     if [[ -z "$project_dir" || ! -d "$project_dir" ]]; then
         log_message "ERROR" "Invalid project directory specified."
         return 1
     fi
-    
+
     # Check if Git is installed
-    if ! command -v git &> /dev/null; then
+    if ! command -v git &>/dev/null; then
         log_message "ERROR" "Git is not installed. Please install Git and try again."
         return 1
     fi
@@ -159,14 +177,14 @@ fetch_latest_changes() {
     # Check if the directory is a Git repository
     if [ -d "$project_dir/.git" ]; then
         log_message "INFO" "Repository found at $project_dir. Checking the current branch and for latest changes..."
-        
+
         # Navigate to the project directory
-        pushd "$project_dir" > /dev/null
-        
+        pushd "$project_dir" >/dev/null
+
         # Get the current branch name
         branch=$(git symbolic-ref --short HEAD 2>/dev/null)
         log_message "INFO" "Current branch is '$branch'."
-        
+
         # Check if there are untracked files
         if git status --porcelain | grep '^[?]'; then
             # Check if the repository has any commits
@@ -178,13 +196,13 @@ fetch_latest_changes() {
                     stash_applied=true
                 else
                     log_message "ERROR" "Failed to stash untracked files."
-                    popd > /dev/null
+                    popd >/dev/null
                     return 1
                 fi
             else
                 log_message "ERROR" "Repository does not have any commits. Cannot stash untracked files."
                 log_message "INFO" "Manual intervention required to handle untracked files."
-                popd > /dev/null
+                popd >/dev/null
                 return 1
             fi
         fi
@@ -193,7 +211,7 @@ fetch_latest_changes() {
             log_message "INFO" "Successfully pulled the latest changes from branch '$branch'."
         else
             log_message "ERROR" "Failed to pull the latest changes. Check your network connection or repository settings."
-            popd > /dev/null
+            popd >/dev/null
             return 1
         fi
 
@@ -204,18 +222,20 @@ fetch_latest_changes() {
         fi
 
         # Return to the original directory
-        popd > /dev/null
+        popd >/dev/null
     fi
 }
 
+
 # Check if Flask app is running
-if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" > /dev/null; then
+if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" >/dev/null; then
+    check_missing_dependencies
     log_message "Flask app is not running. Checking repository and starting it..."
     [ "$auto_update" = true ] &&
-    fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
+        fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
     log_message "Starting Flask app..."
     # Ensure environment activation and `flask` command
-    bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>> "$LOG_FILE" &
+    bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>>"$LOG_FILE" &
 else
     log_message "Flask app is already running."
 fi

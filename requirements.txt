@@ -14,6 +14,7 @@ gunicorn==23.0.0
 flask-sqlalchemy==3.1.1  # SQLAlchemy integration for Flask
 flask-login==0.6.3       # User session management for Flask
 flask-session==0.8.0     # Server-side session handling for Flask
+flask-migrate==4.0.7     # Database migrations for Flask
 
 # File system monitoring and watching
 watchdog==5.0.2
