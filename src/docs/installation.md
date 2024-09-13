@@ -18,11 +18,22 @@ chmod +x install_miniconda.sh && ./install_miniconda.sh
 
 ### Installation Steps
 
-1. Update your system and install the required dependencies:
+1. Install the required dependencies:
 
 ```bash
+# debian based distros
 sudo apt-get update
 sudo apt-get install git curl wget unzip iptables figlet jq
+```
+
+```bash
+sudo dnf update -y
+sudo dnf install -y git curl wget unzip iptables figlet jq
+```
+
+```bash
+sudo yum update -y
+sudo yum install -y git curl wget unzip iptables figlet jq
 ```
 
 - curl: For downloading files from the internet.

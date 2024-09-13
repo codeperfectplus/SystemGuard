@@ -203,16 +203,68 @@ display_credentials() {
     message_box "Login Credentials\n\n$message\n\n$username\n$password" 0
 }
 
-# function to check for required dependencies
+# Function to check the available package manager
+detect_package_manager() {
+    if command -v apt-get &>/dev/null; then
+        echo "apt-get"
+    elif command -v dnf &>/dev/null; then
+        echo "dnf"
+    elif command -v yum &>/dev/null; then
+        echo "yum"
+    elif command -v pacman &>/dev/null; then
+        echo "pacman"
+    elif command -v zypper &>/dev/null; then
+        echo "zypper"
+    elif command -v brew &>/dev/null; then
+        echo "brew"
+    else
+        log "ERROR" "No supported package manager found on the system."
+        exit 1
+    fi
+}
+
+# Function to install dependencies
+install_dependencies() {
+    local manager="$1"
+    shift
+    local dependencies=("$@")
+
+    case "$manager" in
+        apt-get)
+            sudo apt-get update
+            sudo apt-get install -y "${dependencies[@]}"
+            ;;
+        dnf)
+            sudo dnf install -y "${dependencies[@]}"
+            ;;
+        yum)
+            sudo yum install -y "${dependencies[@]}"
+            ;;
+        pacman)
+            sudo pacman -Sy --noconfirm "${dependencies[@]}"
+            ;;
+        zypper)
+            sudo zypper install -y "${dependencies[@]}"
+            ;;
+        brew)
+            brew install "${dependencies[@]}"
+            ;;
+        *)
+            log "ERROR" "Unsupported package manager: $manager"
+            exit 1
+            ;;
+    esac
+}
+
+# Function to check for required dependencies
 check_dependencies() {
     # List of required dependencies
     local dependencies=(git curl wget unzip iptables figlet)
 
-    # Check if `apt-get` is available
-    if ! command -v apt-get &>/dev/null; then
-        log "ERROR" "This script requires apt-get but it is not available."
-        exit 1
-    fi
+    # Detect the package manager
+    local manager
+    manager=$(detect_package_manager)
+    echo "Package manager found: $manager"
 
     # Array to keep track of missing dependencies
     local missing_dependencies=()
@@ -226,17 +278,17 @@ check_dependencies() {
 
     # If there are missing dependencies, prompt the user for installation
     if [ ${#missing_dependencies[@]} -gt 0 ]; then
-        log "The following dependencies are missing: ${missing_dependencies[*]}"
+        log "INFO" "The following dependencies are missing: ${missing_dependencies[*]}"
         echo "Do you want to install them now? (y/n)"
         read -r choice
         if [ "$choice" == "y" ]; then
-            sudo apt-get install -y "${missing_dependencies[@]}"
+            install_dependencies "$manager" "${missing_dependencies[@]}"
         else
-            log "Please install the required dependencies and run the script again."
+            log "ERROR" "Please install the required dependencies and run the script again."
             exit 1
         fi
     else
-        log "All required dependencies are already installed."
+        log "INFO" "All required dependencies are already installed."
     fi
 }
 
