@@ -37,6 +37,7 @@ Before creating a new release, make sure the following tasks are completed:
 
 - [ ] Update the version number in the `config.py` file.
 - [ ] Add and update release notes in the `Release.md` file.
+- [ ] Create a new branch for the release (e.g., `release-vn.n.n`).
 - [ ] Test the release in a staging environment.
 - [ ] Merge changes into the `production` branch.
 - [ ] Create a new release on GitHub.
