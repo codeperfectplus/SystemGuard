@@ -300,10 +300,7 @@ add_cron_job() {
     local cron_job="* * * * * /bin/bash $script_path >> $log_dir/$APP_NAME_LOWER-cron.log 2>&1"
 
     # Create log directory with error handling
-    if [ $? -ne 0 ]; then
-        log "CRITICAL" "Failed to create log directory: $log_dir"
-        exit 1
-    fi
+    create_dir "$log_dir"
 
 
     # Temporarily store current crontab to avoid overwriting on error
@@ -314,10 +311,16 @@ add_cron_job() {
     fi
 
     # List the current crontab
-    if ! $crontab_cmd -l 2>/dev/null > "$temp_cron"; then
-        log "CRITICAL" "Unable to list current crontab."
-        rm "$temp_cron"
-        exit 1
+    if ! $crontab_cmd -l > "$temp_cron" 2>&1; then
+        # If no crontab exists, create an empty file
+        if grep -q "no crontab for" "$temp_cron" 2>/dev/null; then
+            : > "$temp_cron"  # Create an empty file
+            log "No crontab for user $USER_NAME. Creating new crontab."
+        else
+            log "CRITICAL" "Unable to list current crontab."
+            rm "$temp_cron"
+            exit 1
+        fi
     fi
 
     # Ensure the cron job does not already exist
