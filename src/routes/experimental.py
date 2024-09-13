@@ -99,21 +99,33 @@ def parse_nmap_ports_output(output):
     
     return ports
 
-@app.route('/scan', methods=['GET', 'POST'])
-def scan_network_():
+def handle_network_scan():
+    ip_address = get_ip_address()
+    ip_address_with_mask = f"{ip_address}/24"
+    scan_result = scan_network(ip_address_with_mask)
+    return render_template(
+        'experimental/scan.html', 
+        network_result=scan_result, 
+        ip_address=ip_address
+    )
+
+def handle_port_scan():
+    ip_address = request.form['ip_address']
+    scan_results = scan_ports(ip_address)
+    return render_template(
+        'experimental/scan.html', 
+        port_results=scan_results, 
+        ip_address=ip_address
+    )
+
+@app.route('/security_analysis', methods=['GET', 'POST'])
+def security_analysis():
     if request.method == 'POST':
-        print(request.form)
         if 'scan_network' in request.form:
-            print("Scanning network")
-            ip_address = get_ip_address()
-            ip_address_with_mask = ip_address + "/24"
-            scan_result = scan_network(ip_address_with_mask)
-            return render_template('experimental/scan.html', network_result=scan_result)
+            return handle_network_scan()
         elif 'scan_ports' in request.form:
-            ip_address = request.form['ip_address']
-            scan_results = scan_ports(ip_address)
-            print("Scan results: ", scan_results)
-            return render_template('experimental/scan.html', port_results=scan_results)
+            return handle_port_scan()
     
-    
+    # Render the default scan page if the request method is GET or no valid action is found in POST.
     return render_template('experimental/scan.html')
+
