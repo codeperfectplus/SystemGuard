@@ -154,8 +154,6 @@ generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
 
-echo "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
-
 color_border="\033[1;36m"   # Cyan for borders
 color_message="\033[1;32m"  # Green for the message
 color_reset="\033[0m"       # Reset to default
@@ -177,6 +175,40 @@ welcome_message() {
 }
 # Display the welcome message
 welcome_message
+
+display_credentials() {
+    local color_reset="\033[0m"
+    local color_username="\033[1;34m"  # Blue for username
+    local color_password="\033[1;32m"  # Green for password
+    local color_border="\033[1;36m"    # Cyan for borders
+
+    # Credentials
+    local username="Username: ${ADMIN_LOGIN}"
+    local password="Password: ${ADMIN_PASSWORD}"
+    local message="Here are your login credentials. It will be used to login to the dashboard."
+
+    local max_length=$(( ${#username} > ${#password} ? ${#username} : ${#password} ))
+    local max_length_message=$(( ${#message} > max_length ? ${#message} : max_length ))
+
+    # Create top and bottom borders dynamically
+    local border=$(printf "%*s" $((max_length + 4)) | tr ' ' '─')
+
+    
+    echo ""
+    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $((max_length_message + 4))))┐${color_reset}"
+    echo -e "${color_border}│${color_reset}  ${message}  ${color_border}│${color_reset}"
+    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $((max_length_message + 4))))┘${color_reset}"
+    echo ""
+    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $((max_length + 4))))┐${color_reset}"
+    echo -e "${color_border}│ ${color_reset}${color_username}${username}${color_reset} $(printf "%*s" $((max_length - ${#username})) ' ') ${color_border}│${color_reset}"
+    echo -e "${color_border}│ ${color_reset}${color_password}${password}${color_reset} $(printf "%*s" $((max_length - ${#password})) ' ') ${color_border}│${color_reset}"
+    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $((max_length + 4))))┘${color_reset}"
+    echo ""
+}
+
+display_credentials
+# do something so user can see the credentials and then clear the screen
+sleep 5
 
 # function to check for required dependencies
 check_dependencies() {
@@ -736,21 +768,6 @@ install_from_source_code() {
     install_using_setup_file_in_cwd
     setup_cron_job
     log "$APP_NAME version $VERSION installed successfully!"
-}
-
-display_credentials() {
-    log "INFO" "You can now login to the server using the following credentials:"
-    local color_reset="\033[0m"
-    local color_username="\033[1;34m"  # Blue
-    local color_password="\033[1;32m"  # Green
-    local color_border="\033[1;36m"    # Cyan for borders
-
-    echo ""
-    echo -e "${color_border}┌───────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_border}│${color_reset}   ${color_username}Username: ${ADMIN_LOGIN}${color_reset}                              ${color_border}│${color_reset}"
-    echo -e "${color_border}│${color_reset}   ${color_password}Password: ${ADMIN_PASSWORD}${color_reset}                              ${color_border}│${color_reset}"
-    echo -e "${color_border}└───────────────────────────────────────────────────────────────┘${color_reset}"
-    echo ""
 }
 
 
