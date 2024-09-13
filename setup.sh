@@ -157,22 +157,50 @@ log() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
 }
 
-# introductary message
-generate_ascii_art "$APP_NAME" "yellow"
-generate_ascii_art "Installer" "yellow"
-generate_ascii_art "By" "yellow"
-generate_ascii_art "CodePerfectPlus" "yellow"
+# # introductary message
+# generate_ascii_art "$APP_NAME" "yellow"
+# generate_ascii_art "Installer" "yellow"
+# generate_ascii_art "By" "yellow"
+# generate_ascii_art "CodePerfectPlus" "yellow"
 
-welcome_message() {
-    welcome_message="Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
+message_box() {
+    message="$1"
+    sleeptime="$2"
     padding=4
-    message_length=$((${#welcome_message} + $padding * 2))
 
-    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $message_length))┐${color_reset}"
-    echo -e "${color_border}│${color_reset}$(printf '%*s' $padding)${color_message}${welcome_message}$(printf '%*s' $padding)${color_reset}${color_border}│${color_reset}"
-    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $message_length))┘${color_reset}"
+    # Check if multiple lines are passed and adjust to the longest line
+    if [ $(echo -e "$message" | wc -l) -gt 1 ]; then
+        echo ""
+    fi
 
+    # Find the length of the longest line in the message
+    message_length=$(echo -e "$message" | awk '{ if (length > max) max = length } END { print max }')
+
+    # Adjust the total length to account for padding on both sides
+    total_length=$((message_length + 2 * padding))
+
+    # Print the top border of the message box
+    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $total_length))┐${color_reset}"
+
+    # Read the message line by line and print with padding and side borders
+    while IFS= read -r line; do
+        printf "%b│%b%*s%b%s%b%*s%b│%b\n" \
+            "$color_border" "$color_reset" $padding "" "$color_message" "$line" "$color_reset" $((total_length - padding - ${#line})) "" "$color_border" "$color_reset"
+    done <<< "$(echo -e "$message")"
+
+    # Print the bottom border of the message box
+    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $total_length))┘${color_reset}"
+
+    # Pause for the specified sleep time if provided
+    if [ -n "$sleeptime" ]; then
+        sleep "$sleeptime"
+    fi
 }
+
+
+# message_box "Welcome to the $APP_NAME installer script!" 0
+
+# message_box "This script will guide \nyou through the \ninstallation process." 0
 
 display_credentials() {
     # Credentials
@@ -186,24 +214,8 @@ display_credentials() {
     # Create top and bottom borders dynamically
     local border=$(printf "%*s" $((max_length + 4)) | tr ' ' '─')
 
-    echo ""
-    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $((max_length_message + 4))))┐${color_reset}"
-    echo -e "${color_border}│${color_reset}  ${message}  ${color_border}│${color_reset}"
-    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $((max_length_message + 4))))┘${color_reset}"
-    echo ""
-    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $((max_length + 4))))┐${color_reset}"
-    echo -e "${color_border}│ ${color_reset}${color_username}${username}${color_reset} $(printf "%*s" $((max_length - ${#username})) ' ') ${color_border}│${color_reset}"
-    echo -e "${color_border}│ ${color_reset}${color_password}${password}${color_reset} $(printf "%*s" $((max_length - ${#password})) ' ') ${color_border}│${color_reset}"
-    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $((max_length + 4))))┘${color_reset}"
-    echo ""
+    message_box "Login Credentials\n\n$message\n\n$username\n$password" 0
 }
-
-# Display the welcome message
-welcome_message
-# Display the credentials
-display_credentials
-# do something so user can see the credentials and then clear the screen
-sleep 5
 
 # function to check for required dependencies
 check_dependencies() {
@@ -284,17 +296,7 @@ fi
 # Function to create a environment variable in the .bashrc file
 prompt_user() {
     # Display the prompt with improved formatting
-    echo ""
-    echo -e "${color_prompt}┌─────────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_prompt}│${color_reset} Do you want to enable automatic updates for ${color_message}${APP_NAME}${color_reset}?        ${color_prompt}│${color_reset}"
-    echo -e "${color_prompt}│${color_reset} This will allow ${APP_NAME} to check for updates automatically. ${color_prompt}│${color_reset}"
-    echo -e "${color_prompt}└─────────────────────────────────────────────────────────────────┘${color_reset}"
-    echo ""
-    echo -e "${color_prompt}┌──────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_prompt}│     ${color_reset} ${color_message}1) Yes (Enable automatic updates)                   ${color_prompt}│${color_reset}"
-    echo -e "${color_prompt}│     ${color_reset} ${color_message}2) No (Disable automatic updates)                   ${color_prompt}│${color_reset}"
-    echo -e "${color_prompt}└──────────────────────────────────────────────────────────┘${color_reset}"
-    echo ""
+    message_box "Do you want to enable automatic updates for ${APP_NAME}?\n\nThis will allow ${APP_NAME} to check for updates automatically.\n\n1) Yes (Enable automatic updates)\n2) No (Disable automatic updates)" 0
     read -p "Enter your choice (1 or 2): " user_choice
 
     # Convert the user's choice to true/false
@@ -603,18 +605,8 @@ install_from_git() {
 
     # Remove any previous installations
     remove_previous_installation
-    echo ""
-    echo ""
-    echo -e "${color_border}┌──────────────────────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_border}│${color_reset}  \033[1mSelect the version of $APP_NAME to install:\033[0m                               ${color_border}│${color_reset}"
-    echo -e "${color_border}└──────────────────────────────────────────────────────────────────────────────┘${color_reset}"
-    echo ""
-    echo -e "${color_border}┌──────────────────────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_border}│${color_reset}  ${color_message}1. Production (stable)${color_reset}     ->   Recommended for most users                ${color_border}  │${color_reset}"
-    echo -e "${color_border}│${color_reset}  ${color_message}2. Development (dev)${color_reset}       ->   Latest features, may be unstable        ${color_border}    │${color_reset}"
-    echo -e "${color_border}│${color_reset}  ${color_message}3. Specify a branch${color_reset}        ->   Enter the branch/tag name when prompted ${color_border}    │${color_reset}"
-    echo -e "${color_border}└──────────────────────────────────────────────────────────────────────────────┘${color_reset}"
-    echo ""
+    message_box "Select the version of $APP_NAME to install" 0
+    message_box "1. Production (stable) -> Recommended for most users\n2. Development (dev) -> Latest features, may be unstable\n3. Specify a branch -> Enter the branch/tag name when prompted" 0
     echo "Enter the number of your choice:"
     read -r VERSION
 
@@ -812,20 +804,12 @@ start_server() {
 
 # Install function
 install() {
+    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 0
     check_dependencies
     log "Starting installation of $APP_NAME..."
     create_dir "$EXTRACT_DIR"
-    echo ""
-    echo ""
-    echo -e "${color_border}┌────────────────────────────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_border}│${color_reset}       ${color_message}Would you like to install from a Git repository or a specific release?${color_reset}       ${color_border}│${color_reset}"
-    echo -e "${color_border}│${color_reset}       ${color_message}For production use, it is recommended to install from a release.${color_reset}             ${color_border}│${color_reset}"
-    echo -e "${color_border}└────────────────────────────────────────────────────────────────────────────────────┘${color_reset}"
-    echo -e "${color_border}┌───────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_border}│${color_reset}       ${color_message}1. Release (More Stable Version)${color_reset}                     ${color_border}   │${color_reset}"
-    echo -e "${color_border}│${color_reset}       ${color_message}2. Git Repository (Pre-Release Version)${color_reset}              ${color_border}   │${color_reset}"
-    echo -e "${color_border}│${color_reset}       ${color_message}3. Source Code (Current Directory)${color_reset}                   ${color_border}   │${color_reset}"
-    echo -e "${color_border}└───────────────────────────────────────────────────────────────┘${color_reset}"
+    message_box "Choose the installation method\nNote: Release is recommended for production use." 0
+    message_box "1. Release (More Stable Version)\n2. Git Repository (Pre-Release Version)\n3. Source Code (Current Directory)" 0
 
     echo "Enter the number of your choice:"
     read -r INSTALL_METHOD
@@ -847,10 +831,12 @@ install() {
     esac
     generate_ascii_art "$APP_NAME Installed" "green"
     start_server
-    open_browser
+    message_box "The $APP_NAME server is running at $HOST_URL" 0
+    # open_browser
 }
 # Uninstall function
 uninstall() {
+    message_box "Goodbye, $(echo "$USER_NAME" | sed 's/.*/\u&/'), Thank you for using $APP_NAME."
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
     stop_server
