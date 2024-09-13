@@ -1,35 +1,60 @@
-/* Ensure the card has a light background and dark text */
+/* CSS for modern and clean design */
+
+.container {
+    max-width: 100%;
+}
+
 .card {
-    background-color: #ffffff; /* White background */
-    color: #333333; /* Dark text for readability */
-    border-radius: 0.5rem; /* Rounded corners */
-    margin-top: 1rem; /* Add space above the card */
+    background-color: #f9f9f9; /* Light background */
+    color: #2c3e50; /* Dark text */
+    border-radius: 12px; /* Smooth rounded corners */
+    margin-top: 2rem; /* Add space above the card */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Elevated shadow */
 }
 
 .card-title {
-    font-size: 2rem; /* Larger font size for titles */
+    font-size: 2.5rem; /* Larger font size for titles */
     font-weight: bold;
+    color: #34495e; /* Slightly darker text for titles */
 }
 
 .card-subtitle {
-    font-size: 1.25rem; /* Slightly smaller than the title */
-    color: #6c757d; /* Muted text color */
+    font-size: 1.2rem; /* Consistent subtitle size */
+    color: #7f8c8d; /* Muted text color */
 }
 
 .card-text {
-    font-size: 1rem; /* Regular text size */
-    line-height: 1.5; /* Line height for readability */
+    font-size: 1.1rem; /* Regular text size */
+    line-height: 1.6; /* Improved line height for readability */
 }
 
-.btn-primary {
-    background-color: #007bff; /* Bootstrap primary color */
-    border-color: #007bff;
+.btn-outline-primary {
+    border-color: #2980b9; /* Adjust button border color */
+    color: #2980b9; /* Match button text color */
+}
+
+.btn-outline-primary:hover {
+    background-color: #2980b9; /* Solid color on hover */
+    color: #fff; /* White text */
 }
 
 .text-primary {
-    color: #007bff; /* Link color matching the button */
+    color: #3498db; /* Link color */
 }
 
 hr {
-    border-top: 1px solid #dee2e6; /* Light gray border for separators */
+    border-top: 1px solid #ecf0f1; /* Light gray border for separators */
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5em 0.7em;
+    border-radius: 10px;
 }

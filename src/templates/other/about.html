@@ -2,44 +2,45 @@
 {% block title %}About {{title}} {% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h1 class="card-title">{{ title }}</h1>
-                    <h4 class="card-subtitle mb-3 text-muted">{{ version }}</h4>
-
-                    <p class="card-text">
-                        {{ description }}
-                    </p>
-
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-5">
+                    <h1 class="card-title display-4 mb-3">{{ title }}</h1>
+                    <h4 class="card-subtitle mb-4 text-muted">
+                        <i class="fas fa-code-branch me-2"></i>{{ version }}
+                        {% if pre_release %}
+                        <span class="badge bg-warning text-dark">Pre-release</span>
+                        {% else %}
+                        <span class="badge bg-success">Stable</span>
+                        {% endif %}
+                    </h4>
+                    <p class="card-text lead">{{ description }}</p>
                     <hr>
-
-                    <h5 class="card-title">Author</h5>
-                    <p class="card-text">{{ author }}</p>
-
-                    <h5 class="card-title">Year</h5>
-                    <p class="card-text">{{ year }}</p>
-
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Author</h5>
+                            <p class="card-text mb-0">{{ author }}</p>
+                        </div>
+                        <div>
+                            <h5 class="card-title">Year</h5>
+                            <p class="card-text mb-0">{{ year }}</p>
+                        </div>
+                    </div>
                     <hr>
-
                     <h5 class="card-title">GitHub Repository</h5>
-                    <p class="card-text">
-                        <a href="{{ project_url }}" target="_blank"
-                            class="btn btn-primary">
-                            View on GitHub
-                        </a>
-                    </p>
-
+                    <a href="{{ project_url }}" target="_blank" class="btn btn-outline-primary btn-lg">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
                     <hr>
-
                     <h5 class="card-title">Contact</h5>
                     <p class="card-text">
-                        For more information, please visit the <a href="{{project_url}}" target="_blank"> GitHub
-                            repository</a>
+                        For more information, please visit the <a href="{{ project_url }}" target="_blank">GitHub
+                            repository</a>.
                     </p>
                 </div>
             </div>
