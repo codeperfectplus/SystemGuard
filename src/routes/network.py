@@ -15,7 +15,7 @@ from flask_login import login_required
 @login_required
 def dashboard_network():
     groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
-    return render_template('dashboard_network.html', groups=groups)
+    return render_template('network/dashboard_network.html', groups=groups)
 
 
 @app.route('/add_server', methods=['GET', 'POST'])
@@ -41,7 +41,7 @@ def add_server():
         flash('Server added successfully!', 'success')
         return redirect(url_for('dashboard_network'))
 
-    return render_template('add_server.html')
+    return render_template('network/add_server.html')
 
 @app.route('/edit_server/<int:server_id>', methods=['GET', 'POST'])
 @login_required
@@ -60,7 +60,7 @@ def edit_server(server_id):
         db.session.commit()
         flash('Server updated successfully!', 'success')
         return redirect(url_for('dashboard_network'))
-    return render_template('edit_server.html', server=server)
+    return render_template('network/edit_server.html', server=server)
 
 @app.route('/delete_server/<int:server_id>', methods=['POST'])
 @login_required

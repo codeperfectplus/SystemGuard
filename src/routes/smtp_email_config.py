@@ -38,4 +38,4 @@ def smtp_config():
         flash("Email and password updated successfully!", "success")
         return redirect(url_for("smtp_config"))
 
-    return render_template("smtp_config.html", smtp_config=smtp_config)
+    return render_template("other/smtp_config.html", smtp_config=smtp_config)

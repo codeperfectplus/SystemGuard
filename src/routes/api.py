@@ -8,10 +8,9 @@ import gc
 
 api_bp = blueprints.Blueprint("api", __name__)
 
-
 @app.route("/api/system-info", methods=["GET"])
 @login_required
-def cpu_percent_api():
+def system_api():
     try:
         system_info = _get_system_info()
         return jsonify(system_info), 200

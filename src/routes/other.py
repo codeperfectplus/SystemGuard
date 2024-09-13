@@ -27,7 +27,7 @@ def terminal():
                 # If the command fails, capture the error output
                 output = e.output
             return jsonify(output=output)
-    return render_template('terminal.html')
+    return render_template('other/terminal.html')
 
 
 @app.route("/send_email", methods=["GET", "POST"])

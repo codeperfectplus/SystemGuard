@@ -133,7 +133,7 @@ def firewall():
             if not check_sudo_password(sudo_password):
                 message = "Incorrect sudo password. Please try again."
                 flash(message, 'danger')
-                return render_template('firewall.html', message=message, open_ports=open_ports)
+                return render_template('firewall/firewall.html', message=message, open_ports=open_ports)
             session['sudo_password'] = sudo_password
             flash("Sudo password saved in session successfully.", 'info')
         else:
@@ -176,4 +176,4 @@ def firewall():
             message = "Please enter your sudo password to view the open ports."
             flash(message, 'info')
 
-    return render_template('firewall.html', message=message, open_ports=open_ports)
+    return render_template('firewall/firewall.html', message=message, open_ports=open_ports)

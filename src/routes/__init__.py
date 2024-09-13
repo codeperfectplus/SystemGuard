@@ -5,7 +5,6 @@ from src.routes.memory_info import memory_info_bp
 from src.routes.network_info import network_info_bp
 from src.routes.settings import settings_bp
 from src.routes.speedtest import speedtest_bp
-from src.routes.system_health import system_health_bp
 from src.routes.process import process_bp
 from src.routes.auth import auth_bp
 from src.routes.network import network_bp
@@ -18,3 +17,4 @@ from src.routes.firewall import firewall_bp
 from src.routes.health import health_bp
 from src.routes.api import api_bp
 from src.routes.experimental import experimental_bp
+from src.routes.error_handlers import error_handlers_bp
