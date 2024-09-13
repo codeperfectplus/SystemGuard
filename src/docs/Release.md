@@ -1,14 +1,10 @@
-# Release Notes : SystemGuard
-
----
+# Release Notes: SystemGuard
 
 ## SystemGuard v1.0.5 Pre Release
 
 - Version: v1.0.5-pre
 - Release Date: September 20, 2024
 - Status: In Development
-
----
 
 ## SystemGuard v1.0.4 Release
 
@@ -29,6 +25,8 @@
 - **Graphs:**
   - Enhanced graphs with improved refresh intervals and datetime display.
   - Added CPU, memory, network, and battery usage graphs.
+- **Basic Firewall Added:**
+  - Initial firewall setup for enhanced security.
 
 ### Fixes
 
@@ -44,22 +42,19 @@
 - **Dependency Updates:** Updated Flask and other dependencies in `requirements.txt`.
 
 ### Other Changes
-- **Basic Firewall Added:** Initial firewall setup for enhanced security.
 - **Code Refactoring:** Refined codebase, including JavaScript and installation scripts for better maintainability.
 
-## Upgrade Instructions
+### Known Issues
+
+- **Firewall:** Basic firewall features are still in development and may not be fully functional.
+
+### Upgrade Instructions
 
 It's recommended to upgrade to the latest version of SystemGuard to benefit from the new features and improvements, upgrade from release only for the stable version.
 
 ```
 sudo systemguard-installer --install
 ```
-
-## Known Issues
-
-- **Firewall:** Basic firewall features are still in development and may not be fully functional.
-
----
 
 ## SystemGuard v1.0.4 Pre Release 
 
@@ -93,10 +88,6 @@ sudo systemguard-installer --install
 - **Graph DateTime**: Improved DateTime display for graphs.
 - **Installation Fixes**: Resolved installation script bugs for a seamless setup.
 
-This release enhances stability, security, and performance while introducing new features for system monitoring and ease of use.
-
----
-
 ## SystemGuard v1.0.3 Release
 
 - Version: v1.0.3
@@ -122,8 +113,6 @@ This release enhances stability, security, and performance while introducing new
 
 From tightening up scripts to rolling out new features, these updates reflect ongoing dedication to improving the application, one commit at a time!
 
----
-
 ## SystemGuard v1.0.2 Release
 
 - Version: v1.0.2
@@ -136,8 +125,6 @@ From tightening up scripts to rolling out new features, these updates reflect on
 - Caching enabled for some settings that not going to change such as cpu core, max temperature
 - checkbox added to enable/disable card on the dashboard
 
----
-
 ## SystemGuard v1.0.1 Release
 
 - Version: v1.0.1
@@ -148,8 +135,6 @@ From tightening up scripts to rolling out new features, these updates reflect on
 
 - Installation of the SystemGuard is improved.
 - bug fixes
-
----
 
 ## SystemGuard v1.0.0 Release
 
