@@ -34,8 +34,13 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         user = UserProfile.query.filter_by(username=username).first()
+
         if user and check_password_hash(user.password, password):
             login_user(user)
+            # Check if the user has changed the default password
+            if check_password_hash(user.password, "admin"):
+                flash("Security Alert: Please change the default password", "danger")
+                return redirect(url_for("change_password"))
             receiver_email = current_user.email
             admin_emails_with_alerts = get_email_addresses(
                 user_level="admin", receive_email_alerts=True
@@ -53,7 +58,6 @@ def login():
                     login_alert_template = os.path.join(
                         ROOT_DIR, "src/templates/email_templates/admin_login_alert.html"
                     )
-                    print(login_alert_template)
                     email_body = render_template_from_file(
                         login_alert_template, **context
                     )

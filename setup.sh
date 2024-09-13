@@ -4,25 +4,42 @@
 # ----------------------------
 # This script installs, uninstalls, backs up, restores App, and includes load testing using Locust.
 
-# USER_NAME=$(logname 2>/dev/null || echo $SUDO_USER)
-USER_NAME=$USER
-if [ "$(whoami)" = "root" ]; then
-    # LOGNAME_USER=$(logname)
-    # echo $LOGNAME_USER
-    # if [ "$LOGNAME_USER" = "logname: no login name" ]; then
-    LOGNAME_USER=$(logname 2>/dev/null)  # Redirect any error output to /dev/null
-    if [ $? -ne 0 ]; then  # Check if the exit status of the last command is not 0
-        echo "No login name found. Using fallback method."
-        # use head -n 1 for native linux. tail -n 1 works with wsl.
-        USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
-    else
-        USER_NAME=$LOGNAME_USER
-    fi
-else
-    USER_NAME=$(whoami)
-fi
-USER_HOME=/home/$USER_NAME
+color_border="\033[1;36m"   # Cyan for borders
+color_message="\033[1;32m"  # Green for the message
+color_reset="\033[0m"       # Reset to default
+color_username="\033[1;34m" # Blue for username
+color_password="\033[1;32m" # Green for password
+color_debug="\033[1;34m"    # Blue
+color_info="\033[1;32m"     # Green
+color_warning="\033[1;33m"  # Yellow
+color_error="\033[1;31m"    # Red
+color_critical="\033[1;41m" # Red background
+color_reset="\033[0m"       # Reset to default
+color_red="\033[1;31m"      # Red
+color_green="\033[1;32m"    # Green
+color_yellow="\033[1;33m"   # Yellow
+color_blue="\033[1;34m"     # Blue
+color_magenta="\033[1;35m"  # Magenta
+color_cyan="\033[1;36m"     # Cyan
+color_white="\033[1;37m"    # White
 
+get_user_name() {
+    if [ "$(whoami)" = "root" ]; then
+        LOGNAME_USER=$(logname 2>/dev/null) # Redirect any error output to /dev/null
+        if [ $? -ne 0 ]; then               # Check if the exit status of the last command is not 0
+            echo "No login name found. Using fallback method."
+            # use head -n 1 for native linux. tail -n 1 works with wsl.
+            USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+        else
+            USER_NAME=$LOGNAME_USER
+        fi
+    else
+        USER_NAME=$(whoami)
+    fi
+    echo "$USER_NAME"
+}
+USER_NAME=$(get_user_name)
+USER_HOME=/home/$USER_NAME
 
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
@@ -56,16 +73,16 @@ NUM_OF_RETRIES=5
 NUM_BACKUPS=5
 
 # Environment variables
-ENV_FILE="$USER_HOME/.bashrc"  # Default environment file
+ENV_FILE="$USER_HOME/.bashrc" # Default environment file
 
 # authentication
 ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
 
 # colors for the script
-color_prompt="\033[1;36m"  # Cyan for the prompt
-color_option="\033[37m"  # Blue for options
-color_reset="\033[0m"      # Reset to default
+color_prompt="\033[1;36m" # Cyan for the prompt
+color_option="\033[37m"   # Blue for options
+color_reset="\033[0m"     # Reset to default
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
@@ -78,26 +95,26 @@ trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
-  local text="$1"
-  local color_code="$2"
+    local text="$1"
+    local color_code="$2"
 
-  # Define color codes with default to reset if not specified
-  local color_reset="\033[0m"
-  local color="$color_reset"
+    # Define color codes with default to reset if not specified
+    local color_reset="\033[0m"
+    local color="$color_reset"
 
-  case "$color_code" in
-    red)    color="\033[31m" ;;  # Red
-    green)  color="\033[32m" ;;  # Green
-    yellow) color="\033[33m" ;;  # Yellow
-    blue)   color="\033[34m" ;;  # Blue
-    magenta) color="\033[35m" ;; # Magenta
-    cyan)   color="\033[36m" ;;  # Cyan
-    white)  color="\033[37m" ;;  # White
-    *)      color="$color_reset" ;; # Default to no color
-  esac
+    case "$color_code" in
+    red) color=$color_red ;;         # Red
+    green) color=$color_green ;;     # Green
+    yellow) color=$color_yellow ;;   # Yellow
+    blue) color=$color_blue ;;       # Blue
+    magenta) color=$color_magenta ;; # Magenta
+    cyan) color=$color_cyan ;;       # Cyan
+    white) color=$color_white ;;     # White
+    *) color="$color_reset" ;;       # Default to no color
+    esac
 
-  # Print the ASCII art with color
-  echo -e "${color}$(figlet "$text")${color_reset}"
+    # Print the ASCII art with color
+    echo -e "${color}$(figlet "$text")${color_reset}"
 }
 
 log() {
@@ -107,41 +124,33 @@ log() {
 
     # Check if a second argument exists, indicating that the first is the level.
     if [ -z "$2" ]; then
-        message="$1"  # Only message is passed, assign the first argument to message.
-        level="INFO"  # Default level when only message is passed.
+        message="$1" # Only message is passed, assign the first argument to message.
+        level="INFO" # Default level when only message is passed.
     else
-        message="$2"  # When both level and message are passed.
+        message="$2" # When both level and message are passed.
     fi
-
-    # Define colors based on log levels.
-    local color_reset="\033[0m"
-    local color_debug="\033[1;34m"   # Blue
-    local color_info="\033[1;32m"    # Green
-    local color_warning="\033[1;33m" # Yellow
-    local color_error="\033[1;31m"   # Red
-    local color_critical="\033[1;41m" # Red background
 
     # Select color based on level.
     local color="$color_reset"
     case "$level" in
-        DEBUG)
-            color="$color_debug"
-            ;;
-        INFO)
-            color="$color_info"
-            ;;
-        WARNING)
-            color="$color_warning"
-            ;;
-        ERROR)
-            color="$color_error"
-            ;;
-        CRITICAL)
-            color="$color_critical"
-            ;;
-        *)
-            color="$color_reset"  # Default to no color if the level is unrecognized.
-            ;;
+    DEBUG)
+        color="$color_debug"
+        ;;
+    INFO)
+        color="$color_info"
+        ;;
+    WARNING)
+        color="$color_warning"
+        ;;
+    ERROR)
+        color="$color_error"
+        ;;
+    CRITICAL)
+        color="$color_critical"
+        ;;
+    *)
+        color="$color_reset" # Default to no color if the level is unrecognized.
+        ;;
     esac
 
     # Log the message with timestamp, level, and message content, applying the selected color.
@@ -154,16 +163,7 @@ generate_ascii_art "Installer" "yellow"
 generate_ascii_art "By" "yellow"
 generate_ascii_art "CodePerfectPlus" "yellow"
 
-color_border="\033[1;36m"   # Cyan for borders
-color_message="\033[1;32m"  # Green for the message
-color_reset="\033[0m"       # Reset to default
-
 welcome_message() {
-    # # Define color variables
-    # color_border="\033[1;36m"   # Cyan for borders
-    # color_message="\033[1;32m"  # Green for the message
-    # color_reset="\033[0m"       # Reset to default
-
     welcome_message="Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')"
     padding=4
     message_length=$((${#welcome_message} + $padding * 2))
@@ -173,27 +173,19 @@ welcome_message() {
     echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $message_length))┘${color_reset}"
 
 }
-# Display the welcome message
-welcome_message
 
 display_credentials() {
-    local color_reset="\033[0m"
-    local color_username="\033[1;34m"  # Blue for username
-    local color_password="\033[1;32m"  # Green for password
-    local color_border="\033[1;36m"    # Cyan for borders
-
     # Credentials
     local username="Username: ${ADMIN_LOGIN}"
     local password="Password: ${ADMIN_PASSWORD}"
     local message="Here are your login credentials. It will be used to login to the dashboard."
 
-    local max_length=$(( ${#username} > ${#password} ? ${#username} : ${#password} ))
-    local max_length_message=$(( ${#message} > max_length ? ${#message} : max_length ))
+    local max_length=$((${#username} > ${#password} ? ${#username} : ${#password}))
+    local max_length_message=$((${#message} > max_length ? ${#message} : max_length))
 
     # Create top and bottom borders dynamically
     local border=$(printf "%*s" $((max_length + 4)) | tr ' ' '─')
 
-    
     echo ""
     echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $((max_length_message + 4))))┐${color_reset}"
     echo -e "${color_border}│${color_reset}  ${message}  ${color_border}│${color_reset}"
@@ -206,6 +198,9 @@ display_credentials() {
     echo ""
 }
 
+# Display the welcome message
+welcome_message
+# Display the credentials
 display_credentials
 # do something so user can see the credentials and then clear the screen
 sleep 5
@@ -216,7 +211,7 @@ check_dependencies() {
     local dependencies=(git curl wget unzip iptables figlet)
 
     # Check if `apt-get` is available
-    if ! command -v apt-get &> /dev/null; then
+    if ! command -v apt-get &>/dev/null; then
         log "ERROR" "This script requires apt-get but it is not available."
         exit 1
     fi
@@ -226,7 +221,7 @@ check_dependencies() {
 
     # Check each dependency
     for cmd in "${dependencies[@]}"; do
-        if ! command -v "$cmd" &> /dev/null; then
+        if ! command -v "$cmd" &>/dev/null; then
             missing_dependencies+=("$cmd")
         fi
     done
@@ -250,14 +245,20 @@ check_dependencies() {
 # Function to change ownership of a directory and its subdirectories
 own_dir() {
     local dir="$1"
-    chown -R "$USER_NAME:$USER_NAME" "$dir" || { log "ERROR" "Failed to change ownership of directory and its contents: $dir"; exit 11; }
+    chown -R "$USER_NAME:$USER_NAME" "$dir" || {
+        log "ERROR" "Failed to change ownership of directory and its contents: $dir"
+        exit 11
+    }
 }
 
 # Function to create a directory if it does not exist
 create_dir() {
     local dir="$1"
     if [ ! -d "$dir" ]; then
-        mkdir -p "$dir" || { log "ERROR" "Failed to create directory: $dir"; exit 10; }
+        mkdir -p "$dir" || {
+            log "ERROR" "Failed to create directory: $dir"
+            exit 10
+        }
         own_dir "$dir" # Call own_dir to change ownership after creation
     fi
 }
@@ -295,19 +296,19 @@ prompt_user() {
     echo -e "${color_prompt}└──────────────────────────────────────────────────────────┘${color_reset}"
     echo ""
     read -p "Enter your choice (1 or 2): " user_choice
-    
+
     # Convert the user's choice to true/false
     case "$user_choice" in
-        1)
-            user_choice="true"
-            ;;
-        2)
-            user_choice="false"
-            ;;
-        *)
-            echo "Invalid choice. Please enter 1 or 2."
-            return 1
-            ;;
+    1)
+        user_choice="true"
+        ;;
+    2)
+        user_choice="false"
+        ;;
+    *)
+        echo "Invalid choice. Please enter 1 or 2."
+        return 1
+        ;;
     esac
 }
 
@@ -315,17 +316,17 @@ prompt_user() {
 update_env_variable() {
     var_name=$1
     var_value=$2
-    
+
     # Ensure the environment file exists
     touch "$ENV_FILE"
-    
+
     # Update or add the variable in the environment file
     if grep -q "^$var_name=" "$ENV_FILE"; then
         # Replace existing variable
         sed -i "s/^$var_name=.*/$var_name=$var_value/" "$ENV_FILE"
     else
         # Add new variable
-        echo "$var_name=$var_value" >> "$ENV_FILE"
+        echo "$var_name=$var_value" >>"$ENV_FILE"
     fi
 }
 
@@ -333,15 +334,15 @@ update_env_variable() {
 set_auto_update() {
     var_name=$1
     prompt_user # Prompt user for input
-    
+
     # If prompt_user returned an error (invalid choice), exit early
     if [ $? -ne 0 ]; then
         return 1
     fi
-    
+
     # Update the environment variable with the user's choice
     update_env_variable "$var_name" "$user_choice"
-    
+
     # Reload the environment file to apply changes
     source "$ENV_FILE"
 }
@@ -369,7 +370,6 @@ add_cron_job() {
     # Create log directory with error handling
     create_dir "$log_dir"
 
-
     # Temporarily store current crontab to avoid overwriting on error
     local temp_cron=$(mktemp)
     if [ $? -ne 0 ]; then
@@ -378,10 +378,10 @@ add_cron_job() {
     fi
 
     # List the current crontab
-    if ! $crontab_cmd -l > "$temp_cron" 2>&1; then
+    if ! $crontab_cmd -l >"$temp_cron" 2>&1; then
         # If no crontab exists, create an empty file
         if grep -q "no crontab for" "$temp_cron" 2>/dev/null; then
-            : > "$temp_cron"  # Create an empty file
+            : >"$temp_cron" # Create an empty file
             log "No crontab for user $USER_NAME. Creating new crontab."
         else
             log "CRITICAL" "Unable to list current crontab."
@@ -398,7 +398,7 @@ add_cron_job() {
     fi
 
     # Add the new cron job
-    echo "$cron_job" >> "$temp_cron"
+    echo "$cron_job" >>"$temp_cron"
     if ! $crontab_cmd "$temp_cron"; then
         log "ERROR" "Failed to add the cron job to crontab."
         rm "$temp_cron"
@@ -417,7 +417,7 @@ cleanup_backups() {
     # Check if the backup directory exists
     if [ -d "$BACKUP_DIR" ]; then
         # List all items in the backup directory
-        local backups=( $(ls -A "$BACKUP_DIR") )
+        local backups=($(ls -A "$BACKUP_DIR"))
 
         # Check if there are any backups to remove
         if [ ${#backups[@]} -gt 0 ]; then
@@ -439,10 +439,10 @@ cleanup_backups() {
 rotate_backups() {
     local num_of_backup=$1
     log "INFO" "Rotating backups... Keeping last $num_of_backup backups."
-    local backups=( $(ls -t $BACKUP_DIR) )
+    local backups=($(ls -t $BACKUP_DIR))
     local count=${#backups[@]}
     if [ "$count" -gt "$num_of_backup" ]; then
-        local to_remove=( "${backups[@]:$num_of_backup}" )
+        local to_remove=("${backups[@]:$num_of_backup}")
         for backup in "${to_remove[@]}"; do
             rm -rf "$BACKUP_DIR/$backup"
             log "INFO" "Removed old backup: $backup"
@@ -524,7 +524,7 @@ remove_extract_dir() {
     fi
 }
 
-remove_cronjob () {
+remove_cronjob() {
     if $crontab_cmd -l | grep -q "$CRON_PATTERN"; then
         $crontab_cmd -l | grep -v "$CRON_PATTERN" | $crontab_cmd -
         log "Old cron jobs removed."
@@ -545,7 +545,7 @@ fetch_latest_version() {
     # Fetch the latest version from GitHub
     API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases/latest"
     RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/latest_version.json "$API_URL")
-    HTTP_CODE="${RESPONSE: -3}"  # Extract HTTP status code
+    HTTP_CODE="${RESPONSE: -3}" # Extract HTTP status code
 
     # Check for HTTP errors
     if [ "$HTTP_CODE" -ne 200 ]; then
@@ -620,23 +620,23 @@ install_from_git() {
 
     # Set Git URL based on user choice
     case "$VERSION" in
-        1|"")  # Stable is the default option if nothing is entered
-            BRANCH="production"
-            log "Selected Production (stable branch)."
-            ;;
-        2)  # Development version
-            BRANCH="dev"
-            log "Selected Development (dev branch)."
-            ;;
-        3)  # Specific branch
-            echo "Enter the branch name to install:"
-            read -r BRANCH
-            log "Selected branch: $BRANCH."
-            ;;
-        *)  # Invalid input handling
-            BRANCH="production"
-            log "WARNING" "Invalid branch selected. Defaulting to 'production'."
-            ;;
+    1 | "") # Stable is the default option if nothing is entered
+        BRANCH="production"
+        log "Selected Production (stable branch)."
+        ;;
+    2) # Development version
+        BRANCH="dev"
+        log "Selected Development (dev branch)."
+        ;;
+    3) # Specific branch
+        echo "Enter the branch name to install:"
+        read -r BRANCH
+        log "Selected branch: $BRANCH."
+        ;;
+    *) # Invalid input handling
+        BRANCH="production"
+        log "WARNING" "Invalid branch selected. Defaulting to 'production'."
+        ;;
     esac
 
     # Construct the full Git URL with branch
@@ -655,8 +655,8 @@ install_from_git() {
 
     # Change to the installation directory
     cd "$GIT_INSTALL_DIR" || {
-        log "ERROR" "Failed to navigate to the installation directory.";
-        exit 1;
+        log "ERROR" "Failed to navigate to the installation directory."
+        exit 1
     }
 
     log "Setting up $APP_NAME from Git repository..."
@@ -680,7 +680,7 @@ fetch_github_releases() {
     local url="https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases"
 
     # Check if jq is installed
-    if ! command -v jq &> /dev/null; then
+    if ! command -v jq &>/dev/null; then
         echo "Error: jq is not installed. Please install jq to use this function."
         return 1
     fi
@@ -695,7 +695,7 @@ fetch_github_releases() {
     fi
 
     # Check if response contains a valid JSON
-    if ! echo "$response" | jq . > /dev/null 2>&1; then
+    if ! echo "$response" | jq . >/dev/null 2>&1; then
         echo "Error: Failed to parse JSON response from GitHub."
         return 1
     fi
@@ -714,9 +714,9 @@ fetch_github_releases() {
     echo -e ""
 
     # Fetch and display release data
-    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 | \
+    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 |
         awk -F'\t' -v color="$color_option" -v reset="$color_header" \
-        '{ printf "│  "color "%-3d %-15s %-20s" reset "                    │\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES
+            '{ printf "│  "color "%-3d %-15s %-20s" reset "                    │\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES
 
     echo -e "${color_header}└──────────────────────────────────────────────────────────────┘${color_reset}"
     # Exit with status code 0
@@ -757,7 +757,10 @@ install_using_setup_file_in_cwd() {
     # copy the code base from the current directory to the $SOURCE_INSTALL_DIR
     # make directory if not exists
     create_dir "$SOURCE_INSTALL_DIR"
-    cp -r ./* "$SOURCE_INSTALL_DIR" || { log "ERROR" "Failed to copy the code to the installation directory."; exit 1; }
+    cp -r ./* "$SOURCE_INSTALL_DIR" || {
+        log "ERROR" "Failed to copy the code to the installation directory."
+        exit 1
+    }
     own_dir "$SOURCE_INSTALL_DIR"
 }
 
@@ -770,10 +773,9 @@ install_from_source_code() {
     log "$APP_NAME version $VERSION installed successfully!"
 }
 
-
 timer() {
     local duration=$1
-    for ((i=1; i<=duration; i++)); do
+    for ((i = 1; i <= duration; i++)); do
         echo -n "$i "
         sleep 1
         echo -ne "\r" # Delete previous number to show next
@@ -787,12 +789,12 @@ open_browser() {
     timer 5
 
     if [ "$(id -u)" = "0" ]; then
-        sudo -u "$SUDO_USER" xdg-open "$HOST_URL" &  # Linux with xdg-open
+        sudo -u "$SUDO_USER" xdg-open "$HOST_URL" & # Linux with xdg-open
     else
         # If running as a normal user, use xdg-open or open (for macOS)
-        if command -v xdg-open &> /dev/null; then
+        if command -v xdg-open &>/dev/null; then
             xdg-open "$HOST_URL" &
-        elif command -v open &> /dev/null; then
+        elif command -v open &>/dev/null; then
             open "$HOST_URL" &
         else
             log "ERROR" "Unable to open the browser. Please open the browser and navigate to $HOST_URL."
@@ -805,7 +807,7 @@ start_server() {
     display_credentials
     cd $EXTRACT_DIR/$APP_NAME-*/
     dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
-    sudo -u "$USER_NAME" bash "$dashboard_script_path" &> /dev/null
+    sudo -u "$USER_NAME" bash "$dashboard_script_path" &>/dev/null
 }
 
 # Install function
@@ -829,21 +831,21 @@ install() {
     read -r INSTALL_METHOD
 
     case $INSTALL_METHOD in
-        1)
-            install_from_release
-            ;;
-        2)
-            install_from_git
-            ;;
-        3)
-            install_from_source_code
-            ;;
-        *)
-            log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."
-            exit 1
-            ;;
+    1)
+        install_from_release
+        ;;
+    2)
+        install_from_git
+        ;;
+    3)
+        install_from_source_code
+        ;;
+    *)
+        log "Invalid installation method. Please choose '1' for Git repository or '2' for Release."
+        exit 1
+        ;;
     esac
-	generate_ascii_art "$APP_NAME Installed" "green"
+    generate_ascii_art "$APP_NAME Installed" "green"
     start_server
     open_browser
 }
@@ -851,8 +853,8 @@ install() {
 uninstall() {
     log "Uninstalling $APP_NAME..."
     remove_previous_installation
-	stop_server
-	generate_ascii_art "$APP_NAME Uninstalled" "red"
+    stop_server
+    generate_ascii_art "$APP_NAME Uninstalled" "red"
 }
 
 # Load test function to start Locust server
@@ -866,8 +868,7 @@ load_test() {
     fi
 
     # Check if Locust is installed
-    if ! command -v locust &> /dev/null
-    then
+    if ! command -v locust &>/dev/null; then
         log "WARNING" "Locust is not installed. Please install it first."
         exit 1
     fi
@@ -888,7 +889,6 @@ check_status() {
     else
         log "$APP_NAME is not installed."
     fi
-
 
     if $crontab_cmd '-l' | grep -q "$CRON_PATTERN"; then
         log "Cron job for $APP_NAME is set."
@@ -911,7 +911,7 @@ health_check() {
         exit 1
     fi
 
-    while (( retries < max_retries )); do
+    while ((retries < max_retries)); do
         log "Performing health check on $HOST_URL..."
 
         # Get the HTTP response code
@@ -935,7 +935,6 @@ health_check() {
     generate_ascii_art "$APP_NAME is DOWN" "red"
     exit 1
 }
-
 
 # app logs
 show_server_logs() {
@@ -987,7 +986,7 @@ stop_server() {
 
 # fix the server
 fix() {
-    log "Fixing $APP_NAME server..."    
+    log "Fixing $APP_NAME server..."
     stop_server
     start_server
     open_browser
@@ -1013,7 +1012,10 @@ install_latest() {
             sleep 1
         done
         echo ""
-        git pull >> /dev/null 2>&1 || { log "ERROR" "Failed to update the code. Please check your internet connection and try again."; exit 1; }
+        git pull >>/dev/null 2>&1 || {
+            log "ERROR" "Failed to update the code. Please check your internet connection and try again."
+            exit 1
+        }
         log "Hurray: Code updated successfully."
     else
         log "Probably you have installed the code from the release, so you can't update the code."
@@ -1074,40 +1076,65 @@ show_help() {
 # Parse command-line options
 for arg in "$@"; do
     case $arg in
-        --install) ACTION="install" ;;
-        --uninstall) ACTION="uninstall" ;;
-        --restore) ACTION="restore" ;;
-        --load-test) ACTION="load_test" ;;
-        --status) ACTION="check_status" ;;
-        --health-check) ACTION="health_check" ;;
-        --clean-backups) ACTION="cleanup_backups" ;;
-        --logs) show_server_logs; exit 0 ;;
-        --installation-logs) show_installer_logs; exit 0 ;;
-        --stop-server) stop_server; exit 0 ;;
-        --fix) fix; exit 0 ;;
-        --install-latest) ACTION="install_latest" ;;
-        --open-app) open_browser; exit 0 ;;
-        --fetch-github-releases) fetch_github_releases; exit 0 ;;
-        --help) show_help; exit 0 ;;
-        *) echo "Unknown option: $arg"; show_help; exit 1 ;;
+    --install) ACTION="install" ;;
+    --uninstall) ACTION="uninstall" ;;
+    --restore) ACTION="restore" ;;
+    --load-test) ACTION="load_test" ;;
+    --status) ACTION="check_status" ;;
+    --health-check) ACTION="health_check" ;;
+    --clean-backups) ACTION="cleanup_backups" ;;
+    --logs)
+        show_server_logs
+        exit 0
+        ;;
+    --installation-logs)
+        show_installer_logs
+        exit 0
+        ;;
+    --stop-server)
+        stop_server
+        exit 0
+        ;;
+    --fix)
+        fix
+        exit 0
+        ;;
+    --install-latest) ACTION="install_latest" ;;
+    --open-app)
+        open_browser
+        exit 0
+        ;;
+    --fetch-github-releases)
+        fetch_github_releases
+        exit 0
+        ;;
+    --help)
+        show_help
+        exit 0
+        ;;
+    *)
+        echo "Unknown option: $arg"
+        show_help
+        exit 1
+        ;;
     esac
 done
 
 # Execute based on the action specified
 case $ACTION in
-    install) install ;;
-    uninstall) uninstall ;;
-    restore) restore ;;
-    load_test) load_test ;;
-    check_status) check_status ;;
-    health_check) health_check ;;
-    cleanup_backups) cleanup_backups ;;
-    stop_server) stop_server ;;
-    logs) show_server_logs ;;
-    installation-logs) show_installer_logs ;;
-    fix) fix ;;
-    install_latest) install_latest ;;
-    open_browser) open_browser ;;
-    fetch_github_releases) fetch_github_releases ;;
-    *) echo "No action specified. Use --help for usage information." ;;
+install) install ;;
+uninstall) uninstall ;;
+restore) restore ;;
+load_test) load_test ;;
+check_status) check_status ;;
+health_check) health_check ;;
+cleanup_backups) cleanup_backups ;;
+stop_server) stop_server ;;
+logs) show_server_logs ;;
+installation-logs) show_installer_logs ;;
+fix) fix ;;
+install_latest) install_latest ;;
+open_browser) open_browser ;;
+fetch_github_releases) fetch_github_releases ;;
+*) echo "No action specified. Use --help for usage information." ;;
 esac
