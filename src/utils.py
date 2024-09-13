@@ -1,5 +1,6 @@
 import os
 import time
+import platform
 import datetime
 import subprocess
 import psutil
@@ -334,6 +335,47 @@ def render_template_from_file(template_file_path, **context):
     rendered_html = template.render(**context)
     
     return rendered_html
+
+def get_os_info():
+    kernel_version = platform.release()
+    os_name = platform.system()
+
+    # Return results in a dictionary
+    return {
+        "operating_system": os_name,
+        "kernel_version": kernel_version
+    }
+
+def get_os_release_info():
+    """
+    Reads /etc/os-release and returns a dictionary with distribution information.
+    """
+    os_info = {}
+
+    try:
+        with open('/etc/os-release', 'r') as file:
+            for line in file:
+                if '=' in line:
+                    key, value = line.strip().split('=', 1)
+                    # Remove surrounding quotes if present
+                    value = value.strip('"')
+                    # Add to dictionary
+                    os_info[key] = value
+
+        # Extract required information
+        return {
+            "os_name": os_info.get("NAME", "Unknown"),
+            "os_version": os_info.get("VERSION_ID", "Unknown"),
+            "os_codename": os_info.get("VERSION_CODENAME", "Unknown"),
+            "os_full_name": os_info.get("PRETTY_NAME", "Unknown")
+        }
+
+    except FileNotFoundError:
+        print("The /etc/os-release file was not found.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. 

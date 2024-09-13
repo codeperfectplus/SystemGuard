@@ -55,6 +55,11 @@ chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 sudo systemguard-installer --install
 ```
 
+```bash
+# if above command doesn't work, try full path
+sudo /usr/local/bin/systemguard-installer --install
+```
+
 ---
 
 ## Uninstallation
