@@ -14,7 +14,6 @@ color_info="\033[1;32m"     # Green
 color_warning="\033[1;33m"  # Yellow
 color_error="\033[1;31m"    # Red
 color_critical="\033[1;41m" # Red background
-color_reset="\033[0m"       # Reset to default
 color_red="\033[1;31m"      # Red
 color_green="\033[1;32m"    # Green
 color_yellow="\033[1;33m"   # Yellow
@@ -22,6 +21,8 @@ color_blue="\033[1;34m"     # Blue
 color_magenta="\033[1;35m"  # Magenta
 color_cyan="\033[1;36m"     # Cyan
 color_white="\033[1;37m"    # White
+color_prompt="\033[1;36m" # Cyan for the prompt
+color_option="\033[37m"   # Blue for options
 
 get_user_name() {
     if [ "$(whoami)" = "root" ]; then
@@ -80,18 +81,14 @@ ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
 
 # colors for the script
-color_prompt="\033[1;36m" # Cyan for the prompt
-color_option="\033[37m"   # Blue for options
-color_reset="\033[0m"     # Reset to default
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
 
-# run this script with sudo
-# if [ "$EUID" -ne 0 ]; then
-#     echo "Please run this program with sudo, exiting..."
-#     exit 1
-# fi
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run this program with sudo, exiting..."
+    exit 1
+fi
 
 # Function to generate colored ASCII art from text using figlet
 generate_ascii_art() {
@@ -157,12 +154,6 @@ log() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}[$level]${color_reset} - $message" | tee -a "$LOG_FILE"
 }
 
-# # introductary message
-# generate_ascii_art "$APP_NAME" "yellow"
-# generate_ascii_art "Installer" "yellow"
-# generate_ascii_art "By" "yellow"
-# generate_ascii_art "CodePerfectPlus" "yellow"
-
 message_box() {
     message="$1"
     sleeptime="$2"
@@ -186,7 +177,7 @@ message_box() {
     while IFS= read -r line; do
         printf "%b│%b%*s%b%s%b%*s%b│%b\n" \
             "$color_border" "$color_reset" $padding "" "$color_message" "$line" "$color_reset" $((total_length - padding - ${#line})) "" "$color_border" "$color_reset"
-    done <<< "$(echo -e "$message")"
+    done <<<"$(echo -e "$message")"
 
     # Print the bottom border of the message box
     echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $total_length))┘${color_reset}"
@@ -197,13 +188,8 @@ message_box() {
     fi
 }
 
-
-# message_box "Welcome to the $APP_NAME installer script!" 0
-
-# message_box "This script will guide \nyou through the \ninstallation process." 0
-
+# display the credentials for the user to login
 display_credentials() {
-    # Credentials
     local username="Username: ${ADMIN_LOGIN}"
     local password="Password: ${ADMIN_PASSWORD}"
     local message="Here are your login credentials. It will be used to login to the dashboard."
@@ -691,26 +677,21 @@ fetch_github_releases() {
         echo "Error: Failed to parse JSON response from GitHub."
         return 1
     fi
+    
+    # Prepare the message content
+    local message="Latest releases for ${APP_NAME}:\n\n"
+    message+="$(printf "%-3s %-15s %-20s\n" "Sr.No." "Tag Name" "Published At")\n"
 
-    # Display releases with newest first
-    # Display releases with newest first in tabular format
-    # Define color variables
-    color_header="\033[1;36m"  # Cyan for headers
-    color_reset="\033[0m"      # Reset to default
-    color_content="\033[1;34m" # Blue for content
+    # Fetch and format release data
+    local release_data
+    release_data=$(echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 |
+        awk -F'\t' '{ printf "%-3d %-15s %-20s\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES)
 
-    echo -e "${color_header}┌──────────────────────────────────────────────────────────────┐${color_reset}"
-    echo -e "${color_header}│${color_reset} Latest releases for ${APP_NAME}:${color_reset}                             ${color_header}│${color_reset}"
-    echo -e "${color_header}├──────────────────────────────────────────────────────────────┤${color_reset}"
-    echo -e "${color_header}│${color_reset}  ${color_message}%-3s %-15s %-20s${color_reset}                 ${color_header}│" | awk '{printf $0, "Sr.No.", "Tag Name", "Published At"}'
-    echo -e ""
+    # Append release data to the message
+    message+="$release_data"
 
-    # Fetch and display release data
-    echo "$response" | jq -r '.[] | [.tag_name, .published_at] | @tsv' | sort -r -t $'\t' -k2,2 |
-        awk -F'\t' -v color="$color_option" -v reset="$color_header" \
-            '{ printf "│  "color "%-3d %-15s %-20s" reset "                    │\n", NR, $1, $2 }' | head -n $NUM_OF_RELEASES
-
-    echo -e "${color_header}└──────────────────────────────────────────────────────────────┘${color_reset}"
+    # Display the message using message_box
+    message_box "$message" 0
     # Exit with status code 0
     return 0
 }
