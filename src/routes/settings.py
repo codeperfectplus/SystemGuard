@@ -9,7 +9,11 @@ from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings,
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
-from src.routes.helper.common_helper import get_email_addresses, admin_required, check_sudo_password
+from src.routes.helper.common_helper import (
+    get_email_addresses, 
+    admin_required, 
+    handle_sudo_password)
+
 from src.config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
@@ -112,21 +116,17 @@ def card_toggles():
 
 @app.route('/utility', methods=['GET', 'POST'])
 @admin_required
+@handle_sudo_password("utility_control")
 def utility_control():
     if request.method == 'POST':
+        # Retrieve the saved sudo password from session
+        sudo_password = session.get('sudo_password', '')
+        if not sudo_password:
+            flash("Please enter the sudo password to proceed.", 'danger')
+            return redirect(url_for('utility_control'))
+
+        # Handle action (shutdown or reboot)
         action = request.form.get('action')
-        sudo_password = request.form.get('sudo_password', '')
-
-        if "clear_session" in request.form:
-            session.pop('sudo_password', None)
-            flash("Session cleared!", "info")
-            return redirect(url_for('control'))
-        
-        if "sudo_password" in request.form:
-            if not check_sudo_password(sudo_password):
-                flash("Invalid sudo password!", "danger")
-                return redirect(url_for('control'))
-
         if action == 'shutdown':
             command = ['sudo', '-S', 'shutdown', '-h', 'now']
             success_message = "Server is shutting down..."
@@ -137,11 +137,11 @@ def utility_control():
             error_message = "Failed to reboot: {}"
         else:
             flash("Invalid action!", 'danger')
-            return redirect(url_for('control'))
+            return redirect(url_for('utility_control'))
 
+        # Execute the command
         try:
-            # Execute the command with the sudo password
-            result = subprocess.run(command, input=sudo_password, check=True, capture_output=True, text=True)
+            result = subprocess.run(command, input=sudo_password + '\n', check=True, capture_output=True, text=True)
             flash(success_message, 'info')
         except subprocess.CalledProcessError as e:
             flash(error_message.format(e), 'danger')

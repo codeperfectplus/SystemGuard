@@ -2,7 +2,7 @@ from src.models import UserProfile, PageToggleSettings
 from src.config import app
 from flask_login import current_user
 from functools import wraps
-from flask import flash, redirect, url_for, render_template
+from flask import flash, redirect, url_for, render_template, request, session
 import subprocess
 
 def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):
@@ -71,6 +71,45 @@ def check_page_toggle(setting_name):
             if not getattr(page_toggles_settings, setting_name, False):
                 flash("You do not have permission to view this page.", "danger")
                 return render_template("error/403.html")
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def reset_sudo_timestamp():
+    """
+    Reset the sudo timestamp, which requires the user to input their sudo password again
+    the next time a sudo command is executed.
+    """
+    subprocess.run(['sudo', '-k'])
+
+
+def handle_sudo_password(redirect_url):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if request.method == 'POST':
+                form_data = request.form
+
+                # Handle session clearing
+                if 'clear_session' in form_data:
+                    session.pop('sudo_password', None)
+                    reset_sudo_timestamp()  # Reset the sudo timestamp if applicable
+                    flash("Sudo password cleared from session.", 'info')
+                    return redirect(url_for(redirect_url))
+
+                # Handle sudo password validation and storage
+                if 'sudo_password' in form_data:
+                    sudo_password = form_data.get('sudo_password')
+                    if not check_sudo_password(sudo_password):
+                        flash("Incorrect sudo password. Please try again.", 'danger')
+                        return redirect(url_for(redirect_url))
+
+                    # Store valid sudo password in session
+                    session['sudo_password'] = sudo_password
+                    flash("Sudo password saved in session successfully.", 'info')
+                    return redirect(url_for(redirect_url))
+
+            # Call the original function if no POST handling is required
             return f(*args, **kwargs)
         return decorated_function
     return decorator

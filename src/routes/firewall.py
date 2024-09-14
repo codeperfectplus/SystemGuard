@@ -1,17 +1,18 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, session, flash
 
 from src.config import app
 from src.routes.helper.firewall_helper import (
     list_open_ports,
     enable_port, 
-    disable_port, 
-    reset_sudo_timestamp)
-from src.routes.helper.common_helper import admin_required, check_sudo_password
+    disable_port)
+from src.routes.helper.common_helper import admin_required, handle_sudo_password
+from flask import request, session, flash
 
 firewall_bp = Blueprint('firewall', __name__)
 
 @app.route('/firewall', methods=['GET', 'POST'])
 @admin_required
+@handle_sudo_password("firewall")
 def firewall():
     """
     Flask view for the firewall page. Handles both GET and POST requests:
@@ -25,27 +26,6 @@ def firewall():
     open_ports = []
 
     if request.method == 'POST':
-
-        # Clear session and reset sudo timestamp
-        if 'clear_session' in request.form:
-            session.pop('sudo_password', None)
-            session.pop('protocol', None)
-            session.pop('action', None)
-            reset_sudo_timestamp()
-            return redirect(url_for('firewall'))
-
-        # Validate sudo password and store it in the session
-        if 'sudo_password' in request.form:
-            sudo_password = request.form['sudo_password']
-            if not check_sudo_password(sudo_password):
-                message = "Incorrect sudo password. Please try again."
-                flash(message, 'danger')
-                return render_template('firewall/firewall.html', message=message, open_ports=open_ports)
-            session['sudo_password'] = sudo_password
-            flash("Sudo password saved in session successfully.", 'info')
-        else:
-            sudo_password = session.get('sudo_password', '')
-
         if 'port' in request.form and 'protocol' in request.form and 'action' in request.form:
             port = request.form['port']
             protocol = request.form['protocol']
