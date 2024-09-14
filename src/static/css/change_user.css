@@ -1,55 +1,48 @@
 .change-user-container {
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px;
     background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .page-title {
-    font-size: 28px;
-    color: #343a40;
-    margin-bottom: 20px;
+    font-size: 30px;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .change-user-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
+    gap: 20px;
 }
 
 .form-group label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 5px;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
 }
 
-.form-group input[type="text"],
-.form-group select {
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+.form-control {
     font-size: 16px;
-    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+}
+
+.form-check-input {
+    margin-right: 10px;
 }
 
 .btn-primary {
-    padding: 10px 20px;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
     background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
+    color: white;
+    border-radius: 6px;
     transition: background-color 0.3s ease;
 }
 

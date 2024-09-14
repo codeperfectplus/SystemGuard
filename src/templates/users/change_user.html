@@ -5,31 +5,31 @@
 {% endblock %}
 {% block content %}
 <div class="change-user-container">
-    <h2 class="page-title">Change User Settings</h2>
-    <form method="post" class="change-user-form">
+    <h2 class="page-title bg-primary text-white p-3">Change User Settings</h2>
+    <form method="post" class="change-user-form shadow-lg p-4">
         {% include 'ext/message.html' %}
         
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+            <label for="username"><i class="fas fa-user"></i> Username</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="user_level">User Level:</label>
-            <select id="user_level" name="user_level" required>
+            <label for="user_level"><i class="fas fa-user-shield"></i> User Level</label>
+            <select id="user_level" name="user_level" class="form-control">
                 <option value="user" {% if user.user_level == 'user' %}selected{% endif %}>User</option>
                 <option value="admin" {% if user.user_level == 'admin' %}selected{% endif %}>Admin</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="profession">Profession:</label>
-            <select id="profession" name="profession" required>
+            <label for="profession"><i class="fas fa-briefcase"></i> Profession</label>
+            <select id="profession" name="profession" class="form-control">
                 <option value="Software Developer" {% if user.profession == 'Software Developer' %}selected{% endif %}>Software Developer</option>
                 <option value="Network Engineer" {% if user.profession == 'Network Engineer' %}selected{% endif %}>Network Engineer</option>
                 <option value="System Administrator" {% if user.profession == 'System Administrator' %}selected{% endif %}>System Administrator</option>
@@ -38,14 +38,12 @@
             </select>
         </div>
 
-        
-
-        <div class="form-group">
-            <label for="receive_email_alerts">Receive Email Alerts:</label>
-            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" {% if user.receive_email_alerts %}checked{% endif %}>
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" id="receive_email_alerts" name="receive_email_alerts" {% if user.receive_email_alerts %}checked{% endif %}>
+            <label for="receive_email_alerts" class="form-check-label"><i class="fas fa-envelope-open"></i> Receive Email Alerts</label>
         </div>
 
-        <button type="submit" class="btn btn-primary">Update Settings</button>
+        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Update Settings</button>
     </form>
 </div>
 {% endblock %}

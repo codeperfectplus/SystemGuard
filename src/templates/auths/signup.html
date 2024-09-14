@@ -2,9 +2,10 @@
 {% block title %}Signup{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+<script src="{{ url_for('static', filename='js/signup.js') }}" defer></script>
 {% endblock %}
 {% block content %}
-<div class="signup-container">
+<div class="signup-card">
     <h2 class="signup-title">Create an Account</h2>
     <form method="post" class="signup-form">
         <div class="form-group">
@@ -28,17 +29,22 @@
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <div id="password-strength" class="strength-meter"></div>
         </div>
         <div class="form-group">
             <label for="confirm_password">Confirm Password</label>
             <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+            <div id="password-match" class="match-status"></div>
         </div>
-        <div class="form-group">
+        <div class="form-group form-check">
+            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts">
             <label for="receive_email_alerts">Receive Email Alerts</label>
-            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts" class="form-control">
         </div>
         <button type="submit" class="btn btn-primary">Sign Up</button>
     </form>
     <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/check_password.js') }}" defer></script>
 {% endblock %}

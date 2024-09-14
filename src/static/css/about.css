@@ -2,10 +2,13 @@
 body {
     background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Soft gradient background */
     font-family: 'Roboto', sans-serif; /* Modern font */
+    color: #2c3e50; /* Text color */
 }
 
+/* Container for Layout */
 .container {
-    max-width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* Card Design */
@@ -77,4 +80,16 @@ hr {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* List Styles */
+.list-group-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.list-group-item:not(:last-child) {
+    margin-bottom: 5px;
 }

@@ -1,8 +1,13 @@
 <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card cpu-card bg-cpu" data-cpu-frequency="{{ system_info['cpu_frequency']}}">
-        <div class="card-body">
-            <h5 class="card-title">CPU Critical Temperature <i class="fas fa-microchip"></i></h5>
-            <p class="card-text fs-4">{{ system_info['critical_temp']}} &deg;C</p>
+    <div class="card cpu-high-temp-card bg-cpu shadow-sm" data-cpu-high-temp="{{ system_info['high_temp'] }}">
+        <div class="card-body d-flex flex-column align-items-center">
+            <h5 class="card-title mb-3">CPU High Temperature <i class="fas fa-microchip"></i></h5>
+            <p class="card-text fs-4 high-temp-value" data-bs-toggle="tooltip" title="Current CPU high temperature">
+                {{ system_info['high_temp'] }} &deg;C
+            </p>
+            <div class="high-temp-indicator mt-3">
+                <div class="high-temp-bar" style="width: {{ system_info['critical_temp'] }}%;"></div>
+            </div>
         </div>
     </div>
 </div>

@@ -1,0 +1,11 @@
+{% if card_settings.is_user_card_enabled %}
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card user-card bg-username shadow-sm">
+        <div class="card-body text-center">
+            <h5 class="card-title">Installed OS <i class="fa-solid fa-server"></i></h5>
+            <p class="card-text fs-5"><i class="fa-brands fa-{{ system_info['os_info']['os_name']|lower }}"></i>
+                {{ system_info['os_info']['os_full_name'] }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}

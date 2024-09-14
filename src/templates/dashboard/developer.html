@@ -9,16 +9,18 @@
 <div class="row">    
         <!-- Container for positioning the select input on the right -->
         {% include 'card_comp/other/username.html' %}
-        <!-- {% include 'card_comp/other/server_node.html' %} -->
-        {% include 'card_comp/other/boot_time.html' %}{% include 'card_comp/battery/percentage.html' %}{% include
-        'card_comp/cpu/core.html' %}{% include 'card_comp/cpu/usages.html' %}{% include
-        'card_comp/cpu/current_temp.html' %}{% include 'card_comp/memory/dashboard_memory.html' %}{% include
-        'card_comp/memory/usage.html' %}{% include 'card_comp/disk/usage.html' %}{% include
+        {% include 'card_comp/other/os_info.html' %}
+        
+        {% include 'card_comp/battery/percentage.html' %}
+        {% include 'card_comp/cpu/core.html' %}{% include 'card_comp/cpu/usages.html' %}{% include
+        'card_comp/cpu/current_temp.html' %}{% include
+        'card_comp/memory/usage.html' %}{% include 'card_comp/disk/usage.html' %}
+        {% include 'card_comp/other/boot_time.html' %}{% include
         'card_comp/other/uptime.html' %}{% include 'card_comp/network/stats.html' %}{% include
         'card_comp/other/speedtest.html' %} </div>  
 </div>
 {% endblock %}
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/battery_card.js')}}"></script>
+<script src="{{ url_for('static', filename='js/colour_card.js')}}"></script>
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
 {% endblock %}

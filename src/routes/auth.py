@@ -31,8 +31,9 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        remember_me = request.form.get("remember_me") == "on"  # TODO: Implement remember me
         user = UserProfile.query.filter_by(username=username).first()
-
+    
         if user and check_password_hash(user.password, password):
             login_user(user)
             # Check if the user has changed the default password

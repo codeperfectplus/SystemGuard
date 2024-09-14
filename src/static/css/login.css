@@ -1,24 +1,34 @@
 .login-container {
     max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin-top: 50px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 .login-title {
     font-size: 28px;
     color: #343a40;
     margin-bottom: 20px;
+    position: relative;
+}
+
+.login-title:after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #007bff;
+    margin: 8px auto 0;
 }
 
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 .form-group {
@@ -31,32 +41,58 @@
     font-weight: 600;
     color: #495057;
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.form-group label i {
+    margin-right: 8px;
 }
 
 .form-group input[type="text"],
 .form-group input[type="password"] {
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     background-color: #ffffff;
     font-size: 16px;
-    width: 100%;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.form-check input {
+    margin-right: 10px;
 }
 
 .btn-primary {
-    padding: 10px;
+    padding: 12px;
     background-color: #007bff;
     color: #ffffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
-    transition: background-color 0.3s ease;
-    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .btn-primary:hover {
     background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
 }
 
 @media (max-width: 576px) {
@@ -66,10 +102,6 @@
 
     .login-title {
         font-size: 24px;
-    }
-
-    .btn-primary {
-        width: 100%;
     }
 }
 
@@ -86,4 +118,15 @@
 
 .signup-link a:hover {
     text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
