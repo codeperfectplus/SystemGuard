@@ -9,15 +9,19 @@
     {% include 'ext/message.html' %}
     <form method="post" class="login-form">
         <div class="form-group">
-            <label for="username">Username:</label>
+            <label for="username"><i class="fas fa-user"></i> Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
         </div>
         <div class="form-group">
-            <label for="password">Password:</label>
+            <label for="password"><i class="fas fa-lock"></i> Password</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
         </div>
+        <div class="form-group form-check">
+            <input type="checkbox" id="remember_me" name="remember_me">
+            <label for="remember_me">Remember Me</label>
+        </div>
         <div class="form-group">
-            <input type="submit" value="Login" class="btn btn-primary">
+            <input type="submit" value="Login" class="btn btn-primary btn-block">
         </div>
     </form>
     <p class="signup-link">Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>.</p>

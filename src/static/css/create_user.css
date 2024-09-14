@@ -1,30 +1,35 @@
+/* Container styling */
 .add-user-container {
-    padding: 30px;
-    max-width: 600px;
-    margin: 0 auto;
+    padding: 40px;
+    max-width: 650px;
+    margin: 50px auto;
     background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .page-title {
-    margin-bottom: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
+    margin-bottom: 30px;
+    font-size: 26px;
+    font-weight: 700;
     text-align: center;
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px;
+    padding: 15px;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+/* Form styling */
+.user-form .form-group {
+    margin-bottom: 20px;
 }
 
 label {
     font-size: 16px;
+    font-weight: 500;
     color: #333;
+    display: inline-block;
+    margin-bottom: 8px;
 }
 
 input[type="text"],
@@ -32,29 +37,61 @@ input[type="email"],
 input[type="password"],
 select {
     font-size: 16px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
     width: 100%;
     box-sizing: border-box;
 }
 
 input[type="checkbox"] {
-    margin-right: 10px;
+    width: 18px;
+    height: 18px;
 }
 
-button {
+.user-form .form-check-input {
+    margin-right: 8px;
+}
+
+.user-form button {
     background-color: #007bff;
     color: white;
     padding: 12px;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 6px;
     font-size: 16px;
+    font-weight: 600;
     transition: background-color 0.3s ease;
     width: 100%;
 }
 
-button:hover {
+.user-form button:hover {
     background-color: #0056b3;
+}
+
+.user-form button i {
+    margin-right: 8px;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .add-user-container {
+        padding: 30px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        font-size: 14px;
+    }
+
+    .user-form button {
+        font-size: 14px;
+        padding: 10px;
+    }
 }

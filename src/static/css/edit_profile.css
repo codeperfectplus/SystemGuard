@@ -1,49 +1,109 @@
-/* static/css/edit_profile.css */
-
-form {
+/* Container styling */
+.edit-profile-container {
     max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #f7f7f7;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 50px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h2 {
+    font-size: 30px;
+    color: #007bff;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.user-info {
+    color: #6c757d;
+    font-size: 16px;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+/* Form styling */
+.edit-form {
+    width: 100%;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    text-align: left;
 }
 
 .form-group label {
-    font-weight: bold;
     display: block;
-    margin-bottom: 5px;
+    font-size: 16px;
+    color: #343a40;
+    margin-bottom: 10px;
 }
 
-.form-group input {
+.form-group input, .form-group select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
 }
 
-.form-group input[type="checkbox"] {
-    display: inline-block;
-    width: auto;
-    margin-left: 10px;
+.form-group input:focus, .form-group select:focus {
+    border-color: #007bff;
 }
 
-.btn {
+.form-check-input {
+    margin-right: 10px;
+}
+
+/* Button styling */
+.btn-action {
     display: inline-block;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 4px;
+    width: 100%;
+    padding: 15px;
     background-color: #007bff;
-    color: white;
+    color: #fff;
     border: none;
-    cursor: pointer;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
-.btn:hover {
+.btn-action:hover {
     background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
+/* Flash messages styling */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-messages .alert {
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Form icon styling */
+.form-group i {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 18px;
 }

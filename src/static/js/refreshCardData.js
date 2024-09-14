@@ -109,6 +109,8 @@ function refreshData() {
         updateCard('.cpu-card-usage', 'cpu_percent', data, '%');   // CPU Usage
         updateCard('.network-received', 'network_received', data, "MB");  // Network Received
         updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
+        updateCard('.network-stats', 'network_stats', data, "MB");  // Network Sent
+        updateCard('.battery-card', 'battery_percent', data, "%");  // Battery
     });
 }
 

@@ -45,7 +45,7 @@ def change_password():
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))
 
-    return render_template('users/change_password.html')
+    return render_template('users/change_password.html', user=current_user)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
