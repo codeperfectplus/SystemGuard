@@ -1,6 +1,17 @@
 import os
 import subprocess
 
+def get_system_username():
+    """
+    Get the current system username.
+    ---
+    Parameters:
+    ---
+    Returns:
+        str: System username.
+    """
+    return os.getlogin()
+
 def get_system_node_name():
     """ 
     Get the system node name.

@@ -21,6 +21,7 @@ def create_user():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        profession = request.form['profession']
         user_level = request.form.get('user_level', 'user')
         receive_email_alerts = request.form.get('receive_email_alerts', 'on') == 'on'
 
@@ -33,6 +34,7 @@ def create_user():
             username=username,
             email=email,
             password=generate_password_hash(password),
+            profession=profession,
             user_level=user_level,
             receive_email_alerts=receive_email_alerts
         )

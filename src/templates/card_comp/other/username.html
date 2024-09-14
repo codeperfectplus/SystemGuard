@@ -3,8 +3,8 @@
     <div class="card user-card bg-username shadow-sm">
         <div class="card-body text-center">
             <h5 class="card-title">System Node <i class="fas fa-user"></i></h5>
-            <p class="card-text fs-5 mb-2">IP Address: {{ system_ip_address }}</p>
-            <p class="card-text fs-5">Username: {{ system_info['username'] }}</p>
+            <p class="card-text fs-5 mb-2">{{ system_info['system_username'] }}@{{ system_ip_address }}</p>
+            <!-- <p class="card-text fs-5">{{ system_info['system_username'] }}@{{ system_info['nodename'] }}</p> -->
         </div>
     </div>
 </div>

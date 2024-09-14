@@ -103,13 +103,12 @@ function refreshData() {
         }
         updateCard('.bg-disk', 'disk_percent', data);         // Disk Usage
         updateCard('.cpu-temp-card', 'current_temp', data, ' °C');  // CPU Temperature
-        updateCard('.bg-dashboard-memory', 'dashboard_memory_usage', data);  // Memory Usage
         updateCard('.bg-memory', 'memory_percent', data, '%');  // Memory Usage
         updateCard('.cpu-frequency', 'cpu_frequency', data, " MHz");  // CPU Frequency
-        updateCard('.cpu-card-usage', 'cpu_percent', data, '%');   // CPU Usage
+        updateCard('.cpu-usage-card', 'cpu_percent', data, '%');   // CPU Usage
         updateCard('.network-received', 'network_received', data, "MB");  // Network Received
         updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
-        updateCard('.network-stats', 'network_stats', data, "MB");  // Network Sent
+        updateCard('.network-stats-card', 'network_stats', data, "");  // Network Sent
         updateCard('.battery-card', 'battery_percent', data, "%");  // Battery
         updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
         updateCard('.network-received', 'network_received', data, "MB");  // Network Received

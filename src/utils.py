@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from src.logger import logger
 from src.models import GeneralSettings
-from src.helper import get_system_node_name, get_ip_address
+from src.helper import get_system_node_name, get_ip_address, get_system_username
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -453,7 +453,7 @@ def _get_system_info():
         'network_sent': network_sent,
         'battery_percent': round(battery_info.percent, 1) if battery_info else 0,
         'network_received': network_received,
-        "network_stats" : f"D: {network_received} MB / U: {network_sent} MB",
+        "network_stats" : f"D: {network_sent} MB / U: {network_received} MB",
         'dashboard_memory_usage': get_flask_memory_usage(),
         'cpu_frequency': get_cpu_frequency(),
         'current_temp': get_cpu_temp()[0],
@@ -472,7 +472,9 @@ def get_system_info():
     Returns:
         dict: System information dictionary with various system metrics.
     """
-    username = get_cached_value('username', get_system_node_name)
+    # get system username
+    system_username = get_cached_value('system_username', get_system_username)
+    nodename = get_cached_value('nodename', get_system_node_name)
     ipv4_address = get_cached_value('ipv4', lambda: get_ip_address())
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
@@ -482,7 +484,8 @@ def get_system_info():
     
     # Prepare system information dictionary
     info = {
-        'username': username,
+        "system_username": system_username,
+        'nodename': nodename,
         'cpu_core': get_cpu_core_count(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
         'process_count': len(psutil.pids()),

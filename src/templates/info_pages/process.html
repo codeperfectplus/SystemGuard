@@ -18,7 +18,7 @@
 
     <form method="post" class="form-control">
         {% if session.get('sudo_password') %}
-        <button type="clear" name="clear_session">Clear Session</button>
+        <button type="clear" name="clear_session">Deauthenticate</button>
         {% else %}
         <input type="text" id="sudo_password" name="sudo_password" placeholder="Enter sudo password">
         <button type="submit">Authenticate</button>

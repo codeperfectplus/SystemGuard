@@ -37,13 +37,13 @@ function applyGradient(element, value, thresholds, isReversed = false) {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Battery Card (High percentage is good)
-    const batteryCard = document.querySelector('.battery-card');
-    const batteryPercent = parseInt(batteryCard.getAttribute('data-battery'), 10);
-    applyGradient(batteryCard, batteryPercent, {
-        high: 75,
-        mediumHigh: 50,
-        mediumLow: 25
-    }, false);  // `false` for normal logic (high percentage is good)
+    // const batteryCard = document.querySelector('.battery-card');
+    // const batteryPercent = parseInt(batteryCard.getAttribute('data-battery'), 10);
+    // applyGradient(batteryCard, batteryPercent, {
+    //     high: 75,
+    //     mediumHigh: 50,
+    //     mediumLow: 25
+    // }, false);  // `false` for normal logic (high percentage is good)
 
     // CPU Usage Card (Low usage percentage is good)
     // const cpuUsageCard = document.querySelector('.cpu-usage-card');
@@ -55,12 +55,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // }, true);  // `true` to reverse logic (low percentage is good)
 
     // CPU Temperature Card (Low temperature is good)
-    const cpuTemperatureCard = document.querySelector('.cpu-temp-card');
-    const cpuTemperature = parseInt(cpuTemperatureCard.getAttribute('data-cpu-temp'), 10);
-    // TODO: take max temperature from the system and set it as the high value
-    applyGradient(cpuTemperatureCard, cpuTemperature, {
-        high: 90,
-        mediumHigh: 70,
-        mediumLow: 60
-    }, true);  // `true` to reverse logic (low temperature is good)
+    // const cpuTemperatureCard = document.querySelector('.cpu-temp-card');
+    // const cpuTemperature = parseInt(cpuTemperatureCard.getAttribute('data-cpu-temp'), 10);
+    // // TODO: take max temperature from the system and set it as the high value
+    // applyGradient(cpuTemperatureCard, cpuTemperature, {
+    //     high: 90,
+    //     mediumHigh: 70,
+    //     mediumLow: 60
+    // }, true);  // `true` to reverse logic (low temperature is good)
 });
