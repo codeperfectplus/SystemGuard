@@ -31,17 +31,23 @@ def check_installation_information():
     # when .git exists, return True and which branch is checked out
 
     # check if .git exists
+    output = {
+        "is_git_repo": False,
+        "git_branch": None,
+        "git_commit": None,
+        "git_repo": None,
+    }
     if not os.path.exists(".git"):
-        return False, None
+        return output
     
     # read the HEAD file    
     with open(".git/HEAD", "r") as f:
         head = f.read().strip()
 
     # check if HEAD is a branch
-
     if head.startswith("ref: refs/heads/"):
         branch = head.replace("ref: refs/heads/", "")
-        return True, branch
+        output["is_git_repo"] = True
+        output["git_branch"] = branch
     
-    return True, None
+    return output

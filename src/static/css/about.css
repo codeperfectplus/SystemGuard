@@ -1,122 +1,80 @@
-/* General Container Styling */
-.container {
-    max-width: 100%;
-    padding: 2rem 1.5rem;
-    background-color: #f4f7f9;
+/* Global Styling */
+body {
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Soft gradient background */
+    font-family: 'Roboto', sans-serif; /* Modern font */
 }
 
-/* Card Styling */
+.container {
+    max-width: 100%;
+}
+
+/* Card Design */
 .card {
-    background-color: #ffffff;
-    color: #2c3e50;
-    border-radius: 16px;
-    margin-top: 3rem;
-    padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff; /* Clean background */
+    color: #2c3e50; /* Dark text */
+    border-radius: 20px; /* Smooth rounded corners */
+    margin-top: 2rem;
+    transition: transform 0.4s ease, box-shadow 0.4s ease; /* Smooth transitions */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Elevated shadow */
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px); /* Lift effect on hover */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* Deeper shadow */
 }
 
-/* Typography Styling */
+.animate-card {
+    animation: fadeInUp 1s ease; /* Card animation on load */
+}
+
 .card-title {
-    font-size: 2.7rem;
-    font-weight: 700;
-    color: #34495e;
+    font-size: 2.8rem; /* Larger title font */
+    font-weight: bold;
+    color: #2980b9; /* Brighter title color */
 }
 
-.card-subtitle {
-    font-size: 1.3rem;
-    color: #7f8c8d;
+.text-gradient {
+    background: linear-gradient(45deg, #3498db, #8e44ad); /* Gradient for title text */
+    -webkit-background-clip: text;
+    color: transparent;
 }
 
-.card-text {
-    font-size: 1.2rem;
-    line-height: 1.8;
-    color: #34495e;
+/* Info Sections */
+.info-section {
+    margin-top: 1.5rem;
+    text-align: center;
 }
 
-/* Enhanced Button Styling */
-.btn-outline-primary {
-    border: 2px solid #2980b9;
-    color: #2980b9;
-    font-size: 1.1rem;
-    padding: 0.6rem 1.5rem;
-    transition: all 0.3s ease;
-    border-radius: 50px;
-}
-
-.btn-outline-primary:hover {
-    background-color: #2980b9;
-    color: #ffffff;
-}
-
-/* Badge Styling */
-.badge {
-    font-size: 1rem;
-    padding: 0.6em 1em;
-    border-radius: 12px;
-}
-
-.badge.bg-warning {
-    background-color: #f1c40f;
-    color: #2c3e50;
-}
-
-.badge.bg-success {
-    background-color: #2ecc71;
-    color: #ffffff;
-}
-
-/* Responsive Layout */
-@media (max-width: 768px) {
-    .card-title {
-        font-size: 2.2rem;
-    }
-
-    .card-subtitle {
-        font-size: 1.1rem;
-    }
-
-    .card-text {
-        font-size: 1rem;
-    }
-
-    .btn-outline-primary {
-        font-size: 1rem;
-    }
-}
-
-/* Divider Styling */
 hr {
+    border-top: 1px solid #bdc3c7; /* Soft gray separator */
+    margin: 1.5rem 0;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #3498db;
     border: none;
-    border-top: 2px solid #ecf0f1;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-}
-
-/* Author and Year Section */
-.d-flex {
-    margin-top: 1rem;
-}
-
-.d-flex h5 {
-    font-size: 1.3rem;
-    color: #2c3e50;
-}
-
-.d-flex p {
-    font-size: 1.1rem;
-    color: #7f8c8d;
-}
-
-/* GitHub Section */
-a.btn {
-    display: inline-block;
+    padding: 12px 25px;
     font-size: 1.2rem;
-    padding: 0.6rem 1.8rem;
-    margin-top: 1.2rem;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-5px); /* Button lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Elevated shadow on hover */
+    background-color: #2c3e50; /* Darker hover background */
+    color: #fff;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

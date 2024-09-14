@@ -9,6 +9,7 @@ from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smtp_email
 from src.logger import logger
 from src.utils import get_os_release_info, get_os_info
+from src.helper import check_installation_information
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -89,7 +90,9 @@ def send_email_page():
 
 @app.route("/about")
 def about():
-    return render_template("other/about.html")
+    installation_info = check_installation_information()
+    return render_template("other/about.html", 
+                            installation_info=installation_info)
 
 
 @app.route('/os_info', methods=['GET'])

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 from src.logger import logger
-from src.helper import get_system_node_name, get_ip_address, check_installation_information
+from src.helper import get_system_node_name, get_ip_address
 # from src.utils import get_ip_address, get_system_node_name
 
 app = Flask(__name__)
@@ -20,7 +20,6 @@ PROJECT_URL = f"https://github.com/codeperfectplus/{APP_NAME}"
 CONTACT_EMAIL = ""
 SYSTEM_NAME = get_system_node_name()
 SYSTEM_IP_ADDRESS = get_ip_address()
-IS_GIT_REPO, GIT_BRANCH = check_installation_information()
 
 HOME_DIR = os.path.expanduser("~")
 DB_DIR = os.path.join(HOME_DIR, ".database")
@@ -47,8 +46,6 @@ app.jinja_env.globals.update(
     contact_email=CONTACT_EMAIL,
     system_name=SYSTEM_NAME,
     system_ip_address=SYSTEM_IP_ADDRESS,
-    is_git_repo=IS_GIT_REPO,
-    git_branch=GIT_BRANCH,
 )
 
 def get_app_info():
@@ -64,6 +61,4 @@ def get_app_info():
         "contact_email": CONTACT_EMAIL,
         "system_name": SYSTEM_NAME,
         "system_ip_address": SYSTEM_IP_ADDRESS,
-        "is_git_repo": IS_GIT_REPO,
-        "git_branch": GIT_BRANCH,
     }
