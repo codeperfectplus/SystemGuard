@@ -1,24 +1,20 @@
-import datetime
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings
-from src.config import app, db
-from src.routes.helper import get_email_addresses
+from src.models import GeneralSettings
+from src.config import app
+from src.routes.helper.common_helper import get_email_addresses
 from src.scripts.email_me import send_smtp_email
-from src.logger import logger
 from src.utils import get_os_release_info, get_os_info
 from src.helper import check_installation_information
+from src.routes.helper.common_helper import admin_required
 
 other_bp = blueprints.Blueprint('other', __name__)
 
 @app.route('/terminal', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def terminal():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/403.html")
     if request.method == 'POST':
         command = request.form.get('command')
         if command:
@@ -33,13 +29,8 @@ def terminal():
 
 
 @app.route("/send_email", methods=["GET", "POST"])
-@login_required
+@admin_required
 def send_email_page():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        flash("User level for this account is: " + current_user.user_level, "danger")
-        flash("Please contact your administrator for more information.", "danger")
-        return render_template("error/403.html")
     receiver_email = get_email_addresses(user_level='admin', receive_email_alerts=True)    
     general_settings = GeneralSettings.query.first()
     if general_settings:

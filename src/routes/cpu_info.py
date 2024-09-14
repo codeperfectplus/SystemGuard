@@ -1,21 +1,16 @@
-import psutil
-from flask import render_template, blueprints, flash
+from flask import render_template, blueprints
 
 from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cpu_core_count, get_cpu_frequency, cpu_usage_percent, get_cpu_temp, get_cached_value
-from src.models import PageToggleSettings, SystemInformation
-
+from src.routes.helper.common_helper import check_page_toggle
 cpu_info_bp = blueprints.Blueprint("cpu_usage", __name__)
 
 @app.route("/cpu_usage")
 @login_required
+@check_page_toggle("is_cpu_info_enabled")
 def cpu_usage():
-    page_toggles_settings = PageToggleSettings.query.first()
-    if not page_toggles_settings.is_cpu_info_enabled:
-        flash("You do not have permission to view this page.", "danger")
-        return render_template("error/403.html")
     
     current_temp, high_temp, critical_temp = get_cpu_temp()
     cpu_core = get_cached_value("cpu_core", get_cpu_core_count)

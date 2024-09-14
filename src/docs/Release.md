@@ -6,6 +6,22 @@
 - Release Date: September 20, 2024
 - Status: In Development
 
+### Key Features
+
+- **Admin Privileges:** Improved User/Admin roles for better access control.
+- **User Settings:** Added some basic user settings for user customization.
+- **UI Enhancements:** Improved control panel UI for better user experience.
+- **Ux Improvements:** User can see the installation medium, branch name, and version in about page.
+- **Os Detection:** Added OS detection for better compatibility.
+
+### Fixes
+
+- **Sudo Issue:** Fixed issue with sudo implementation and command execution.
+
+### Known Issues
+
+- **Utility Functionality:** Some utility functions are still in development and may not be fully functional.
+
 ## SystemGuard v1.0.4 Release
 
 - Version: v1.0.4

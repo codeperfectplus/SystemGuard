@@ -1,24 +1,22 @@
 import os
 import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
-from flask_login import login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import current_user
+from werkzeug.security import generate_password_hash
 
 from src.config import app, db
 from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
-from src.routes.helper import get_email_addresses
+from src.routes.helper.common_helper import get_email_addresses
 from src.config import get_app_info
+from src.routes.helper.common_helper import admin_required
 
-user_bp = blueprints.Blueprint('user', __name__)
+user_management_bp = blueprints.Blueprint('user_management', __name__)
 
 @app.route('/create_user', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def create_user():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/403.html")
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -80,19 +78,13 @@ def create_user():
     return render_template('users/create_user.html')
 
 @app.route('/users')
-@login_required
+@admin_required
 def view_users():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/403.html")
-
-    # Fetch all users from the database
     users = UserProfile.query.all()
-
     return render_template('users/view_users.html', users=users)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def change_user_settings(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
 
@@ -118,14 +110,9 @@ def change_user_settings(username):
     return render_template('users/change_user.html', user=user)
 
 @app.route('/delete_user/<username>', methods=['POST'])
-@login_required
+@admin_required
 def delete_user(username):
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to perform this action.", "danger")
-        return redirect(url_for('view_users'))  # Redirect to the users page
-
     user = UserProfile.query.filter_by(username=username).first_or_404()
-
     # Get Admin Emails with Alerts Enabled:
     admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
     if admin_email_address:
@@ -145,70 +132,3 @@ def delete_user(username):
     flash(f'User {username} has been deleted successfully!', 'success')
     return redirect(url_for('view_users'))
 
-# View Profile Route
-@app.route('/profile', methods=['GET'])
-@login_required
-def view_profile():
-    """
-    This route displays the user's profile information.
-    """
-    user = current_user  # Get the currently logged-in user
-    return render_template('users/view_profile.html', user=user)
-
-# Change Password Route
-@app.route('/change_password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    """
-    This route allows users to change their password.
-    """
-    if request.method == 'POST':
-        old_password = request.form['old_password']
-        new_password = request.form['new_password']
-        confirm_password = request.form['confirm_password']
-
-        # Check if the old password is correct
-        if not check_password_hash(current_user.password, old_password):
-            flash('Old password is incorrect.', 'danger')
-            return redirect(url_for('change_password'))
-
-        # Check if the new password matches the confirmation
-        if new_password != confirm_password:
-            flash('New passwords do not match.', 'danger')
-            return redirect(url_for('change_password'))
-
-        # Update the user's password
-        current_user.password = generate_password_hash(new_password)
-        db.session.commit()
-
-        flash('Password changed successfully!', 'success')
-        return redirect(url_for('view_profile'))
-
-    return render_template('users/change_password.html')
-
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    """
-    This route allows the user to edit their profile information.
-    """
-    user = current_user  # Get the currently logged-in user
-
-    if request.method == 'POST':
-        new_username = request.form['username']
-        new_email = request.form['email']
-        profession = request.form['profession']
-        receive_email_alerts = 'receive_email_alerts' in request.form
-
-        # Update user information
-        user.username = new_username
-        user.email = new_email
-        user.profession = profession
-        user.receive_email_alerts = receive_email_alerts
-
-        db.session.commit()
-
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('view_profile'))
-
-    return render_template('users/edit_profile.html', user=user)

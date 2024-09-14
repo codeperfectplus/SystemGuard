@@ -1,24 +1,19 @@
 from flask import render_template, blueprints, flash, redirect, url_for, request
-from flask_login import login_required, current_user
 
 from src.config import app, db
-from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
 from src.models import  DashboardNetworkSettings
+from src.routes.helper.common_helper import admin_required
 
 network_bp = blueprints.Blueprint('network', __name__)
 
-
-from flask import render_template
-from flask_login import login_required
-
 @app.route('/network', methods=['GET'])
-@login_required
+@admin_required
 def dashboard_network():
     groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
     return render_template('network/dashboard_network.html', groups=groups)
 
-
 @app.route('/add_server', methods=['GET', 'POST'])
+@admin_required
 def add_server():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -44,12 +39,8 @@ def add_server():
     return render_template('network/add_server.html')
 
 @app.route('/edit_server/<int:server_id>', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def edit_server(server_id):
-    if current_user.user_level != 'admin':
-        flash('You are not authorized to access this page.', 'danger')
-        return render_template("error/403.html")
-
     server = DashboardNetworkSettings.query.get_or_404(server_id)
     if request.method == 'POST':
         server.name = request.form['name']
@@ -63,11 +54,8 @@ def edit_server(server_id):
     return render_template('network/edit_server.html', server=server)
 
 @app.route('/delete_server/<int:server_id>', methods=['POST'])
-@login_required
+@admin_required
 def delete_server(server_id):
-    if current_user.user_level != 'admin':
-        flash('You are not authorized to access this page.', 'danger')
-        return render_template("error/403.html")
     server = DashboardNetworkSettings.query.get_or_404(server_id)
     db.session.delete(server)
     db.session.commit()
