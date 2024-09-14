@@ -111,6 +111,8 @@ function refreshData() {
         updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
         updateCard('.network-stats', 'network_stats', data, "MB");  // Network Sent
         updateCard('.battery-card', 'battery_percent', data, "%");  // Battery
+        updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
+        updateCard('.network-received', 'network_received', data, "MB");  // Network Received
     });
 }
 

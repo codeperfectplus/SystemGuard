@@ -5,12 +5,6 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-}
-
 /* Container for Layout */
 .controls-container {
     display: flex;
@@ -21,6 +15,16 @@ body {
 .controls-container select,
 .controls-container button {
     margin-right: 10px; /* Space between select and button */
+}
+
+.page-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+    width: 100%; /* Ensure it takes full width */
+    display: flex;
+    justify-content: center; /* Center the text horizontally */
 }
 
 /* Style for Select Dropdown */
@@ -72,7 +76,6 @@ button i {
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .selector-container {
