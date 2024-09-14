@@ -21,14 +21,29 @@
                     </h4>
                     <p class="card-text lead">{{ description }}</p>
                     <hr>
-                    <div class="d-flex justify-content-between">
+                    <div class="d-flex justify-content-between text-center">
                         <div>
                             <h5 class="card-title">Author</h5>
                             <p class="card-text mb-0">{{ author }}</p>
                         </div>
+                    </div>
+                    <div class="d-flex justify-content-between text-center">
                         <div>
                             <h5 class="card-title">Year</h5>
                             <p class="card-text mb-0">{{ year }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between text-center">
+                        <div>
+                            <h5 class="card-title">Installed Mode</h5>
+                            {% if is_git_repo %}
+                            <p class="card-text mb-0">Git Repository</p>   
+                            <br>
+                            <h5 class="card-title">Git Branch</h5>                         
+                            <p class="card-text mb-0">{{ git_branch }}</p>
+                            {% else %}
+                            <h5 class="card-title">Installed via Release</h5>
+                            {% endif %}
                         </div>
                     </div>
                     <hr>

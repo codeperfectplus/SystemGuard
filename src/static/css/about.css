@@ -1,60 +1,122 @@
-/* CSS for modern and clean design */
-
+/* General Container Styling */
 .container {
     max-width: 100%;
+    padding: 2rem 1.5rem;
+    background-color: #f4f7f9;
 }
 
+/* Card Styling */
 .card {
-    background-color: #f9f9f9; /* Light background */
-    color: #2c3e50; /* Dark text */
-    border-radius: 12px; /* Smooth rounded corners */
-    margin-top: 2rem; /* Add space above the card */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+    background-color: #ffffff;
+    color: #2c3e50;
+    border-radius: 16px;
+    margin-top: 3rem;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Elevated shadow */
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
+/* Typography Styling */
 .card-title {
-    font-size: 2.5rem; /* Larger font size for titles */
-    font-weight: bold;
-    color: #34495e; /* Slightly darker text for titles */
+    font-size: 2.7rem;
+    font-weight: 700;
+    color: #34495e;
 }
 
 .card-subtitle {
-    font-size: 1.2rem; /* Consistent subtitle size */
-    color: #7f8c8d; /* Muted text color */
+    font-size: 1.3rem;
+    color: #7f8c8d;
 }
 
 .card-text {
-    font-size: 1.1rem; /* Regular text size */
-    line-height: 1.6; /* Improved line height for readability */
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #34495e;
 }
 
+/* Enhanced Button Styling */
 .btn-outline-primary {
-    border-color: #2980b9; /* Adjust button border color */
-    color: #2980b9; /* Match button text color */
+    border: 2px solid #2980b9;
+    color: #2980b9;
+    font-size: 1.1rem;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+    border-radius: 50px;
 }
 
 .btn-outline-primary:hover {
-    background-color: #2980b9; /* Solid color on hover */
-    color: #fff; /* White text */
+    background-color: #2980b9;
+    color: #ffffff;
 }
 
-.text-primary {
-    color: #3498db; /* Link color */
-}
-
-hr {
-    border-top: 1px solid #ecf0f1; /* Light gray border for separators */
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
+/* Badge Styling */
 .badge {
-    font-size: 0.9rem;
-    padding: 0.5em 0.7em;
-    border-radius: 10px;
+    font-size: 1rem;
+    padding: 0.6em 1em;
+    border-radius: 12px;
+}
+
+.badge.bg-warning {
+    background-color: #f1c40f;
+    color: #2c3e50;
+}
+
+.badge.bg-success {
+    background-color: #2ecc71;
+    color: #ffffff;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .card-title {
+        font-size: 2.2rem;
+    }
+
+    .card-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .card-text {
+        font-size: 1rem;
+    }
+
+    .btn-outline-primary {
+        font-size: 1rem;
+    }
+}
+
+/* Divider Styling */
+hr {
+    border: none;
+    border-top: 2px solid #ecf0f1;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Author and Year Section */
+.d-flex {
+    margin-top: 1rem;
+}
+
+.d-flex h5 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+}
+
+.d-flex p {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+}
+
+/* GitHub Section */
+a.btn {
+    display: inline-block;
+    font-size: 1.2rem;
+    padding: 0.6rem 1.8rem;
+    margin-top: 1.2rem;
 }
