@@ -7,24 +7,24 @@ function getGradientColor(value, thresholds, isReversed = false) {
     // If reversed, swap the color logic
     if (isReversed) {
         if (value >= thresholds.high) {
-            return 'linear-gradient(135deg, #d32f2f, #f44336)';  // Red (high value is bad)
+            return 'linear-gradient(135deg, #ff0000, #ff8a80)';  // Red (high value is bad)
         } else if (value >= thresholds.mediumHigh) {
-            return 'linear-gradient(135deg, #ff9800, #ff7043)';  // Orange
+            return 'linear-gradient(135deg, #ff9800, #ffcc80)';  // Orange
         } else if (value >= thresholds.mediumLow) {
-            return 'linear-gradient(135deg, #ffeb3b, #fbc02d)';  // Yellow
+            return 'linear-gradient(135deg, #ffeb3b, #fdd835)';  // Yellow
         } else {
-            return 'linear-gradient(135deg, #4caf50, #76c7c0)';  // Green (low value is good)
+            return 'linear-gradient(135deg, #4caf50, #a5d6a7)';  // Green (low value is good)
         }
     } else {
         // Normal logic (e.g., for battery where high value is good)
         if (value >= thresholds.high) {
-            return 'linear-gradient(135deg, #4caf50, #76c7c0)';  // Green (high value is good)
+            return 'linear-gradient(135deg, #4caf50, #a5d6a7)';  // Green (high value is good)
         } else if (value >= thresholds.mediumHigh) {
-            return 'linear-gradient(135deg, #ffeb3b, #fbc02d)';  // Yellow
+            return 'linear-gradient(135deg, #ffeb3b, #fdd835)';  // Yellow
         } else if (value >= thresholds.mediumLow) {
-            return 'linear-gradient(135deg, #ff9800, #ff7043)';  // Orange
+            return 'linear-gradient(135deg, #ff9800, #ffcc80)';  // Orange
         } else {
-            return 'linear-gradient(135deg, #d32f2f, #f44336)';  // Red (low value is bad)
+            return 'linear-gradient(135deg, #ff0000, #ff8a80)';  // Red (low value is bad)
         }
     }
 }
@@ -46,13 +46,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }, false);  // `false` for normal logic (high percentage is good)
 
     // CPU Usage Card (Low usage percentage is good)
-    const cpuUsageCard = document.querySelector('.cpu-card-usage');
-    const cpuUsagePercent = parseInt(cpuUsageCard.getAttribute('data-cpu-usage'), 10);
-    applyGradient(cpuUsageCard, cpuUsagePercent, {
-        high: 90,
-        mediumHigh: 70,
-        mediumLow: 60
-    }, true);  // `true` to reverse logic (low percentage is good)
+    // const cpuUsageCard = document.querySelector('.cpu-usage-card');
+    // const cpuUsagePercent = parseInt(cpuUsageCard.getAttribute('data-cpu-usage'), 10);
+    // applyGradient(cpuUsageCard, cpuUsagePercent, {
+    //     high: 90,
+    //     mediumHigh: 70,
+    //     mediumLow: 60
+    // }, true);  // `true` to reverse logic (low percentage is good)
 
     // CPU Temperature Card (Low temperature is good)
     const cpuTemperatureCard = document.querySelector('.cpu-temp-card');

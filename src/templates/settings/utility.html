@@ -27,19 +27,21 @@
                 Session</button>
             {% else %}
             <div class="form-group">
-                <label for="sudo_password">Enter Sudo Password:</label>
+                <label for="sudo_password">Enter Sudo Password</label>
                 <input type="password" class="form-control form-control-lg" id="sudo_password" name="sudo_password"
                     required>
                 <button type="submit" name="action" value="authenticate"
-                    class="btn btn-primary btn-lg btn-block mt-3">Authenticate</button>
+                    class="btn btn-primary btn-lg btn-block mt-3"><i class="fas fa-key"></i>
+                    Enable Sudo Access</button>
             </div>
             {% endif %}
 
             <div class="form-actions text-center">
                 <button type="submit" name="action" value="shutdown"
-                    class="btn btn-danger btn-lg btn-block mb-3">Shutdown Server</button>
-                <button type="submit" name="action" value="reboot" class="btn btn-warning btn-lg btn-block">Reboot
-                    Server</button>
+                    class="btn btn-danger btn-lg btn-block mb-3"><i class="fas fa-power-off"></i>
+                    Shutdown Server</button>
+                <button type="submit" name="action" value="reboot" class="btn btn-warning btn-lg btn-block"><i class="fas fa-sync-alt"></i>
+                    Reboot Server</button>
             </div>
         </form>
     </div>

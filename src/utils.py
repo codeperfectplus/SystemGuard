@@ -477,6 +477,8 @@ def get_system_info():
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
     current_server_time = datetime.datetime.now()
+    os_info = get_cached_value('os_info', get_os_info)
+    os_info.update(get_cached_value('os_release_info', get_os_release_info))
     
     # Prepare system information dictionary
     info = {
@@ -489,6 +491,7 @@ def get_system_info():
         'timestamp': datetime.datetime.now(),
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'timestamp': current_server_time,
+        'os_info': os_info
     }
     # update uptime dictionary
     _info = _get_system_info()

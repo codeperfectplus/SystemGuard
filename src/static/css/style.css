@@ -135,7 +135,7 @@ body {
 
 /* General Card Styles */
 .card {
-    min-height: 150px;
+    min-height: 140px;
     background: linear-gradient(120deg, #e3f2fd, #bbdefb);
     border: none;
     border-radius: 15px;
@@ -163,6 +163,11 @@ body {
 .cpu-temp-card, .cpu-usage-card, .cpu-core-card, .memory-card, .cpu-frequency-card, .cpu-high-temp-card, .user-card, .battery-card {
     border-radius: 12px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.battery-card, .cpu-usage-card, .cpu-temp-card {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb); /* Default gradient */
+    transition: background 0.3s ease;
 }
 
 .cpu-temp-card:hover, .cpu-usage-card:hover, .cpu-core-card:hover, .memory-card:hover, .cpu-frequency-card:hover, .cpu-high-temp-card:hover, .user-card:hover, .battery-card:hover {
