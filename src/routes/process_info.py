@@ -7,29 +7,20 @@ from flask import (
     flash,
     session,
     blueprints,
-    abort,
 )
 from flask_login import current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
-from src.models import PageToggleSettings
 from src.scripts.email_me import send_smtp_email
 from src.config import get_app_info
-from src.routes.helper.common_helper import admin_required
+from src.routes.helper.common_helper import admin_required, check_page_toggle
 
 process_bp = blueprints.Blueprint("process", __name__)
 
 @app.route("/process", methods=["GET", "POST"])
+@check_page_toggle("is_process_info_enabled")
 @admin_required
 def process():
-    page_toggles_settings = PageToggleSettings.query.first()
-    if not page_toggles_settings.is_process_info_enabled:
-        flash("You do not have permission to view this page.", "danger")
-        return render_template("error/403.html")
-    if current_user.user_level != "admin":
-        flash("You do not have permission to view this page.", "danger")
-        return abort(403)
-
     # Retrieve number of processes from session or set default
     number_of_processes = session.get("number_of_processes", 50)
     sort_by = request.args.get("sort", "cpu")  # Default to sort by CPU usage

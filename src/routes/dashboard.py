@@ -1,9 +1,9 @@
 import datetime
-from flask import render_template, blueprints, jsonify, redirect, url_for
+from flask import render_template, blueprints, redirect, url_for
 from flask_login import login_required, current_user
 
 from src.config import app
-from src.models import NetworkSpeedTestResult, UserDashboardSettings, UserCardSettings
+from src.models import NetworkSpeedTestResult, UserDashboardSettings
 from src.utils import datetimeformat, get_system_info
 
 dashboard_bp = blueprints.Blueprint("dashboard", __name__)

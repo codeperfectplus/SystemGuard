@@ -1,5 +1,4 @@
 from flask import render_template, blueprints, flash, redirect, url_for, request
-from flask_login import login_required, current_user
 
 from src.config import app, db
 from src.models import  DashboardNetworkSettings
@@ -7,16 +6,11 @@ from src.routes.helper.common_helper import admin_required
 
 network_bp = blueprints.Blueprint('network', __name__)
 
-
-from flask import render_template
-from flask_login import login_required
-
 @app.route('/network', methods=['GET'])
 @admin_required
 def dashboard_network():
     groups = DashboardNetworkSettings.query.all()  # Fetch all dashboard groups
     return render_template('network/dashboard_network.html', groups=groups)
-
 
 @app.route('/add_server', methods=['GET', 'POST'])
 @admin_required

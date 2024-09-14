@@ -1,10 +1,6 @@
-import re
-
-from flask import Flask, render_template, request, blueprints, jsonify
-import subprocess
+from flask import render_template, request, blueprints
 
 from src.config import app
-from src.helper import get_ip_address
 from src.routes.helper.network_helper import handle_network_scan, handle_port_scan
 
 experimental_bp = blueprints.Blueprint('experimental', __name__)

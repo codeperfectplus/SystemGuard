@@ -411,6 +411,20 @@ def get_cached_value(key, fresh_value_func):
 
     return fresh_value
 
+def get_network_io():
+    """
+    Get the network I/O statistics.
+    ---
+    Parameters:
+        None
+    ---
+    Returns:
+        tuple: Network sent and received data in MB.
+    """
+    net_io = psutil.net_io_counters(pernic=False)
+    network_sent = round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1)  # In MB
+    network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)  # In MB
+    return network_sent, network_received
 
 def _get_system_info():
     """ Get system information with caching for certain values and fresh data for others. 
@@ -427,9 +441,8 @@ def _get_system_info():
     battery_info = psutil.sensors_battery()
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
-    net_io = psutil.net_io_counters(pernic=False)
-    network_sent = round(net_io.bytes_sent / CONVERSION_FACTOR_MB, 1)  # In MB
-    network_received = round(net_io.bytes_recv / CONVERSION_FACTOR_MB, 1)  # In MB
+    network_sent, network_received = get_network_io()
+   
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
     # Prepare system information dictionary

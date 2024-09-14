@@ -1,7 +1,7 @@
 import os
 import datetime
 from flask import render_template, Blueprint
-from flask_login import login_required, current_user
+from flask_login import current_user
 from src.config import app, db
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file, ROOT_DIR

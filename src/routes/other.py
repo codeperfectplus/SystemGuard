@@ -1,7 +1,6 @@
-import datetime
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
-from flask_login import login_required, current_user
+from flask_login import login_required
 
 from src.models import GeneralSettings
 from src.config import app

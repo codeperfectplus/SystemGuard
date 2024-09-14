@@ -1,12 +1,12 @@
-from src.models import UserProfile
+from src.models import UserProfile, PageToggleSettings
 from src.config import app
 from flask_login import current_user
 from functools import wraps
-from flask import flash, redirect, url_for
-
+from flask import flash, redirect, url_for, render_template
+import subprocess
 
 def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):
-    """Retrieve email addresses of users based on filters."""
+    """ Retrieve email addresses of users based on filters."""
     with app.app_context():
         # Build query with filters
         query = UserProfile.query
@@ -23,6 +23,7 @@ def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_us
 
 
 def admin_required(f):
+    """ Decorator to check if the current user is an admin. """
     @wraps(f)
     def wrap(*args, **kwargs):
         if not current_user.is_authenticated:
@@ -56,3 +57,20 @@ def check_sudo_password(sudo_password):
     except Exception as e:
         # Log any exception that occurs while validating the sudo password
         return False, str(e)
+    
+
+def check_page_toggle(setting_name):
+    """ Decorator to check if a page toggle setting is enabled. 
+    If the setting is enabled, the page is rendered.
+    Otherwise, a 403 error page is rendered.
+    """
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            page_toggles_settings = PageToggleSettings.query.first()
+            if not getattr(page_toggles_settings, setting_name, False):
+                flash("You do not have permission to view this page.", "danger")
+                return render_template("error/403.html")
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator

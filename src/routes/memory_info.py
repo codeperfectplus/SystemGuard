@@ -1,21 +1,17 @@
-import psutil
-from flask import render_template, blueprints, flash
+from flask import render_template, blueprints
 from flask_login import login_required
 
 from src.config import app
 from src.utils import get_cached_value, get_memory_percent, get_memory_available, get_memory_used, get_swap_memory_info
-from src.models import PageToggleSettings
+from src.routes.helper.common_helper import check_page_toggle
 
 memory_info_bp = blueprints.Blueprint("memory_usage", __name__)
 
 
 @app.route("/memory_usage")
 @login_required
+@check_page_toggle("is_memory_info_enabled")
 def memory_usage():
-    page_toggles_settings = PageToggleSettings.query.first()
-    if not page_toggles_settings.is_memory_info_enabled:
-        flash("You do not have permission to view this page.", "danger")
-        return render_template("error/403.html")
     memory_available = get_cached_value("memory_available", get_memory_available) 
     system_info = {
         "memory_percent": get_memory_percent(),

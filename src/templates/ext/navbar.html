@@ -58,7 +58,7 @@
                 </a>
             </li>
             {% endif %}
-            {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}"
                     href="{{ url_for('graphs') }}">

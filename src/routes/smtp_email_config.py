@@ -1,4 +1,3 @@
-from flask_login import login_required
 from flask import render_template, request, flash, redirect, url_for, blueprints
 
 from src.config import app, db

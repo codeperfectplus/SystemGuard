@@ -1,11 +1,9 @@
 import re
 
-from flask import Flask, render_template, request, blueprints, jsonify
+from flask import render_template, request
 import subprocess
 
-from src.config import app
 from src.helper import get_ip_address
-
 
 def scan_network(subnet):
     try:

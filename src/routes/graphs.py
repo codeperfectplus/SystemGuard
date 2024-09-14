@@ -1,5 +1,4 @@
 from flask import render_template, blueprints
-from flask_login import login_required
 from src.config import app
 from src.routes.helper.common_helper import admin_required
 

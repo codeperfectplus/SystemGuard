@@ -2,15 +2,14 @@ import os
 import time
 import datetime
 import subprocess
-from functools import wraps
-from flask import render_template, request, flash, blueprints, redirect, url_for, Response, session
+from flask import render_template, request, flash, blueprints, redirect, url_for, session
 
 from src.config import app, db
-from src.models import UserCardSettings, UserDashboardSettings, UserProfile, GeneralSettings, PageToggleSettings
+from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
-from src.routes.helper.common_helper import get_email_addresses, admin_required
+from src.routes.helper.common_helper import get_email_addresses, admin_required, check_sudo_password
 from src.config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
@@ -110,29 +109,6 @@ def card_toggles():
         return redirect(url_for('card_toggles'))
     return render_template('settings/card_toggles.html', card_settings=card_settings)
 
-
-def check_sudo_password(sudo_password):
-    """
-    Verify the given sudo password by executing a harmless sudo command.
-    If the password is correct, it returns True. Otherwise, returns False.
-
-    :param sudo_password: The user's sudo password to validate.
-    :return: True if the password is correct, otherwise False.
-    """
-    try:
-        # Test if the sudo password is valid by running a safe sudo command
-        result = subprocess.run(
-            ['sudo', '-S', 'true'],
-            input=f'{sudo_password}\n',
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        return result.returncode == 0
-    
-    except Exception as e:
-        # Log any exception that occurs while validating the sudo password
-        return False, str(e)
 
 @app.route('/utility', methods=['GET', 'POST'])
 @admin_required
