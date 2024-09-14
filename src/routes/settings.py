@@ -14,7 +14,18 @@ from src.config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
 
-@app.route('/settings/speedtest', methods=['GET', 'POST'])
+@app.route("/control_panel", methods=["GET", "POST"])
+@login_required
+def settings():
+    if current_user.user_level != 'admin':
+        flash("Your account does not have permission to view this page.", "danger")
+        flash("User level for this account is: " + current_user.user_level, "danger")
+        flash("Please contact your administrator for more information.", "danger")
+        return render_template("error/403.html")
+
+    return render_template("settings/control_panel.html", settings=settings)
+
+@app.route('/control_panel/speedtest', methods=['GET', 'POST'])
 @login_required
 def user_settings():
     user_dashboard_settings = UserDashboardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
@@ -27,7 +38,7 @@ def user_settings():
         return redirect(url_for('user_settings'))
     return render_template('settings/user_settings.html', user_dashboard_settings=user_dashboard_settings)
 
-@app.route('/settings/general', methods=['GET', 'POST'])
+@app.route('/control_panel/general', methods=['GET', 'POST'])
 @login_required
 def general_settings():
     # Retrieve user-specific settings from DB
@@ -65,7 +76,7 @@ def general_settings():
 
     return render_template('settings/general_settings.html', general_settings=general_settings)
 
-@app.route('/settings/page-toggles', methods=['GET', 'POST'])
+@app.route('/control_panel/page-toggles', methods=['GET', 'POST'])
 @login_required
 def feature_toggles():
     page_toggles_settings = PageToggleSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
@@ -82,7 +93,7 @@ def feature_toggles():
         return redirect(url_for('feature_toggles'))
     return render_template('settings/page_toggles.html', page_toggles_settings=page_toggles_settings)
 
-@app.route('/settings/card-toggles', methods=['GET', 'POST'])
+@app.route('/control_panel/card-toggles', methods=['GET', 'POST'])
 @login_required
 def card_toggles():
     card_settings = UserCardSettings.query.filter_by(user_id=current_user.id).first()  # Retrieve user-specific settings from DB
@@ -104,16 +115,6 @@ def card_toggles():
         return redirect(url_for('card_toggles'))
     return render_template('settings/card_toggles.html', card_settings=card_settings)
 
-@app.route("/settings", methods=["GET", "POST"])
-@login_required
-def settings():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        flash("User level for this account is: " + current_user.user_level, "danger")
-        flash("Please contact your administrator for more information.", "danger")
-        return render_template("error/403.html")
-
-    return render_template("settings/settings.html", settings=settings)
 
 def check_sudo_password(sudo_password):
     """
@@ -138,11 +139,22 @@ def check_sudo_password(sudo_password):
         # Log any exception that occurs while validating the sudo password
         return False, str(e)
 
-@app.route('/control', methods=['GET', 'POST'])
-def control():
+@app.route('/utility', methods=['GET', 'POST'])
+@login_required
+def utility_control():
     if request.method == 'POST':
         action = request.form.get('action')
         sudo_password = request.form.get('sudo_password', '')
+
+        if "clear_session" in request.form:
+            session.pop('sudo_password', None)
+            flash("Session cleared!", "info")
+            return redirect(url_for('control'))
+        
+        if "sudo_password" in request.form:
+            if not check_sudo_password(sudo_password):
+                flash("Invalid sudo password!", "danger")
+                return redirect(url_for('control'))
 
         if action == 'shutdown':
             command = ['sudo', '-S', 'shutdown', '-h', 'now']
@@ -158,10 +170,10 @@ def control():
 
         try:
             # Execute the command with the sudo password
-            result = subprocess.run(command, input=sudo_password.encode(), check=True, capture_output=True, text=True)
+            result = subprocess.run(command, input=sudo_password, check=True, capture_output=True, text=True)
             flash(success_message, 'info')
         except subprocess.CalledProcessError as e:
             flash(error_message.format(e), 'danger')
 
     # Render the control form on GET request
-    return render_template("settings/control.html")
+    return render_template("settings/utility.html")

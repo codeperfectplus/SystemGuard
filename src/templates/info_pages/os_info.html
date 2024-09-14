@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% block title %}OS Level Information{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/os_info.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">OS Level Information</h1>
+    <table class="table table-hover table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><i class="fas fa-code-branch"></i> Kernel Version</td>
+                <td>{{ os_info.kernel_version }}</td>
+            </tr>
+            <tr>
+                <td><i class="fas fa-desktop"></i> Operating System</td>
+                <td>{{ os_info.operating_system }}</td>
+            </tr>
+            <tr>
+                <td><i class="fas fa-tag"></i> OS Codename</td>
+                <td>{{ os_info.os_codename }}</td>
+            </tr>
+            <tr>
+                <td><i class="fas fa-info-circle"></i> OS Full Name</td>
+                <td>{{ os_info.os_full_name }}</td>
+            </tr>
+            <tr>
+                <td><i class="fas fa-laptop-code"></i> OS Name</td>
+                <td>{{ os_info.os_name }}</td>
+            </tr>
+            <tr>
+                <td><i class="fas fa-hashtag"></i> OS Version</td>
+                <td>{{ os_info.os_version }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'base/base.html' %}
+{% block title %}Control Panel{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/control_tab.css') }}">
+{% endblock %}
+{% block content %}
+<div class="settings-container container-fluid">
+    <h1 class="settings-title text-center my-4"><span class="text-danger">{{ title }} </span>Control Panel
+        <i class="fas fa-cogs"></i>
+    </h1>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="controlPanelTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="user-management-tab" data-toggle="tab" href="#user-management" role="tab" aria-controls="user-management" aria-selected="true">
+                <i class="fas fa-users"></i> User Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab" aria-controls="feature-toggles" aria-selected="false">
+                <i class="fas fa-toggle-on"></i> Feature Toggles
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="utilities-tab" data-toggle="tab" href="#utilities" role="tab" aria-controls="utilities" aria-selected="false">
+                <i class="fas fa-tools"></i> Utilities
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="network-tab" data-toggle="tab" href="#network-tools" role="tab" aria-controls="network-tools" aria-selected="false">
+                <i class="fas fa-globe"></i> Network Tools
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab" aria-controls="system-info" aria-selected="false">
+                <i class="fas fa-info-circle"></i> System Info
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">
+                <i class="fas fa-cogs"></i> General
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-4" id="controlPanelTabContent">
+        <!-- User Management Section -->
+        <div class="tab-pane fade show active" id="user-management" role="tabpanel" aria-labelledby="user-management-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-users"></i> User Management</h5>
+                            <a href="{{ url_for('view_users') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-users"></i> All Users
+                            </a>
+                            <a href="{{ url_for('create_user') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-plus"></i> Create User
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-cogs"></i> Settings</h5>
+                            <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-key"></i> SMTP Configuration
+                            </a>
+                            <a href="{{ url_for('general_settings') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-cogs"></i> General Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Toggles Section -->
+        <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
+                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-toggle-on"></i> Page Toggles
+                            </a>
+                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-toggle-on"></i> Card Toggles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utilities Section -->
+        <div class="tab-pane fade" id="utilities" role="tabpanel" aria-labelledby="utilities-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
+                            <a href="{{ url_for('terminal') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-terminal"></i> Terminal
+                            </a>
+                            <a href="{{ url_for('utility_control') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-tools"></i> Utility Control
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Tools Section -->
+        <div class="tab-pane fade" id="network-tools" role="tabpanel" aria-labelledby="network-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tools</h5>
+                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-globe"></i> Ping Website
+                            </a>
+                            <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-shield-alt"></i> Firewall
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info Section -->
+        <div class="tab-pane fade" id="system-info" role="tabpanel" aria-labelledby="system-info-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
+                            <a href="{{ url_for('show_os_info') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-info-circle"></i> OS Info
+                            </a>
+                            <a href="{{ url_for('about') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-info-circle"></i> About {{ title }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

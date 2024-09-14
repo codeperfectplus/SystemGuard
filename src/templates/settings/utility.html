@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% block title %}Control Panel{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/utility.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="settings-title text-center"><span class="text-danger">{{ title }}</span> Control Panel<i
+            class="fas fa-cogs ml-2"></i></h1>
+    {% include 'ext/message.html' %}
+
+    <!-- Display flash messages for feedback -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alert-container text-center mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="control-form-wrapper mt-5">
+        <form action="/control" method="POST" class="control-form">
+            {% if session.get('sudo_password') %}
+            <button type="submit" name="clear_session" class="btn btn-secondary btn-lg btn-block mb-2">Clear
+                Session</button>
+            {% else %}
+            <div class="form-group">
+                <label for="sudo_password">Enter Sudo Password:</label>
+                <input type="password" class="form-control form-control-lg" id="sudo_password" name="sudo_password"
+                    required>
+            </div>
+            {% endif %}
+
+            <div class="form-actions text-center">
+                <button type="submit" name="action" value="shutdown"
+                    class="btn btn-danger btn-lg btn-block mb-3">Shutdown Server</button>
+                <button type="submit" name="action" value="reboot" class="btn btn-warning btn-lg btn-block">Reboot
+                    Server</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

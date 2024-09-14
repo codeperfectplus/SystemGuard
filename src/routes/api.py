@@ -2,7 +2,7 @@ from flask import jsonify, blueprints, request
 from flask_login import login_required, current_user
 from src.config import app, db
 from src.models import SystemInformation, UserDashboardSettings
-from src.utils import _get_system_info
+from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
 from datetime import datetime, timedelta
 import gc
 
@@ -17,7 +17,7 @@ def system_api():
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching the system information", "details": str(e)}), 500
 
-@app.route('/api/graphs_data', methods=['GET'])
+@app.route('/api/v1/graphs_data', methods=['GET'])
 @login_required
 def graph_data_api():
     try:
@@ -104,7 +104,7 @@ def graph_data_api():
         # Handle and log the error for debugging purposes
         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
 
-@app.route('/refresh-interval', methods=['GET', 'POST'])
+@app.route('/api/v1/refresh-interval', methods=['GET', 'POST'])
 @login_required
 def manage_refresh_interval():
     try:
@@ -139,3 +139,15 @@ def manage_refresh_interval():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'An error occurred', 'details': str(e)}), 500
+
+
+@app.route('/api/v1/os-info', methods=['GET'])
+@login_required
+def get_os_info_api():
+    os_info = get_cached_value("os_info", get_os_info)
+    try:
+        os_info.update(get_cached_value("os_release_info", get_os_release_info))
+        return jsonify(os_info), 200
+    except Exception as e:
+        return jsonify({"error": "An error occurred while fetching the OS information", "details": str(e)}), 500
+    

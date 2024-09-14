@@ -8,6 +8,7 @@ from src.config import app, db
 from src.routes.helper import get_email_addresses
 from src.scripts.email_me import send_smtp_email
 from src.logger import logger
+from src.utils import get_os_release_info, get_os_info
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -89,3 +90,14 @@ def send_email_page():
 @app.route("/about")
 def about():
     return render_template("other/about.html")
+
+
+@app.route('/os_info', methods=['GET'])
+@login_required
+def show_os_info():
+    # Fetch OS level information
+    os_info = get_os_info()
+    os_info.update(get_os_release_info())
+    
+    # Render the HTML page with the OS information
+    return render_template('info_pages/os_info.html', os_info=os_info)

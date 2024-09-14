@@ -1,0 +1,93 @@
+/* Container Styles */
+/* .container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+} */
+
+/* Title Styles */
+.settings-title {
+    font-size: 32px;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Form Styles */
+.control-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-control {
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+}
+
+/* Button Styles */
+.btn {
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-lg {
+    width: 100%;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-warning {
+    background-color: #f39c12;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+}
+
+.btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #95a5a6;
+}
+
+/* Flash Message Styles */
+.alert-container {
+    margin-top: 20px;
+}
+
+.alert {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 20px;
+}
