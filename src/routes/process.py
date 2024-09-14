@@ -9,18 +9,18 @@ from flask import (
     blueprints,
     abort,
 )
-from flask_login import login_required, current_user
+from flask_login import current_user
 from src.config import app
 from src.utils import get_top_processes, render_template_from_file, ROOT_DIR
 from src.models import PageToggleSettings
 from src.scripts.email_me import send_smtp_email
 from src.config import get_app_info
+from src.routes.helper.common_helper import admin_required
 
 process_bp = blueprints.Blueprint("process", __name__)
 
-
 @app.route("/process", methods=["GET", "POST"])
-@login_required
+@admin_required
 def process():
     page_toggles_settings = PageToggleSettings.query.first()
     if not page_toggles_settings.is_process_info_enabled:

@@ -8,17 +8,15 @@ from src.config import app, db
 from src.models import UserProfile, UserDashboardSettings, UserCardSettings, PageToggleSettings
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
-from src.routes.helper import get_email_addresses
+from src.routes.helper.common_helper import get_email_addresses
 from src.config import get_app_info
+from src.routes.helper.common_helper import admin_required
 
 user_bp = blueprints.Blueprint('user', __name__)
 
 @app.route('/create_user', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def create_user():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/403.html")
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -80,19 +78,13 @@ def create_user():
     return render_template('users/create_user.html')
 
 @app.route('/users')
-@login_required
+@admin_required
 def view_users():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        return render_template("error/403.html")
-
-    # Fetch all users from the database
     users = UserProfile.query.all()
-
     return render_template('users/view_users.html', users=users)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def change_user_settings(username):
     user = UserProfile.query.filter_by(username=username).first_or_404()
 
@@ -118,14 +110,9 @@ def change_user_settings(username):
     return render_template('users/change_user.html', user=user)
 
 @app.route('/delete_user/<username>', methods=['POST'])
-@login_required
+@admin_required
 def delete_user(username):
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to perform this action.", "danger")
-        return redirect(url_for('view_users'))  # Redirect to the users page
-
     user = UserProfile.query.filter_by(username=username).first_or_404()
-
     # Get Admin Emails with Alerts Enabled:
     admin_email_address = get_email_addresses(user_level='admin', receive_email_alerts=True)
     if admin_email_address:

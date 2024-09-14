@@ -7,11 +7,12 @@ from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
 from src.config import get_app_info
+from src.routes.helper.common_helper import admin_required
 
 speedtest_bp = Blueprint("speedtest", __name__)
 
 @app.route("/speedtest")
-@login_required
+@admin_required
 def speedtest():
     user_dashboard_settings = UserDashboardSettings.query.first()
     speedtest_cooldown_duration = user_dashboard_settings.speedtest_cooldown

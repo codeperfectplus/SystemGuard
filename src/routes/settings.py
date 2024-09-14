@@ -2,6 +2,7 @@ import os
 import time
 import datetime
 import subprocess
+from functools import wraps
 from flask import render_template, request, flash, blueprints, redirect, url_for, Response, session
 
 from src.config import app, db
@@ -9,7 +10,7 @@ from src.models import UserCardSettings, UserDashboardSettings, UserProfile, Gen
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
 from src.scripts.email_me import send_smtp_email
-from src.routes.helper import get_email_addresses
+from src.routes.helper.common_helper import get_email_addresses, admin_required
 from src.config import get_app_info
 
 settings_bp = blueprints.Blueprint("settings", __name__)
@@ -17,12 +18,6 @@ settings_bp = blueprints.Blueprint("settings", __name__)
 @app.route("/control_panel", methods=["GET", "POST"])
 @login_required
 def settings():
-    if current_user.user_level != 'admin':
-        flash("Your account does not have permission to view this page.", "danger")
-        flash("User level for this account is: " + current_user.user_level, "danger")
-        flash("Please contact your administrator for more information.", "danger")
-        return render_template("error/403.html")
-
     return render_template("settings/control_panel.html", settings=settings)
 
 @app.route('/control_panel/speedtest', methods=['GET', 'POST'])
@@ -39,7 +34,7 @@ def user_settings():
     return render_template('settings/user_settings.html', user_dashboard_settings=user_dashboard_settings)
 
 @app.route('/control_panel/general', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def general_settings():
     # Retrieve user-specific settings from DB
     general_settings = GeneralSettings.query.filter_by().first()
@@ -140,7 +135,7 @@ def check_sudo_password(sudo_password):
         return False, str(e)
 
 @app.route('/utility', methods=['GET', 'POST'])
-@login_required
+@admin_required
 def utility_control():
     if request.method == 'POST':
         action = request.form.get('action')

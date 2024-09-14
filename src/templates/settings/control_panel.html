@@ -8,17 +8,14 @@
     <h1 class="settings-title text-center my-4"><span class="text-danger">{{ title }} </span>Control Panel
         <i class="fas fa-cogs"></i>
     </h1>
+    {% include 'ext/message.html' %}
 
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs" id="controlPanelTabs" role="tablist">
+        {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
         <li class="nav-item">
             <a class="nav-link active" id="user-management-tab" data-toggle="tab" href="#user-management" role="tab" aria-controls="user-management" aria-selected="true">
-                <i class="fas fa-users"></i> User Management
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab" aria-controls="feature-toggles" aria-selected="false">
-                <i class="fas fa-toggle-on"></i> Feature Toggles
+                <i class="fas fa-users"></i> Users
             </a>
         </li>
         <li class="nav-item">
@@ -28,17 +25,29 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" id="network-tab" data-toggle="tab" href="#network-tools" role="tab" aria-controls="network-tools" aria-selected="false">
-                <i class="fas fa-globe"></i> Network Tools
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab" aria-controls="system-info" aria-selected="false">
-                <i class="fas fa-info-circle"></i> System Info
+                <i class="fas fa-globe"></i> Security Tools
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">
                 <i class="fas fa-cogs"></i> General
+            </a>
+        </li>
+        {% endif %}
+        <li class="nav-item"></li>
+            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab" aria-controls="feature-toggles" aria-selected="false">
+                <i class="fas fa-toggle-on"></i> Feature
+            </a>
+        </li>
+        <li class="nav-item"></li>
+            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab" aria-controls="system-info" aria-selected="false">
+                <i class="fas fa-info-circle"></i> System Info
+            </a>
+        </li>
+        <!-- profile tab -->
+        <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
+                <i class="fas fa-user"></i> Profile
             </a>
         </li>
     </ul>
@@ -77,25 +86,7 @@
                             <a href="{{ url_for('general_settings') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-cogs"></i> General Settings
                             </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Feature Toggles Section -->
-        <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
-                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-toggle-on"></i> Page Toggles
-                            </a>
-                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-toggle-on"></i> Card Toggles
-                            </a>
+                            
                         </div>
                     </div>
                 </div>
@@ -114,6 +105,12 @@
                             </a>
                             <a href="{{ url_for('utility_control') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-tools"></i> Utility Control
+                            </a>
+                            <a href="{{ url_for('send_email_page') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-envelope"></i> Send Email
+                            </a>
+                            <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-tachometer-alt"></i> Speedtest
                             </a>
                         </div>
                     </div>
@@ -134,6 +131,28 @@
                             <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-shield-alt"></i> Firewall
                             </a>
+                            <a href="{{ url_for('security_analysis') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-shield-alt"></i> Security Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Toggles Section -->
+        <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
+                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-toggle-on"></i> Page Toggles
+                            </a>
+                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-toggle-on"></i> Card Toggles
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -153,11 +172,38 @@
                             <a href="{{ url_for('about') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-info-circle"></i> About {{ title }}
                             </a>
+                            
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- profile tab -->
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>
+                            <a href="{{ url_for('view_profile') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-cog"></i> My Profile
+                            </a>
+                            <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-key"></i> Change Password
+                            </a>
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-edit"></i> Edit Profile
+                            </a>
+                            <a href="{{ url_for('user_settings') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-cog"></i> User Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
