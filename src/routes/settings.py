@@ -139,10 +139,21 @@ def check_sudo_password(sudo_password):
         return False, str(e)
 
 @app.route('/control', methods=['GET', 'POST'])
+@login_required
 def control():
     if request.method == 'POST':
         action = request.form.get('action')
         sudo_password = request.form.get('sudo_password', '')
+
+        if "clear_session" in request.form:
+            session.pop('sudo_password', None)
+            flash("Session cleared!", "info")
+            return redirect(url_for('control'))
+        
+        if "sudo_password" in request.form:
+            if not check_sudo_password(sudo_password):
+                flash("Invalid sudo password!", "danger")
+                return redirect(url_for('control'))
 
         if action == 'shutdown':
             command = ['sudo', '-S', 'shutdown', '-h', 'now']
@@ -158,10 +169,10 @@ def control():
 
         try:
             # Execute the command with the sudo password
-            result = subprocess.run(command, input=sudo_password.encode(), check=True, capture_output=True, text=True)
+            result = subprocess.run(command, input=sudo_password, check=True, capture_output=True, text=True)
             flash(success_message, 'info')
         except subprocess.CalledProcessError as e:
             flash(error_message.format(e), 'danger')
 
     # Render the control form on GET request
-    return render_template("settings/control.html")
+    return render_template("settings/utility.html")

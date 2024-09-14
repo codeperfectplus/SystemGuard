@@ -1,59 +1,93 @@
-.title {
-    text-align: center;
-    margin-top: 50px;
-    font-size: 36px;
-    color: #333;
-}
-
-.container {
-    margin-top: 50px;
+/* Container Styles */
+/* .container {
+    background-color: #f9f9f9;
     padding: 20px;
     max-width: 500px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+} */
+
+/* Title Styles */
+.settings-title {
+    font-size: 32px;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
+/* Form Styles */
+.control-form {
+    padding: 20px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .form-control {
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 4px;
-    border: 1px solid #ced4da;
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
 }
 
+.form-control:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+}
+
+/* Button Styles */
 .btn {
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 4px;
-    margin-right: 10px;
-    transition: background-color 0.3s;
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-lg {
+    width: 100%;
 }
 
 .btn-danger {
-    background-color: #dc3545;
+    background-color: #e74c3c;
     border: none;
 }
 
 .btn-danger:hover {
-    background-color: #c82333;
+    background-color: #c0392b;
 }
 
 .btn-warning {
-    background-color: #ffc107;
+    background-color: #f39c12;
     border: none;
-    color: #212529;
 }
 
 .btn-warning:hover {
-    background-color: #e0a800;
+    background-color: #e67e22;
+}
+
+.btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #95a5a6;
+}
+
+/* Flash Message Styles */
+.alert-container {
+    margin-top: 20px;
+}
+
+.alert {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 20px;
 }
