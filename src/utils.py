@@ -476,8 +476,6 @@ def get_system_info():
     ipv4_address = get_cached_value('ipv4', lambda: get_ip_address())
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
-    os_info = get_cached_value('os_info', get_os_info)
-    os_release_info = get_cached_value('os_release_info', get_os_release_info)
     current_server_time = datetime.datetime.now()
     
     # Prepare system information dictionary
@@ -491,8 +489,6 @@ def get_system_info():
         'timestamp': datetime.datetime.now(),
         'current_server_time': current_server_time.strftime("%Y-%m-%d %H:%M:%S"),
         'timestamp': current_server_time,
-        'os_name': os_release_info.get('os_name', 'Unknown'),
-        'os_version': os_release_info.get('os_version', 'Unknown')
     }
     # update uptime dictionary
     _info = _get_system_info()
