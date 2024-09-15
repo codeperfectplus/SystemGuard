@@ -116,12 +116,19 @@ def update_git_version():
     try:
         # Execute the git pull command
         result = subprocess.run(["git", "pull"], capture_output=True, text=True, check=True)
+        result_stdout = result.stdout
+        if "Already up to date." in result_stdout:
+            return jsonify({
+                'status': 'success',
+                'message': 'Already up to date.',
+                'output': result_stdout
+            })
         
         # Return success message and output
         return jsonify({
             'status': 'success',
             'message': 'Successfully updated the source code.',
-            'output': result.stdout
+            'output': result_stdout
         })
 
     except subprocess.CalledProcessError as e:
