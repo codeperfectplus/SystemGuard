@@ -23,8 +23,7 @@
     <div class="control-form-wrapper mt-5">
         <form action="/utility" method="POST" class="control-form">
             {% if session.get('sudo_password') %}
-            <button type="submit" name="clear_session" class="btn btn-secondary btn-lg btn-block mb-2">Clear
-                Session</button>
+            <button type="submit" name="clear_session" class="btn btn-secondary btn-lg btn-block mb-2">Exit SuperAdmin</button>
             {% else %}
             <div class="form-group">
                 <label for="sudo_password">Enter Sudo Password</label>
@@ -32,7 +31,7 @@
                     required>
                 <button type="submit" name="action" value="authenticate"
                     class="btn btn-primary btn-lg btn-block mt-3"><i class="fas fa-key"></i>
-                    Enable Sudo Access</button>
+                    Enable Super Admin</button>
             </div>
             {% endif %}
 

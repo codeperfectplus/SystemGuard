@@ -3,7 +3,7 @@
     max-width: 700px;
     margin: 50px auto;
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #f8f9fa;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -95,4 +95,31 @@
 
 .btn-secondary:hover {
     background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.form-group {
+    margin-top: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
 }

@@ -13,6 +13,8 @@
         <p class="profile-email">{{ user.email }}</p>
     </div>
 
+    {% include 'ext/message.html' %}
+
     <div class="profile-details">
         <div class="detail-item">
             <i class="fas fa-user-tag detail-icon"></i>
@@ -20,17 +22,31 @@
         </div>
         <div class="detail-item">
             <i class="fas fa-envelope detail-icon"></i>
-            <span>Receive Email Alerts:</span> {{ user.receive_email_alerts }}
+            <span>Email Alerts:</span> {{ user.receive_email_alerts }}
         </div>
         <div class="detail-item">
             <i class="fas fa-briefcase detail-icon"></i>
-            <span>Profession:</span> {{ user.profession }}
+            <span>Role:</span> {{ user.profession }}
         </div>
     </div>
 
     <div class="profile-actions">
         <a href="{{ url_for('edit_profile') }}" class="btn-action">Edit Profile</a>
         <a href="{{ url_for('change_password') }}" class="btn-action btn-secondary">Change Password</a>
+        <a href="{{ url_for('delete_user_self') }}" class="btn-action btn-danger">Delete Profile</a>
+        <a href="{{ url_for('logout') }}" class="btn-action btn-warning">Logout</a>
+
+        <form action="/superadmin" method="POST" class="control-form">
+            {% if session.get('sudo_password') %}
+            <button type="submit" name="clear_session" class="btn-action btn-secondary">Exit SuperAdmin</button>
+            {% else %}
+            <div class="form-group">
+                <label for="sudo_password">Enter Sudo Password</label>
+                <input type="password" class="form-control" id="sudo_password" name="sudo_password" required>
+                <button type="submit" name="action" value="authenticate" class="btn-action btn-primary">Enable Super Admin</button>
+            </div>
+            {% endif %}
+        </form>
     </div>
 </div>
 {% endblock %}

@@ -73,3 +73,18 @@ def edit_profile():
         return redirect(url_for('view_profile'))
 
     return render_template('users/edit_profile.html', user=user)
+
+
+# delete_user() function for self-deletion
+@app.route('/delete_user', methods=['GET'])
+@login_required
+def delete_user_self():
+    """
+    This route allows users to delete their own account.
+    """
+    user = current_user
+    db.session.delete(user)
+    db.session.commit()
+
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('login'))

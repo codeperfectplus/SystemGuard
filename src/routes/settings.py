@@ -148,3 +148,10 @@ def utility_control():
 
     # Render the control form on GET request
     return render_template("settings/utility.html")
+
+@app.route('/superadmin', methods=['GET', 'POST'])
+@admin_required
+@handle_sudo_password("superadmin")
+def superadmin():
+    return redirect(url_for('view_profile', user_id=current_user.id))
+

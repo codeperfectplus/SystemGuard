@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <a class="navbar-brand d-flex align-items-center {% if request.endpoint == 'dashboard' %}active{% endif %}"
-       href="{{ url_for('dashboard') }}">
+        href="{{ url_for('dashboard') }}">
         <div class="site-home">
             <div class="title-container">
                 <span class="title">{{title}}</span>
@@ -13,7 +13,7 @@
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -22,7 +22,7 @@
             {% if page_toggles_settings.is_dashboard_network_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
-                   href="{{ url_for('dashboard_network') }}">
+                    href="{{ url_for('dashboard_network') }}">
                     <i class="fa-solid fa-network-wired"></i> Dashboard Network
                 </a>
             </li>
@@ -30,7 +30,7 @@
             {% if page_toggles_settings.is_cpu_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'cpu_usage' %}active{% endif %}"
-                   href="{{ url_for('cpu_usage') }}">
+                    href="{{ url_for('cpu_usage') }}">
                     <i class="fas fa-microchip me-1"></i>CPU Info
                 </a>
             </li>
@@ -38,7 +38,7 @@
             {% if page_toggles_settings.is_memory_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'memory_usage' %}active{% endif %}"
-                   href="{{ url_for('memory_usage') }}">
+                    href="{{ url_for('memory_usage') }}">
                     <i class="fas fa-memory me-1"></i>Memory Info
                 </a>
             </li>
@@ -46,7 +46,7 @@
             {% if page_toggles_settings.is_disk_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'disk_usage' %}active{% endif %}"
-                   href="{{ url_for('disk_usage') }}">
+                    href="{{ url_for('disk_usage') }}">
                     <i class="fas fa-hdd me-1"></i>Disk Info
                 </a>
             </li>
@@ -54,7 +54,7 @@
             {% if page_toggles_settings.is_network_info_enabled %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'network_stats' %}active{% endif %}"
-                   href="{{ url_for('network_stats') }}">
+                    href="{{ url_for('network_stats') }}">
                     <i class="fas fa-network-wired me-1"></i>Network Info
                 </a>
             </li>
@@ -62,7 +62,7 @@
             {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}"
-                   href="{{ url_for('graphs') }}">
+                    href="{{ url_for('graphs') }}">
                     <i class="fas fa-chart-line me-1"></i>Graphs
                 </a>
             </li>
@@ -70,7 +70,7 @@
             {% if page_toggles_settings.is_process_info_enabled and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'process' %}active{% endif %}"
-                   href="{{ url_for('process') }}">
+                    href="{{ url_for('process') }}">
                     <i class="fas fa-tasks me-1"></i>Process
                 </a>
             </li>
@@ -78,7 +78,7 @@
             {% if current_user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}"
-                   href="{{ url_for('settings') }}">
+                    href="{{ url_for('settings') }}">
                     <i class="fas fa-cog me-1"></i>Settings
                 </a>
             </li>
@@ -94,20 +94,27 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('view_profile') }}">
-                    <i class="fas fa-user-alt me-1"></i>{{current_user.username}}
+                <a class="nav-link d-flex align-items-center" href="{{ url_for('view_profile') }}" aria-label="Profile">
+                    {% if session.get('sudo_password') %}
+                        <span class="badge bg-danger d-flex align-items-center">
+                            <i class="fas fa-user-alt me-1"></i> SuperAdmin
+                        </span>
+                    {% else %}
+                        <i class="fas fa-user-alt me-1"></i> 
+                        <span class="username">{{ current_user.username }}</span>
+                    {% endif %}
                 </a>
+                
             </li>
             {% else %}
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}"
-                   href="{{ url_for('login') }}">
+                <a class="nav-link {% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">
                     <i class="fas fa-sign-in-alt me-1"></i>Login
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'signup' %}active{% endif %}"
-                   href="{{ url_for('signup') }}">
+                    href="{{ url_for('signup') }}">
                     <i class="fas fa-user-plus me-1"></i>Signup
                 </a>
             </li>
