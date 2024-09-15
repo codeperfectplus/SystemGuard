@@ -120,7 +120,7 @@ def update_git_version():
         # Return success message and output
         return jsonify({
             'status': 'success',
-            'message': 'Repository updated successfully.',
+            'message': 'Successfully updated the source code.',
             'output': result.stdout
         })
 
@@ -129,6 +129,6 @@ def update_git_version():
         error_message = e.stderr or 'Unknown error occurred'
         return jsonify({
             'status': 'error',
-            'message': error_message,
+            'message': "Failed to update the source code.",
             'error': error_message
         }), 500
