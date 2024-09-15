@@ -353,14 +353,24 @@ body {
 
 /* memory-usage-bar */
 
-.memory-usage-bar.low {
+.memory-usage-bar.high {
     background-color: #28a745; /* Green for low memory usage */
 }
 .memory-usage-bar.medium {
     background-color: #ffc107; /* Yellow for medium memory usage */
 }
-.memory-usage-bar.high {
+.memory-usage-bar.low {
     background-color: #dc3545; /* Red for high memory usage */
 }
 
+/* .frequency-bar */
 
+.frequency-bar.low {
+    background-color: #28a745; /* Green for low frequency */
+}
+.frequency-bar.medium {
+    background-color: #ffc107; /* Yellow for medium frequency */
+}
+.frequency-bar.high {
+    background-color: #dc3545; /* Red for high frequency */
+}

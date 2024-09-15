@@ -1,73 +1,52 @@
-// battery bar color
 document.addEventListener('DOMContentLoaded', function () {
-    const batteryBar = document.querySelector('.battery-bar');
-    const batteryPercentage = parseInt(document.querySelector('.battery-card').getAttribute('data-battery'), 10);
+    const bars = [
+        { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] },
+        { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [50, 80] },
+        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [50, 80] },
+        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [.5, .8] , max_attr: 'data-memory-total' },
+        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [.5, .8], max_attr: 'data-cpu-max-frequency' },
+        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [.7, .9], max_attr: 'data-cpu-max-temp' },
+        // todo: find max frequency and max temperature for the CPU
+    ];
 
-    if (batteryPercentage <= 25) {
-        batteryBar.classList.add('low');
-    } else if (batteryPercentage > 25 && batteryPercentage <= 75) {
-        batteryBar.classList.add('medium');
-    } else {
-        batteryBar.classList.add('high');
-    }
-});
-
-// cpu temp bar color 
-document.addEventListener('DOMContentLoaded', function () {
-    const tempBar = document.querySelector('.temp-bar');
-    const tempPercentage = parseInt(document.querySelector('.cpu-temp-card').getAttribute('data-cpu-temp'), 10);
+    bars.forEach(({ selector, dataAttr, limits, max_attr}) => {
+        const bar = document.querySelector(selector);
+        const card = document.querySelector(`[${dataAttr}]`);
+        const max_value = document.querySelector(`[${max_attr}]`);
+        console.log(max_value);
     
-    if (tempPercentage <= 80) {
-        tempBar.classList.add('low');
-    }
-    else if (tempPercentage > 80 && tempPercentage <= 90) {
-        tempBar.classList.add('medium');
-    }
-    else {
-        tempBar.classList.add('high');
-    }
-});
 
-// disk usage-bar  data-disk-usage
-document.addEventListener('DOMContentLoaded', function () {
-    const diskBar = document.querySelector('.disk-bar');
-    const diskPercentage = parseInt(document.querySelector('.disk-usage-card').getAttribute('data-disk-usage'), 10);
+        if (!bar || !card) {
+            // console.warn(`Element not found for selector: ${selector} or data attribute: ${dataAttr}`);
+            return;
+        }
 
-    if (diskPercentage <= 50) {
-        diskBar.classList.add('low');
-    } else if (diskPercentage > 50 && diskPercentage <= 80) {
-        diskBar.classList.add('medium');
-    } else {
-        diskBar.classList.add('high');
-    }
-});
+        // if max_attr is defined, use that to define the limits
+        if (max_value) {
+            const max = parseInt(card.getAttribute(max_attr), 10);
 
-// cpu-usage-bar
-document.addEventListener('DOMContentLoaded', function () {
-    const cpuBar = document.querySelector('.cpu-usage-bar');
-    const cpuPercentage = parseInt(document.querySelector('.cpu-usage-card').getAttribute('data-cpu-usage'), 10);
+            if (isNaN(max)) {
+                // console.warn(`Invalid max value for ${max_value}`);
+                return;
+            }
 
-    if (cpuPercentage <= 50) {
-        cpuBar.classList.add('low');
-    } else if (cpuPercentage > 50 && cpuPercentage <= 80) {
-        cpuBar.classList.add('medium');
-    } else {
-        cpuBar.classList.add('high');
-    }
-});
+            limits = [max * limits[0], max * limits[1]];
+            console.log(`Limits for ${dataAttr}: ${limits}`);
+        }
 
+        const percentage = parseInt(card.getAttribute(dataAttr), 10);
 
-// memory-usage-bar | data-memory-usage
-document.addEventListener('DOMContentLoaded', function () {
-    const memoryBar = document.querySelector('.memory-usage-bar');
-    const memoryPercentage = parseInt(document.querySelector('.memory-usage-card').getAttribute('data-memory-usage'), 10);
-    console.log("memoryBar", memoryBar);
-    console.log("memoryPercentage: ", memoryPercentage);
-    if (memoryPercentage <= 50) {
-        memoryBar.classList.add('low');
-    } else if (memoryPercentage > 50 && memoryPercentage <= 80) {
-        memoryBar.classList.add('medium');
-    } else {
-        memoryBar.classList.add('high');
-    }
+        if (isNaN(percentage)) {
+            // console.warn(`Invalid percentage value for ${dataAttr}`);
+            return;
+        }
+
+        if (percentage <= limits[0]) {
+            bar.classList.add('low');
+        } else if (percentage > limits[0] && percentage <= limits[1]) {
+            bar.classList.add('medium');
+        } else {
+            bar.classList.add('high');
+        }
+    });
 });

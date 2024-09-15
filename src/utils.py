@@ -152,7 +152,9 @@ def get_cpu_frequency():
     Returns:
         int: Current CPU frequency in MHz.
     """
-    return round(psutil.cpu_freq().current)
+    current_freq = round(psutil.cpu_freq().current)
+    max_freq = round(psutil.cpu_freq().max)
+    return current_freq, max_freq
 
 def get_cpu_core_count():
     """
@@ -441,6 +443,7 @@ def _get_system_info():
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
     network_sent, network_received = get_network_io()
+    cpu_freq, max_freq = get_cpu_frequency()
    
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
@@ -454,7 +457,8 @@ def _get_system_info():
         'network_received': network_received,
         "network_stats" : f"D: {network_sent} MB / U: {network_received} MB",
         'dashboard_memory_usage': get_flask_memory_usage(),
-        'cpu_frequency': get_cpu_frequency(),
+        'cpu_frequency': cpu_freq,
+        'cpu_max_frequency': max_freq,
         'current_temp': get_cpu_temp()[0],
         'timestamp': datetime.datetime.now(),
     }

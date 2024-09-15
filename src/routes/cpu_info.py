@@ -14,9 +14,11 @@ def cpu_usage():
     
     current_temp, high_temp, critical_temp = get_cpu_temp()
     cpu_core = get_cached_value("cpu_core", get_cpu_core_count)
+    cpu_frequency, cpu_max_frequency = get_cpu_frequency()
     system_info = {
         "cpu_core": cpu_core,
-        "cpu_frequency": get_cpu_frequency(),
+        "cpu_frequency": cpu_frequency,
+        "cpu_max_frequency": cpu_max_frequency,
         "cpu_percent": cpu_usage_percent(),
         "current_temp": current_temp,
         "high_temp": high_temp,
