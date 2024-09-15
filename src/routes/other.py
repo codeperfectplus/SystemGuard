@@ -117,6 +117,7 @@ def update_git_version():
 
     except subprocess.CalledProcessError as e:
         # Return error message and output if git pull fails
+        print(f"Error occurred: {e}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to update repository.',
