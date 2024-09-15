@@ -135,7 +135,7 @@ body {
 
 /* General Card Styles */
 .card {
-    min-height: 160px;
+    min-height: 190px;
     /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
     /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
     background: linear-gradient(200deg, #f5f7fa, #c3cfe2);
@@ -197,7 +197,7 @@ body {
     font-weight: bold;
 }
 
-.temp-indicator, .usage-indicator, .memory-usage-bar, .frequency-indicator {
+.temp-indicator, .usage-indicator, .memory-usage-bar, .frequency-indicator, .battery-indicator {
     width: 100%;
     background-color: #e2e6ea;
     border-radius: 5px;
@@ -208,7 +208,6 @@ body {
     height: 20px;
     transition: width 0.3s ease;
 }
-
 
 .cpu-core-visualization {
     display: flex;
@@ -272,13 +271,6 @@ body {
 }
 
 /* batter bar */
-.battery-indicator {
-    width: 100%;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    overflow: hidden;
-    position: relative;
-}
 
 
 /* Battery color indicators based on percentage */
@@ -342,7 +334,7 @@ body {
 /* .frequency-bar */
 
 .frequency-bar.low {
-    background-color: #57d474; /* Green for low frequency */
+    background: linear-gradient(90deg, #57d474, #41d865); /* Green for low temperature */
 }
 .frequency-bar.medium {
     background-color: #d7b25c; /* Yellow for medium frequency */

@@ -437,6 +437,7 @@ def _get_system_info():
     """
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
+    disk_total = get_cached_value("disk_total", get_disk_total)
     memory_available = get_cached_value("memory_available", get_memory_available) 
     # Gathering fresh system information
     battery_info = psutil.sensors_battery()
@@ -454,6 +455,7 @@ def _get_system_info():
         'memory_percent': round(memory_info.percent, 2),
         'memory_available': memory_available,
         'disk_percent': round(disk_info.percent, 2),
+        'disk_total': disk_total,
         'network_sent': network_sent,
         'battery_percent': round(battery_info.percent, 1) if battery_info else 0,
         'network_received': network_received,

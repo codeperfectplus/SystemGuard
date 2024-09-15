@@ -9,6 +9,7 @@
             <div class="frequency-indicator mt-3">
                 <div class="frequency-bar" style="width: {{ 100 * system_info['cpu_frequency'] / (system_info['cpu_max_frequency'] if system_info['cpu_max_frequency'] != 0 else 1) }}%;"></div>
             </div>
+            <p class="card-text fs-6 mt-2">Max Frequency: {{ system_info['cpu_max_frequency'] }} MHz</p>
         </div>
     </div>
 </div>

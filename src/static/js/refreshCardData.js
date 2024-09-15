@@ -99,10 +99,10 @@ function updateColorBars() {
     const barConfigs = [
         { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] }, // alreday in %
         { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [60, 80] }, // alreday in %
-        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [50, 80] }, // alreday in %
-        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [50, 80], maxAttr: 'data-memory-total' },
-        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [50, 80], maxAttr: 'data-cpu-max-frequency' },
-        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [20, 50], maxAttr: 'data-cpu-max-temp' }
+        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [60, 90] }, // alreday in %
+        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [60, 90], maxAttr: 'data-memory-total' },
+        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [60, 90], maxAttr: 'data-cpu-max-frequency' },
+        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [70, 90], maxAttr: 'data-cpu-max-temp' }
     ];
 
     barConfigs.forEach(({ selector, dataAttr, limits, maxAttr }) => {
@@ -111,8 +111,8 @@ function updateColorBars() {
         const maxElement = maxAttr ? document.querySelector(`[${maxAttr}]`) : null;
 
         if (!bar || !card) return;
-        let percentage = parseFloat(bar.style.width);
-        if (isNaN(percentage)) return;
+        let card_value = parseFloat(bar.style.width);
+        if (isNaN(card_value)) return;
 
         if (maxElement) {
             const maxValue = parseFloat(maxElement.getAttribute(maxAttr));
@@ -120,13 +120,12 @@ function updateColorBars() {
                 limits = [maxValue * limits[0]/100, maxValue * limits[1]/100];
             }
         }
-
-        percentage = Math.min(percentage, 100); // Ensure percentage is not greater than 100
+        
         bar.classList.remove('low', 'medium', 'high');
         // Apply the appropriate class based on the limits
-        if (percentage <= limits[0]) {
+        if (card_value <= limits[0]) {
             bar.classList.add('low');
-        } else if (percentage > limits[0] && percentage <= limits[1]) {
+        } else if (card_value > limits[0] && card_value <= limits[1]) {
             bar.classList.add('medium');
         } else {
             bar.classList.add('high');
