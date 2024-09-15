@@ -100,3 +100,25 @@ def show_os_info():
 @app.route('/terms')
 def terms():
     return render_template('other/terms.html')
+
+
+@app.route('/update_git_version', methods=['POST'])
+def update_git_version():
+    try:
+        # Execute the git pull command
+        result = subprocess.run(["git", "pull"], capture_output=True, text=True, check=True)
+        
+        # Return success message and output
+        return jsonify({
+            'status': 'success',
+            'message': 'Repository updated successfully.',
+            'output': result.stdout
+        })
+
+    except subprocess.CalledProcessError as e:
+        # Return error message and output if git pull fails
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to update repository.',
+            'error': e.stderr
+        }), 500

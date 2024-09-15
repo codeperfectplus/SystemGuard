@@ -10,7 +10,8 @@
 {% endblock %}
 {% block content %}
 
-<h2 class="page-title"><i class="fas fa-chart-line"></i> Dashboard Graphs</h2>
+<h2 class="page-title"><i class="fas fa-chart-line"></i>
+    <span class="text-danger m-2"> {{ title }} </span> Metrics</h2>
 <hr>
 <div class="container">
     <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
@@ -26,7 +27,7 @@
             <select id="timeFilter">
                 <option value="5 minutes">Last 5 Minutes</option>
                 <option value="15 minutes">Last 15 Minutes</option>
-                <option value="30 minutes">Last 30 Minutes</option>                
+                <option value="30 minutes">Last 30 Minutes</option>
                 <option value="1 hour">Last 1 Hour</option>
                 <option value="3 hours">Last 3 Hours</option>
                 <option value="6 hours">Last 6 Hours</option>
