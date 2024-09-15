@@ -7,11 +7,16 @@ function stringToDate(dateString) {
 }
 
 function fetchDataAndRenderCharts() {
-    // Get the selected filter value
-    const filterValue = document.getElementById('timeFilter').value;
-    
+    // Retrieve stored filter value from local storage or set default value
+    const storedFilterValue = localStorage.getItem('filterValue') || 5;
+
+    // Set the filter element value to the stored filter value
+    document.getElementById('timeFilter').value = storedFilterValue;
+
+    console.log('Stored Filter Value:', storedFilterValue);
+
     // Fetch data with the selected time filter
-    fetch(`/api/v1/graphs_data?filter=${filterValue}`)
+    fetch(`/api/v1/graphs_data?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
@@ -24,8 +29,7 @@ function fetchDataAndRenderCharts() {
             const currentTempData = data.current_temp;
             const currentTime = data.current_time;
             const timeZoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            console.log(currentTime);
-        
+
             // Format the time data using the currentTime from backend
             const timeData = data.time.map(time => formatDate(time, currentTime));
 
@@ -35,6 +39,25 @@ function fetchDataAndRenderCharts() {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
+// Add event listener to refresh data when filter value changes
+document.getElementById('timeFilter').addEventListener('change', (event) => {
+    // Save the new filter value to local storage
+    localStorage.setItem('filterValue', event.target.value);
+    // Fetch data with the new filter value
+    fetchDataAndRenderCharts();
+});
+
+// Initial fetch when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    fetchDataAndRenderCharts();
+});
+
+// Add the refresh button to fetch the data
+document.getElementById('refreshData').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
 
 function formatDate(dateString, currentTime) {
     const date = new Date(dateString);
@@ -58,6 +81,10 @@ function formatDate(dateString, currentTime) {
     const diffYears = now.getFullYear() - date.getUTCFullYear();
 
     // Determine the label based on time differences
+    // // Reset the time to 12am for the date comparison
+    // date.setUTCHours(0, 0, 0, 0);
+    // now.setUTCHours(0, 0, 0, 0);
+
     // if (diffDays === 0) {
     //     return `Today ${hours}:${minutes}`;
     // } else if (diffDays === 1) {
@@ -83,7 +110,19 @@ function displayTimeAndTimeZone(currentTime, timeZoneName) {
     // Display the current time and timezone
     document.getElementById('currentTime').textContent = `Current Time: ${currentTime}`;
     document.getElementById('timeZoneName').textContent = `Time Zone: ${timeZoneName}`;
+    // Update currentTime by 1 second every second
+    setInterval(() => {
+        const date = new Date(currentTime);
+        date.setSeconds(date.getSeconds() + 1);
+        currentTime = date.toISOString();
+        document.getElementById('currentTime').textContent = `Current Time: ${currentTime}`;
+    }, 1000);
 }
+
+// add the refresh button to fetch the data
+document.getElementById('refreshData').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
 
 
 // Function to create a chart with multiple datasets
@@ -218,10 +257,5 @@ function createCharts(cpuData, timeData, memoryData, batteryData, networkSentDat
 
 // Fetch initial data when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    fetchDataAndRenderCharts();
-});
-
-// Trigger data update when the select dropdown value changes
-document.getElementById('timeFilter').addEventListener('change', () => {
     fetchDataAndRenderCharts();
 });

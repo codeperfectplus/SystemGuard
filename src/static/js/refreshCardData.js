@@ -64,7 +64,6 @@ function fetchSystemData(apiEndpoint) {
             return response.json();
         })
         .then(data => {
-            console.log(`Fetched data from ${apiEndpoint}:`, data);
             return data;
         })
         .catch(error => {
@@ -124,8 +123,6 @@ function startRefresh() {
         refreshTimer = setInterval(refreshData, refreshInterval); // Set a new interval
     }
 }
-
-console.log('Starting data refresh process...');
 
 // Fetch the refresh interval initially
 fetchRefreshInterval();

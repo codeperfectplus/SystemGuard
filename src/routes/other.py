@@ -95,3 +95,8 @@ def show_os_info():
     
     # Render the HTML page with the OS information
     return render_template('info_pages/os_info.html', os_info=os_info)
+
+# terms
+@app.route('/terms')
+def terms():
+    return render_template('other/terms.html')

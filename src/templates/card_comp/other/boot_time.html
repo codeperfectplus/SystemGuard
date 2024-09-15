@@ -8,35 +8,3 @@
     </div>
 </div>
 {% endif %}
-
-<script>
-// Function to format time in HH:MM:SS
-function formatTime(hours, minutes, seconds) {
-    let date = new Date();
-    let day = date.getDate().toString().padStart(2, '0');
-    let month = (date.getMonth() + 1).toString().padStart(2, '0');
-    let year = date.getFullYear().toString().padStart(2, '0');
-    let formattedDate = year + '-' + month + '-' + day;
-    let formattedTime = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
-    return [
-        formattedDate,
-        formattedTime
-    ].join(' ');
-}
-
-// Initialize the time from the server
-let serverTime = new Date('{{ system_info["current_server_time"] }}');
-let timeElement = document.getElementById('server-time');
-
-// Update the time every second
-setInterval(() => {
-    // Increment the server time by 1 second
-    serverTime.setSeconds(serverTime.getSeconds() + 1);
-    // Update the displayed time
-    timeElement.textContent = formatTime(
-        serverTime.getHours(),
-        serverTime.getMinutes(),
-        serverTime.getSeconds()
-    );
-}, 1000);
-</script>

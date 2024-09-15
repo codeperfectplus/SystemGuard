@@ -2,11 +2,11 @@
 {% block title %}Signup{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
-<script src="{{ url_for('static', filename='js/signup.js') }}" defer></script>
 {% endblock %}
 {% block content %}
 <div class="signup-card">
-    <h2 class="signup-title">Create an Account</h2>
+    <h2 class="signup-title"><span class="text-primary">{{title}}</span> Signup Form</h2>
+    <p class="signup-desc">Please fill in this form to create an account.</p>
     <form method="post" class="signup-form">
         <div class="form-group">
             <label for="username">Username</label>
@@ -36,13 +36,23 @@
             <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
             <div id="password-match" class="match-status"></div>
         </div>
-        <div class="form-group form-check">
-            <input type="checkbox" id="receive_email_alerts" name="receive_email_alerts">
-            <label for="receive_email_alerts">Receive Email Alerts</label>
+
+        <!-- Checkbox for server notifications -->
+        <div class="form-check">
+            <input type="checkbox" id="receive_server_notifications" name="receive_server_notifications">
+            <label for="receive_server_notifications">Receive Server Notifications</label>
         </div>
+
+        <!-- Checkbox for agreeing to terms and conditions -->
+        <div class="form-check">
+            <input type="checkbox" id="agree_terms" name="agree_terms" required>
+            <label for="agree_terms">I agree to the <a href="{{ url_for('terms') }}" target="_blank">Terms and Conditions</a></label>
+        </div>
+
         <button type="submit" class="btn btn-primary">Sign Up</button>
     </form>
     <p class="login-link">Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+    <p class="login-link">Powered by <a href="#">SystemGuard</a>.</p>
 </div>
 {% endblock %}
 {% block extra_scripts %}

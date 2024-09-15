@@ -1,0 +1,34 @@
+.terms-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 32px;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 22px;
+    color: #007bff;
+    margin-top: 20px;
+}
+
+p {
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+a {
+    display: block;
+    margin-top: 30px;
+    font-size: 16px;
+    color: #007bff;
+    text-align: center;
+}

@@ -32,10 +32,19 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         remember_me = request.form.get("remember_me") == "on"  # TODO: Implement remember me
+        
+
         user = UserProfile.query.filter_by(username=username).first()
     
         if user and check_password_hash(user.password, password):
-            login_user(user)
+            login_user(user, remember=remember_me)
+
+            # Remember me cookie duration logic
+            if remember_me:
+                login_manager.remember_cookie_duration = datetime.timedelta(days=7)
+            else:
+                login_manager.remember_cookie_duration = datetime.timedelta(0)
+
             # Check if the user has changed the default password
             if check_password_hash(user.password, "admin"):
                 flash("Security Alert: Please change the default password", "danger")

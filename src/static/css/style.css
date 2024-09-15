@@ -39,7 +39,7 @@
 
 /* General Styles */
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Cabin', sans-serif;
     color: #333;
     background-size: cover;
     background-repeat: no-repeat;
@@ -137,7 +137,7 @@ body {
 .card {
     min-height: 140px;
     background: linear-gradient(120deg, #e3f2fd, #bbdefb);
-    border: none;
+    border: 1px solid #cdddeb;
     border-radius: 15px;
     box-shadow: 0 12px 24px var(--color-shadow);
     color: var(--color-dark);
@@ -228,8 +228,8 @@ body {
 }
 
 .cpu-core-bar {
-    width: 5px;
-    height: 15px;
+    width: 15px;
+    height: 5px;
     background-color: var(--color-primary);
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

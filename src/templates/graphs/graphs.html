@@ -16,6 +16,7 @@
     <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
     <p id="currentTime">Current Time: </p>
     <p id="timeZoneName">Time Zone: </p>
+    <button id="refreshData" class="btn btn-primary">Refresh Graphs</button>
 </div>
 <hr>
 <div class="col container">
@@ -79,4 +80,5 @@
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
+<script src="{{ url_for('static', filename='js/boot_time.js')}}"></script>
 {% endblock %}
