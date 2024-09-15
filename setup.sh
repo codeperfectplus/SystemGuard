@@ -347,6 +347,12 @@ update_env_variable() {
     fi
 }
 
+set_variable() {
+    var_name=$1
+    var_value=$2
+    update_env_variable "$var_name" "$var_value"
+}
+
 # Function to set the auto update variable
 set_auto_update() {
     var_name=$1
@@ -357,11 +363,7 @@ set_auto_update() {
         return 1
     fi
 
-    # Update the environment variable with the user's choice
-    update_env_variable "$var_name" "$user_choice"
-
-    # Reload the environment file to apply changes
-    source "$ENV_FILE"
+    set_variable "$var_name" "$user_choice"
 }
 
 # this function will change the ownership of the directory
@@ -614,7 +616,7 @@ setup_cron_job() {
 # Function to install from Git repository
 install_from_git() {
     log "Starting installation of $APP_NAME from Git repository..."
-
+    set_variable "sg_installation_method" "git"
     # Backup existing configurations
     backup_configs
 
@@ -728,6 +730,7 @@ fetch_github_releases() {
 # install the latest version of APP from the release
 install_from_release() {
     fetch_github_releases
+    set_variable "sg_installation_method" "release"
     echo "Enter the tag name of the release to install (e.g., v1.0.3) or 'latest' for the latest release:"
     read -r VERSION
 
@@ -767,6 +770,7 @@ install_using_setup_file_in_cwd() {
 }
 
 install_from_source_code() {
+    set_variable "sg_installation_method" "source"
     backup_configs
     remove_previous_installation
     log "Using the current folder as the installation directory..."

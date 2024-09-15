@@ -171,9 +171,11 @@
                             <a href="{{ url_for('about') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-info-circle"></i> About {{ title }}
                             </a>
+                            {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
                             <a href="#" class="btn btn-primary btn-lg hover-raise" id="updateButton">
                                 <i class="fas fa-download"></i> Update Now
                             </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

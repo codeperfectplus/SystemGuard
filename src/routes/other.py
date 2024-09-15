@@ -79,11 +79,38 @@ def send_email_page():
 
     return render_template("other/send_email.html", enable_alerts=enable_alerts)
 
+def fetch_bashrc_variable(variable_name):
+    """
+    Fetch the value of a given environment variable from the ~/.bashrc file.
+
+    Args:
+        variable_name (str): The name of the environment variable to fetch.
+
+    Returns:
+        str: The value of the environment variable if found, otherwise None.
+    """
+    bashrc_path = os.path.expanduser("~/.bashrc")
+    
+    if not os.path.exists(bashrc_path):
+        raise FileNotFoundError(f"{bashrc_path} does not exist")
+
+    with open(bashrc_path, "r") as file:
+        for line in file:
+            # Look for lines that set the variable
+            if line.strip().startswith(f"{variable_name}="):
+                # Extract the variable value
+                parts = line.strip().split('=', 1)
+                if len(parts) == 2:
+                    return parts[1].strip().strip('"').strip("'")
+    
+    return None
 
 @app.route("/about")
 def about():
     installation_info = check_installation_information()
-    print(installation_info)
+    # fetch sg_installation_method from .bashrc file
+    sg_installation_method = fetch_bashrc_variable("sg_installation_method")
+    installation_info["sg_installation_method"] = sg_installation_method
     return render_template("other/about.html", 
                             installation_info=installation_info)
 
@@ -105,16 +132,17 @@ def terms():
 
 
 @app.route('/update_git_version', methods=['POST'])
+@admin_required
 def update_git_version():
     # Check if the directory is a git repository
     if not os.path.exists(".git"):
         return jsonify({
             'status': 'error',
-            'message': 'Not a Git repository.'
+            'message': 'Installation available only for git repositories for now, in the future we will support other version control systems.'
         }), 400
 
     try:
-        subprocess.run(["git", "stash"], capture_output=True, text=True, check=True)
+        # subprocess.run(["git", "stash"], capture_output=True, text=True, check=True)
         result = subprocess.run(["git", "pull"], capture_output=True, text=True, check=True)
 
         result_stdout = result.stdout

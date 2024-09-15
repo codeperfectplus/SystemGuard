@@ -89,6 +89,5 @@ def check_installation_information():
             output["update_available"] = True
     except subprocess.CalledProcessError:
         pass
-    print("Update available:", output["update_available"])
 
     return output
