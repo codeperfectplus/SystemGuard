@@ -114,16 +114,23 @@ def update_git_version():
         }), 400
 
     try:
-        # Execute the git pull command
+        subprocess.run(["git", "stash"], capture_output=True, text=True, check=True)
         result = subprocess.run(["git", "pull"], capture_output=True, text=True, check=True)
+
         result_stdout = result.stdout
         if "Already up to date." in result_stdout:
             return jsonify({
-                'status': 'success',
+                'status': 'info',
                 'message': 'Already up to date.',
                 'output': result_stdout
             })
-        
+        if "You have unstaged changes" in result_stdout:
+            return jsonify({
+                'status': 'error',
+                'message': 'You have unstaged changes. Please commit or stash them before updating.',
+                'output': result_stdout
+            }), 400
+
         # Return success message and output
         return jsonify({
             'status': 'success',
@@ -132,12 +139,10 @@ def update_git_version():
         })
 
     except subprocess.CalledProcessError as e:
-        print(f"Error: {
-            e.stderr}")
         # Log the detailed error message
         error_message = e.stderr or 'Unknown error occurred'
         return jsonify({
             'status': 'error',
-            'message': "Failed to update the source code.",
+            'message': error_message,
             'error': error_message
         }), 500
