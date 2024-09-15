@@ -80,7 +80,8 @@ ENV_FILE="$USER_HOME/.bashrc" # Default environment file
 ADMIN_LOGIN="admin"
 ADMIN_PASSWORD="admin"
 
-# colors for the script
+# installation script link
+install_script_link="https://raw.githubusercontent.com/codeperfectplus/SystemGuard/main/setup.sh"
 
 set -e
 trap 'echo "An error occurred. Exiting..."; exit 1;' ERR
@@ -517,6 +518,20 @@ restore() {
         log "WARNING" "No backups found to restore."
     fi
 }
+
+update_executable() {
+    # wget the latest version of the script
+    log "Updating the installer script..."
+    if ! wget -q "$install_script_link" -O "$EXECUTABLE"; then
+        log "ERROR" "Failed to download the latest version of the installer script."
+        exit 1
+    fi
+    
+    # install the script as an executable in /usr/local/bin
+    chmod +x "$EXECUTABLE"
+    log "Installer script updated successfully."
+}
+    
 
 # Function to install the script as an executable
 install_executable() {
@@ -1026,6 +1041,7 @@ show_help() {
     echo "Usage: $EXECUTABLE_APP_NAME [options]"
     echo ""
     echo "Options:"
+    echo ""
     echo "  --install                  Install $APP_NAME and set up all necessary dependencies."
     echo "                             This will configure the environment and start the application."
     echo ""
@@ -1064,6 +1080,8 @@ show_help() {
     echo " --install-latest            Update the code to the latest version."
     echo "                             This will pull the latest code from the Git repository."
     echo ""
+    echo " --update-executable         Update the installer to the latest version."
+    echo "                             This will download the latest version of the installer."
     echo ""
     echo "  --help                     Display this help message."
     echo "                             Shows information about all available options and how to use them."
@@ -1104,6 +1122,10 @@ for arg in "$@"; do
         fetch_github_releases
         exit 0
         ;;
+    --update-executable)
+        update_executable
+        exit 0
+        ;;
     --help)
         show_help
         exit 0
@@ -1132,5 +1154,6 @@ fix) fix ;;
 install_latest) install_latest ;;
 open_browser) open_browser ;;
 fetch_github_releases) fetch_github_releases ;;
+update_executable) update_executable ;;
 *) echo "No action specified. Use --help for usage information." ;;
 esac
