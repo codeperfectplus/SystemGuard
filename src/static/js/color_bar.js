@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // if max_attr is defined, use that to define the limits
         if (max_value) {
             const max = parseInt(card.getAttribute(max_attr), 10);
-
+            console.log("dataAttr: ", dataAttr, "max: ", max);
             if (isNaN(max)) {
                 // console.warn(`Invalid max value for ${max_value}`);
                 return;
