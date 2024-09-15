@@ -390,7 +390,7 @@ body {
 
 /* speedtest result */
 
-<style>.bg-speedtest {
+.bg-speedtest {
     background-color: #f1f4f9; /* Light background to match other cards */
     border-radius: 12px;
 }

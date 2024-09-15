@@ -1,128 +1,168 @@
-let refreshInterval = 0; // Initialize with a default value
-let refreshTimer; // Variable to hold the setInterval timer
-let refreshTimeout; // Variable to hold the setTimeout timer
+let refreshInterval = 0;
+let refreshTimer, refreshTimeout;
 
+// Fetch the refresh interval from the server
 function fetchRefreshInterval() {
-    fetch('/api/v1/refresh-interval')
+    return fetch('/api/v1/refresh-interval')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                refreshInterval = data.refresh_interval * 1000; // Convert to milliseconds
-                console.log('Refresh interval fetched successfully:', data.refresh_interval);
-                startRefresh(); // Start refreshing after fetching the interval
+                refreshInterval = data.refresh_interval * 1000; // Convert to ms
+                console.log('Refresh interval:', data.refresh_interval);
+                return refreshInterval;
             } else {
-                console.error('Failed to fetch refresh interval:', data.error);
+                console.error('Error fetching interval:', data.error);
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('Fetch interval error:', error));
 }
 
-// Event listener for select input change
-document.getElementById('refresh-interval').addEventListener('change', function () {
-    // Clear the existing timeout
-    clearTimeout(refreshTimeout);
+// Update the refresh interval when the user changes the value
+function updateRefreshInterval() {
+    const refreshInput = document.getElementById('refresh-interval');
+    refreshInput.addEventListener('change', function () {
+        clearTimeout(refreshTimeout);
+        refreshInterval = parseInt(this.value) * 1000;
 
-    // Update the interval based on the selected value
-    refreshInterval = parseInt(this.value) * 1000;  // Convert to milliseconds
+        refreshTimeout = setTimeout(() => window.location.reload(), refreshInterval);
+        
+        postRefreshInterval(refreshInterval / 1000); // Send in seconds
+        updateColorBars(); // Update color bars based on data attributes
+});
+}
 
-    // refresh the page once
-    refreshTimeout = setTimeout(() => {
-        window.location.reload();
-    }, refreshInterval);
-
-    // Send the updated refresh interval to the server
+// Post the updated refresh interval to the server
+function postRefreshInterval(newInterval) {
     fetch('/api/v1/refresh-interval', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refresh_interval: parseInt(this.value) })  // Send in seconds, not milliseconds
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_interval: newInterval })
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('Refresh interval updated successfully:', data.refresh_interval);
+                console.log('Updated interval:', data.refresh_interval);
             } else {
-                console.error('Failed to update refresh interval:', data.error);
+                console.error('Failed to update interval:', data.error);
             }
         })
         .catch(error => console.error('Error:', error));
-});
+}
 
-// Function to fetch system data from the API once
+// Fetch system data from a given API endpoint
 function fetchSystemData(apiEndpoint) {
-    if (!apiEndpoint) {
-        console.error('Missing required parameter: apiEndpoint.');
-        return;
-    }
-
     return fetch(apiEndpoint)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            return data;
-        })
+        .then(response => response.json())
         .catch(error => {
-            console.error(`Error fetching data from ${apiEndpoint}:`, error);
-            return null;  // Return null on error so we can handle it later
+            console.error(`Error fetching ${apiEndpoint}:`, error);
+            return null;
         });
 }
 
-// Function to update individual cards with the fetched data
-function updateCard(cardSelector, dataKey, data, unit = '') {
+// Update card content based on the fetched data
+function updateCard(cardSelector, dataKey, data, unit = '', barSelector) {
     const cardElement = document.querySelector(cardSelector);
-    if (!cardElement) {
-        return;  // Exit early if the card element is not found
-    }
+    if (!cardElement) return;
+    
+    const dataValue = data?.[dataKey];
+    cardElement.querySelector('.card-text').textContent = dataValue 
+        ? `${dataValue}${unit}` 
+        : 'Data not available';
 
-    const dataValue = data[dataKey];
-    if (dataValue === undefined) {
-        console.warn(`Data key ${dataKey} not found in the response.`);
-        cardElement.querySelector('.card-text').textContent = 'Data not available';
-        return;
-    }
-    else if (dataValue === null) {
-        console.warn(`Data key ${dataKey} is null in the response.`);
-        cardElement.querySelector('.card-text').textContent = 'Data not available';
-        return;
-    }
+    // update the bar element if a selector is provided
+    if (barSelector) {
+        const barElement = cardElement.querySelector(barSelector);
+        if (!barElement) return;
 
-    cardElement.querySelector('.card-text').textContent = `${dataValue}${unit}`;
+        // update the bar element based on the data value
+        const percentage = parseFloat(dataValue);
+        if (isNaN(percentage)) return;
+
+        barElement.style.width = `${percentage}%`;
+    }
 }
 
-// Main function to refresh data and update all necessary cards
+
+// Refresh all card data
 function refreshData() {
-    fetchSystemData('api/system-info').then(data => {
-        if (!data) {
-            return;  // Don't update cards if the fetch failed
-        }
-        updateCard('.bg-disk', 'disk_percent', data);         // Disk Usage
-        updateCard('.cpu-temp-card', 'current_temp', data, ' °C');  // CPU Temperature
-        updateCard('.bg-memory', 'memory_percent', data, '%');  // Memory Usage
-        updateCard('.cpu-frequency', 'cpu_frequency', data, " MHz");  // CPU Frequency
-        updateCard('.cpu-usage-card', 'cpu_percent', data, '%');   // CPU Usage
-        updateCard('.network-received', 'network_received', data, "MB");  // Network Received
-        updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
-        updateCard('.network-stats-card', 'network_stats', data, "");  // Network Sent
-        updateCard('.battery-card', 'battery_percent', data, "%");  // Battery
-        updateCard('.network-sent', 'network_sent', data, "MB");  // Network Sent
-        updateCard('.network-received', 'network_received', data, "MB");  // Network Received
+    fetchSystemData('/api/system-info').then(data => {
+        if (!data) return;
+        updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');
+        updateCard('.cpu-temp-card', 'current_temp', data, ' °C', '.temp-bar');
+        updateCard('.bg-memory', 'memory_percent', data, '%', '.memory-usage-bar');
+        updateCard('.cpu-frequency', 'cpu_frequency', data, ' MHz', '.frequency-bar');
+        updateCard('.cpu-usage-card', 'cpu_percent', data, '%', '.cpu-usage-bar');
+        updateCard('.network-received', 'network_received', data, 'MB');
+        updateCard('.network-sent', 'network_sent', data, 'MB');
+        updateCard('.battery-card', 'battery_percent', data, '%', '.battery-bar');
+        updateColorBars(); // Update color bars based on data attributes
     });
 }
 
-// Function to start refreshing data at the set interval
+// Update color bars based on data attributes
+function updateColorBars() {
+    const bars = [
+        { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] },
+        { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [60, 80] },
+        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [50, 80] },
+        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [0.5, 0.8], maxAttr: 'data-memory-total' },
+        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [0.5, 0.8], maxAttr: 'data-cpu-max-frequency' },
+        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [0.65, 0.9], maxAttr: 'data-cpu-max-temp' }
+    ];
+
+    bars.forEach(({ selector, dataAttr, limits, maxAttr }) => {
+        const bar = document.querySelector(selector);
+        const card = document.querySelector(`[${dataAttr}]`);
+        const maxElement = maxAttr ? document.querySelector(`[${maxAttr}]`) : null;
+
+        if (!bar || !card) {
+            // console.warn(`Element not found for selector: ${selector} or data attribute: ${dataAttr}`);
+            return;
+        }
+
+        let percentage = parseFloat(card.getAttribute(dataAttr));
+
+        if (isNaN(percentage)) {
+            console.warn(`Invalid percentage value for ${dataAttr}`);
+            return;
+        }
+
+        // If maxAttr is defined, use it to scale the limits
+        if (maxElement) {
+            const maxValue = parseFloat(maxElement.getAttribute(maxAttr));
+            if (isNaN(maxValue)) {
+                // console.warn(`Invalid max value for ${maxAttr}`);
+                return;
+            }
+
+            limits = [maxValue * limits[0], maxValue * limits[1]];
+        }
+
+        // Apply class based on percentage within the defined limits
+        if (percentage <= limits[0]) {
+            bar.classList.add('low');
+        } else if (percentage > limits[0] && percentage <= limits[1]) {
+            bar.classList.add('medium');
+        } else {
+            bar.classList.add('high');
+        }
+    });
+}
+
+
+// Start the automatic refresh process
 function startRefresh() {
-    if (refreshTimer) {
-        clearInterval(refreshTimer); // Clear any existing interval
-    }
+    clearInterval(refreshTimer);
     if (refreshInterval > 0) {
-        refreshTimer = setInterval(refreshData, refreshInterval); // Set a new interval
+        refreshTimer = setInterval(refreshData, refreshInterval);
     }
 }
 
-// Fetch the refresh interval initially
-fetchRefreshInterval();
+// Initialize the system
+function init() {
+    fetchRefreshInterval().then(startRefresh); // Fetch interval and start refreshing
+    updateRefreshInterval(); // Listen for changes to the refresh interval input
+    updateColorBars(); // Update color bars based on data attributes
+}
+
+document.addEventListener('DOMContentLoaded', init);
