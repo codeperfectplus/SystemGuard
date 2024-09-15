@@ -3,9 +3,9 @@
     /* Base Colors */
     --color-primary: #7ea0c4;
     --color-secondary: #6c757d;
-    --color-success: #28a745;
-    --color-danger: #dc3545;
-    --color-warning: #ffc107;
+    --color-success: #57d474;
+    --color-danger: #dd6c77;
+    --color-warning: #d7b25c;
     --color-info: #17a2b8;
     --color-light: #f8f9fa;
     --color-dark: #343a40;
@@ -137,8 +137,8 @@ body {
 .card {
     min-height: 140px;
     /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    /* background: linear-gradient(200deg, #f5f7fa, #c3cfe2); */
+    /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
+    background: linear-gradient(200deg, #f5f7fa, #c3cfe2);
     /* background: linear-gradient(135deg, #f5faf7, #c3e2d0); */
     box-sizing: border-box;
     border: 1px solid #cdddeb;  
@@ -153,7 +153,8 @@ body {
     transform: translateY(-10px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s, box-shadow 0.3s;
-}
+    border: 2px solid var(--color-primary);
+    }
 
 /* Card Body Styles */
 .card-body {
@@ -161,18 +162,6 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-/* Individual Card Types */
-.cpu-temp-card, .cpu-usage-card, .cpu-core-card, .memory-card, .cpu-frequency-card, .cpu-high-temp-card, .user-card, .battery-card {
-    border-radius: 12px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-
-.cpu-temp-card:hover, .cpu-usage-card:hover, .cpu-core-card:hover, .memory-card:hover, .cpu-frequency-card:hover, .cpu-high-temp-card:hover, .user-card:hover, .battery-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* Card Title and Text Styles */
@@ -216,28 +205,13 @@ body {
 }
 
 .temp-bar, .disk-bar, .frequency-bar, .cpu-usage-bar, .memory-usage-bar {
-    height: 8px;
+    height: 25px;
     transition: width 0.3s ease;
 }
 
-.temp-bar {
-    background-color: #ff5733;
-}
-
-.disk-bar {
-    background-color: var(--color-primary);
-}
-
-.cpu-usage-bar {
-    background-color: var(--color-primary);
-}
-
-.memory-usage-bar {
-    background-color: var(--color-primary);
-}
-
-.memory-usage-fill, .frequency-bar {
-    background-color: var(--color-primary);
+.battery-bar {
+    height: 25px;
+    transition: width 0.3s ease;
 }
 
 .cpu-core-visualization {
@@ -250,7 +224,7 @@ body {
 
 .cpu-core-bar {
     width: 15px;
-    height: 5px;
+    height: 55px;
     background-color: var(--color-primary);
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -258,7 +232,7 @@ body {
 }
 
 .cpu-core-bar:nth-child(even) {
-    background-color: #0056b3;
+    background-color: #d7b25c;
 }
 
 .cpu-core-bar:hover {
@@ -304,88 +278,81 @@ body {
 /* batter bar */
 .battery-indicator {
     width: 100%;
-    height: 10px;
     background-color: #e0e0e0;
     border-radius: 5px;
     overflow: hidden;
     position: relative;
 }
 
-.battery-bar {
-    height: 100%;
-    background-color: var(--battery-color, #28a745); /* Default color is green */
-    border-radius: 5px;
-    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
-}
 
 /* Battery color indicators based on percentage */
 .battery-bar.low {
-    background-color: #dc3545; /* Red for low battery */
+    background-color: #dd6c77; /* Red for low battery */
 }
 .battery-bar.medium {
-    background-color: #ffc107; /* Yellow for medium battery */
+    background-color: #d7b25c; /* Yellow for medium battery */
 }
 .battery-bar.high {
-    background-color: #28a745; /* Green for high battery */
+    background-color: #57d474; /* Green for high battery */
 }
 
 /* Temperature color indicators based on value */
 .temp-bar.low {
-    background-color: #28a745; /* Green for low temperature */
+    background-color: #57d474; /* Green for low temperature */
 }
 .temp-bar.medium {
-    background-color: #ffc107; /* Yellow for medium temperature */
+    background-color: #d7b25c; /* Yellow for medium temperature */
 }
 .temp-bar.high {
-    background-color: #dc3545; /* Red for high temperature */
+    background-color: #dd6c77; /* Red for high temperature */
 }
 
 /* disk usage bar | disk-bar*/
 
 .disk-bar.low {
-    background-color: #28a745; /* Green for low disk usage */
+    background-color: #57d474; /* Green for low disk usage */
 }
 .disk-bar.medium {
-    background-color: #ffc107; /* Yellow for medium disk usage */
+    background-color: #d7b25c; /* Yellow for medium disk usage */
 }
 .disk-bar.high {
-    background-color: #dc3545; /* Red for high disk usage */
+    background-color: #dd6c77; /* Red for high disk usage */
 }
 
 /* cpu-usage-bar */
 
 .cpu-usage-bar.low {
-    background-color: #28a745; /* Green for low cpu usage */
+    background-color: #57d474; /* Green for low cpu usage */
 }
 .cpu-usage-bar.medium {
-    background-color: #ffc107; /* Yellow for medium cpu usage */
+    background-color: #d7b25c; /* Yellow for medium cpu usage */
 }
 .cpu-usage-bar.high {
-    background-color: #dc3545; /* Red for high cpu usage */
+    background-color: #dd6c77; /* Red for high cpu usage */
 }
 
 /* memory-usage-bar */
 
 .memory-usage-bar.high {
-    background-color: #28a745; /* Green for low memory usage */
+    background-color: #57d474; /* Green for low memory usage */
 }
 .memory-usage-bar.medium {
-    background-color: #ffc107; /* Yellow for medium memory usage */
+    background-color: #d7b25c; /* Yellow for medium memory usage */
 }
 .memory-usage-bar.low {
-    background-color: #dc3545; /* Red for high memory usage */
+    background-color: #dd6c77; /* Red for high memory usage */
 }
 
 /* .frequency-bar */
 
 .frequency-bar.low {
-    background-color: #28a745; /* Green for low frequency */
+    background-color: #57d474; /* Green for low frequency */
 }
 .frequency-bar.medium {
-    background-color: #ffc107; /* Yellow for medium frequency */
+    background-color: #d7b25c; /* Yellow for medium frequency */
 }
 .frequency-bar.high {
-    background-color: #dc3545; /* Red for high frequency */
+    background-color: #dd6c77; /* Red for high frequency */
 }
 
 /* speedtest result */
@@ -401,12 +368,12 @@ body {
 }
 
 .bg-speedtest .fw-bold {
-    color: #007bff; /* Highlighted labels */
+    color: #72a0d1; /* Highlighted labels */
 }
 
 .bg-speedtest .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #72a0d1;
+    border-color: #72a0d1;
     padding: 10px 20px;
 }
 

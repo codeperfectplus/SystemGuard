@@ -97,12 +97,12 @@ async function refreshData() {
 // Update the color of bars based on their percentage
 function updateColorBars() {
     const barConfigs = [
-        { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] },
-        { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [60, 80] },
-        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [50, 80] },
-        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [.50, .80], maxAttr: 'data-memory-total' },
-        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [.50, .80], maxAttr: 'data-cpu-max-frequency' },
-        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [.70, .90], maxAttr: 'data-cpu-max-temp' }
+        { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] }, // alreday in %
+        { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [60, 80] }, // alreday in %
+        { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [50, 80] }, // alreday in %
+        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [50, 80], maxAttr: 'data-memory-total' },
+        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [50, 80], maxAttr: 'data-cpu-max-frequency' },
+        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [20, 50], maxAttr: 'data-cpu-max-temp' }
     ];
 
     barConfigs.forEach(({ selector, dataAttr, limits, maxAttr }) => {
@@ -117,7 +117,7 @@ function updateColorBars() {
         if (maxElement) {
             const maxValue = parseFloat(maxElement.getAttribute(maxAttr));
             if (!isNaN(maxValue)) {
-                limits = [maxValue * limits[0], maxValue * limits[1]];
+                limits = [maxValue * limits[0]/100, maxValue * limits[1]/100];
             }
         }
 
