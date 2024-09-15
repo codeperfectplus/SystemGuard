@@ -261,8 +261,7 @@ def get_disk_usage_percent():
         tuple: Disk usage percentage and calculated disk usage percentage
     """
     disk_usage = psutil.disk_usage("/")
-    calculated_percent = (disk_usage.used / disk_usage.total) * 100
-    return disk_usage.percent, round(calculated_percent, 1)
+    return disk_usage.percent
 
 
 def get_memory_available():

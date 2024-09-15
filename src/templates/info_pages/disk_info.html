@@ -5,9 +5,13 @@
 {% block content %}
 {% include 'card_comp/selector/refresh_button.html' %}<h2 class="my-4">Disk
     Usage Details</h2>
-<div class="row">{% include 'card_comp/disk/usage.html' %} {% include 'card_comp/disk/total.html' %} {% include
-    'card_comp/disk/used.html' %} {% include 'card_comp/disk/free.html' %} </div>
+<div class="row">
+    {% include 'card_comp/disk/usage.html' %} 
+    {% include 'card_comp/disk/total.html' %} 
+    {% include 'card_comp/disk/used.html' %} 
+    {% include 'card_comp/disk/free.html' %} </div>
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
+<script src="{{ url_for('static', filename='js/color_bar.js')}}"></script>
 {% endblock %}

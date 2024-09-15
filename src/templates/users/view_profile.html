@@ -36,6 +36,7 @@
         <a href="{{ url_for('delete_user_self') }}" class="btn-action btn-danger">Delete Profile</a>
         <a href="{{ url_for('logout') }}" class="btn-action btn-warning">Logout</a>
 
+        {% if current_user.user_level == 'admin' %}
         <form action="/superadmin" method="POST" class="control-form">
             {% if session.get('sudo_password') %}
             <button type="submit" name="clear_session" class="btn-action btn-secondary">Exit SuperAdmin</button>
@@ -47,6 +48,7 @@
             </div>
             {% endif %}
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

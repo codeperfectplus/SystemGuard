@@ -202,7 +202,7 @@ body {
     overflow: hidden;
 }
 
-.temp-bar, .usage-bar, .frequency-bar {
+.temp-bar, .disk-bar, .frequency-bar, .cpu-usage-bar, .memory-usage-bar {
     height: 8px;
     transition: width 0.3s ease;
 }
@@ -211,7 +211,15 @@ body {
     background-color: #ff5733;
 }
 
-.usage-bar {
+.disk-bar {
+    background-color: var(--color-primary);
+}
+
+.cpu-usage-bar {
+    background-color: var(--color-primary);
+}
+
+.memory-usage-bar {
     background-color: var(--color-primary);
 }
 
@@ -307,3 +315,52 @@ body {
 .battery-bar.high {
     background-color: #28a745; /* Green for high battery */
 }
+
+/* Temperature color indicators based on value */
+.temp-bar.low {
+    background-color: #28a745; /* Green for low temperature */
+}
+.temp-bar.medium {
+    background-color: #ffc107; /* Yellow for medium temperature */
+}
+.temp-bar.high {
+    background-color: #dc3545; /* Red for high temperature */
+}
+
+/* disk usage bar | disk-bar*/
+
+.disk-bar.low {
+    background-color: #28a745; /* Green for low disk usage */
+}
+.disk-bar.medium {
+    background-color: #ffc107; /* Yellow for medium disk usage */
+}
+.disk-bar.high {
+    background-color: #dc3545; /* Red for high disk usage */
+}
+
+/* cpu-usage-bar */
+
+.cpu-usage-bar.low {
+    background-color: #28a745; /* Green for low cpu usage */
+}
+.cpu-usage-bar.medium {
+    background-color: #ffc107; /* Yellow for medium cpu usage */
+}
+.cpu-usage-bar.high {
+    background-color: #dc3545; /* Red for high cpu usage */
+}
+
+/* memory-usage-bar */
+
+.memory-usage-bar.low {
+    background-color: #28a745; /* Green for low memory usage */
+}
+.memory-usage-bar.medium {
+    background-color: #ffc107; /* Yellow for medium memory usage */
+}
+.memory-usage-bar.high {
+    background-color: #dc3545; /* Red for high memory usage */
+}
+
+
