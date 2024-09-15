@@ -1,10 +1,12 @@
 {% if card_settings.is_user_card_enabled %}
 <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card user-card bg-username shadow-sm">
+    <div class="card user-card shadow-sm">
         <div class="card-body text-center">
-            <h5 class="card-title">System Node <i class="fas fa-user"></i></h5>
-            <p class="card-text fs-5 mb-2">{{ system_info['system_username'] }}@{{ system_ip_address }}</p>
-            <!-- <p class="card-text fs-5">{{ system_info['system_username'] }}@{{ system_info['nodename'] }}</p> -->
+            <h5 class="card-title mb-3">System Node <i class="fas fa-user"></i></h5>
+            <div class="d-flex justify-content-center align-items-center">
+                <p class="card-text fs-5 fw-bold mb-1">{{ system_info['system_username'] }}<span class="text-muted">@{{ system_ip_address }}</span></p>
+            </div>
+            <p class="card-text fs-6 text-secondary">{{ system_info['system_username'] }}@{{ system_info['nodename'] }}</p>
         </div>
     </div>
 </div>

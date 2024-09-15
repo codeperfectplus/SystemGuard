@@ -444,6 +444,7 @@ def _get_system_info():
     disk_info = psutil.disk_usage('/')
     network_sent, network_received = get_network_io()
     cpu_freq, max_freq = get_cpu_frequency()
+    current_temp, high_temp, critical_temp = get_cpu_temp()
    
     # ifconfig | grep -E 'RX packets|TX packets' -A 1
 
@@ -460,7 +461,9 @@ def _get_system_info():
         'dashboard_memory_usage': get_flask_memory_usage(),
         'cpu_frequency': cpu_freq,
         'cpu_max_frequency': max_freq,
-        'current_temp': get_cpu_temp()[0],
+        'current_temp': current_temp,
+        'high_temp': high_temp,
+        'critical_temp': critical_temp,
         'timestamp': datetime.datetime.now(),
     }
     # update uptime dictionary

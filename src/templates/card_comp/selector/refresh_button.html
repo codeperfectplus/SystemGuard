@@ -3,7 +3,7 @@
         <label for="refresh-interval">Select Refresh Interval (seconds):</label>
         <select id="refresh-interval">
             <option value="60000" {% if user_dashboard_settings.refresh_interval == 0 %}selected{% endif %}>No Refresh</option>
-            <!-- <option value="1" {% if user_dashboard_settings.refresh_interval == 1 %}selected{% endif %}>1 seconds</option> -->
+            <option value="2" {% if user_dashboard_settings.refresh_interval == 2 %}selected{% endif %}>2 seconds</option>
             <option value="5" {% if user_dashboard_settings.refresh_interval == 5 %}selected{% endif %}>5 seconds</option>
             <option value="10" {% if user_dashboard_settings.refresh_interval == 10 %}selected{% endif %}>10 seconds</option>
             <option value="15" {% if user_dashboard_settings.refresh_interval == 15 %}selected{% endif %}>15 seconds</option>
