@@ -36,18 +36,17 @@
                         <h5 class="card-title mt-3">Git Branch</h5>
                         <p class="card-text mb-0">{{ installation_info["git_branch"] }}</p>
                         <!-- update_available -->
-                        {% if update_available %}
+
+                        {% if installation_info["update_available"] %}
+
                         <h5 class="card-title mt-3">Update Available</h5>
                         <p class="card-text mb-0">A new version is available. Please update to the latest version.</p>
-                        <a href="{{ url_for('update_git_version') }}" class="btn btn-primary btn-lg hover-raise">
+                        <a href="#" class="btn btn-primary btn-lg hover-raise" id="updateButton">
                             <i class="fas fa-download"></i> Update Now
                         </a>
                         {% else %}
                         <h5 class="card-title mt-3">Update Status</h5>
                         <p class="card-text mb-0">You are up-to-date with the latest version.</p>
-                        <a href="#" class="btn btn-primary btn-lg hover-raise" id="updateButton">
-                            <i class="fas fa-download"></i> Update Now
-                        </a>
                         {% endif %}
                         {% else %}
                         <p class="card-text">Installed via Release</p>

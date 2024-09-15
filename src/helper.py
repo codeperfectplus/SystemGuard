@@ -82,11 +82,13 @@ def check_installation_information():
     # Check for updates
     try:
         result = subprocess.run(["git", "status", "-uno"], capture_output=True, text=True, check=True)
+        print(result.stdout)
         if "Your branch is up to date" in result.stdout:
             output["update_available"] = False
         else:
             output["update_available"] = True
     except subprocess.CalledProcessError:
         pass
+    print("Update available:", output["update_available"])
 
     return output

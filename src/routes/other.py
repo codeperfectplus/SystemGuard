@@ -1,3 +1,4 @@
+import os
 import subprocess
 from flask import render_template, request, jsonify, flash, blueprints, redirect, url_for
 from flask_login import login_required
@@ -82,6 +83,7 @@ def send_email_page():
 @app.route("/about")
 def about():
     installation_info = check_installation_information()
+    print(installation_info)
     return render_template("other/about.html", 
                             installation_info=installation_info)
 
@@ -104,6 +106,13 @@ def terms():
 
 @app.route('/update_git_version', methods=['POST'])
 def update_git_version():
+    # Check if the directory is a git repository
+    if not os.path.exists(".git"):
+        return jsonify({
+            'status': 'error',
+            'message': 'Not a Git repository.'
+        }), 400
+
     try:
         # Execute the git pull command
         result = subprocess.run(["git", "pull"], capture_output=True, text=True, check=True)
@@ -116,10 +125,10 @@ def update_git_version():
         })
 
     except subprocess.CalledProcessError as e:
-        # Return error message and output if git pull fails
-        print(f"Error occurred: {e}")
+        # Log the detailed error message
+        error_message = e.stderr or 'Unknown error occurred'
         return jsonify({
             'status': 'error',
-            'message': 'Failed to update repository.',
-            'error': e.stderr
+            'message': error_message,
+            'error': error_message
         }), 500
