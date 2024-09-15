@@ -125,6 +125,8 @@ def update_git_version():
         })
 
     except subprocess.CalledProcessError as e:
+        print(f"Error: {
+            e.stderr}")
         # Log the detailed error message
         error_message = e.stderr or 'Unknown error occurred'
         return jsonify({
