@@ -24,12 +24,11 @@ color_white="\033[1;37m"    # White
 color_prompt="\033[1;36m" # Cyan for the prompt
 color_option="\033[37m"   # Blue for options
 
+# function to get the user name
 get_user_name() {
     if [ "$(whoami)" = "root" ]; then
         LOGNAME_USER=$(logname 2>/dev/null) # Redirect any error output to /dev/null
         if [ $? -ne 0 ]; then               # Check if the exit status of the last command is not 0
-            echo "No login name found. Using fallback method."
-            # use head -n 1 for native linux. tail -n 1 works with wsl.
             USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
         else
             USER_NAME=$LOGNAME_USER
@@ -39,6 +38,7 @@ get_user_name() {
     fi
     echo "$USER_NAME"
 }
+
 USER_NAME=$(get_user_name)
 USER_HOME=/home/$USER_NAME
 

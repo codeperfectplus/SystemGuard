@@ -39,9 +39,14 @@ def graph_data_api():
             '2 days': timedelta(days=2),
             '3 days': timedelta(days=3),
             '1 week': timedelta(weeks=1),
-            '1 month': timedelta(weeks=4)
+            '1 month': timedelta(weeks=4),
+            '3 months': timedelta(weeks=12),
+
         }
-        start_time = now - time_deltas.get(time_filter, timedelta(days=1))
+        if time_filter == 'all':
+            start_time = datetime.min
+        else:
+            start_time = now - time_deltas.get(time_filter, timedelta(days=1))
 
         # Fetch entries within the time range
         query = SystemInformation.query.filter(SystemInformation.timestamp >= start_time)
