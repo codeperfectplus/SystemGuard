@@ -59,11 +59,11 @@ async function fetchSystemData(apiEndpoint) {
 }
 
 // Update card content and bar width based on fetched data
-function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null) {
+function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null, maxDataKey = null) {
     const cardElement = document.querySelector(cardSelector);
     if (!cardElement) return;
 
-    const dataValue = data?.[dataKey];
+    let dataValue = data?.[dataKey];
     cardElement.querySelector('.card-text').textContent = dataValue ? `${dataValue}${unit}` : 'Data not available';
 
     // Update the bar width if a bar selector is provided
@@ -71,8 +71,21 @@ function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null) 
         const barElement = cardElement.querySelector(barSelector);
         if (!barElement) return;
 
-        const percentage = parseFloat(dataValue);
+        let percentage = parseFloat(dataValue);
+
         if (!isNaN(percentage)) {
+            // If a maxDataKey is provided, calculate the percentage based on the max value
+            if (maxDataKey) {
+                const maxDataValue = parseFloat(data?.[maxDataKey]);
+                if (!isNaN(maxDataValue) && maxDataValue > 0) {
+                    percentage = (percentage / maxDataValue) * 100;
+                }
+            }
+
+            // Ensure the percentage doesn't exceed 100%
+            percentage = Math.min(percentage, 100);
+
+            // Set the bar width based on the percentage
             barElement.style.width = `${percentage}%`;
         }
     }
@@ -86,7 +99,7 @@ async function refreshData() {
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');
     updateCard('.cpu-temp-card', 'current_temp', data, ' °C', '.temp-bar');
     updateCard('.bg-memory', 'memory_percent', data, '%', '.memory-usage-bar');
-    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar');
+    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar', 'cpu_max_frequency');
     updateCard('.cpu-usage-card', 'cpu_percent', data, '%', '.cpu-usage-bar');
     updateCard('.network-received', 'network_received', data, 'MB');
     updateCard('.network-sent', 'network_sent', data, 'MB');
@@ -120,7 +133,7 @@ function updateColorBars() {
                 limits = [maxValue * limits[0]/100, maxValue * limits[1]/100];
             }
         }
-        
+        // console.log("card_value", card_value, limits)
         bar.classList.remove('low', 'medium', 'high');
         // Apply the appropriate class based on the limits
         if (card_value <= limits[0]) {
@@ -130,6 +143,7 @@ function updateColorBars() {
         } else {
             bar.classList.add('high');
         }
+
     });
 }
 
