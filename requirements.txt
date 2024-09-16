@@ -21,3 +21,6 @@ watchdog==5.0.2
 
 # python requests library for making HTTP requests
 requests==2.32.3
+
+# Speedtest CLI for testing internet speed
+speedtest-cli==2.1.3 

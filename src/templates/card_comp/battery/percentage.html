@@ -2,12 +2,21 @@
 <div class="col-md-6 col-lg-4 mb-4">
     <div class="card battery-card shadow-sm" data-battery="{{ system_info['battery_percent'] }}">
         <div class="card-body text-center">
-            <h5 class="card-title">Battery Percentage <i class="fas fa-battery-three-quarters"></i></h5>
-            <p class="card-text fs-4">{{ system_info['battery_percent']}}%</p>
+            <h5 class="card-title">
+                Battery Percentage 
+                {% if system_info['battery_percent'] > 50 %}
+                    <i class="battery-icon fas fa-battery-full {{ 'text-success' if system_info['battery_status'] == 'Charging' else 'text-danger' }}"></i>
+                {% elif system_info['battery_percent'] > 25 %}
+                    <i class="battery-icon fas fa-battery-half {{ 'text-success' if system_info['battery_status'] == 'Charging' else 'text-danger' }}"></i>
+                {% else %}
+                    <i class="battery-icon fas fa-battery-empty {{ 'text-success' if system_info['battery_status'] == 'Charging' else 'text-danger' }}"></i>
+                {% endif %}
+            </h5>
+            <p class="card-text fs-4">{{ system_info['battery_percent'] }}%</p>
             <div class="battery-indicator mt-2">
-                <div class="battery-bar" style="width: {{ system_info['battery_percent']}}%;"></div>
+                <div class="battery-bar" style="width: {{ system_info['battery_percent'] }}%;"></div>
             </div>
-                <p class="battery-status fs-6 mt-2">Battery Status: {{ system_info['battery_status']}}</p>
+            <p class="battery-status fs-6 mt-2">Battery Status: {{ system_info['battery_status'] }}</p>
         </div>
     </div>
 </div>

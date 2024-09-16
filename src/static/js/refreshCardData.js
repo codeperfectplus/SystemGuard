@@ -152,6 +152,26 @@ async function refreshCardText(cardSelector, dataKey, data) {
     }
 }
 
+async function updateBatteryIcon(iconSelector, batteryStatusKey, batteryPercentKey, data) {
+    let iconElement = document.querySelector(iconSelector);
+    let batteryStatus = data[batteryStatusKey];
+    let batteryPercent = data[batteryPercentKey];
+
+    if (!iconElement) return;
+    iconElement.className = '';
+    // based on battery status(Charging/Discharging) and percentage, update the icon, to full, half or empty and color
+    if (batteryPercent > 50) {
+        iconElement.classList.add('battery-icon', 'fas', 'fa-battery-full', batteryStatus === 'Charging' ? 'text-success' : 'text-danger');
+    }
+    else if (batteryPercent > 25) {
+        iconElement.classList.add('battery-icon', 'fas', 'fa-battery-half', batteryStatus === 'Charging' ? 'text-success' : 'text-danger');
+    }
+    else {
+        iconElement.classList.add('battery-icon', 'fas', 'fa-battery-empty', batteryStatus === 'Charging' ? 'text-success' : 'text-danger');
+    }
+    
+}
+
 // Refresh all card data
 async function refreshData() {
     const data = await queueRequest('/api/system-info');
@@ -167,6 +187,7 @@ async function refreshData() {
     updateCard('.battery-card', 'battery_percent', data, '%', '.battery-bar');
 
     refreshCardText('.battery-status', 'battery_status', data); // battery charging status
+    updateBatteryIcon('.battery-icon', 'battery_status', 'battery_percent', data); // battery charging status
     updateColorBars(); // Update color bars based on the fetched data
 }
 
