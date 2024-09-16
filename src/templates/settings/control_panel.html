@@ -57,7 +57,7 @@
         <!-- User Management Section -->
         <div class="tab-pane fade show active" id="user-management" role="tabpanel" aria-labelledby="user-management-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-users"></i> User Management</h5>
@@ -76,7 +76,7 @@
         <!-- Settings Section -->
         <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-cogs"></i> Settings</h5>
@@ -95,7 +95,7 @@
         <!-- Utilities Section -->
         <div class="tab-pane fade" id="utilities" role="tabpanel" aria-labelledby="utilities-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
@@ -111,6 +111,9 @@
                             <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-tachometer-alt"></i> Speedtest
                             </a>
+                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-globe"></i> Ping Website
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -120,13 +123,10 @@
         <!-- Network Tools Section -->
         <div class="tab-pane fade" id="network-tools" role="tabpanel" aria-labelledby="network-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tools</h5>
-                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-globe"></i> Ping Website
-                            </a>
+                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tols</h5>
                             <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-shield-alt"></i> Firewall
                             </a>
@@ -142,7 +142,7 @@
         <!-- Feature Toggles Section -->
         <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
@@ -161,7 +161,7 @@
         <!-- System Info Section -->
         <div class="tab-pane fade" id="system-info" role="tabpanel" aria-labelledby="system-info-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
@@ -185,7 +185,7 @@
         <!-- profile tab -->
         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>

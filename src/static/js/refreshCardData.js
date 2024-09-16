@@ -91,6 +91,22 @@ function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null, 
     }
 }
 
+// refresh the card text based on fetched data
+async function refreshCardText(cardSelector, dataKey, data) {
+    const cardElement = document.querySelector(cardSelector);
+
+    if (!cardElement) return;
+    // fetch value dataKey from data
+    let dataValue = data[dataKey];
+
+    // Update the card text
+    if (dataValue) {
+        cardElement.textContent = `Battery Status: ${dataValue}`;
+    } else {
+        cardElement.textContent = 'Data not available';
+    }
+}
+
 // Refresh all card data
 async function refreshData() {
     const data = await fetchSystemData('/api/system-info');
@@ -104,6 +120,8 @@ async function refreshData() {
     updateCard('.network-received', 'network_received', data, 'MB');
     updateCard('.network-sent', 'network_sent', data, 'MB');
     updateCard('.battery-card', 'battery_percent', data, '%', '.battery-bar');
+
+    refreshCardText('.battery-status', 'battery_status', data); // battery charging status
     updateColorBars(); // Update color bars based on the fetched data
 }
 

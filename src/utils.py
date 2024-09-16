@@ -347,6 +347,34 @@ def get_os_info():
         "kernel_version": kernel_version
     }
 
+
+def check_battery_status():
+    battery = psutil.sensors_battery()
+    
+    output = {}
+    if battery is not None:
+        percent = battery.percent
+        is_plugged = battery.power_plugged
+
+        if is_plugged:
+            status = "Charging"
+        else:
+            status = "Discharging"
+
+        output = {
+            "status": status,
+            "percent": round(percent)
+        }
+        
+    else:
+        output = {
+            "status": "Not available",
+            "percent": 0
+        }
+
+    return output
+
+
 # TODO: cache the result to avoid reading the file every time
 def get_os_release_info():
     """
@@ -428,7 +456,8 @@ def get_network_io():
     return network_sent, network_received
 
 def _get_system_info():
-    """ Get system information with caching for certain values and fresh data for others. 
+    """ sub function required by the get_system_info function and front-end dashboard to 
+    update the system information with fresh data for certain values and cached data for others.
     ---
     Parameters:
     ---
@@ -440,7 +469,8 @@ def _get_system_info():
     disk_total = get_cached_value("disk_total", get_disk_total)
     memory_available = get_cached_value("memory_available", get_memory_available) 
     # Gathering fresh system information
-    battery_info = psutil.sensors_battery()
+    battery_data = check_battery_status()
+    print("Battery Data: ", battery_data)
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
     network_sent, network_received = get_network_io()
@@ -457,9 +487,10 @@ def _get_system_info():
         'disk_percent': round(disk_info.percent, 2),
         'disk_total': disk_total,
         'network_sent': network_sent,
-        'battery_percent': round(battery_info.percent, 1) if battery_info else 0,
         'network_received': network_received,
         "network_stats" : f"D: {network_sent} MB / U: {network_received} MB",
+        'battery_percent': battery_data['percent'],
+        'battery_status': battery_data['status'],
         'dashboard_memory_usage': get_flask_memory_usage(),
         'cpu_frequency': cpu_freq,
         'cpu_max_frequency': max_freq,
@@ -484,10 +515,10 @@ def get_system_info():
     # get system username
     system_username = get_cached_value('system_username', get_system_username)
     nodename = get_cached_value('nodename', get_system_node_name)
-    ipv4_address = get_cached_value('ipv4', lambda: get_ip_address())
     boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
     uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
     current_server_time = datetime.datetime.now()
+    ipv4_address = get_ip_address()
     os_info = get_cached_value('os_info', get_os_info)
     os_info.update(get_cached_value('os_release_info', get_os_release_info))
     
