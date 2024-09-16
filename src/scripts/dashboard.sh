@@ -101,7 +101,7 @@ fetch_env_variable() {
 
 auto_update=$(fetch_env_variable "sg_auto_update")
 # Fetch from bashrc for auto-update
-echo "Auto update for $APP_NAME is set to $auto_update"
+log_message "Auto update for $APP_NAME is set to $auto_update"
 
 # Ensure log directory exists
 LOG_DIR="$(dirname "$LOG_FILE")"

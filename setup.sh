@@ -45,6 +45,7 @@ USER_HOME=/home/$USER_NAME
 # Define directories and file paths
 DOWNLOAD_DIR="/tmp"
 APP_NAME="SystemGuard"
+INSATLLER_VERSION="v1.0.0"
 APP_NAME_LOWER=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]')
 EXTRACT_DIR="$USER_HOME/.$APP_NAME_LOWER"
 GIT_INSTALL_DIR="$EXTRACT_DIR/${APP_NAME}-git"
@@ -67,11 +68,11 @@ GITHUB_USER="codeperfectplus"
 GITHUB_REPO="$APP_NAME"
 GITHUB_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO"
 ISSUE_TRACKER_URL="$GITHUB_URL/issues"
-NUM_OF_RELEASES=5
-NUM_OF_RETRIES=5
 
 # Backup settings
-NUM_BACKUPS=5
+NUM_OF_BACKUP=5
+NUM_OF_RELEASES=5
+NUM_OF_RETRIES=5
 
 # Environment variables
 ENV_FILE="$USER_HOME/.bashrc" # Default environment file
@@ -149,16 +150,16 @@ message_box() {
     total_length=$((message_length + 2 * padding))
 
     # Print the top border of the message box
-    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $total_length))┐${color_reset}"
+    echo -e "${color_border}┌$(printf '─%.0s' $(seq 1 $total_length))┐${color_reset}" | tee -a "$LOG_FILE"
 
     # Read the message line by line and print with padding and side borders
     while IFS= read -r line; do
         printf "%b│%b%*s%b%s%b%*s%b│%b\n" \
-            "$color_border" "$color_reset" $padding "" "$color_message" "$line" "$color_reset" $((total_length - padding - ${#line})) "" "$color_border" "$color_reset"
+            "$color_border" "$color_reset" $padding "" "$color_message" "$line" "$color_reset" $((total_length - padding - ${#line})) "" "$color_border" "$color_reset" | tee -a "$LOG_FILE"
     done <<<"$(echo -e "$message")"
 
     # Print the bottom border of the message box
-    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $total_length))┘${color_reset}"
+    echo -e "${color_border}└$(printf '─%.0s' $(seq 1 $total_length))┘${color_reset}" | tee -a "$LOG_FILE"
 
     # Pause for the specified sleep time if provided
     if [ -n "$sleeptime" ]; then
@@ -170,7 +171,7 @@ message_box() {
 display_credentials() {
     local username="Username: ${ADMIN_LOGIN}"
     local password="Password: ${ADMIN_PASSWORD}"
-    local message="Here are your login credentials. It will be used to login to the dashboard."
+    local message="Here are your login credentials. \nIt will be use to login to the dashboard."
 
     local max_length=$((${#username} > ${#password} ? ${#username} : ${#password}))
     local max_length_message=$((${#message} > max_length ? ${#message} : max_length))
@@ -242,7 +243,6 @@ check_dependencies() {
     # Detect the package manager
     local manager
     manager=$(detect_package_manager)
-    echo "Package manager found: $manager"
 
     # Array to keep track of missing dependencies
     local missing_dependencies=()
@@ -469,6 +469,7 @@ rotate_backups() {
         done
     fi
 }
+
 # Backup function for existing configurations
 backup_configs() {
     rotate_backups $NUM_OF_BACKUP
@@ -630,7 +631,6 @@ setup_cron_job() {
 
 # Function to install from Git repository
 install_from_git() {
-    log "Starting installation of $APP_NAME from Git repository..."
     set_variable "sg_installation_method" "git"
     # Backup existing configurations
     backup_configs
@@ -824,18 +824,38 @@ open_browser() {
 }
 
 start_server() {
-    log "Starting $APP_NAME server..."
+    log "Starting ${APP_NAME} server..."
     display_credentials
-    cd $EXTRACT_DIR/$APP_NAME-*/
-    dashboard_script_path=$(find . -name dashboard.sh | head -n 1)
-    sudo -u "$USER_NAME" bash "$dashboard_script_path" &>/dev/null
+
+    # Change to the correct directory
+    if cd ${EXTRACT_DIR}/${APP_NAME}-*/; then
+        # Find the dashboard script
+        dashboard_script_path=$(find . -name "dashboard.sh" | head -n 1)
+
+        # Check if the script was found
+        if [[ -n "$dashboard_script_path" ]]; then
+            # Run the script with the specified user
+            if sudo -u "${USER_NAME}" bash "${dashboard_script_path}"; then
+                log "Server started successfully."
+            else
+                log "Failed to start the server."
+                return 1
+            fi
+        else
+            log "dashboard.sh not found."
+            return 1
+        fi
+    else
+        log "Failed to change directory to ${EXTRACT_DIR}/${APP_NAME}-*/"
+        return 1
+    fi
 }
 
 # Install function
 install() {
-    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 0
+    message_box "$APP_NAME Installer $INSATLLER_VERSION" 0
+    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 3
     check_dependencies
-    log "Starting installation of $APP_NAME..."
     create_dir "$EXTRACT_DIR"
     message_box "Choose the installation method\nNote: Release is recommended for production use." 0
     message_box "1. Release (More Stable Version)\n2. Git Repository (Pre-Release Version)\n3. Source Code (Current Directory)" 0
@@ -981,18 +1001,25 @@ show_installer_logs() {
 }
 
 # stop flask server
-stop_server_helper() {
-    if lsof -Pi :5050 -sTCP:LISTEN -t >/dev/null; then
-        kill -9 $(lsof -t -i:5050)
-        log "Server stopped successfully."
-    else
-        log "Server is not running."
-    fi
-}
-
 stop_server() {
-    log "Stopping $APP_NAME server..."
-    stop_server_helper
+    local port=5050
+    local pid
+
+    # Check if the server is listening on the specified port
+    if pid=$(lsof -ti :"$port" 2>/dev/null); then
+        if [ -n "$pid" ]; then
+            # Terminate the process
+            if kill -9 "$pid" >/dev/null 2>&1; then
+                log "Server on port $port stopped successfully."
+            else
+                log "Error: Failed to stop the server on port $port."
+            fi
+        else
+            log "No process found listening on port $port."
+        fi
+    else
+        log "No process found listening on port $port."
+    fi
 }
 
 # fix the server

@@ -123,9 +123,13 @@ function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null, 
 
         let percentage = parseFloat(dataValue);
 
-
-        // Ensure the percentage doesn't exceed 100%
-        percentage = Math.min(percentage, 100);
+        // check if maxDataKey is provided
+        if (maxDataKey) {
+            let maxDataValue = data?.[maxDataKey];
+            percentage = dataValue / maxDataValue * 100;
+        } else {
+            percentage = Math.min(percentage, 100);
+        }
 
         // Set the bar width based on the percentage
         barElement.style.width = `${percentage}%`;
@@ -156,7 +160,7 @@ async function refreshData() {
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');
     updateCard('.cpu-temp-card', 'current_temp', data, ' °C', '.temp-bar');
     updateCard('.bg-memory', 'memory_percent', data, '%', '.memory-usage-bar');
-    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar');
+    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar', 'cpu_max_frequency');
     updateCard('.cpu-usage-card', 'cpu_percent', data, '%', '.cpu-usage-bar');
     updateCard('.network-received', 'network_received', data, 'MB');
     updateCard('.network-sent', 'network_sent', data, 'MB');
@@ -186,7 +190,6 @@ function updateColorBars() {
         if (isNaN(card_value)) return;
 
         bar.classList.remove('low', 'medium', 'high');
-        console.log("dataAttr", dataAttr, card_value, limits)
         // Apply the appropriate class based on the limits
         if (card_value <= limits[0]) {
             bar.classList.add('low');
