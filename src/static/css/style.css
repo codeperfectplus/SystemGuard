@@ -321,15 +321,16 @@ body {
 
 /* memory-usage-bar */
 
-.memory-usage-bar.high {
-    background-color: #57d474; /* Green for low memory usage */
+.memory-usage-bar.low {
+    background-color: #57d474; /* Green for low memory usage */    
 }
 .memory-usage-bar.medium {
     background-color: #d7b25c; /* Yellow for medium memory usage */
 }
-.memory-usage-bar.low {
-    background-color: #dd6c77; /* Red for high memory usage */
+.memory-usage-bar.high {
+    background-color: #dd6c77; /* Red for high memory usage */   
 }
+
 
 /* .frequency-bar */
 

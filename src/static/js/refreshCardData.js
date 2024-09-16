@@ -123,21 +123,12 @@ function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null, 
 
         let percentage = parseFloat(dataValue);
 
-        if (!isNaN(percentage)) {
-            // If a maxDataKey is provided, calculate the percentage based on the max value
-            if (maxDataKey) {
-                const maxDataValue = parseFloat(data?.[maxDataKey]);
-                if (!isNaN(maxDataValue) && maxDataValue > 0) {
-                    percentage = (percentage / maxDataValue) * 100;
-                }
-            }
 
-            // Ensure the percentage doesn't exceed 100%
-            percentage = Math.min(percentage, 100);
+        // Ensure the percentage doesn't exceed 100%
+        percentage = Math.min(percentage, 100);
 
-            // Set the bar width based on the percentage
-            barElement.style.width = `${percentage}%`;
-        }
+        // Set the bar width based on the percentage
+        barElement.style.width = `${percentage}%`;
     }
 }
 
@@ -165,7 +156,7 @@ async function refreshData() {
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');
     updateCard('.cpu-temp-card', 'current_temp', data, ' °C', '.temp-bar');
     updateCard('.bg-memory', 'memory_percent', data, '%', '.memory-usage-bar');
-    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar', 'cpu_max_frequency');
+    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar');
     updateCard('.cpu-usage-card', 'cpu_percent', data, '%', '.cpu-usage-bar');
     updateCard('.network-received', 'network_received', data, 'MB');
     updateCard('.network-sent', 'network_sent', data, 'MB');
@@ -181,28 +172,21 @@ function updateColorBars() {
         { selector: '.battery-bar', dataAttr: 'data-battery', limits: [25, 75] }, // alreday in %
         { selector: '.disk-bar', dataAttr: 'data-disk-usage', limits: [60, 80] }, // alreday in %
         { selector: '.cpu-usage-bar', dataAttr: 'data-cpu-usage', limits: [60, 90] }, // alreday in %
-        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [60, 90], maxAttr: 'data-memory-total' },
-        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [60, 90], maxAttr: 'data-cpu-max-frequency' },
-        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [70, 90], maxAttr: 'data-cpu-max-temp' }
+        { selector: '.memory-usage-bar', dataAttr: 'data-memory-usage', limits: [60, 90] },
+        { selector: '.frequency-bar', dataAttr: 'data-cpu-frequency', limits: [60, 90] },
+        { selector: '.temp-bar', dataAttr: 'data-cpu-temp', limits: [70, 90] }
     ];
 
-    barConfigs.forEach(({ selector, dataAttr, limits, maxAttr }) => {
+    barConfigs.forEach(({ selector, dataAttr, limits }) => {
         const bar = document.querySelector(selector);
         const card = document.querySelector(`[${dataAttr}]`);
-        const maxElement = maxAttr ? document.querySelector(`[${maxAttr}]`) : null;
 
         if (!bar || !card) return;
         let card_value = parseFloat(bar.style.width);
         if (isNaN(card_value)) return;
 
-        if (maxElement) {
-            const maxValue = parseFloat(maxElement.getAttribute(maxAttr));
-            if (!isNaN(maxValue)) {
-                limits = [maxValue * limits[0]/100, maxValue * limits[1]/100];
-            }
-        }
-        // console.log("card_value", card_value, limits)
         bar.classList.remove('low', 'medium', 'high');
+        console.log("dataAttr", dataAttr, card_value, limits)
         // Apply the appropriate class based on the limits
         if (card_value <= limits[0]) {
             bar.classList.add('low');
