@@ -58,6 +58,34 @@ document.getElementById('refreshData').addEventListener('click', () => {
     fetchDataAndRenderCharts();
 });
 
+document.getElementById('refreshCpuTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshMemoryTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshBatteryTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshNetworkTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshDashboardMemoryTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshCpuFrequencyTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
+document.getElementById('refreshCurrentTempTime').addEventListener('click', () => {
+    fetchDataAndRenderCharts();
+});
+
 
 function formatDate(dateString, currentTime) {
     const date = new Date(dateString);
@@ -148,8 +176,9 @@ function createChart(ctx, labels, datasets, yLabel) {
                     ticks: {
                         autoSkip: true,          // Automatically skip some labels to prevent overlap
                         maxTicksLimit: 10,       // Maximum number of ticks to display
-                        maxRotation: 30,          // Prevent rotating the labels for better readability
-                        minRotation: 0
+                        maxRotation: 20,          // Prevent rotating the labels for better readability
+                        minRotation: 0,
+                        
                     }
                 },
                 y: {

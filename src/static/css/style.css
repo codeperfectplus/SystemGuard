@@ -137,8 +137,8 @@ body {
 .card {
     min-height: 190px;
     /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
-    /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
-    background: linear-gradient(200deg, #f5f7fa, #c3cfe2);
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    /* background: linear-gradient(200deg, #f5f7fa, #c3cfe2); */
     /* background: linear-gradient(135deg, #f5faf7, #c3e2d0); */
     box-sizing: border-box;
     border: 1px solid #cdddeb;  

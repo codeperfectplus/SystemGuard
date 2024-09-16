@@ -86,7 +86,7 @@ async function refreshData() {
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');
     updateCard('.cpu-temp-card', 'current_temp', data, ' °C', '.temp-bar');
     updateCard('.bg-memory', 'memory_percent', data, '%', '.memory-usage-bar');
-    updateCard('.cpu-frequency', 'cpu_frequency', data, ' MHz', '.frequency-bar');
+    updateCard('.cpu-frequency-card', 'cpu_frequency', data, ' MHz', '.frequency-bar');
     updateCard('.cpu-usage-card', 'cpu_percent', data, '%', '.cpu-usage-bar');
     updateCard('.network-received', 'network_received', data, 'MB');
     updateCard('.network-sent', 'network_sent', data, 'MB');

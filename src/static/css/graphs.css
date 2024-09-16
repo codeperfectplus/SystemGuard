@@ -1,54 +1,58 @@
-/* Basic Reset and Global Styles */
+/* Reset and Global Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Container for Layout */
-.controls-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.controls-container select,
-.controls-container button {
-    margin-right: 10px; /* Space between select and button */
-}
-
-.page-title {
-    font-size: 2rem;
-    margin-bottom: 20px;
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
     color: #333;
-    text-align: center;
-    width: 100%; /* Ensure it takes full width */
-    display: flex;
-    justify-content: center; /* Center the text horizontally */
 }
 
-/* Style for Select Dropdown */
-select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+/* Layout Containers */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
     background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Page Title */
+.page-title {
+    font-size: 2.5rem;
     color: #333;
-    transition: border-color 0.3s;
+    margin-bottom: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-select:hover,
-select:focus {
-    border-color: #4caf50; /* Highlight on hover/focus */
-    outline: none;
+.page-title i {
+    color: #4caf50;
+    margin-right: 10px;
+    transition: transform 0.3s;
 }
 
-/* Style for Refresh Button */
+.page-title:hover i {
+    transform: rotate(10deg);
+}
+
+/* Buttons */
 button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     background-color: #4caf50;
     color: #fff;
     font-size: 1rem;
@@ -69,64 +73,54 @@ button i {
     margin-right: 8px;
 }
 
-/* Container Styles for Charts */
-.container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-}
-
-.selector-container {
-    display: flex;
-    align-items: center; /* Align items vertically in the center */
-    gap: 1rem; /* Space between the elements */
-}
-
-.time-filter-container {
-    display: flex;
-    flex-direction: column; /* Stack label and select vertically */
-}
-
-.time-filter-container label {
-    margin-bottom: 0.5rem; /* Space between label and select */
-}
-
+/* Select Dropdown */
 select {
-    padding: 0.5rem; /* Add padding for better appearance */
-    border-radius: 0.25rem; /* Rounded corners */
-    border: 1px solid #ccc; /* Border color */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #fff;
+    color: #333;
+    transition: border-color 0.3s, background-color 0.3s;
 }
 
+select:hover,
+select:focus {
+    border-color: #4caf50;
+    background-color: #f9f9f9;
+    outline: none;
+}
+
+/* Headings */
 h2 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 2rem;
     color: #444;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
 }
 
 h2 i {
     margin-right: 10px;
-    color: #4caf50; /* Icon color */
+    color: #4caf50;
 }
 
-/* Chart Styles */
+/* Chart Canvas */
 canvas {
     display: block;
-    height: 400px;
     width: 100%;
+    height: 400px;
     background-color: #f5f5f5;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
 }
 
-/* Animation for Charts */
+/* Animation for Container and Chart Load */
 .container {
     opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 1s forwards;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
 @keyframes fadeInUp {
@@ -134,6 +128,34 @@ canvas {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Controls */
+.controls-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.controls-container select,
+.controls-container button {
+    margin-right: 10px;
+}
+
+.selector-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.time-filter-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-filter-container label {
+    margin-bottom: 0.5rem;
 }
 
 /* Responsive Styles */
@@ -148,11 +170,111 @@ canvas {
         margin-bottom: 10px;
     }
 
+    .page-title {
+        font-size: 1.75rem;
+    }
+
     h2 {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
 
     button {
         font-size: 0.875rem;
     }
+}
+
+/* Improved Color Scheme */
+body {
+    --primary-color: #4caf50;
+    --secondary-color: #333;
+    --background-color: #f0f2f5;
+    --text-color: #444;
+    --light-bg: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --hover-color: #45a049;
+    --card-background: #f5f5f5;
+}
+
+/* Apply Variables */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.page-title i,
+h2 i {
+    color: var(--primary-color);
+}
+
+.container {
+    background-color: var(--light-bg);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+button {
+    background-color: var(--primary-color);
+}
+
+button:hover {
+    background-color: var(--hover-color);
+}
+
+canvas {
+    background-color: var(--card-background);
+}
+
+/* Hover Animations */
+button:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.05);
+}
+
+/* General Button Styles */
+button {
+    padding: 10px 20px;             /* Adjust padding for a comfortable size */
+    border: 2px solid transparent;  /* Add border for better contrast */
+    border-radius: 5px;             /* Slightly rounded corners for modern look */
+    background-color: #4caf50;      /* Primary button background color (green) */
+    color: white;                   /* Button text color */
+    font-size: 1rem;                /* Base font size */
+    cursor: pointer;                /* Show pointer on hover */
+    display: inline-flex;           /* Align button content horizontally */
+    align-items: center;            /* Center icon and text vertically */
+    justify-content: center;        /* Center content */
+    transition: background-color 0.3s, transform 0.3s;  /* Smooth transition on hover */
+    margin-bottom: 10px;           /* Add space between buttons */
+}
+
+/* Hover and Active States */
+button:hover {
+    background-color: #45a049;      /* Darken background on hover */
+    transform: scale(1.05);         /* Slight zoom effect on hover */
+}
+
+button:active {
+    transform: scale(0.98);         /* Slight shrink effect on click */
+}
+
+/* Icon Spacing */
+button i {
+    margin-right: 8px;              /* Space between icon and text */
+}
+
+/* Style for Icon in Button */
+button i.fas {
+    font-size: 1.2rem;              /* Adjust icon size */
+    vertical-align: middle;         /* Center the icon vertically */
+}
+
+/* Custom Styles for Specific Buttons (Optional) */
+#refreshData, #refreshCpuTime, #refreshMemoryTime, #refreshBatteryTime, 
+#refreshNetworkTime, #refreshDashboardMemoryTime, #refreshCpuFrequencyTime,
+#refreshCurrentTempTime {
+    background-color: #3498db;      /* Optional: Blue background for specific buttons */
+}
+
+#refreshData:hover, #refreshCpuTime:hover, #refreshMemoryTime:hover, #refreshBatteryTime:hover, 
+#refreshNetworkTime:hover, #refreshDashboardMemoryTime:hover, 
+#refreshCpuFrequencyTime:hover, #refreshCurrentTempTime:hover {
+    background-color: #2980b9;      /* Darker blue on hover for specific buttons */
 }
