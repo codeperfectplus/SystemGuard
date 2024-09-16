@@ -75,22 +75,7 @@ export FLASK_ENV=production
 export FLASK_RUN_PORT="$FLASK_PORT"
 export FLASK_RUN_HOST="0.0.0.0"
 
-# function to check missing dependencies and install them
-check_missing_dependencies() {
-    chmod +x "$SCRIPT_TO_CHECK_REQUIREMENTS"
-    MISSING_PACKAGES=$(python $SCRIPT_TO_CHECK_REQUIREMENTS "$REQUIREMENTS_FILE")
-    echo "Missing packages: $MISSING_PACKAGES"
 
-    if [ "$MISSING_PACKAGES" != "All packages are installed." ]; then
-        echo "Installing missing packages..."
-        # Install each missing package
-        for package in $MISSING_PACKAGES; do
-            pip install "$package"
-        done
-    else
-        echo "All packages are installed."
-    fi
-}
 
 # Function to fetch the value of an environment variable from a file
 fetch_env_variable() {
@@ -226,16 +211,15 @@ fetch_latest_changes() {
     fi
 }
 
-
 # Check if Flask app is running
 if ! pgrep -f "flask run --host=0.0.0.0 --port=$FLASK_PORT" >/dev/null; then
-    check_missing_dependencies
-    log_message "Flask app is not running. Checking repository and starting it..."
-    [ "$auto_update" = true ] &&
-        fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
-    log_message "Starting Flask app..."
+    conda run -n "$CONDA_ENV_NAME" pip install -r "$REQUIREMENTS_FILE"
+    log_message "INFO" "Flask app is not running. Checking repository and starting it..."
+    [ "$auto_update" = true ] && fetch_latest_changes $PROJECT_DIR $GIT_REMOTE_URL
+
+    log_message "INFO" "Starting Flask app..."
     # Ensure environment activation and `flask` command
     bash -c "source $CONDA_SETUP_SCRIPT && conda activate $CONDA_ENV_NAME && flask run --host=0.0.0.0 --port=$FLASK_PORT" &>>"$LOG_FILE" &
 else
-    log_message "Flask app is already running."
+    log_message "INFO" "Flask app is already running."
 fi
