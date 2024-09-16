@@ -48,15 +48,65 @@ async function postRefreshInterval(newInterval) {
 }
 
 // Fetch system data from a given API endpoint
-async function fetchSystemData(apiEndpoint) {
-    try {
-        const response = await fetch(apiEndpoint);
-        return await response.json();
-    } catch (error) {
-        console.error(`Error fetching ${apiEndpoint}:`, error);
-        return null;
+// Note: depcrecated in favor of fetchSystemDataWithRetries
+
+// async function fetchSystemData(apiEndpoint) {
+//     try {
+//         const response = await fetch(apiEndpoint);
+//         return await response.json();
+//     } catch (error) {
+//         console.error(`Error fetching ${apiEndpoint}:`, error);
+//         return null;
+//     }
+// }
+
+async function fetchSystemDataWithRetries(apiEndpoint, retries = 3, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(apiEndpoint);
+            if (response.ok) {
+                return await response.json();
+            } else {
+                const errorText = await response.text();
+                console.error(`Error fetching ${apiEndpoint} - Status: ${response.status}, Response: ${errorText}`);
+            }
+        } catch (error) {
+            console.error(`Fetch attempt ${i + 1} failed: ${error.message}`);
+        }
+        if (i < retries - 1) {
+            await new Promise(res => setTimeout(res, delay));
+        }
     }
+    return null; // Return null after exhausting retries
 }
+
+
+let requestQueue = [];
+let isRequestInProgress = false;
+
+async function processQueue() {
+    if (isRequestInProgress || requestQueue.length === 0) return;
+    isRequestInProgress = true;
+
+    const { apiEndpoint, resolve, reject } = requestQueue.shift();
+    try {
+        const data = await fetchSystemDataWithRetries(apiEndpoint);
+        resolve(data);
+    } catch (error) {
+        reject(error);
+    }
+
+    isRequestInProgress = false;
+    processQueue(); // Continue processing the next request
+}
+
+function queueRequest(apiEndpoint) {
+    return new Promise((resolve, reject) => {
+        requestQueue.push({ apiEndpoint, resolve, reject });
+        processQueue(); // Start processing if not already in progress
+    });
+}
+
 
 // Update card content and bar width based on fetched data
 function updateCard(cardSelector, dataKey, data, unit = '', barSelector = null, maxDataKey = null) {
@@ -109,7 +159,7 @@ async function refreshCardText(cardSelector, dataKey, data) {
 
 // Refresh all card data
 async function refreshData() {
-    const data = await fetchSystemData('/api/system-info');
+    const data = await queueRequest('/api/system-info');
     if (!data) return;
 
     updateCard('.bg-disk', 'disk_percent', data, '%', '.disk-bar');

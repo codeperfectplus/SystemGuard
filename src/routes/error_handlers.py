@@ -24,6 +24,10 @@ def method_not_allowed(e):
     """Handle 405 Method Not Allowed error."""
     return "Method not allowed", 405
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return "Too many requests, please try again later.", 429
+
 @app.errorhandler(500)
 def internal_server_error(e):
     """Handle 500 Internal Server Error."""

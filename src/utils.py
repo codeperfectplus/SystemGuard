@@ -470,7 +470,6 @@ def _get_system_info():
     memory_available = get_cached_value("memory_available", get_memory_available) 
     # Gathering fresh system information
     battery_data = check_battery_status()
-    print("Battery Data: ", battery_data)
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
     network_sent, network_received = get_network_io()
