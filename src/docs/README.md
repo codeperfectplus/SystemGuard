@@ -1,21 +1,25 @@
-## Product Screenshots 📸
+# Product Screenshots 📸
 
-### HomePage
+## Home Page
 
-![HomePage](/src/static/images/dashboard.png)
+![screenshot_002](/src/static/images/screenshot_002.png)
 
-### CPU Stats
+## Cpu Info
 
-![CPU Stats](/src/static/images/cpu.png)
+![screenshot_003](/src/static/images/screenshot_003.png)
 
-### Memory Stats
+## Control Panel
 
-![Memory Stats](/src/static/images/memory.png)
+![screenshot_004](/src/static/images/screenshot_004.png)
 
-### Disk Stats
+## Network Statistics
 
-![Disk Stats](/src/static/images/disk.png)
+![screenshot_005](/src/static/images/screenshot_005.png)
 
-### Speed Test
+## Running Processes
 
-![Speed Test](/src/static/images/speedtest.png)
+![screenshot_006](/src/static/images/screenshot_006.png)
+
+## Security Analysis
+
+![screenshot_007](/src/static/images/screenshot_007.png)
