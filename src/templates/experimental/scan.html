@@ -6,65 +6,97 @@
 {% block content %}
 <h1 class="text-center"><span class="bg-danger text-white p-2"><i class="fas fa-shield-alt"></i>
         {{title}}</span><span class="text-white bg-warning p-2">Security Scan</span></h1>
-<h2 class="scan-header">Scan for Devices</h1>
-    <form action="/security_analysis" method="post">
-        <button type="submit" id="scan_network" name="scan_network">Scan Subnet for Devices</button>
-    </form>
 
-    <h2 class="scan-header">Nmap Port Scanner</h1>
-        <form action="/security_analysis" method="post">
-            <label for="ip_address">Enter IP Address:</label>
-            <input type="text" id="ip_address" name="ip_address" required value="{{system_ip_address}}">
-            <button type="submit" id="scan_ports" , name="scan_ports">Scan Ports</button>
-        </form>
+<!-- Network Scan Section -->
+<h2 class="scan-header">Scan for Devices</h2>
+<form action="/security_analysis" method="post">
+    <button type="submit" id="scan_network" name="scan_network" class="btn btn-primary" onclick="showNetworkLoading()">
+        <i class="fas fa-network-wired"></i> Scan Subnet for Devices
+    </button>
+    <div id="network-loading-spinner" class="spinner-border text-primary mb-4" role="status" style="display: none;">
+        <span class="visually-hidden">Scanning network...</span>
+    </div>
+</form>
 
-        <!-- results for network scan -->
-        {% if network_result %}
-        <h2 style="text-align: center;">Nmap Scan Results for Subnet</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Device Name</th>
-                    <th>IP Address</th>
-                    <th>Latency</th>
-                    <th>Ports Searched</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for result in network_result %}
-                <tr class="{% if ip_address == result.ip %}highlight{% endif %}">
-                    <td>{{ result.device }}</td>
-                    <td>{{ result.ip }}</td>
-                    <td>{{ result.latency }}</td>
-                    <td>{{ result.ports_searched }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
+<!-- Nmap Port Scanner Section -->
+<h2 class="scan-header">Nmap Port Scanner</h2>
+<form action="/security_analysis" method="post">
+    <label for="ip_address">Enter IP Address:</label>
+    <input type="text" id="ip_address" name="ip_address" required value="{{ system_ip_address }}" class="form-control mb-2">
+    <button type="submit" id="scan_ports" name="scan_ports" class="btn btn-warning" onclick="showPortLoading()">
+        <i class="fas fa-search"></i> Scan Ports
+    </button>
+    <div id="port-loading-spinner" class="spinner-border text-warning mb-4" role="status" style="display: none;">
+        <span class="visually-hidden">Scanning ports...</span>
+    </div>
+</form>
 
+<!-- Network Scan Results -->
+{% if network_result %}
+<h2 class="text-center">Nmap Scan Results for Subnet</h2>
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Device Name</th>
+            <th>IP Address</th>
+            <th>Latency</th>
+            <th>Ports Searched</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in network_result %}
+        <tr class="{% if ip_address == result.ip %}highlight{% endif %}">
+            <td>{{ result.device }}</td>
+            <td>{{ result.ip }}</td>
+            <td>{{ result.latency }}</td>
+            <td>{{ result.ports_searched }}</td>
+            <td>
+                <!-- Port Scan Button for each row -->
+                <form action="/security_analysis" method="post" style="display:inline;">
+                    <input type="hidden" name="ip_address" value="{{ result.ip }}">
+                    <button type="submit" name="scan_ports" class="btn btn-info">
+                        <i class="fas fa-search"></i> Scan Ports
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 
-        <!-- results for port scan -->
-        {% if port_results %}
-        <h2>Scan Results for <span class="text-danger">
-                {{ ip_address }} </span></h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Port</th>
-                    <th>State</th>
-                    <th>Service</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for result in port_results %}
-                <tr>
-                    <td>{{ result.port }}</td>
-                    <td>{{ result.state }}</td>
-                    <td>{{ result.service }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-        {% endblock %}
+<!-- Port Scan Results -->
+{% if port_results %}
+<h2>Scan Results for <span class="text-danger">{{ ip_address }}</span></h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Port</th>
+            <th>State</th>
+            <th>Service</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in port_results %}
+        <tr>
+            <td>{{ result.port }}</td>
+            <td>{{ result.state }}</td>
+            <td>{{ result.service }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<script>
+    function showNetworkLoading() {
+        document.getElementById('network-loading-spinner').style.display = 'block';
+    }
+
+    function showPortLoading() {
+        document.getElementById('port-loading-spinner').style.display = 'block';
+    }
+</script>
+
+{% endblock %}

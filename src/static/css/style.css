@@ -135,9 +135,9 @@ body {
 
 /* General Card Styles */
 .card {
-    min-height: 190px;
-    /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    min-height: 230px;
+    background: linear-gradient(120deg, #e3f2fd, #bbdefb);
+    /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
     /* background: linear-gradient(200deg, #f5f7fa, #c3cfe2); */
     /* background: linear-gradient(135deg, #f5faf7, #c3e2d0); */
     box-sizing: border-box;
@@ -377,4 +377,24 @@ body {
 
 .bg-speedtest .card-text {
     color: #495057;
+}
+
+
+.card {
+    position: relative; /* Ensure that the text can be positioned at the bottom */
+    padding-bottom: 40px; /* Reserve space for the text */
+}
+
+.data-provider-text {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    left: 10px;
+    font-size: 0.75rem;
+    text-align: right;
+    color: #6c757d;
+    padding: 5px 10px;
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
+    border-radius: 0 0 10px 10px; /* Rounded bottom corners */
 }
