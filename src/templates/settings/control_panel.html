@@ -4,49 +4,55 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/control_tab.css') }}">
 {% endblock %}
 {% block content %}
-<div class="settings-container container-fluid">
-    <h1 class="settings-title text-center my-4"><span class="text-danger">{{ title }} </span>Control Panel
+<div class="settings-container container-fluid p-4">
+    <h1 class="settings-title text-center my-4"><span class="text-danger">{{ title }}</span> Control Panel
         <i class="fas fa-cogs"></i>
     </h1>
     {% include 'ext/message.html' %}
 
     <!-- Tab Navigation -->
-    <ul class="nav nav-tabs" id="controlPanelTabs" role="tablist">
+    <ul class="nav nav-tabs justify-content-center mb-4" id="controlPanelTabs" role="tablist">
         {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
         <li class="nav-item">
-            <a class="nav-link active" id="user-management-tab" data-toggle="tab" href="#user-management" role="tab" aria-controls="user-management" aria-selected="true">
+            <a class="nav-link active" id="user-management-tab" data-toggle="tab" href="#user-management" role="tab"
+                aria-controls="user-management" aria-selected="true">
                 <i class="fas fa-users"></i> Users
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="utilities-tab" data-toggle="tab" href="#utilities" role="tab" aria-controls="utilities" aria-selected="false">
+            <a class="nav-link" id="utilities-tab" data-toggle="tab" href="#utilities" role="tab"
+                aria-controls="utilities" aria-selected="false">
                 <i class="fas fa-tools"></i> Utilities
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="network-tab" data-toggle="tab" href="#network-tools" role="tab" aria-controls="network-tools" aria-selected="false">
+            <a class="nav-link" id="network-tab" data-toggle="tab" href="#network-tools" role="tab"
+                aria-controls="network-tools" aria-selected="false">
                 <i class="fas fa-globe"></i> Security Tools
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings" aria-selected="false">
+            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings"
+                aria-selected="false">
                 <i class="fas fa-cogs"></i> General
             </a>
         </li>
         {% endif %}
         <li class="nav-item">
-            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab" aria-controls="feature-toggles" aria-selected="false">
+            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab"
+                aria-controls="feature-toggles" aria-selected="false">
                 <i class="fas fa-toggle-on"></i> Feature
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab" aria-controls="system-info" aria-selected="false">
+            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab"
+                aria-controls="system-info" aria-selected="false">
                 <i class="fas fa-info-circle"></i> System Info
             </a>
         </li>
-        <!-- profile tab -->
         <li class="nav-item">
-            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+                aria-selected="false">
                 <i class="fas fa-user"></i> Profile
             </a>
         </li>
@@ -55,17 +61,27 @@
     <!-- Tab Content -->
     <div class="tab-content mt-4" id="controlPanelTabContent">
         <!-- User Management Section -->
-        <div class="tab-pane fade show active" id="user-management" role="tabpanel" aria-labelledby="user-management-tab">
-            <div class="row">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-users"></i> User Management</h5>
-                            <a href="{{ url_for('view_users') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-users"></i> User Management
+        <div class="tab-pane fade show active" id="user-management" role="tabpanel"
+            aria-labelledby="user-management-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg">
+                        <div class="card-body text-center">
+                            <!-- Title -->
+                            <h5 class="card-title mb-4 d-flex justify-content-center align-items-center">
+                                <i class="fas fa-users me-2"></i> User Management
+                            </h5>
+
+                            <!-- User Management Button -->
+                            <a href="{{ url_for('view_users') }}"
+                                class="btn btn-primary btn-lg btn-block mb-3 d-flex justify-content-center align-items-center">
+                                <i class="fas fa-users me-2"></i> Manage Users
                             </a>
-                            <a href="{{ url_for('create_user') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-user-plus"></i> Create User
+
+                            <!-- Create User Button -->
+                            <a href="{{ url_for('create_user') }}"
+                                class="btn btn-success btn-lg btn-block d-flex justify-content-center align-items-center">
+                                <i class="fas fa-user-plus me-2"></i> Create New User
                             </a>
                         </div>
                     </div>
@@ -75,9 +91,9 @@
 
         <!-- Settings Section -->
         <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-cogs"></i> Settings</h5>
                             <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
@@ -94,24 +110,24 @@
 
         <!-- Utilities Section -->
         <div class="tab-pane fade" id="utilities" role="tabpanel" aria-labelledby="utilities-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-tools"></i> Utilities</h5>
                             <a href="{{ url_for('terminal') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-terminal"></i> Terminal
                             </a>
-                            <a href="{{ url_for('utility_control') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('utility_control') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-tools"></i> Shutdown/Reboot
                             </a>
-                            <a href="{{ url_for('send_email_page') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('send_email_page') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-envelope"></i> Send Email
                             </a>
-                            <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('speedtest') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-tachometer-alt"></i> Speedtest
                             </a>
-                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block mb-2">
+                            <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-globe"></i> Ping Website
                             </a>
                         </div>
@@ -122,12 +138,12 @@
 
         <!-- Network Tools Section -->
         <div class="tab-pane fade" id="network-tools" role="tabpanel" aria-labelledby="network-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tols</h5>
-                            <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block">
+                            <h5 class="card-title"><i class="fas fa-globe"></i> Network Tools</h5>
+                            <a href="{{ url_for('firewall') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-shield-alt"></i> Firewall
                             </a>
                             <a href="{{ url_for('security_analysis') }}" class="btn btn-primary btn-block">
@@ -138,12 +154,12 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Feature Toggles Section -->
         <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
                             <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
@@ -160,15 +176,15 @@
 
         <!-- System Info Section -->
         <div class="tab-pane fade" id="system-info" role="tabpanel" aria-labelledby="system-info-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-info-circle"></i> System Info</h5>
                             <a href="{{ url_for('show_os_info') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-info-circle"></i> Show OS Info
                             </a>
-                            <a href="{{ url_for('about') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('about') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-info-circle"></i> About {{ title }}
                             </a>
                             {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
@@ -182,20 +198,20 @@
             </div>
         </div>
 
-        <!-- profile tab -->
+        <!-- Profile Section -->
         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 text-center">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-user"></i> Profile</h5>
-                            <a href="{{ url_for('view_profile') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('view_profile') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-user-cog"></i> My Profile
                             </a>
-                            <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-key"></i> Change Password
                             </a>
-                            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary btn-block">
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-user-edit"></i> Edit Profile
                             </a>
                             <a href="{{ url_for('user_settings') }}" class="btn btn-primary btn-block">
@@ -206,6 +222,8 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 </div>
 <script>
@@ -216,7 +234,6 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // Add any additional headers if needed
             },
         })
             .then(response => response.json())
