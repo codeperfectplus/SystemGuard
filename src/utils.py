@@ -482,6 +482,7 @@ def _get_system_info():
     info = {
         'cpu_percent': cpu_usage_percent(),
         'memory_percent': round(memory_info.percent, 2),
+        "memory_used": get_memory_used(),
         'memory_available': memory_available,
         'disk_percent': round(disk_info.percent, 2),
         'disk_total': disk_total,

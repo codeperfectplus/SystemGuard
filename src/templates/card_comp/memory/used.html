@@ -1,8 +1,20 @@
 <div class="col-md-6 col-lg-4 mb-4">
-    <div class="card bg-memory shadow-sm border-0 rounded-3">
-        <div class="card-body">
-            <h5 class="card-title">Memory Used <i class="fas fa-memory"></i></h5>
-            <p class="card-text fs-4">{{ system_info['memory_used']}} GB</p>
+    <div class="card memory-usage-number-card" data-memory-total="{{ system_info['memory_available'] }}">
+        <div class="card-body d-flex flex-column align-items-center text-center">
+            <!-- Title with Icon -->
+            <h5 class="card-title mb-3 d-flex align-items-center">
+                <span class="me-2">Memory Usage</span>
+                <i class="fas fa-memory"></i>
+            </h5>
+
+            <!-- Memory Usage Text -->
+            <p class="card-text fs-4 usage-value" data-bs-toggle="tooltip" title="Current memory usage in percentage">
+                {{ system_info['memory_used'] }} GB
+            </p>
+            
+            <p class="card-text fs-6 text-muted mb-0">
+                Total Memory: {{ system_info['memory_available'] }} GB
+            </p>
         </div>
     </div>
 </div>
