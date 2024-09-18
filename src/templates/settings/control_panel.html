@@ -14,44 +14,44 @@
     <ul class="nav nav-tabs justify-content-center mb-4" id="controlPanelTabs" role="tablist">
         {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
         <li class="nav-item">
-            <a class="nav-link active" id="user-management-tab" data-toggle="tab" href="#user-management" role="tab"
+            <a class="nav-link active" id="user-management-tab" data-bs-toggle="tab" href="#user-management" role="tab"
                 aria-controls="user-management" aria-selected="true">
                 <i class="fas fa-users"></i> Users
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="utilities-tab" data-toggle="tab" href="#utilities" role="tab"
+            <a class="nav-link" id="utilities-tab" data-bs-toggle="tab" href="#utilities" role="tab"
                 aria-controls="utilities" aria-selected="false">
                 <i class="fas fa-tools"></i> Utilities
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="network-tab" data-toggle="tab" href="#network-tools" role="tab"
+            <a class="nav-link" id="network-tab" data-bs-toggle="tab" href="#network-tools" role="tab"
                 aria-controls="network-tools" aria-selected="false">
                 <i class="fas fa-globe"></i> Security Tools
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab" aria-controls="settings"
+            <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#settings" role="tab" aria-controls="settings"
                 aria-selected="false">
                 <i class="fas fa-cogs"></i> General
             </a>
         </li>
         {% endif %}
         <li class="nav-item">
-            <a class="nav-link" id="toggles-tab" data-toggle="tab" href="#feature-toggles" role="tab"
+            <a class="nav-link" id="toggles-tab" data-bs-toggle="tab" href="#feature-toggles" role="tab"
                 aria-controls="feature-toggles" aria-selected="false">
                 <i class="fas fa-toggle-on"></i> Feature
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="system-info-tab" data-toggle="tab" href="#system-info" role="tab"
+            <a class="nav-link" id="system-info-tab" data-bs-toggle="tab" href="#system-info" role="tab"
                 aria-controls="system-info" aria-selected="false">
                 <i class="fas fa-info-circle"></i> System Info
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile"
                 aria-selected="false">
                 <i class="fas fa-user"></i> Profile
             </a>
