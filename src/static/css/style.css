@@ -102,12 +102,15 @@ body {
 }
 
 .navbar-toggler {
-    border: none;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Light blue gradient background */
+    border: none; /* Optional: Remove the default border */
 }
 
 .navbar-toggler-icon {
-    background-image: url('data:image/svg+xml;charset=utf8,...');
+    background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns%3D%22http://www.w3.org/2000/svg%22 viewBox%3D%220 0 30 30%22%3E%3Cpath stroke%3D%22rgba(255, 255, 255, 1.0)%22 stroke-width%3D%222%22 stroke-linecap%3D%22round%22 stroke-miterlimit%3D%2210%22 d%3D%22M4 7h22M4 15h22M4 23h22%22/%3E%3C/svg%3E');
+    /* Change the stroke color inside the URL to customize the icon color */
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
