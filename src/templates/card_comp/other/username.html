@@ -1,13 +1,13 @@
 {% if card_settings.is_user_card_enabled %}
-    <div class="card user-card  ">
-        <div class="card-body text-center p-4">
+    <div class="card user-card">
+        <div class="card-body text-center" data-bs-toggle="tooltip" title="User Name: {{ system_info['system_username'] }}@{{ system_info['nodename'] }} &#10;IP Address: {{ system_ip_address }}">
             <!-- Card Title -->
-            <h5 class="card-title">
+            <!-- <h5 class="card-title">
                 {{ system_info['system_username'] }}@{{ system_info['nodename'] }}
-            </h5>
+            </h5> -->
 
             <!-- User Info -->
-            <div class="d-flex justify-content-center align-items-center mt-3">
+            <div class="d-flex justify-content-center align-items-center">
                 <p class="card-text fs-5 fw-bold mb-0">
                     {{ system_info['system_username'] }} 
                     <span class="text-muted">@{{ system_ip_address }}</span>

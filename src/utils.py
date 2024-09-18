@@ -407,6 +407,24 @@ def get_os_release_info():
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
+    
+def get_linux_processor_name():
+    """ Get the processor name from /proc/cpuinfo.
+    ---
+    Parameters:
+        None
+    ---
+    Returns:
+        str: Processor name
+    """
+    try:
+        with open('/proc/cpuinfo', 'r') as f:
+            for line in f:
+                if "model name" in line:
+                    return line.split(":")[1].strip()
+    except Exception as e:
+        print(f"Error reading processor info: {e}")
+        return None
 
 def get_cached_value(key, fresh_value_func):
     """ Get a cached value if available and not expired, otherwise get fresh value. 
@@ -527,6 +545,7 @@ def get_system_info():
         "system_username": system_username,
         'nodename': nodename,
         'cpu_core': get_cpu_core_count(),
+        'processort_name': get_linux_processor_name(),
         'boot_time': boot_time.strftime("%Y-%m-%d %H:%M:%S"),
         'process_count': len(psutil.pids()),
         'swap_memory': psutil.swap_memory().percent,

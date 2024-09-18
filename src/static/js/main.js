@@ -11,4 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Append the text element to the card
         card.appendChild(providerText);
     });
+
+    // Initialize all Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+        new bootstrap.Tooltip(tooltipTriggerEl, {
+            animation: true,
+            delay: { show: 300, hide: 100 },
+            html: true,
+        });
+    });
 });

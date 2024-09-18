@@ -1,16 +1,16 @@
 {% if card_settings.is_user_card_enabled %}
-    <div class="card user-card  ">
-        <div class="card-body text-center p-4">
+    <div class="card os-info-card">
+        <div class="card-body text-center" data-bs-toggle="tooltip" title="Kernal Version: {{ system_info['os_info']['kernel_version'] }}&#10;Codename: {{ system_info['os_info']['os_codename'] }}&#10;OS: {{ system_info['os_info']['operating_system'] }}">
             <!-- OS Icon and Name -->
-            <h5 class="card-title d-flex justify-content-center align-items-center mb-3">
-                <i class="fa-brands fa-{{ system_info['os_info']['os_name']|lower }} me-2 text-info fs-1"></i>
-                <span>{{ system_info['os_info']['os_full_name'] }}</span>
+            <h5 class="card-title d-flex justify-content-center align-items-center">
+            <i class="fa-brands fa-{{ system_info['os_info']['os_name']|lower }} me-2 text-info fs-1"></i>
+            <span>{{ system_info['os_info']['os_full_name'] }}</span>
             </h5>
             
             <!-- Optional OS Details -->
-            <p class="card-text text-muted fs-6 mt-2">
-                {{ system_info['os_info']['os_version'] }} - {{ system_info['os_info']['operating_system'] }}
-            </p>
+            <!-- <p class="card-text text-muted fs-6 mt-2">
+            {{ system_info['os_info']['os_version'] }} - {{ system_info['os_info']['operating_system'] }}
+            </p> -->
         </div>
     </div>
 {% endif %}
