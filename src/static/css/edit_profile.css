@@ -107,3 +107,56 @@ h2 {
     color: #007bff;
     font-size: 18px;
 }
+
+/* Checkbox styling */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.form-check-input {
+    margin-right: 10px;
+}
+
+/* Hide the default checkbox */
+.checkbox-input {
+    display: none;
+}
+
+/* Custom checkbox appearance */
+.checkbox-label input[type="checkbox"] + span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #fff;
+    position: relative;
+    vertical-align: middle;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label i {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 18px;
+}
