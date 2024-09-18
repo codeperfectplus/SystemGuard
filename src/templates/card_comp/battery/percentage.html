@@ -1,6 +1,5 @@
 {% if card_settings.is_battery_card_enabled %}
-<div class="col-md-6 col-lg-4 mb-4">
-    <div class="card battery-card shadow-sm" data-battery="{{ system_info['battery_percent'] }}">
+    <div class="card battery-card shadow-sm" data-battery="{{ system_info['battery_percent'] }}" data-bs-toggle="tooltip" title="Battery Status: {{ system_info['battery_status'] }}">
         <div class="card-body text-center">
             <h5 class="card-title">
                 Battery Percentage 
@@ -16,8 +15,7 @@
             <div class="battery-indicator mt-2">
                 <div class="battery-bar" style="width: {{ system_info['battery_percent'] }}%;"></div>
             </div>
-            <p class="battery-status fs-6 mt-2">Battery Status: {{ system_info['battery_status'] }}</p>
+            <!-- <p class="battery-status fs-6 mt-2">Battery Status: {{ system_info['battery_status'] }}</p> -->
         </div>
     </div>
-</div>
 {% endif %}

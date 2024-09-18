@@ -1,16 +1,14 @@
 {% if card_settings.is_disk_usage_card_enabled %}
-<div class="col-md-6 col-lg-4 mb-4">
-    <div class="card disk-usage-card bg-disk shadow-sm" data-disk-usage="{{ system_info['disk_percent'] }}">
+    <div class="card disk-usage-card bg-disk shadow-sm" data-disk-usage="{{ system_info['disk_percent'] }}" data-bs-toggle="tooltip" title="Total Disk: {{ system_info['disk_total'] }} GB">
         <div class="card-body d-flex flex-column align-items-center">
             <h5 class="card-title mb-3">Disk Usage <i class="fas fa-hdd"></i></h5>
-            <p class="card-text fs-4 usage-value" data-bs-toggle="tooltip" title="Current disk usage in percentage">
+            <p class="card-text fs-4 usage-value">
                 {{ system_info['disk_percent'] }}%
             </p>
             <div class="usage-indicator mt-2">
                 <div class="disk-bar" style="width: {{ system_info['disk_percent'] }}%;"></div>
             </div>
-            <p class="card-text fs-6 mt-2">Total Disk: {{ system_info['disk_total'] }} GB</p>
+            <!-- <p class="card-text fs-6 mt-2">Total Disk: {{ system_info['disk_total'] }} GB</p> -->
         </div>
     </div>
-</div>
 {% endif %}

@@ -1,142 +1,116 @@
-/* General Container Styling */
+/* Container */
 .settings-container {
-    background-color: #f4f6f9;
     padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    margin-top: 50px;
+    background-color: #f9f9f9;
 }
 
-.settings-title {
-    font-size: 2.8rem;
-    color: #2c3e50;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Tab Navigation Styling */
-.nav-tabs .nav-link {
-    color: #2980b9;
-    border: none;
-    font-weight: 600;
-    font-size: 1.2rem;
-    transition: all 0.3s ease;
-    background-color: transparent;
-}
-
-.nav-tabs .nav-link:hover {
-    color: #1abc9c;
-}
-
-.nav-tabs .nav-link.active {
-    color: #fff;
-    background-color: #2980b9;
-    border: none;
-    border-radius: 0.5rem 0.5rem 0 0;
-}
-
-/* Card Styling */
+/* General Card Styling */
 .card {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
+/* Card Hover Effect */
 .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
 }
 
+/* Card Titles */
 .card-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 600;
     margin-bottom: 20px;
-    color: #34495e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
 }
 
 /* Button Styling */
-.btn-primary {
-    background-color: #2980b9;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    font-weight: 600;
+.btn {
     border-radius: 25px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    padding: 12px 24px;
+    margin: 10px 0;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #1abc9c;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    background-color: #0056b3;
+    border-color: #004080;
 }
 
-.btn-primary i {
-    margin-right: 10px;
-}
-
-/* Utility Buttons: Alternate Button Style */
-.btn-secondary {
-    background-color: #8e44ad;
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
     color: #fff;
-    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Button Groups */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Tab Navigation */
+.nav-tabs .nav-link {
+    border-radius: 8px;
     padding: 10px 20px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    border-radius: 25px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.btn-secondary:hover {
-    background-color: #9b59b6;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
 }
 
-/* Responsive Media Queries */
+.nav-tabs .nav-link:hover {
+    background-color: #f1f1f1;
+}
+
+/* Tab Content Margin */
+.tab-content {
+    margin-top: 30px;
+}
+
+/* Profile Card Improvements */
+.card-body {
+    padding: 25px;
+    font-size: 1rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .settings-title {
-        font-size: 2rem;
-    }
-
-    .nav-tabs .nav-link {
-        font-size: 1rem;
+    .btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
     }
 
     .card-title {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
-
-    .btn-primary, .btn-secondary {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-}
-
-/* Tooltip Styling for Extra Info on Hover */
-.btn-primary[data-toggle="tooltip"], .btn-secondary[data-toggle="tooltip"] {
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-primary[data-toggle="tooltip"]:hover::before,
-.btn-secondary[data-toggle="tooltip"]:hover::before {
-    content: attr(data-original-title);
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #34495e;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    opacity: 0;
-    animation: fadeIn 0.3s forwards;
-}
-
-@keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
 }

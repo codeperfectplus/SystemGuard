@@ -1,4 +1,3 @@
-
 {% extends 'base/base.html' %}
 {% block title %}Server Dashboard{% endblock %}
 {% block extra_head %}
@@ -6,21 +5,52 @@
 {% endblock %}
 {% block content %}
 {% include 'card_comp/selector/refresh_button.html' %}
-<div class="row">    
+<div class="row">
         <!-- Container for positioning the select input on the right -->
-        {% include 'card_comp/other/username.html' %}
-        {% include 'card_comp/other/os_info.html' %}
-        {% include 'card_comp/battery/percentage.html' %}
-        {% include 'card_comp/cpu/core.html' %}
-        {% include 'card_comp/cpu/current_temp.html' %}
-        <!-- {% include 'card_comp/other/server_time.html' %} -->
-        {% include 'card_comp/cpu/frequency.html' %}
-        {% include 'card_comp/cpu/usages.html' %}
-        {% include 'card_comp/memory/usage.html' %}
-        {% include 'card_comp/disk/usage.html' %}
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/other/username.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/other/os_info.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/cpu/core.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/other/server_time.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/battery/percentage.html' %}
+        </div>
+
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/cpu/usages.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/memory/usage.html' %}
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+                {% include 'card_comp/disk/usage.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/cpu/current_temp.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
+                {% include 'card_comp/cpu/frequency.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
         {% include 'card_comp/other/uptime.html' %}
+        </div>
+        <div class="col-md-6 col-lg-6 mb-4">
         {% include 'card_comp/network/stats.html' %}
-        {% include 'card_comp/other/speedtest.html' %} </div>  
+        </div>
+        <div class="col-md-6 col-lg-12 mb-4">
+        {% include 'card_comp/other/speedtest.html' %}
+        </div>
+</div>
 </div>
 {% endblock %}
 {% block extra_scripts %}

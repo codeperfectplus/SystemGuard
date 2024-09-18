@@ -4,9 +4,22 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 ## Features 🚀
 
-- Lightweight, open-source, and free to use with a straightforward installation process.
+- Lightweight, open-source, and free to use with a straightforward installation process, out-of-the-box monitoring solution.
 - Capable of monitoring core server metrics like CPU, memory, disk usage, and network traffic.
+- Analyze fluctuations in server performance with historical data displayed as charts.
+- Centralized control panel for monitor/manage/analyze the fleet of servers.
+- Role-Based Access Control (RBAC) for managing user permissions.
 - Includes built-in security features such as authentication for login, logout, and signup.
+- Analuze the network speed with the built-in speed test feature.
+- Anaylze the suspicious processes and terminate them with a single click.
+- Anaylze the network statistics with the built-in network statistics feature.
+- Anaylze the subnet for security vulnerabilities with the built-in security analysis feature.
+- Option to download historical data in CSV format for detailed analysis (upcoming feature).
+- Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
+- Update security updates with a single click or automatically update to the latest version to simplify maintenance.
+
+## Old Features 🚀
+
 - Administrators can manage user accounts by creating, updating, or deleting users.
 - Admin-level access is required for configuring settings, managing users, and adjusting security and notification - preferences.
 - Historical performance data can be viewed as charts, aiding in trend analysis.
@@ -19,7 +32,6 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Notifications are sent to users and admins when a process is manually terminated.
 - Offers website monitoring tasks that trigger email alerts when a website becomes unavailable.
 - Configurable email alerts for various actions across the server.
-- Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Option to download historical data in CSV format for detailed analysis (upcoming feature).
 - Server status monitoring with alerts for server downtime or recovery (upcoming feature).
 
@@ -42,7 +54,7 @@ The installation process is straightforward and can be completed in a few steps.
 
 ## Product Screenshots 📸
 
-Check the product screenshots [here](/src/docs/README.md).
+Check the product [screenshots](/src/docs/README.md) for a visual representation of the app.
 
 ## Why not use a Docker image? 🐳
 
@@ -56,11 +68,7 @@ Contributions are always welcome! Please read the [contribution guidelines](/CON
 
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
 
-## Acknowledgments 
 
-| Project         | License              | Repository                                                  |
-| --------------- | -------------------- | ----------------------------------------------------------- |
-| `speedtest-cli` | Apache License 2.0   | [GitHub repository](https://github.com/sivel/speedtest-cli) |
-| `psutil`        | BSD 3-Clause License | [GitHub repository](https://github.com/giampaolo/psutil)    |
-| `flask`         | BSD 3-Clause License | [GitHub repository](https://github.com/pallets/flask)       |
-| `chart.js`      | MIT License          | [GitHub repository](https://github.com/chartjs/Chart.js)    |
+<!-- ## Contact 📧
+
+- Please email me at deepak008@live.com to schedule a demo of the commercial version of the app. This version includes the latest features, a centralized control panel, role-based dashboards, support for multiple servers, and more. -->

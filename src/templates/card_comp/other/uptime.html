@@ -1,6 +1,5 @@
 {% if card_settings.is_system_uptime_card_enabled %}
-<div class="col-md-6 col-lg-6 mb-4">
-    <div class="card uptime-card bg-uptime shadow-sm border-0 rounded-3">
+    <div class="card uptime-card bg-uptime " data-bs-toggle="tooltip" title="System started at {{ system_info['current_server_time'] }}">
         <div class="card-body text-center">
             <h5 class="card-title">System Uptime <i class="fas fa-clock"></i></h5>
             <p class="card-text fs-4" id="system-uptime">
@@ -9,5 +8,4 @@
             </p>
         </div>
     </div>
-</div>
 {% endif %}

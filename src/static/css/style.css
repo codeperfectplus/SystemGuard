@@ -135,11 +135,9 @@ body {
 
 /* General Card Styles */
 .card {
-    min-height: 190px;
-    /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    /* background: linear-gradient(200deg, #f5f7fa, #c3cfe2); */
-    /* background: linear-gradient(135deg, #f5faf7, #c3e2d0); */
+    min-height: 230px;
+    /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2); /* Light blue gradient background */
     box-sizing: border-box;
     border: 1px solid #cdddeb;  
     border-radius: 15px;
@@ -147,6 +145,19 @@ body {
     color: var(--color-dark);
     transition: transform 0.4s, box-shadow 0.4s;
 }
+
+.os-info-card, .user-card {
+    min-height: 120px;
+    transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1), /* Smooth in and out transitions */
+                box-shadow 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+}
+.os-info-card:hover, .user-card:hover {
+    transform: translateY(-15px) rotate(3deg) scale(1.1); /* Slightly larger scaling and movement */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); /* Stronger shadow for more depth */
+    transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1), /* Add a custom ease for smoother effect */
+                box-shadow 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
 
 /* Card Hover Effect */
 .card:hover {
@@ -199,7 +210,7 @@ body {
 
 .temp-indicator, .usage-indicator, .memory-usage-bar, .frequency-indicator, .battery-indicator {
     width: 100%;
-    background-color: #e2e6ea;
+    background-color: #fff;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -377,4 +388,60 @@ body {
 
 .bg-speedtest .card-text {
     color: #495057;
+}
+
+
+.card {
+    position: relative; /* Ensure that the text can be positioned at the bottom */
+    padding-bottom: 40px; /* Reserve space for the text */
+}
+
+.data-provider-text {
+    font-family: 'Roboto', sans-serif; /* Modern and clean font */
+    font-size: 0.85rem;
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    left: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: right;
+    color: #155dc9;
+    padding: 5px 10px;
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */
+    border-radius: 0 0 10px 10px; /* Rounded bottom corners */
+}
+
+
+/* tooltip change */
+.tooltip {
+    background-color: #222; /* Darker background for better visibility */
+    color: #fff; /* White text for contrast */
+    border-radius: 8px; /* Rounded corners */
+    padding: 8px 12px; /* Better padding for readability */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+    font-size: 14px;
+    text-align: center; 
+}
+
+.tooltip-arrow {
+    border-top-color: #222 !important; /* Match tooltip background */
+}
+
+.tooltip.show {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out; /* Smooth transition */
+}
+
+.tooltip-inner {
+    background-color: #222;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.card:hover .tooltip-inner {
+    background-color: #343a40; /* Slight change when hovering over card */
 }
