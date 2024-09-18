@@ -6,9 +6,20 @@
 {% include 'card_comp/selector/refresh_button.html' %}
 <h2 class="my-4">
     Network Statistics</h2>
-<div class="row">{% include 'card_comp/network/packets_sent.html' %} {% include
-    'card_comp/network/packets_received.html' %} {% include 'card_comp/network/ipv4_ip.html' %} {% include
-    'card_comp/network/ipv6_ip.html' %} </div>
+<div class="row">
+    <div class="col-md-6 col-lg-4 mb-4">
+    {% include 'card_comp/network/packets_sent.html' %} 
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+    {% include 'card_comp/network/packets_received.html' %}
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+    {% include 'card_comp/network/ipv4_ip.html' %} 
+    </div>
+    <div class="col-md-6 col-lg-12 mb-4">
+    {% include 'card_comp/network/ipv6_ip.html' %} 
+    </div>
+</div>
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>

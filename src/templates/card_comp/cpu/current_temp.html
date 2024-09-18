@@ -1,5 +1,4 @@
 {% if card_settings.is_cpu_temp_card_enabled %}
-<div class="col-md-6 col-lg-4 mb-4">
     <div class="card cpu-temp-card bg-cpu shadow-sm" data-cpu-temp="{{ system_info['current_temp'] }}"
         data-cpu-max-temp="{{ system_info['high_temp'] }}">
         <div class="card-body d-flex flex-column align-items-center">
@@ -11,5 +10,4 @@
             <p class="card-text fs-6 mt-2">Max Temperature: {{ system_info['high_temp'] }} &deg;C</p>
         </div>
     </div>
-</div>
 {% endif %}

@@ -136,8 +136,8 @@ body {
 /* General Card Styles */
 .card {
     min-height: 230px;
-    background: linear-gradient(120deg, #e3f2fd, #bbdefb);
-    /* background: linear-gradient(135deg, #f5f7fa, #c3cfe2); */
+    /* background: linear-gradient(120deg, #e3f2fd, #bbdefb); */
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
     /* background: linear-gradient(200deg, #f5f7fa, #c3cfe2); */
     /* background: linear-gradient(135deg, #f5faf7, #c3e2d0); */
     box-sizing: border-box;
@@ -199,7 +199,7 @@ body {
 
 .temp-indicator, .usage-indicator, .memory-usage-bar, .frequency-indicator, .battery-indicator {
     width: 100%;
-    background-color: #e2e6ea;
+    background-color: #fff;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -386,13 +386,15 @@ body {
 }
 
 .data-provider-text {
+    font-family: 'Roboto', sans-serif; /* Modern and clean font */
+    font-size: 0.85rem;
     position: absolute;
     bottom: 0;
     right: 10px;
     left: 10px;
     font-size: 0.75rem;
     text-align: right;
-    color: #6c757d;
+    color: #155dc9;
     padding: 5px 10px;
     background-color: #ffffff;
     border-top: 1px solid rgba(0, 0, 0, 0.1); /* Lighter border */

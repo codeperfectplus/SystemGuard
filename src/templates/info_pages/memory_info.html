@@ -6,12 +6,24 @@
 {% include 'card_comp/selector/refresh_button.html' %}
 <h2 class="my-4">Memory
     Usage Details</h2>
-<div class="row">{% include 'card_comp/memory/usage.html' %} 
+<div class="row">
+    <div class="col-md-6 col-lg-4 mb-4">
+        {% include 'card_comp/memory/usage.html' %}
+    </div>
     <!-- {% include 'card_comp/memory/available.html' %}  -->
-    {% include 'card_comp/memory/used.html' %} 
-    {% include 'card_comp/memory/swap_total.html' %} 
-    {% include 'card_comp/memory/swap_used.html' %} 
-    {% include 'card_comp/memory/swap_free.html' %} </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        {% include 'card_comp/memory/used.html' %}
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        {% include 'card_comp/memory/swap_total.html' %}
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        {% include 'card_comp/memory/swap_used.html' %}
+    </div>
+    <div class="col-md-6 col-lg-4 mb-4">
+        {% include 'card_comp/memory/swap_free.html' %}
+    </div>
+</div>
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/refreshCardData.js')}}"></script>
