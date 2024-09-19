@@ -482,11 +482,9 @@ def _get_system_info():
     Returns:
         dict: System information dictionary with various system metrics.
     """
-    boot_time = get_cached_value('boot_time', lambda: datetime.datetime.fromtimestamp(psutil.boot_time()))
-    uptime_dict = get_cached_value('uptime', lambda: format_uptime(datetime.datetime.now() - boot_time))
-    disk_total = get_cached_value("disk_total", get_disk_total)
-    memory_available = get_cached_value("memory_available", get_memory_available) 
-    # Gathering fresh system information
+    
+    disk_total = get_disk_total()
+    memory_available = get_memory_available()
     battery_data = check_battery_status()
     memory_info = psutil.virtual_memory()
     disk_info = psutil.disk_usage('/')
@@ -518,7 +516,6 @@ def _get_system_info():
         'timestamp': datetime.datetime.now(),
     }
     # update uptime dictionary
-    info.update(uptime_dict)
 
     return info
 
