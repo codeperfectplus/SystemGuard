@@ -15,6 +15,11 @@ disk_usage_metric = Gauge('disk_usage_percentage', 'Disk usage percentage')
 network_sent_metric = Gauge('network_bytes_sent', 'Total network bytes sent')
 network_recv_metric = Gauge('network_bytes_received', 'Total network bytes received')
 request_count = Counter('http_requests_total', 'Total HTTP requests made')
+cpu_temp_metric = Gauge('cpu_temperature', 'Current CPU temperature')
+cpu_frequency_metric = Gauge('cpu_frequency', 'Current CPU frequency')
+battery_percentage_metric = Gauge('battery_percentage', 'Current battery percentage')
+dashboard_memory_usage_metric = Gauge('dashboard_memory_usage_percentage', 'Current memory usage percentage')
+
 
 def collect_metrics():
     """
@@ -32,6 +37,11 @@ def collect_metrics():
             disk_usage_metric.set(system_info['disk_percent'])
             network_sent_metric.set(system_info['network_sent'])
             network_recv_metric.set(system_info['network_received'])
+            cpu_temp_metric.set(system_info['current_temp'])
+            cpu_frequency_metric.set(system_info['cpu_frequency'])
+            battery_percentage_metric.set(system_info['battery_percent'])
+            dashboard_memory_usage_metric.set(system_info['dashboard_memory_usage'])
+
 
             # Increment HTTP request counter
             request_count.inc()
