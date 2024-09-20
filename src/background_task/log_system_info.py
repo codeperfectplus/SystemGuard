@@ -7,6 +7,8 @@ from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 from prometheus_client import Counter, Gauge
+import os, time
+from influxdb_client import Point, WritePrecision
 
 from src.logger import logger
 from src.config import influx_client, bucket, write_api
@@ -78,9 +80,11 @@ def log_system_info_to_db():
 
             # Update Prometheus metrics
             update_prometheus_metrics(system_info)
+            # Store system information in InfluxDB
+            store_system_info_in_influxdb(system_info)
 
             # Store system information in the database
-            store_system_info_in_db(system_info)
+            # store_system_info_in_db(system_info)
             logger.info("System information logged to database.")
 
         except SQLAlchemyError as db_err:
@@ -123,6 +127,36 @@ def store_system_info_in_db(system_info):
     )
     db.session.add(system_log)
     db.session.commit()
+
+def store_system_info_in_influxdb(system_info):
+    """
+    Stores the collected system information into the InfluxDB with proper error handling.
+    """
+    try:
+        # Create a data point for system information
+        point = (
+            Point("system_info")
+            .tag("host", os.environ.get("HOSTNAME", "unknown"))
+            .field("cpu_percent", system_info["cpu_percent"])
+            .field("memory_percent", system_info["memory_percent"])
+            .field("battery_percent", system_info["battery_percent"])
+            .field("network_sent", system_info["network_sent"])
+            .field("network_received", system_info["network_received"])
+            .field("dashboard_memory_usage", system_info["dashboard_memory_usage"])
+            .field("cpu_frequency", system_info["cpu_frequency"])
+            .field("current_temp", system_info["current_temp"])
+            .time(int(time.time() * 1_000_000_000), WritePrecision.NS)  # Nanosecond precision
+        )
+
+        # Write the data point to InfluxDB
+        write_api.write(bucket=bucket, record=point)
+        logger.info("Successfully wrote system information to InfluxDB")
+
+    except ValueError as ve:
+        logger.error(f"Value error while storing system info: {ve}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}", exc_info=True)
+
 
 
 def monitor_settings():

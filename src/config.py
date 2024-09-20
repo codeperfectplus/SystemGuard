@@ -2,6 +2,10 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import os, time
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
+
 
 from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address
@@ -26,14 +30,34 @@ DB_DIR = os.path.join(HOME_DIR, ".database")
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Configure the SQLite database
-# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 
 # Initialize the database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+# influx db configuration
+
+INFLUXDB_TOKEN=""
+print("Token: ", INFLUXDB_TOKEN)
+if not INFLUXDB_TOKEN:
+    raise ValueError("Please set the INFLUXDB_TOKEN environment variable.")
+org = "systemguard"
+url = "http://localhost:8086"
+bucket="_monitoring"
+try:
+    influx_client = InfluxDBClient(url=url, token=INFLUXDB_TOKEN, org=org)
+    bucket = "_monitoring"
+    write_api = influx_client.write_api(write_options=SYNCHRONOUS)
+    query_api = influx_client.query_api()
+    logger.info("Connected to InfluxDB successfully")
+
+except Exception as e:
+    logger.error(f"Failed to connect to InfluxDB: {e}")
+    raiseclient = InfluxDBClient(url=url, token=INFLUXDB_TOKEN, org=org)
 
 # Define global variables for templates
 app.jinja_env.globals.update(
