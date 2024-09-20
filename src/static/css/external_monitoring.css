@@ -1,0 +1,41 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+.card {
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+}
+
+.card-title {
+    font-weight: bold;
+}
+
+.message {
+    color: #28a745; /* Success message color */
+}
+
+.list-group-item {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}

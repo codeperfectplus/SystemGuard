@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+{% block title %}External Monitoring{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/external_monitoring.css') }}">
+{% endblock %}
+{% block content %}
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">External Monitoring</h1>
+        {% include 'ext/message.html' %}
+        <div class="card mt-4">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('external_monitoring') }}">
+                    <div class="mb-3">
+                        <label for="file-path" class="form-label">Enter File Path for Monitoring</label>
+                        <input type="text" id="file-path" name="file_path" class="form-control" placeholder="Enter file path" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                <div class="message mt-3" id="message"></div>
+            </div>
+        </div>
+
+        {% if data %}
+            <div class="mt-4">
+                <h5>Monitoring File Paths</h5>
+                {% for item in data %}
+                    <div class="list-group mb-2">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ item.file_path }}</span>
+                            <form method="POST" action="{{ url_for('delete_file_path', id=item.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock %}
