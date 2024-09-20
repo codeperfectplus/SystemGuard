@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External File for Monitoring Prometheus</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Add File Path</h1>
+        <form method="POST" action="{{ url_for('add_file_path') }}">
+            <label for="file-path">File Path</label>
+            <input type="text" id="file-path" name="file_path" placeholder="Enter file path" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- show a list of external monitoring file path from db -->
+    <!-- /prometheus/delete_file_path/<int:id> -->
+    {% if data %}
+        {% for item in data %}
+            <div>
+                <p>{{ item.file_path }}</p>
+                <form method="POST" action="{{ url_for('delete_file_path', id=item.id) }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+
+</html>

@@ -9,6 +9,7 @@ from src.models.network_speed_test_result import NetworkSpeedTestResult
 from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile
 from src.models.monitored_website import MonitoredWebsite
+from src.models.prometheus_model import ExternalMonitornig
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash
