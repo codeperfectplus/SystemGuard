@@ -8,6 +8,8 @@ from src.models import GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 from prometheus_client import Counter, Gauge
 
+from src.logger import logger
+from src.config import influx_client, bucket, write_api
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
 
