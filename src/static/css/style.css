@@ -46,6 +46,16 @@ body {
     background-position: center center;
 }
 
+.content {
+    margin: 0 auto; /* Center the content */
+    padding: 1rem 5rem;
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    font-family: 'Arial', sans-serif; /* Font family */
+    line-height: 1.6; /* Improve readability */
+}
+
 .header {
     background-color: var(--color-dark);
     color: var(--color-white);

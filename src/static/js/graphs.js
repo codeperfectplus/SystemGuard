@@ -1,11 +1,7 @@
 // Variables to store chart instances
 let cpuTimeChart, memoryTimeChart, batteryTimeChart, networkTimeChart, dashboardMemoryTimeChart, cpuFrequencyTimeChart, currentTempTimeChart;
 
-function stringToDate(dateString) {
-    const date = new Date(dateString);
-    return date;
-}
-
+// Function to fetch data and render charts
 function fetchDataAndRenderCharts() {
     // Retrieve stored filter value from local storage or set default value
     const storedFilterValue = localStorage.getItem('filterValue') || 5;

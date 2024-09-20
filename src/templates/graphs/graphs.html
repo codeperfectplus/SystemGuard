@@ -11,11 +11,12 @@
 {% block content %}
 
 <h2 class="page-title"><i class="fas fa-chart-line"></i>
-    <span class="text-danger m-2"> {{ title }} </span> Metrics</h2>
+    <span class="text-danger m-2"> {{ title }} </span> Metrics
+</h2>
 <hr>
 
 <!-- Server Time Section -->
-<div class="container">
+<div class="">
     <div class="section-header d-flex justify-content-between align-items-center">
         <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
         <button id="refreshData" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Graphs</button>
@@ -26,7 +27,7 @@
 <hr>
 
 <!-- Time Filter Section -->
-<div class="col container">
+<div class="col">
     <div class="row selector-container">
         <div class="time-filter-container">
             <label for="timeFilter">Select Time Filter:</label>
@@ -51,61 +52,75 @@
 </div>
 <hr>
 
-<!-- Chart Containers with Buttons Next to Titles -->
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-microchip"></i> CPU Usage Over Time</h2>
-        <button id="refreshCpuTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh CPU Graph</button>
+<div class="row">
+    <div class="cpu-usage col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-microchip"></i> CPU Usage Over Time</h2>
+            <button id="refreshCpuTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh CPU
+                Graph</button>
+        </div>
+        <canvas id="cpuTimeChart"></canvas>
     </div>
-    <canvas id="cpuTimeChart"></canvas>
+
+    <div class="memory-usage col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-memory"></i> Memory Usage Over Time</h2>
+            <button id="refreshMemoryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Memory
+                Graph</button>
+        </div>
+        <canvas id="memoryTimeChart"></canvas>
+    </div>
 </div>
 
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-memory"></i> Memory Usage Over Time</h2>
-        <button id="refreshMemoryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Memory Graph</button>
+<div class="row">
+    <div class="battery-usage col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-battery-half"></i> Battery Percentage Over Time</h2>
+            <button id="refreshBatteryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Battery
+                Graph</button>
+        </div>
+        <canvas id="batteryTimeChart"></canvas>
     </div>
-    <canvas id="memoryTimeChart"></canvas>
+
+    <div class="network-usage col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-network-wired"></i> Network Sent & Received Over Time</h2>
+            <button id="refreshNetworkTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Network
+                Graph</button>
+        </div>
+        <canvas id="networkTimeChart"></canvas>
+    </div>
 </div>
 
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-battery-half"></i> Battery Percentage Over Time</h2>
-        <button id="refreshBatteryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Battery Graph</button>
+<div class="row">
+    <div class="dashboard-memory-usage col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-memory"></i>Memory Usage Over Time(APP)</h2>
+            <button id="refreshDashboardMemoryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh
+                Dashboard Memory Graph</button>
+        </div>
+        <canvas id="dashboardMemoryTimeChart"></canvas>
     </div>
-    <canvas id="batteryTimeChart"></canvas>
+
+    <div class="cpu-frequency col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-microchip"></i> CPU Frequency Over Time</h2>
+            <button id="refreshCpuFrequencyTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh CPU
+                Frequency Graph</button>
+        </div>
+        <canvas id="cpuFrequencyTimeChart"></canvas>
+    </div>
 </div>
 
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-network-wired"></i> Network Sent & Received Over Time</h2>
-        <button id="refreshNetworkTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Network Graph</button>
+<div class="row">
+    <div class="cpu-temperature col-md-6">
+        <div class="section-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-thermometer-half"></i> Current Temperature Over Time</h2>
+            <button id="refreshCurrentTempTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh
+                Temperature Graph</button>
+        </div>
+        <canvas id="currentTempTimeChart"></canvas>
     </div>
-    <canvas id="networkTimeChart"></canvas>
-</div>
-
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-memory"></i> Dashboard Memory Usage Over Time</h2>
-        <button id="refreshDashboardMemoryTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Dashboard Memory Graph</button>
-    </div>
-    <canvas id="dashboardMemoryTimeChart"></canvas>
-</div>
-
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-microchip"></i> CPU Frequency Over Time</h2>
-        <button id="refreshCpuFrequencyTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh CPU Frequency Graph</button>
-    </div>
-    <canvas id="cpuFrequencyTimeChart"></canvas>
-</div>
-
-<div class="container">
-    <div class="section-header d-flex justify-content-between align-items-center">
-        <h2><i class="fas fa-thermometer-half"></i> Current Temperature Over Time</h2>
-        <button id="refreshCurrentTempTime" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Temperature Graph</button>
-    </div>
-    <canvas id="currentTempTimeChart"></canvas>
 </div>
 
 {% endblock %}

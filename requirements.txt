@@ -27,3 +27,6 @@ speedtest-cli==2.1.3
 
 # prometheus client for monitoring
 prometheus_client==0.20.0
+
+# influxdb-client==1.46.0
+influxdb-client==1.46.0
