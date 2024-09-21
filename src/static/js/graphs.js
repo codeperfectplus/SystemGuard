@@ -12,7 +12,7 @@ function fetchDataAndRenderCharts() {
     console.log('Stored Filter Value:', storedFilterValue);
 
     // Fetch data with the selected time filter
-    fetch(`/api/v1/prometheus/graphs_data/targets?filter=${storedFilterValue}`)
+    fetch(`/api/v1/prometheus/graphs_data?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
@@ -164,17 +164,17 @@ function createChart(ctx, labels, datasets, yLabel) {
         options: {
             scales: {
                 x: {
-                    type: 'category', // Use 'category' scale to treat time as strings
+                    type: 'category', 
+                    reverse: true, // Reverse the x-axis to start from the right
                     title: {
                         display: true,
                         text: 'Time'
                     },
                     ticks: {
-                        autoSkip: true,          // Automatically skip some labels to prevent overlap
-                        maxTicksLimit: 10,       // Maximum number of ticks to display
-                        maxRotation: 20,          // Prevent rotating the labels for better readability
+                        autoSkip: true,          
+                        maxTicksLimit: 10,       
+                        maxRotation: 20,         
                         minRotation: 0,
-                        
                     }
                 },
                 y: {
@@ -194,97 +194,90 @@ function createChart(ctx, labels, datasets, yLabel) {
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {
     // CPU Usage Chart
     const ctxCpu = document.getElementById('cpuTimeChart').getContext('2d');
-    const cpuDatasets = cpuData.map((cpu, index) => ({
-        label: `CPU Usage (%) ${cpu.metric.instance}`,
-        data: cpu.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 192, 0.2)`,
+    createChart(ctxCpu, timeData, [{
+        label: 'CPU Usage (%)',
+        data: cpuData,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
         tension: 0.4
-    }));
-
-    createChart(ctxCpu, timeData, cpuDatasets, 'CPU Usage (%)');
+    }], 'CPU Usage (%)');
 
     // Memory Usage Chart
     const ctxMemory = document.getElementById('memoryTimeChart').getContext('2d');
-    const memoryDatasets = memoryData.map((memory, index) => ({
-        label: `Memory Usage (%) ${memory.metric.instance}`,
-        data: memory.values,
-        borderColor: `rgba(${75 + index * 20}, 75, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 75, 192, 0.2)`,
+    createChart(ctxMemory, timeData, [{
+        label: 'Memory Usage (%)',
+        data: memoryData,
+        borderColor: 'rgba(153, 102, 255, 1)',
+        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+        fill: true,
         tension: 0.4
-    }));
-
-    createChart(ctxMemory, timeData, memoryDatasets, 'Memory Usage (%)');    
+    }], 'Memory Usage (%)');
 
     // Battery Percentage Chart
     const ctxBattery = document.getElementById('batteryTimeChart').getContext('2d');
-    const batteryDatasets = batteryData.map((battery, index) => ({
-        label: `Battery Usage (%) ${battery.metric.instance}`,
-        data: battery.values,
-        borderColor: `rgba(${192 + index * 20}, 75, 75, 1)`,
-        backgroundColor: `rgba(${192 + index * 20}, 75, 75, 0.2)`,
+    createChart(ctxBattery, timeData, [{
+        label: 'Battery Percentage (%)',
+        data: batteryData,
+        borderColor: 'rgba(255, 159, 64, 1)',
+        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+        fill: true,
         tension: 0.4
-    }));
-
-    createChart(ctxBattery, timeData, batteryDatasets, 'Battery Percentage (%)');
+    }], 'Battery Percentage (%)');
 
     // Network Sent & Received Chart
     const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');
-    const networkDatasets = [
-        ...networkSentData.map((networkSent, index) => ({
-            label: `Network Sent (MB) ${networkSent.metric.instance}`,
-            data: networkSent.values,
-            borderColor: `rgba(${75 + index * 20}, 75, 192, 1)`,
-            backgroundColor: `rgba(${75 + index * 20}, 75, 192, 0.2)`,
+    createChart(ctxNetwork, timeData, [
+        {
+            label: 'Network Sent (MB)',
+            data: networkSentData,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: true,
             tension: 0.4
-        })),
-        ...networkReceivedData.map((networkReceived, index) => ({
-            label: `Network Received (MB) ${networkReceived.metric.instance}`,
-            data: networkReceived.values,
-            borderColor: `rgba(${192 + index * 20}, 75, 75, 1)`,
-            backgroundColor: `rgba(${192 + index * 20}, 75, 75, 0.2)`,
+        },
+        {
+            label: 'Network Received (MB)',
+            data: networkReceivedData,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            fill: true,
             tension: 0.4
-        }))
-    ];
-
-    createChart(ctxNetwork, timeData, networkDatasets, 'Data Transferred (MB)');
+        }
+    ], 'Data Transferred (MB)');
 
     // Dashboard Memory Usage Chart
     const ctxDashboardMemory = document.getElementById('dashboardMemoryTimeChart').getContext('2d');
-    const dashboardMemoryDatasets = dashboardMemoryUsageData.map((dashboardMemory, index) => ({
-        label: `Dashboard Memory Usage (%) ${dashboardMemory.metric.instance}`,
-        data: dashboardMemory.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 75, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 75, 0.2)`,
+    createChart(ctxDashboardMemory, timeData, [{
+        label: 'Dashboard Memory Usage (%)',
+        data: dashboardMemoryUsageData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
         tension: 0.4
-    }));
-
-    createChart(ctxDashboardMemory, timeData, dashboardMemoryDatasets, 'Dashboard Memory Usage (%)');
+    }], 'Dashboard Memory Usage (%)');
 
     // CPU Frequency Chart
     const ctxCpuFrequency = document.getElementById('cpuFrequencyTimeChart').getContext('2d');
-    const cpuFrequencyDatasets = cpuFrequencyData.map((cpuFrequency, index) => ({
-        label: `CPU Frequency (GHz) ${cpuFrequency.metric.instance}`,
-        data: cpuFrequency.values,
-        borderColor: `rgba(${192 + index * 20}, 192, 75, 1)`,
-        backgroundColor: `rgba(${192 + index * 20}, 192, 75, 0.2)`,
-        tension: 0.4,
-
-    }));
-
-    createChart(ctxCpuFrequency, timeData, cpuFrequencyDatasets, 'CPU Frequency (GHz)');
+    createChart(ctxCpuFrequency, timeData, [{
+        label: 'CPU Frequency (GHz)',
+        data: cpuFrequencyData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
+        tension: 0.4
+    }], 'CPU Frequency (GHz)');
 
     // Current Temperature Chart
     const ctxCurrentTemp = document.getElementById('currentTempTimeChart').getContext('2d');
-    const currentTempDatasets = currentTempData.map((currentTemp, index) => ({
-        label: `Current Temperature (°C) ${currentTemp.metric.instance}`,
-        data: currentTemp.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 192, 0.2)`,
+    createChart(ctxCurrentTemp, timeData, [{
+        label: 'Current Temperature (°C)',
+        data: currentTempData,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        fill: true,
         tension: 0.4
-    }));
-
-    createChart(ctxCurrentTemp, timeData, currentTempDatasets, 'Current Temperature (°C)');
+    }], 'Current Temperature (°C)');
 }
 
 // Fetch initial data when the page loads

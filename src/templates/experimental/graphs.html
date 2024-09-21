@@ -11,7 +11,7 @@
 {% block content %}
 
 <h2 class="page-title"><i class="fas fa-chart-line"></i>
-    <span class="text-danger m-2"> {{ title }} </span> Metrics
+    <span class="text-danger m-2"> {{ title }} </span> Metrics (Experimental)
 </h2>
 <hr>
 
@@ -20,7 +20,7 @@
     <div class="section-header d-flex justify-content-between align-items-center">
         <h2><i class="fas fa-clock"></i> Current Server Time & Time Zone</h2>
         <button id="refreshData" class="btn btn-primary"><i class="fas fa-sync-alt"></i> Refresh Graphs</button>
-        <a href="{{ url_for('experimental_graphs') }}" class="btn btn-primary">Experimental Graphs</a>
+        <a href="{{ url_for('graphs') }}" class="btn btn-primary">Exit Experimental Graphs</a>
     </div>
     <p id="currentTime">Current Time: </p>
     <p id="timeZoneName">Time Zone: </p>
@@ -127,6 +127,6 @@
 
 {% endblock %}
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='js/graphs.js')}}"></script>
+<script src="{{ url_for('static', filename='js/graphs_experimental.js')}}"></script>
 <script src="{{ url_for('static', filename='js/boot_time.js')}}"></script>
 {% endblock %}
