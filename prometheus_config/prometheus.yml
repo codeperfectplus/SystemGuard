@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 30s  # How often Prometheus scrapes the target
+
+scrape_configs:
+  - job_name: 'flask_app_metrics'  # Scraping metrics from Flask app
+    static_configs:
+      - targets: ['192.168.1.10:5050']

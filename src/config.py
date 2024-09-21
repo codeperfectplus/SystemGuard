@@ -39,26 +39,6 @@ app.config['SECRET_KEY'] = 'secret'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# influx db configuration
-
-INFLUXDB_TOKEN=""
-print("Token: ", INFLUXDB_TOKEN)
-if not INFLUXDB_TOKEN:
-    raise ValueError("Please set the INFLUXDB_TOKEN environment variable.")
-org = "systemguard"
-url = "http://localhost:8086"
-bucket="system_metrics"
-try:
-    influx_client = InfluxDBClient(url=url, token=INFLUXDB_TOKEN, org=org)
-    bucket = "system_metrics"
-    write_api = influx_client.write_api(write_options=SYNCHRONOUS)
-    query_api = influx_client.query_api()
-    logger.info("Connected to InfluxDB successfully")
-
-except Exception as e:
-    logger.error(f"Failed to connect to InfluxDB: {e}")
-    raiseclient = InfluxDBClient(url=url, token=INFLUXDB_TOKEN, org=org)
-
 # Define global variables for templates
 app.jinja_env.globals.update(
     title=APP_NAME,

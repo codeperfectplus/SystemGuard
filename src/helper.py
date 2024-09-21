@@ -33,12 +33,7 @@ def get_ip_address():
         
         return ip_address
     except (IndexError, subprocess.CalledProcessError) as e:
-        print(f"Error occurred: {e}")
         return None
-    
-
-import os
-import subprocess
 
 def check_installation_information():
     # Output dictionary to store results
@@ -82,7 +77,6 @@ def check_installation_information():
     # Check for updates
     try:
         result = subprocess.run(["git", "status", "-uno"], capture_output=True, text=True, check=True)
-        print(result.stdout)
         if "Your branch is up to date" in result.stdout:
             output["update_available"] = False
         else:

@@ -12,7 +12,7 @@ function fetchDataAndRenderCharts() {
     console.log('Stored Filter Value:', storedFilterValue);
 
     // Fetch data with the selected time filter
-    fetch(`/api/v2/graphs_data?filter=${storedFilterValue}`)
+    fetch(`/api/v3/prometheus/graphs_data?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
