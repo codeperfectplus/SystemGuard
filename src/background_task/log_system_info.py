@@ -7,11 +7,9 @@ from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 from prometheus_client import Counter, Gauge
-import os, time
+import os
 
 from src.logger import logger
-from src.influxdb_config import bucket, write_api
-from src.utils import get_system_username
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
 fetch_system_info_interval = 30
@@ -179,7 +177,7 @@ def monitor_settings():
                 is_logging_scheduled = False
 
             # Recheck settings every 10 seconds
-            Timer(10, monitor_settings).start()
+            Timer(30, monitor_settings).start()
 
         except SQLAlchemyError as db_err:
             logger.error(f"Error fetching settings: {db_err}", exc_info=True)
