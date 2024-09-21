@@ -47,10 +47,10 @@ if not INFLUXDB_TOKEN:
     raise ValueError("Please set the INFLUXDB_TOKEN environment variable.")
 org = "systemguard"
 url = "http://localhost:8086"
-bucket="_monitoring"
+bucket="system_metrics"
 try:
     influx_client = InfluxDBClient(url=url, token=INFLUXDB_TOKEN, org=org)
-    bucket = "_monitoring"
+    bucket = "system_metrics"
     write_api = influx_client.write_api(write_options=SYNCHRONOUS)
     query_api = influx_client.query_api()
     logger.info("Connected to InfluxDB successfully")

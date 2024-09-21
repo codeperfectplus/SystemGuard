@@ -6,10 +6,11 @@ CONTAINER_NAME="influxdb"
 NETWORK_NAME="influx_network"
 DATA_DIR="./influxdb_data"
 INFLUXDB_USER="admin"                # Change this to your desired username
-INFLUXDB_PASSWORD="admin_passwor"         # Change this to your desired password
+INFLUXDB_PASSWORD="admin_password"         # Change this to your desired password
 INFLUXDB_ORG="systemguard"                # Change this to your desired organization name
 INFLUXDB_BUCKET="system_metrics"     # Change this to your desired initial bucket (database) name
-INFLUXDB_TOKEN="GixPn4ZmYuPyzPtj2XivfALmtHUaatBTK85ZjSe78P8NdbM_J9426tTPoqnbQDCok_NgBreOaqzdmoGxJ3UfsA=="
+# demo influxdb token | change this to your own token
+INFLUXDB_TOKEN=""
 
 # Export the INFLUXDB_TOKEN to be used later in your app
 export "INFLUXDB_TOKEN"=$INFLUXDB_TOKEN
@@ -45,6 +46,7 @@ echo "Running InfluxDB container..."
 docker run -d \
   --name $CONTAINER_NAME \
   --network $NETWORK_NAME \
+  --restart=always \
   -p 8086:8086 \
   -v $PWD/$DATA_DIR:/var/lib/influxdb2 \
   -e DOCKER_INFLUXDB_INIT_MODE=setup \
@@ -54,6 +56,7 @@ docker run -d \
   -e DOCKER_INFLUXDB_INIT_BUCKET=$INFLUXDB_BUCKET \
   -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$INFLUXDB_TOKEN \
   influxdb:$INFLUXDB_VERSION
+
 
 # Output completion message
 echo "InfluxDB setup completed! Access it at http://localhost:8086 with your credentials."
