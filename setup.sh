@@ -856,7 +856,7 @@ install() {
     create_dir "$EXTRACT_DIR"
     # PROMETHEUS_INSTALL_SCRIPT
     message_box "$APP_NAME Installer $INSATLLER_VERSION" 0
-    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 3
+    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 0
     check_dependencies
     
     message_box "Choose the installation method\nNote: Release is recommended for production use." 0

@@ -45,23 +45,26 @@ if docker ps -a --format '{{.Names}}' | grep -q "$CONTAINER_NAME"; then
     log "Container $CONTAINER_NAME already exists. Stopping and removing it."
     docker stop "$CONTAINER_NAME" &> /dev/null
     docker rm "$CONTAINER_NAME" &> /dev/null
+else
+    log "No existing container found. Proceeding to start a new one."
 fi
 
 # Run Prometheus container
 log "Starting Prometheus container: $CONTAINER_NAME"
-docker run -d \
+run_output=$(docker run -d \
   --name "$CONTAINER_NAME" \
   --network "$NETWORK_NAME" \
   -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
   --restart unless-stopped \
   -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
-  "$PROMETHEUS_IMAGE" &> /dev/null
+  "$PROMETHEUS_IMAGE" 2>&1)  # Capture both stdout and stderr
 
 # Check if Prometheus started successfully
 if [ $? -eq 0 ]; then
     log "Prometheus container $CONTAINER_NAME started successfully on port $PROMETHEUS_PORT."
     log "Prometheus config file located at $PROMETHEUS_CONFIG_FILE"
 else
-    echo "[ERROR] Failed to start Prometheus container."
+    echo "[ERROR] Failed to start Prometheus container: $run_output"
+    echo "[ERROR] Checking logs for container: $CONTAINER_NAME"
     exit 1
 fi
