@@ -6,18 +6,33 @@ CONTAINER_NAME="influxdb"
 NETWORK_NAME="influx_network"
 DATA_DIR="./influxdb_data"
 INFLUXDB_USER="admin"                # Change this to your desired username
-INFLUXDB_PASSWORD="admin_password"         # Change this to your desired password
-INFLUXDB_ORG="systemguard"                # Change this to your desired organization name
+INFLUXDB_PASSWORD="admin_password"   # Change this to your desired password
+INFLUXDB_ORG="systemguard"           # Change this to your desired organization name
 INFLUXDB_BUCKET="system_metrics"     # Change this to your desired initial bucket (database) name
-# demo influxdb token | change this to your own token
-INFLUXDB_TOKEN=""
+INFLUXDB_TOKEN=""                    # Demo InfluxDB token | Change this to your own token
 
 # Export the INFLUXDB_TOKEN to be used later in your app
-export "INFLUXDB_TOKEN"=$INFLUXDB_TOKEN
+export INFLUXDB_TOKEN="$INFLUXDB_TOKEN"
+
+# Function to get the appropriate username, even when running as root
+get_user_name() {
+    if [ "$(whoami)" = "root" ]; then
+        LOGNAME_USER=$(logname 2>/dev/null)
+        if [ $? -ne 0 ]; then
+            USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+        else
+            USER_NAME=$LOGNAME_USER
+        fi
+    else
+        USER_NAME=$(whoami)
+    fi
+    echo "$USER_NAME"
+}
+
+USER_NAME=$(get_user_name)
 
 # Create a data directory for InfluxDB
-rm -rf $DATA_DIR
-mkdir -p $DATA_DIR
+sudo -u "$USER_NAME" mkdir -p "$DATA_DIR"
 
 # Stop and remove existing InfluxDB container if it exists
 if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
@@ -33,7 +48,7 @@ if sudo lsof -i :8086; then
     sudo fuser -k 8086/tcp
 fi
 
-# Create a Docker network
+# Create a Docker network if it doesn't exist
 echo "Creating Docker network..."
 docker network create $NETWORK_NAME || true  # Avoid error if the network already exists
 
@@ -48,7 +63,7 @@ docker run -d \
   --network $NETWORK_NAME \
   --restart=always \
   -p 8086:8086 \
-  -v $PWD/$DATA_DIR:/var/lib/influxdb2 \
+  -v "$PWD/$DATA_DIR:/var/lib/influxdb2" \
   -e DOCKER_INFLUXDB_INIT_MODE=setup \
   -e DOCKER_INFLUXDB_INIT_USERNAME=$INFLUXDB_USER \
   -e DOCKER_INFLUXDB_INIT_PASSWORD=$INFLUXDB_PASSWORD \
@@ -56,7 +71,6 @@ docker run -d \
   -e DOCKER_INFLUXDB_INIT_BUCKET=$INFLUXDB_BUCKET \
   -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$INFLUXDB_TOKEN \
   influxdb:$INFLUXDB_VERSION
-
 
 # Output completion message
 echo "InfluxDB setup completed! Access it at http://localhost:8086 with your credentials."
