@@ -28,7 +28,7 @@ else
       --name "$CONTAINER_NAME" \
       --network "$NETWORK_NAME" \
       -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
-      --restart unless-stopped \
+      --restart always \
       -v "$PROMETHEUS_CONFIG:/etc/prometheus/prometheus.yml" \
       "$PROMETHEUS_IMAGE" &> /dev/null
 

@@ -55,7 +55,7 @@ run_output=$(docker run -d \
   --name "$CONTAINER_NAME" \
   --network "$NETWORK_NAME" \
   -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
-  --restart unless-stopped \
+  --restart always \
   -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
   "$PROMETHEUS_IMAGE" 2>&1)  # Capture both stdout and stderr
 
