@@ -234,7 +234,7 @@ def graph_data_api():
 #         # Handle and log the error for debugging purposes
 #         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
 
-@app.route('/api/v3/prometheus/graphs_data', methods=['GET'])
+@app.route('/api/v1/prometheus/graphs_data', methods=['GET'])
 @login_required
 def graph_data_api_v3():
     try:
@@ -319,6 +319,104 @@ def graph_data_api_v3():
         # Handle and log the error for debugging purposes
         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
 
+@app.route('/api/v1/prometheus/graphs_data/targets', methods=['GET'])
+@login_required
+def graph_data_api_v3_():
+    try:
+        current_time = datetime.now()
+
+        # Get the time filter from query parameters
+        time_filter = request.args.get('filter', default='1 day')
+
+        # Determine the start time based on the filter
+        time_deltas = {
+            '5 minutes': 5 * 60,
+            '15 minutes': 15 * 60,
+            '30 minutes': 30 * 60,
+            '1 hour': 60 * 60,
+            '3 hours': 3 * 60 * 60,
+            '6 hours': 6 * 60 * 60,
+            '12 hours': 12 * 60 * 60,
+            '1 day': 24 * 60 * 60,
+            '2 days': 2 * 24 * 60 * 60,
+            '3 days': 3 * 24 * 60 * 60,
+            '1 week': 7 * 24 * 60 * 60,
+            '1 month': 30 * 24 * 60 * 60,
+            '3 months': 90 * 24 * 60 * 60,
+        }
+
+        # Get the time range in seconds
+        time_range_seconds = time_deltas.get(time_filter, 24 * 60 * 60)
+
+        # Prepare time parameters for the Prometheus query
+        end_time = int(current_time.timestamp())
+        start_time = end_time - time_range_seconds
+        step = '10s'
+
+        # Initialize lists for the data
+        time_data = []
+        metric_data = {}
+
+        # Fetch data for each metric from Prometheus
+        for metric, prometheus_query in PROMETHEUS_METRICS.items():
+            # Prepare Prometheus API query parameters
+            params = {
+                'query': prometheus_query,
+                'start': start_time,
+                'end': end_time,
+                'step': step
+            }
+
+            # Send the query to Prometheus
+            response = requests.get(PROMETHEUS_URL, params=params)
+            
+            # Check if the request was successful
+            if response.status_code == 200:
+                result = response.json().get('data', {}).get('result', [])
+                
+                if result:
+                    # Initialize a dictionary to hold time series data for this metric
+                    metric_data[metric] = []
+                    
+                    for series in result:
+                        # Create a new list for the time series data of this particular series
+                        series_data = {
+                            "metric": series.get("metric"),
+                            "values": []
+                        }
+                        
+                        # Iterate over the values for this series
+                        for value in series.get("values", []):
+                            timestamp = datetime.fromtimestamp(float(value[0]), tz=timezone.utc).isoformat()
+                            if timestamp not in time_data:
+                                time_data.append(timestamp)
+                            series_data["values"].append(value[1])
+                        
+                        # Append the series data to the metric
+                        metric_data[metric].append(series_data)
+                else:
+                    print(f"No data for metric: {metric}")
+            else:
+                raise Exception(f"Failed to fetch data for {metric} from Prometheus: {response.text}")
+
+        # Ensure all metric data has the same length as time_data
+        for metric, series_list in metric_data.items():
+            for series in series_list:
+                while len(series["values"]) < len(time_data):
+                    series["values"].append(None)
+
+        # Return the data as JSON
+        response_data = {
+            "time": time_data,
+            **metric_data,
+            "current_time": current_time
+        }
+
+        return jsonify(response_data), 200
+
+    except Exception as e:
+        # Handle and log the error for debugging purposes
+        return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
 
 @app.route('/api/v1/refresh-interval', methods=['GET', 'POST'])
 @login_required
