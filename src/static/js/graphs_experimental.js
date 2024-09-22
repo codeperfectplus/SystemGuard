@@ -167,7 +167,6 @@ function createChart(ctx, labels, datasets, yLabel) {
             scales: {
                 x: {
                     type: 'category', 
-                    reverse: true, // Reverse the x-axis to start from the right
                     title: {
                         display: true,
                         text: 'Time'

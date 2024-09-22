@@ -10,7 +10,7 @@ from prometheus_client import Counter, Gauge
 from src.logger import logger
 # Flag to track if logging is already scheduled
 is_logging_scheduled = False
-fetch_system_info_interval = 30
+fetch_system_info_interval = 10
 
 # Initialize Prometheus metrics
 metrics = {
@@ -175,7 +175,7 @@ def monitor_settings():
                 is_logging_scheduled = False
 
             # Recheck settings every 10 seconds
-            Timer(30, monitor_settings).start()
+            Timer(10, monitor_settings).start()
 
         except SQLAlchemyError as db_err:
             logger.error(f"Error fetching settings: {db_err}", exc_info=True)

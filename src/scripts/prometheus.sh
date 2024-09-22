@@ -23,7 +23,7 @@ mkdir -p "$PROMETHEUS_CONFIG_DIR"
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
-  scrape_interval: 30s  # How often Prometheus scrapes the target
+  scrape_interval: 10s  # How often Prometheus scrapes the target
 
 scrape_configs:
   - job_name: 'flask_app_metrics'  # Scraping metrics from Flask app
