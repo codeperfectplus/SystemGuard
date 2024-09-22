@@ -382,7 +382,7 @@ def graph_data_api_v3_():
                         # Create a new list for the time series data of this particular series
                         series_data = {
                             "metric": series.get("metric"),
-                            "values": []
+                            "values": {}
                         }
                         
                         # Iterate over the values for this series
@@ -390,7 +390,7 @@ def graph_data_api_v3_():
                             timestamp = datetime.fromtimestamp(float(value[0]), tz=timezone.utc).isoformat()
                             if timestamp not in time_data:
                                 time_data.append(timestamp)
-                            series_data["values"].append(value[1])
+                            series_data["values"][timestamp] = value[1]
                         
                         # Append the series data to the metric
                         metric_data[metric].append(series_data)
@@ -399,16 +399,21 @@ def graph_data_api_v3_():
             else:
                 raise Exception(f"Failed to fetch data for {metric} from Prometheus: {response.text}")
 
-        # Ensure all metric data has the same length as time_data
+        # Sort the time data for proper alignment
+        time_data.sort()
+
+        # Ensure all metric data aligns with time_data
         for metric, series_list in metric_data.items():
             for series in series_list:
-                while len(series["values"]) < len(time_data):
-                    series["values"].append(None)
+                aligned_values = []
+                for timestamp in time_data:
+                    aligned_values.append(series["values"].get(timestamp, None))
+                series["values"] = aligned_values
 
         # Return the data as JSON
         response_data = {
             "time": time_data,
-            **metric_data,
+            **{metric: [{"metric": s["metric"], "values": s["values"]} for s in series_list] for metric, series_list in metric_data.items()},
             "current_time": current_time
         }
 

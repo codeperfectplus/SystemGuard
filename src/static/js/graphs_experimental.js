@@ -149,7 +149,7 @@ function createChart(ctx, labels, datasets, yLabel) {
             })),
         },
         options: {
-            
+            responsive: true,
             scales: {
                 x: {
                     type: 'category', 
@@ -179,97 +179,130 @@ function createChart(ctx, labels, datasets, yLabel) {
 
 // Function to create charts with the fetched data
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {
+
+    // Function to generate dynamic colors based on index
+    function generateColor(index) {
+        const hue = (index * 40) % 360;  // Adjust hue for unique colors
+        return {
+            borderColor: `hsl(${hue}, 70%, 50%)`, // Border color
+            backgroundColor: `hsl(${hue}, 70%, 80%)` // Background color
+        };
+    }
+
     // CPU Usage Chart
     const ctxCpu = document.getElementById('cpuTimeChart').getContext('2d');
-    const cpuDatasets = cpuData.map((cpu, index) => ({
-        label: `CPU Usage (%) ${cpu.metric.instance}`,
-        data: cpu.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 192, 0.2)`,
-        tension: 0.4
-    }));
+    const cpuDatasets = cpuData.map((cpu, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `CPU Usage (%) ${cpu.metric.instance}`,
+            data: cpu.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
     createChart(ctxCpu, timeData, cpuDatasets, 'CPU Usage (%)');
 
     // Memory Usage Chart
     const ctxMemory = document.getElementById('memoryTimeChart').getContext('2d');
-    const memoryDatasets = memoryData.map((memory, index) => ({
-        label: `Memory Usage (%) ${memory.metric.instance}`,
-        data: memory.values,
-        borderColor: `rgba(${75 + index * 20}, 75, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 75, 192, 0.2)`,
-        tension: 0.4
-    }));
+    const memoryDatasets = memoryData.map((memory, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Memory Usage (%) ${memory.metric.instance}`,
+            data: memory.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
-    createChart(ctxMemory, timeData, memoryDatasets, 'Memory Usage (%)');    
+    createChart(ctxMemory, timeData, memoryDatasets, 'Memory Usage (%)');
 
     // Battery Percentage Chart
     const ctxBattery = document.getElementById('batteryTimeChart').getContext('2d');
-    const batteryDatasets = batteryData.map((battery, index) => ({
-        label: `Battery Usage (%) ${battery.metric.instance}`,
-        data: battery.values,
-        borderColor: `rgba(${192 + index * 20}, 75, 75, 1)`,
-        backgroundColor: `rgba(${192 + index * 20}, 75, 75, 0.2)`,
-        tension: 0.4
-    }));
+    const batteryDatasets = batteryData.map((battery, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Battery Usage (%) ${battery.metric.instance}`,
+            data: battery.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
     createChart(ctxBattery, timeData, batteryDatasets, 'Battery Percentage (%)');
 
     // Network Sent & Received Chart
     const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');
     const networkDatasets = [
-        ...networkSentData.map((networkSent, index) => ({
-            label: `Network Sent (MB) ${networkSent.metric.instance}`,
-            data: networkSent.values,
-            borderColor: `rgba(${75 + index * 20}, 75, 192, 1)`,
-            backgroundColor: `rgba(${75 + index * 20}, 75, 192, 0.2)`,
-            tension: 0.4
-        })),
-        ...networkReceivedData.map((networkReceived, index) => ({
-            label: `Network Received (MB) ${networkReceived.metric.instance}`,
-            data: networkReceived.values,
-            borderColor: `rgba(${192 + index * 20}, 75, 75, 1)`,
-            backgroundColor: `rgba(${192 + index * 20}, 75, 75, 0.2)`,
-            tension: 0.4
-        }))
+        ...networkSentData.map((networkSent, index) => {
+            const { borderColor, backgroundColor } = generateColor(index);
+            return {
+                label: `Network Sent (MB) ${networkSent.metric.instance}`,
+                data: networkSent.values,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                tension: 0.4
+            };
+        }),
+        ...networkReceivedData.map((networkReceived, index) => {
+            const { borderColor, backgroundColor } = generateColor(index + networkSentData.length);
+            return {
+                label: `Network Received (MB) ${networkReceived.metric.instance}`,
+                data: networkReceived.values,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                tension: 0.4
+            };
+        })
     ];
 
     createChart(ctxNetwork, timeData, networkDatasets, 'Data Transferred (MB)');
 
     // Dashboard Memory Usage Chart
     const ctxDashboardMemory = document.getElementById('dashboardMemoryTimeChart').getContext('2d');
-    const dashboardMemoryDatasets = dashboardMemoryUsageData.map((dashboardMemory, index) => ({
-        label: `Dashboard Memory Usage (%) ${dashboardMemory.metric.instance}`,
-        data: dashboardMemory.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 75, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 75, 0.2)`,
-        tension: 0.4
-    }));
+    const dashboardMemoryDatasets = dashboardMemoryUsageData.map((dashboardMemory, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Dashboard Memory Usage (%) ${dashboardMemory.metric.instance}`,
+            data: dashboardMemory.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
     createChart(ctxDashboardMemory, timeData, dashboardMemoryDatasets, 'Dashboard Memory Usage (%)');
 
     // CPU Frequency Chart
     const ctxCpuFrequency = document.getElementById('cpuFrequencyTimeChart').getContext('2d');
-    const cpuFrequencyDatasets = cpuFrequencyData.map((cpuFrequency, index) => ({
-        label: `CPU Frequency (GHz) ${cpuFrequency.metric.instance}`,
-        data: cpuFrequency.values,
-        borderColor: `rgba(${192 + index * 20}, 192, 75, 1)`,
-        backgroundColor: `rgba(${192 + index * 20}, 192, 75, 0.2)`,
-        tension: 0.4,
-
-    }));
+    const cpuFrequencyDatasets = cpuFrequencyData.map((cpuFrequency, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `CPU Frequency (GHz) ${cpuFrequency.metric.instance}`,
+            data: cpuFrequency.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
     createChart(ctxCpuFrequency, timeData, cpuFrequencyDatasets, 'CPU Frequency (GHz)');
 
     // Current Temperature Chart
     const ctxCurrentTemp = document.getElementById('currentTempTimeChart').getContext('2d');
-    const currentTempDatasets = currentTempData.map((currentTemp, index) => ({
-        label: `Current Temperature (°C) ${currentTemp.metric.instance}`,
-        data: currentTemp.values,
-        borderColor: `rgba(${75 + index * 20}, 192, 192, 1)`,
-        backgroundColor: `rgba(${75 + index * 20}, 192, 192, 0.2)`,
-        tension: 0.4
-    }));
+    const currentTempDatasets = currentTempData.map((currentTemp, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Current Temperature (°C) ${currentTemp.metric.instance}`,
+            data: currentTemp.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
 
     createChart(ctxCurrentTemp, timeData, currentTempDatasets, 'Current Temperature (°C)');
 }
