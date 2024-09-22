@@ -84,9 +84,9 @@ def add_target():
         }
         config['scrape_configs'].append(new_job)
         
-    update_prometheus_container()
     save_yaml(config, prometheus_yml_path)
     flash('Target added successfully!', 'success')
+    update_prometheus_container()
     return redirect(url_for('targets'))
 
 @app.route('/targets/remove_target', methods=['POST'])
@@ -102,7 +102,6 @@ def remove_target():
                 targets.remove(target_to_remove)
                 flash(f'Target {target_to_remove} removed successfully!', 'success')
                 
-                update_prometheus_container()
                 # Check if this was the last target, then remove the job
                 if not targets:  # If the list is now empty
                     config['scrape_configs'].remove(scrape_config)
@@ -114,6 +113,7 @@ def remove_target():
         flash(f'Job {job_name} not found.', 'warning')
 
     save_yaml(config, prometheus_yml_path)
+    update_prometheus_container()
     return redirect(url_for('targets'))
 
 @app.route('/targets/change_interval', methods=['POST'])
@@ -126,8 +126,8 @@ def change_interval():
         if scrape_config['job_name'] == job_name:
             scrape_config['scrape_interval'] = new_interval
             flash('Scrape interval updated successfully!', 'success')
-            update_prometheus_container()
             break
 
     save_yaml(config, prometheus_yml_path)
+    update_prometheus_container()
     return redirect(url_for('targets'))

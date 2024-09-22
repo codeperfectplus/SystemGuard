@@ -42,17 +42,11 @@ mkdir -p "$PROMETHEUS_DATA_DIR"
 # Create the prometheus.yml configuration file
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
-global:
-  scrape_interval: $SCRAPING_INTERVAL
-  # how frequently to scrape targets from the target list
-
 scrape_configs:
   - job_name: $JOB_NAME
     static_configs:
-      - targets: ['$FLASK_APP_IP:$FLASK_APP_PORT']
-
-      # apeend more targets list to scrape metrics from multiple services, on central prometheus server
-      # first ip address in the local machine ip address list
+    - targets:
+      - '$FLASK_APP_IP:$FLASK_APP_PORT'
 EOL
 
 # Check if Docker network exists
