@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# function to get the user name
+get_user_name() {
+    if [ "$(whoami)" = "root" ]; then
+        LOGNAME_USER=$(logname 2>/dev/null) # Redirect any error output to /dev/null
+        if [ $? -ne 0 ]; then               # Check if the exit status of the last command is not 0
+            USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+        else
+            USER_NAME=$LOGNAME_USER
+        fi
+    else
+        USER_NAME=$(whoami)
+    fi
+    echo "$USER_NAME"
+}
+
+USER_NAME=$(get_user_name)
 # Configuration
 NETWORK_NAME="flask-prometheus-net"
 CONTAINER_NAME="prometheus"
@@ -7,8 +23,11 @@ PROMETHEUS_IMAGE="prom/prometheus"
 PROMETHEUS_PORT="9090"
 PROMETHEUS_CONFIG_DIR="$(pwd)/prometheus_config"
 PROMETHEUS_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
+PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
+SCRAPING_INTERVAL="10s"
+JOB_NAME='systemguard-metrics'
 
 # Logging function for better readability
 log() {
@@ -18,18 +37,22 @@ log() {
 # Ensure the config directory exists
 log "Creating Prometheus config directory if it doesn't exist."
 mkdir -p "$PROMETHEUS_CONFIG_DIR"
+mkdir -p "$PROMETHEUS_DATA_DIR"
 
 # Create the prometheus.yml configuration file
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
-  scrape_interval: 10s  # How often Prometheus scrapes the target
+  scrape_interval: $SCRAPING_INTERVAL
+  # how frequently to scrape targets from the target list
 
 scrape_configs:
-  - job_name: 'flask_app_metrics'  # Scraping metrics from Flask app
-    static_configs:  # first ip address in the local machine ip address list
+  - job_name: $JOB_NAME
+    static_configs:
       - targets: ['$FLASK_APP_IP:$FLASK_APP_PORT']
+
       # apeend more targets list to scrape metrics from multiple services, on central prometheus server
+      # first ip address in the local machine ip address list
 EOL
 
 # Check if Docker network exists
@@ -57,6 +80,7 @@ run_output=$(docker run -d \
   -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
   --restart always \
   -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
+  -v "PROMETHEUS_DATA_DIR:/prometheus" \
   "$PROMETHEUS_IMAGE" 2>&1)  # Capture both stdout and stderr
 
 # Check if Prometheus started successfully

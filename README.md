@@ -2,6 +2,7 @@
 
 System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
+
 ## Features 🚀
 
 - Lightweight, open-source, and free to use with a straightforward installation process, out-of-the-box monitoring solution.
@@ -17,6 +18,16 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Option to download historical data in CSV format for detailed analysis (upcoming feature).
 - Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Update security updates with a single click or automatically update to the latest version to simplify maintenance.
+
+## Architecture 🏗️
+
+![SystemGuard-Architecture](/src/docs/images/SystemGuard-Architecture.jpg)
+
+## Tech Stack 🛠️
+
+- **Frontend**: JavaScript, Bootstrap, Chart.js, Grafana
+- **Backend**: Python, Flask, SQLAlchemy, SQLite, Prometheus, InfluxDB
+- **Monitoring**: psutil, speedtest-cli, nmap, netstat
 
 ## Get started 🛠️
 
