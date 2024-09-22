@@ -1,4 +1,3 @@
-import os
 import datetime
 from threading import Timer
 from src.config import app, db
@@ -7,7 +6,6 @@ from src.logger import logger
 from src.models import GeneralSettings, SystemInformation
 from sqlalchemy.exc import SQLAlchemyError
 from prometheus_client import Counter, Gauge
-import os, time
 
 from src.logger import logger
 # Flag to track if logging is already scheduled

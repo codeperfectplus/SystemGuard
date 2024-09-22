@@ -2,10 +2,7 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import os, time
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
-
+import os
 
 from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address
