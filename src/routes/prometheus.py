@@ -87,7 +87,7 @@ def add_target():
     save_yaml(config, prometheus_yml_path)
     flash('Target added successfully!', 'success')
     update_prometheus_container()
-    return redirect(url_for('targets'))
+    return redirect(url_for('dashboard_network'))
 
 @app.route('/targets/remove_target', methods=['POST'])
 def remove_target():
@@ -114,7 +114,7 @@ def remove_target():
 
     save_yaml(config, prometheus_yml_path)
     update_prometheus_container()
-    return redirect(url_for('targets'))
+    return redirect(url_for('dashboard_network'))
 
 @app.route('/targets/change_interval', methods=['POST'])
 def change_interval():

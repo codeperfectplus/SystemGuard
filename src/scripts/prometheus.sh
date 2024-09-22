@@ -44,6 +44,7 @@ log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 scrape_configs:
   - job_name: $JOB_NAME
+    scrape_interval: $SCRAPING_INTERVAL
     static_configs:
     - targets:
       - '$FLASK_APP_IP:$FLASK_APP_PORT'

@@ -11,13 +11,13 @@ async function fetchTargetData() {
             data.active_targets.forEach(target => {
                 const row = document.createElement('tr');
 
-                const instanceCell = document.createElement('td');
-                instanceCell.textContent = target.labels.instance;
-                row.appendChild(instanceCell);
-
                 const jobCell = document.createElement('td');
                 jobCell.textContent = target.labels.job;
                 row.appendChild(jobCell);
+
+                const instanceCell = document.createElement('td');
+                instanceCell.textContent = target.labels.instance;
+                row.appendChild(instanceCell);
 
                 const healthCell = document.createElement('td');
                 healthCell.textContent = target.health;
@@ -40,6 +40,11 @@ async function fetchTargetData() {
                 scrapeDurationCell.textContent = target.lastScrapeDuration.toFixed(3);
                 row.appendChild(scrapeDurationCell);
 
+                // __scrape_interval__
+                const scrapeIntervalCell = document.createElement('td');
+                scrapeIntervalCell.textContent = target.discoveredLabels.__scrape_interval__;
+                row.appendChild(scrapeIntervalCell);
+
                 if (target.health === 'up') {
                     const dashboardCell = document.createElement('td');
                     const dashboardLink = document.createElement('a');
@@ -53,6 +58,40 @@ async function fetchTargetData() {
                     const emptyCell = document.createElement('td');
                     row.appendChild(emptyCell);
                 }
+
+                // remove the instance from the prometheus
+
+                const removeCell = document.createElement('td');
+                const removeForm = document.createElement('form');
+                removeForm.action = '/targets/remove_target'; // Replace with actual endpoint if needed
+                removeForm.method = 'POST';
+                removeForm.style.display = 'inline';
+
+                const jobNameInput = document.createElement('input');
+                jobNameInput.type = 'hidden';
+                jobNameInput.name = 'job_name';
+                jobNameInput.value = target.labels.job;
+                removeForm.appendChild(jobNameInput);
+
+                const targetToRemoveInput = document.createElement('input');
+                targetToRemoveInput.type = 'hidden';
+                targetToRemoveInput.name = 'target_to_remove';
+                targetToRemoveInput.value = target.labels.instance;
+                removeForm.appendChild(targetToRemoveInput);
+
+                const submitButton = document.createElement('input');
+                submitButton.type = 'submit';
+                submitButton.value = 'Remove';
+                submitButton.onclick = function () {
+                    return confirm('Are you sure you want to remove this target?');
+                };
+                removeForm.appendChild(submitButton);
+
+                removeCell.appendChild(removeForm);
+                row.appendChild(removeCell);
+
+                // Append the row to the table body
+                targetTableBody.appendChild(row);
 
                 // Append the row to the table body
                 targetTableBody.appendChild(row);
