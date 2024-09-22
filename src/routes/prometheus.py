@@ -65,4 +65,3 @@ def delete_file_path(id):
     db.session.commit()
     flash('File path deleted successfully!', 'success')
     return redirect(url_for('external_monitoring'))
-

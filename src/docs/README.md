@@ -23,3 +23,7 @@
 ## Security Analysis
 
 ![screenshot_007](/src/static/images/screenshot_007.png)
+
+## Central Dashboard
+
+![screenshot_008](/src/static/images/tracking.png)

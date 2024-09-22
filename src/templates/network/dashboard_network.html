@@ -1,41 +1,31 @@
 {% extends 'base/base.html' %}
-{% block title %}Dashboard Network{% endblock %}
+{% block title %}Prometheus Active Targets{% endblock %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_network.css') }}">
 {% endblock %}
 {% block content %}
-
-<div class="container">
-    <h1>Dashboard Groups</h1>
-    <div class="card-container">
-        <a href="{{ url_for('dashboard') }}" class="card">
-            <h2>{{title}}</h2>
-            <p>In-depth system monitoring and management</p>
-        </a>
-        {% for group in groups %}
-        <div class="card">
-            <a
-                href="{% if group.ip_address and group.port %}http://{{ group.ip_address }}:{{ group.port }}{% elif group.link %}{{ group.link }}{% endif %}/dashboard">
-                <h2>{{ group.name }}</h2>
-                <p>{{ group.description }}</p>
-                {% if group.ip_address and group.port %}
-                <p><strong>IP Address:</strong> {{ group.ip_address }}</p>
-                <p><strong>Port:</strong> {{ group.port }}</p>
-                {% elif group.link %}
-                <p><strong>URL:</strong> {{ group.link }}</p>
-                {% endif %}
-            </a>
-            <div class="card-actions">
-                <a href="{{ url_for('edit_server', server_id=group.id) }}" class="btn btn-warning">Edit</a>
-                <form action="{{ url_for('delete_server', server_id=group.id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="container">
+        <h1>SystemGuard Active Targets</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Instance</th>
+                    <th>Job</th>
+                    <th>Health</th>
+                    <th>Last Scrape</th>
+                    <th>Last Error</th>
+                    <th>Scrape URL</th>
+                    <th>Scrape Duration (s)</th>
+                    <th>Go to Dashboard</th>
+                </tr>
+            </thead>
+            <tbody id="target-table-body">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
     </div>
-    <div class="add-server-link">
-        <a href="{{ url_for('add_server') }}" class="btn btn-primary">Add New Server</a>
-    </div>
-</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/targets.js') }}"></script>
 {% endblock %}

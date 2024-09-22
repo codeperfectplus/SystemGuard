@@ -8,9 +8,15 @@ from datetime import datetime, timedelta
 from flask import request, jsonify
 import gc
 from datetime import datetime, timezone
+
+from src.routes.helper.common_helper import admin_required
+
 api_bp = blueprints.Blueprint("api", __name__)
 
-PROMETHEUS_URL = 'http://localhost:9090/api/v1/query_range'  # Change if using a different URL or port
+PROMETHEUS_URL = 'http://localhost:9090'  # Change if using a different URL or port
+QUERY_API_URL = f'{PROMETHEUS_URL}/api/v1/query'
+TARGETS_API_URL = f'{PROMETHEUS_URL}/api/v1/targets'
+
 PROMETHEUS_METRICS = {
     'cpu': 'cpu_usage_percentage',  # Adjusting to match the defined gauge
     'memory': 'memory_usage_percentage',
@@ -283,7 +289,7 @@ def graph_data_api_v3():
             }
 
             # Send the query to Prometheus
-            response = requests.get(PROMETHEUS_URL, params=params)
+            response = requests.get(QUERY_API_URL, params=params)
 
             # Check if the request was successful
             if response.status_code == 200:
@@ -368,7 +374,7 @@ def graph_data_api_v3_():
             }
 
             # Send the query to Prometheus
-            response = requests.get(PROMETHEUS_URL, params=params)
+            response = requests.get(QUERY_API_URL, params=params)
             
             # Check if the request was successful
             if response.status_code == 200:
@@ -422,6 +428,40 @@ def graph_data_api_v3_():
     except Exception as e:
         # Handle and log the error for debugging purposes
         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
+
+
+@app.route('/api/v1/targets', methods=['GET'])
+@admin_required
+def get_prometheus_targets():
+    try:
+        # Query Prometheus API to get the targets
+        response = requests.get(TARGETS_API_URL)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            targets_data = response.json().get('data', {})
+            active_targets = targets_data.get('activeTargets', [])
+            dropped_targets = targets_data.get('droppedTargets', [])
+            
+            # Return the active and dropped targets as JSON
+            return jsonify({
+                'active_targets': active_targets,
+                'dropped_targets': dropped_targets
+            }), 200
+        else:
+            # Handle non-200 responses from Prometheus
+            return jsonify({
+                'error': 'Failed to fetch targets from Prometheus',
+                'details': response.text
+            }), response.status_code
+    
+    except Exception as e:
+        # Handle exceptions
+        return jsonify({
+            'error': 'An error occurred while fetching Prometheus targets',
+            'details': str(e)
+        }), 500
+
 
 @app.route('/api/v1/refresh-interval', methods=['GET', 'POST'])
 @login_required
