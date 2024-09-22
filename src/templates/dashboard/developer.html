@@ -1,5 +1,5 @@
 {% extends 'base/base.html' %}
-{% block title %}Server Dashboard{% endblock %}
+{% block title %}{{ system_info['system_username'] }}@{{ system_info['nodename'] }} - SystemGuard{% endblock %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/refresher.css') }}">
 {% endblock %}

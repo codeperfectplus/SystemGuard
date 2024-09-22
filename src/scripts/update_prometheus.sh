@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # Configuration
+CURRENT_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+CURRENT_DIR="$CURRENT_SCRIPT_DIR"
+ROOT_DIR="$(dirname "$(dirname "$CURRENT_DIR")")"
+PROMETHEUS_CONFIG_DIR="$ROOT_DIR/prometheus_config"
 CONTAINER_NAME="prometheus"
-PROMETHEUS_CONFIG="$(pwd)/prometheus.yml"
+PROMETHEUS_CONFIG="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
 PROMETHEUS_IMAGE="prom/prometheus"  # Add your image name if needed
 NETWORK_NAME="flask-prometheus-net"  # Specify your network name
 PROMETHEUS_PORT="9090"  # Specify your port

@@ -6,7 +6,14 @@ import yaml
 from src.config import app, db
 from src.models import ExternalMonitornig
 from src.utils import ROOT_DIR
-from src.routes.helper.prometheus_helper import load_yaml, save_yaml, is_valid_file, show_targets, prometheus_yml_path
+from src.routes.helper.prometheus_helper import (
+    load_yaml, 
+    save_yaml, 
+    is_valid_file, 
+    show_targets, 
+    prometheus_yml_path,
+    update_prometheus_container)
+
 
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint('prometheus', __name__)
@@ -57,6 +64,7 @@ def targets():
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 
+
 @app.route('/targets/add_target', methods=['POST'])
 def add_target():
     job_name = request.form.get('job_name')
@@ -75,7 +83,8 @@ def add_target():
             'scrape_interval': scrape_interval  # Set the specific interval
         }
         config['scrape_configs'].append(new_job)
-
+        
+    update_prometheus_container()
     save_yaml(config, prometheus_yml_path)
     flash('Target added successfully!', 'success')
     return redirect(url_for('targets'))
@@ -92,7 +101,8 @@ def remove_target():
             if target_to_remove in targets:
                 targets.remove(target_to_remove)
                 flash(f'Target {target_to_remove} removed successfully!', 'success')
-
+                
+                update_prometheus_container()
                 # Check if this was the last target, then remove the job
                 if not targets:  # If the list is now empty
                     config['scrape_configs'].remove(scrape_config)
@@ -116,6 +126,7 @@ def change_interval():
         if scrape_config['job_name'] == job_name:
             scrape_config['scrape_interval'] = new_interval
             flash('Scrape interval updated successfully!', 'success')
+            update_prometheus_container()
             break
 
     save_yaml(config, prometheus_yml_path)

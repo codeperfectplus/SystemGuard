@@ -1,8 +1,10 @@
 import os
 import yaml
+import subprocess
 from src.utils import ROOT_DIR
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
+update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.sh')
 
 def is_valid_file(file_path: str) -> bool:
     """Checks if a file is valid and has key-value pairs separated by a colon."""
@@ -38,3 +40,22 @@ def show_targets():
             'scrape_interval': scrape_interval
         })
     return targets_info
+
+
+def update_prometheus_container():
+    """Update the Prometheus container."""
+    # Define the path to your shell script
+    try:
+        # Use subprocess.run to execute the shell script
+        result = subprocess.run(['bash', update_prometheus_path], check=True, text=True, capture_output=True)
+
+        # Print the output of the script
+        print("Output:")
+        print(result.stdout)
+        
+        # Print any errors (if any)
+        if result.stderr:
+            print("Errors:")
+            print(result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")

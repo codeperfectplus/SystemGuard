@@ -1,16 +1,12 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
 
-body {
+
+/* body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f9;
     color: #333;
     line-height: 1.6;
     padding: 20px;
-}
+} */
 
 h1, h2 {
     color: #4a4a4a;
