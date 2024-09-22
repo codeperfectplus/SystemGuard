@@ -1,0 +1,53 @@
+{% extends 'base/base.html' %}
+{% block title %}SystemGuard Targets{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/targets.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1>SystemGuard Targets</h1>
+    <table>
+        <tr>
+            <th>Job Name</th>
+            <th>Targets</th>
+            <th>Scrape Interval</th>
+            <th>Actions</th>
+        </tr>
+        {% for info in targets_info %}
+        <tr>
+            <td>{{ info.job_name }}</td>
+            <td>
+                <ul>
+                    {% for target in info.targets %}
+                    <li>
+                        {{ target }}
+                        <form action="{{ url_for('remove_target') }}" method="post" style="display:inline;">
+                            <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                            <input type="hidden" name="target_to_remove" value="{{ target }}">
+                            <input type="submit" value="Remove">
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ info.scrape_interval }}</td>
+            <td>
+                <form action="{{ url_for('change_interval') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                    <input type="text" name="new_interval" placeholder="New Interval" required>
+                    <input type="submit" value="Change Interval">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add New Target</h2>
+    <form action="{{ url_for('add_target') }}" method="post">
+        <input type="text" name="job_name" placeholder="Job Name" required>
+        <input type="text" name="new_target" placeholder="New Target" required>
+        <input type="text" name="scrape_interval" placeholder="Scrape Interval" required>
+        <input type="submit" value="Add Target">
+    </form>
+{% endblock %}

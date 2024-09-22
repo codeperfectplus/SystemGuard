@@ -1,17 +1,20 @@
-
-
-.container {
-    max-width: 1200px;
-    margin-top: 20px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-h1 {
-    text-align: center;
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
     color: #333;
+    line-height: 1.6;
+    padding: 20px;
 }
 
-.target-table {
-    margin-top: 20px;
+h1, h2 {
+    color: #4a4a4a;
+    margin-bottom: 20px;
 }
 
 table {
@@ -20,38 +23,60 @@ table {
     margin-bottom: 20px;
 }
 
-table th, table td {
+th, td {
     padding: 12px;
-    border: 1px solid #ddd;
     text-align: left;
+    border-bottom: 1px solid #ccc;
 }
 
-table th {
-    background-color: #3f51b5;
+th {
+    background-color: #007bff;
     color: white;
 }
 
-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+tr:hover {
+    background-color: #f1f1f1;
 }
 
-table td.health-up {
-    color: green;
-    font-weight: bold;
+form {
+    display: inline;
 }
 
-table td.health-down {
-    color: red;
-    font-weight: bold;
+input[type="text"], input[type="submit"] {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border 0.3s ease;
 }
 
-.error-message {
-    color: red;
-    font-style: italic;
+input[type="text"]:focus {
+    border: 1px solid #007bff;
+    outline: none;
 }
 
-.footer {
-    text-align: center;
-    color: #666;
-    font-size: 12px;
+input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.flash {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+.flash.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash.danger {
+    background-color: #f8d7da;
+    color: #721c24;
 }

@@ -30,3 +30,6 @@ prometheus_client==0.20.0
 
 # influxdb-client, optional for writing metrics to InfluxDB
 # influxdb-client==1.46.0
+
+# pyyaml for parsing YAML configuration files
+pyyaml==6.0.2
