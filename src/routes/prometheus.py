@@ -21,8 +21,8 @@ from src.routes.helper.prometheus_helper import (
 prometheus_bp = Blueprint('prometheus', __name__)
 
 # todo, find a better way to store the username and password
-username = 'admin'
-password = 'admin'
+username = 'prometheus_admin'
+password = 'prometheus_password'
 
 # Define a route to serve Prometheus metrics
 @app.route('/metrics')
@@ -73,7 +73,7 @@ def delete_file_path(id):
 @app.route('/configure_targets')
 @admin_required
 def configure_targets():
-    update_prometheus_config()
+    # update_prometheus_config()
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 

@@ -43,22 +43,39 @@ def show_targets():
 
 def update_prometheus_config():
     """
-    update the first target whenever the function called
-    as the network change the ip address will also change 
-    so 1st ip address in the list is the ip adddress of the machine
-    with the job localhost
+    Update the first target whenever the function is called.
+    If the network changes, the IP address will also change.
+    This updates the first IP address in the list, assuming it's the machine with the 'localhost' job.
     """
     print("Updating Prometheus config...")
+    
+    # Get the machine's IP address
     ipv4_address = subprocess.run(['hostname', '-I'], capture_output=True, text=True, check=True).stdout.split()[0]
+    
+    # Define the path to Prometheus config file
     prometheus_config_path = os.path.join(ROOT_DIR, 'prometheus_config', 'prometheus.yml')
+    
+    # Load the existing config
     config = load_yaml(prometheus_config_path)
-    # fetch the localhost job
+    # Fetch the 'localhost' job
     localhost_job = next((job for job in config['scrape_configs'] if job['job_name'] == 'localhost'), None)
+    
     if localhost_job:
+        # Update the IP address for the 'localhost' job target
         localhost_job['static_configs'][0]['targets'][0] = f'{ipv4_address}:5050'
+        
+        # localhost_job['basic_auth'] = {
+        #     'username': "username",
+        #     'password': "password"
+        # }
+        
+        # Save the updated config
         save_yaml(config, prometheus_config_path)
+        
+        print("Prometheus config updated successfully.")
         return True
 
+    print("No 'localhost' job found in Prometheus config.")
     return False
 
 def update_prometheus_container():

@@ -49,8 +49,8 @@ scrape_configs:
     - targets:
       - '$FLASK_APP_IP:$FLASK_APP_PORT'
     basic_auth:
-      username: admin
-      password: admin
+      username: prometheus_admin
+      password: prometheus_password
 
 EOL
 
