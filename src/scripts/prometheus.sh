@@ -43,7 +43,7 @@ mkdir -p "$PROMETHEUS_DATA_DIR"
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 scrape_configs:
-  - job_name: $JOB_NAME
+  - job_name: localhost
     scrape_interval: $SCRAPING_INTERVAL
     static_configs:
     - targets:

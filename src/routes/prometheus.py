@@ -12,7 +12,9 @@ from src.routes.helper.prometheus_helper import (
     is_valid_file, 
     show_targets, 
     prometheus_yml_path,
-    update_prometheus_container)
+    update_prometheus_container,
+    update_prometheus_config)
+
 
 
 # Define the Prometheus Blueprint
@@ -61,9 +63,17 @@ def delete_file_path(id):
 
 @app.route('/targets')
 def targets():
+    update_prometheus_config()
+    # update_prometheus_container()
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 
+@app.route('/targets/restart_prometheus')
+def restart_prometheus():
+    update_prometheus_config
+    update_prometheus_container()
+    flash('Prometheus container restarted successfully!', 'success')
+    return redirect(url_for('dashboard_network'))
 
 @app.route('/targets/add_target', methods=['POST'])
 def add_target():
@@ -72,6 +82,11 @@ def add_target():
     scrape_interval = request.form.get('scrape_interval', '15s') + 's'  # New scrape interval
     config = load_yaml(prometheus_yml_path)
 
+    # new target should be <ip>:<port> check if it is in the correct format
+    if ':' not in new_target:
+        flash('Invalid target format. It should be in the format <ip>:<port>.', 'danger')
+        return redirect(url_for('dashboard_network'))
+    
     for scrape_config in config['scrape_configs']:
         if scrape_config['job_name'] == job_name:
             scrape_config['static_configs'][0]['targets'].append(new_target)
@@ -127,7 +142,7 @@ def change_interval():
             scrape_config['scrape_interval'] = new_interval
             flash('Scrape interval updated successfully!', 'success')
             break
-
+    
     save_yaml(config, prometheus_yml_path)
     update_prometheus_container()
     return redirect(url_for('targets'))

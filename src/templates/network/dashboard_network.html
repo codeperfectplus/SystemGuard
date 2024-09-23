@@ -7,6 +7,7 @@
 {% block content %}
 <div class="container">
     <h1>SystemGuard Active Targets</h1>
+    {% include 'ext/message.html' %}
     <table>
         <thead>
             <tr>
@@ -26,6 +27,14 @@
             <!-- Data will be populated here -->
         </tbody>
     </table>
+</div>
+
+
+<div class="text-center">
+    <h2>Restart Prometheus Docker Service</h2>
+    <form action="{{ url_for('restart_prometheus') }}">
+        <input type="submit" value="Restart Prometheus">
+    </form>
 </div>
 
 <div class="text-center">
