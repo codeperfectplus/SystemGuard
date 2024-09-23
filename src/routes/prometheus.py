@@ -61,10 +61,9 @@ def delete_file_path(id):
     flash('File path deleted successfully!', 'success')
     return redirect(url_for('external_monitoring'))
 
-@app.route('/targets')
-def targets():
+@app.route('/configure_targets')
+def configure_targets():
     update_prometheus_config()
-    # update_prometheus_container()
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 
@@ -73,7 +72,7 @@ def restart_prometheus():
     update_prometheus_config
     update_prometheus_container()
     flash('Prometheus container restarted successfully!', 'success')
-    return redirect(url_for('dashboard_network'))
+    return redirect(url_for('configure_targets'))
 
 @app.route('/targets/add_target', methods=['POST'])
 def add_target():
@@ -85,7 +84,7 @@ def add_target():
     # new target should be <ip>:<port> check if it is in the correct format
     if ':' not in new_target:
         flash('Invalid target format. It should be in the format <ip>:<port>.', 'danger')
-        return redirect(url_for('dashboard_network'))
+        return redirect(url_for('configure_targets'))
     
     for scrape_config in config['scrape_configs']:
         if scrape_config['job_name'] == job_name:
@@ -101,8 +100,8 @@ def add_target():
         
     save_yaml(config, prometheus_yml_path)
     flash('Target added successfully!', 'success')
-    update_prometheus_container()
-    return redirect(url_for('dashboard_network'))
+    # update_prometheus_container()
+    return redirect(url_for('configure_targets'))
 
 @app.route('/targets/remove_target', methods=['POST'])
 def remove_target():
@@ -128,8 +127,8 @@ def remove_target():
         flash(f'Job {job_name} not found.', 'warning')
 
     save_yaml(config, prometheus_yml_path)
-    update_prometheus_container()
-    return redirect(url_for('dashboard_network'))
+    # update_prometheus_container()
+    return redirect(url_for('configure_targets'))
 
 @app.route('/targets/change_interval', methods=['POST'])
 def change_interval():
@@ -144,5 +143,5 @@ def change_interval():
             break
     
     save_yaml(config, prometheus_yml_path)
-    update_prometheus_container()
-    return redirect(url_for('targets'))
+    # update_prometheus_container()
+    return redirect(url_for('configure_targets'))

@@ -6,49 +6,74 @@
 {% endblock %}
 
 {% block content %}
-    <h1>SystemGuard Targets</h1>
-    {% include 'ext/message.html' %}
-    <table>
-        <tr>
-            <th>Job Name</th>
-            <th>Targets</th>
-            <th>Scrape Interval</th>
-            <th>Actions</th>
-        </tr>
-        {% for info in targets_info %}
-        <tr>
-            <td>{{ info.job_name }}</td>
-            <td>
-                <ul>
-                    {% for target in info.targets %}
-                    <li>
-                        {{ target }}
-                        <form action="{{ url_for('remove_target') }}" method="post" style="display:inline;">
-                            <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                            <input type="hidden" name="target_to_remove" value="{{ target }}">
-                            <input type="submit" value="Remove">
-                        </form>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </td>
-            <td>{{ info.scrape_interval }}</td>
-            <td>
-                <form action="{{ url_for('change_interval') }}" method="post" style="display:inline;">
-                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                    <input type="text" name="new_interval" placeholder="New Interval" required>
-                    <input type="submit" value="Change Interval">
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <h1>SystemGuard Targets</h1>
+        {% include 'ext/message.html' %}
 
-    <h2>Add New Target</h2>
-    <form action="{{ url_for('add_target') }}" method="post">
-        <input type="text" name="job_name" placeholder="Job Name" required>
-        <input type="text" name="new_target" placeholder="New Target" required>
-        <input type="text" name="scrape_interval" placeholder="Scrape Interval" required>
-        <input type="submit" value="Add Target">
-    </form>
+        <div class="table-wrapper">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Job Name</th>
+                        <th>Targets</th>
+                        <th>Scrape Interval</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in targets_info %}
+                    <tr>
+                        <td>{{ info.job_name }}</td>
+                        <td>
+                            <ul class="target-list">
+                                {% for target in info.targets %}
+                                <li>
+                                    {{ target }}
+                                    <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
+                                        <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                        <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                        <input type="submit" value="Remove" class="btn-danger">
+                                    </form>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ info.scrape_interval }}</td>
+                        <td>
+                            <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
+                                <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                <input type="text" name="new_interval" placeholder="New Interval" required class="input-field">
+                                <input type="submit" value="Change Interval" class="btn-primary">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Restart Prometheus Docker Service</h2>
+            <form action="{{ url_for('restart_prometheus') }}">
+                <input type="submit" value="Restart Prometheus" class="btn-warning">
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Add New Target</h2>
+            <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
+                <input type="text" name="job_name" placeholder="Job Name" required class="input-field">
+                <input type="text" name="new_target" placeholder="New Target" required class="input-field">
+                <input type="text" name="scrape_interval" placeholder="Scrape Interval" required class="input-field">
+                <br>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus"></i> Add Target
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/targets.js') }}"></script>
 {% endblock %}

@@ -20,7 +20,6 @@
                 <th>Scrape Duration (s)</th>
                 <th>Scrape Interval</th>
                 <th>Go to Dashboard</th>
-                <th>Remove Target</th>
             </tr>
         </thead>
         <tbody id="target-table-body">
@@ -29,8 +28,7 @@
     </table>
 </div>
 
-
-<div class="text-center">
+<!-- <div class="text-center">
     <h2>Restart Prometheus Docker Service</h2>
     <form action="{{ url_for('restart_prometheus') }}">
         <input type="submit" value="Restart Prometheus">
@@ -40,12 +38,11 @@
 <div class="text-center">
     <h2>Add New Target</h2>
     <form action="{{ url_for('add_target') }}" method="post">
-        <input type="text" name="job_name" placeholder="Job Name" required>
         <input type="text" name="new_target" placeholder="New Instance" required>
         <input type="text" name="scrape_interval" placeholder="Scrape Interval" required>
         <input type="submit" value="Add Target">
     </form>
-</div>
+</div> -->
 {% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/targets.js') }}"></script>

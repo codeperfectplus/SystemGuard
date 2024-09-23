@@ -73,25 +73,22 @@ async function fetchTargetData() {
                 jobNameInput.value = target.labels.job;
                 removeForm.appendChild(jobNameInput);
 
-                const targetToRemoveInput = document.createElement('input');
-                targetToRemoveInput.type = 'hidden';
-                targetToRemoveInput.name = 'target_to_remove';
-                targetToRemoveInput.value = target.labels.instance;
-                removeForm.appendChild(targetToRemoveInput);
+                // const targetToRemoveInput = document.createElement('input');
+                // targetToRemoveInput.type = 'hidden';
+                // targetToRemoveInput.name = 'target_to_remove';
+                // targetToRemoveInput.value = target.labels.instance;
+                // removeForm.appendChild(targetToRemoveInput);
 
-                const submitButton = document.createElement('input');
-                submitButton.type = 'submit';
-                submitButton.value = 'Remove';
-                submitButton.onclick = function () {
-                    return confirm('Are you sure you want to remove this target?');
-                };
-                removeForm.appendChild(submitButton);
+                // const submitButton = document.createElement('input');
+                // submitButton.type = 'submit';
+                // submitButton.value = 'Remove';
+                // submitButton.onclick = function () {
+                //     return confirm('Are you sure you want to remove this target?');
+                // };
+                // removeForm.appendChild(submitButton);
 
-                removeCell.appendChild(removeForm);
-                row.appendChild(removeCell);
-
-                // Append the row to the table body
-                targetTableBody.appendChild(row);
+                // removeCell.appendChild(removeForm);
+                // row.appendChild(removeCell);
 
                 // Append the row to the table body
                 targetTableBody.appendChild(row);
