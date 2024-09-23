@@ -48,6 +48,10 @@ scrape_configs:
     static_configs:
     - targets:
       - '$FLASK_APP_IP:$FLASK_APP_PORT'
+    basic_auth:
+      username: admin
+      password: admin
+
 EOL
 
 # Check if Docker network exists

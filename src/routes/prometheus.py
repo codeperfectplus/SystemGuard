@@ -6,6 +6,7 @@ import yaml
 from src.config import app, db
 from src.models import ExternalMonitornig
 from src.utils import ROOT_DIR
+from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_yaml, 
     save_yaml, 
@@ -16,19 +17,26 @@ from src.routes.helper.prometheus_helper import (
     update_prometheus_config)
 
 
-
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint('prometheus', __name__)
+
+# todo, find a better way to store the username and password
+username = 'admin'
+password = 'admin'
 
 # Define a route to serve Prometheus metrics
 @app.route('/metrics')
 def metrics():
+    auth = request.authorization
+    if not auth or not (auth.username == username and auth.password == password):
+        return Response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
     output = generate_latest()
     output = '\n'.join([line for line in output.decode().split('\n') if not line.startswith('#') and line])
     return Response(output, mimetype='text/plain')
 
 # POST request to manage file paths
 @app.route('/external_monitoring', methods=['GET', 'POST'])
+@admin_required
 def external_monitoring():
     if request.method == 'POST':
         file_path = request.form.get('file_path')
@@ -54,6 +62,7 @@ def external_monitoring():
 
 # POST request to delete file path
 @app.route('/external_monitoring/delete_file_path/<int:id>', methods=['POST'])
+@admin_required
 def delete_file_path(id):
     file_path = ExternalMonitornig.query.get_or_404(id)
     db.session.delete(file_path)
@@ -62,12 +71,14 @@ def delete_file_path(id):
     return redirect(url_for('external_monitoring'))
 
 @app.route('/configure_targets')
+@admin_required
 def configure_targets():
     update_prometheus_config()
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 
 @app.route('/targets/restart_prometheus')
+@admin_required
 def restart_prometheus():
     update_prometheus_config
     update_prometheus_container()
@@ -104,6 +115,7 @@ def add_target():
     return redirect(url_for('configure_targets'))
 
 @app.route('/targets/remove_target', methods=['POST'])
+@admin_required
 def remove_target():
     job_name = request.form.get('job_name')
     target_to_remove = request.form.get('target_to_remove')
@@ -131,6 +143,7 @@ def remove_target():
     return redirect(url_for('configure_targets'))
 
 @app.route('/targets/change_interval', methods=['POST'])
+@admin_required
 def change_interval():
     job_name = request.form.get('job_name')
     new_interval = request.form.get('new_interval') + 's'  # New scrape interval
