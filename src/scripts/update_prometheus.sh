@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# function to get the user name
+get_user_name() {
+    if [ "$(whoami)" = "root" ]; then
+        LOGNAME_USER=$(logname 2>/dev/null) # Redirect any error output to /dev/null
+        if [ $? -ne 0 ]; then               # Check if the exit status of the last command is not 0
+            USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+        else
+            USER_NAME=$LOGNAME_USER
+        fi
+    else
+        USER_NAME=$(whoami)
+    fi
+    echo "$USER_NAME"
+}
+
+USER_NAME=$(get_user_name)
 # Configuration
 CURRENT_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 CURRENT_DIR="$CURRENT_SCRIPT_DIR"
@@ -7,6 +23,7 @@ ROOT_DIR="$(dirname "$(dirname "$CURRENT_DIR")")"
 PROMETHEUS_CONFIG_DIR="$ROOT_DIR/prometheus_config"
 CONTAINER_NAME="prometheus"
 PROMETHEUS_CONFIG="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
+PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 PROMETHEUS_IMAGE="prom/prometheus"  # Add your image name if needed
 NETWORK_NAME="flask-prometheus-net"  # Specify your network name
 PROMETHEUS_PORT="9090"  # Specify your port
@@ -34,6 +51,7 @@ else
       -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
       --restart always \
       -v "$PROMETHEUS_CONFIG:/etc/prometheus/prometheus.yml" \
+      -v "PROMETHEUS_DATA_DIR:/prometheus" \
       "$PROMETHEUS_IMAGE" &> /dev/null
 
     log "Prometheus container started successfully."

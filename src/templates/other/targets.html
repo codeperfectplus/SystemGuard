@@ -14,10 +14,10 @@
             <table class="modern-table">
                 <thead>
                     <tr>
-                        <th>Job Name</th>
-                        <th>Targets</th>
-                        <th>Scrape Interval</th>
-                        <th>Actions</th>
+                        <th>Group Name <i class="fas fa-info-circle" title="Job Name is the name of the service that is being monitored."></i></th>
+                        <th>Targets <i class="fas fa-info-circle" title="Targets are the IP addresses of the services that are being monitored."></i></th>
+                        <th>Scrape Interval <i class="fas fa-info-circle" title="Scrape Interval is the time interval between each scrape of the target."></i></th>
+                        <th>New Interval<i class="fas fa-info-circle" title="Change the scrape interval of the target."></i></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,7 +32,9 @@
                                     <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
                                         <input type="hidden" name="job_name" value="{{ info.job_name }}">
                                         <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                        <input type="submit" value="Remove" class="btn-danger">
+                                        <button type="submit" class="btn-danger">
+                                            <i class="fas fa-times"></i> Remove
+                                        </button>
                                     </form>
                                 </li>
                                 {% endfor %}
@@ -62,7 +64,7 @@
         <div class="section">
             <h2>Add New Target</h2>
             <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
-                <input type="text" name="job_name" placeholder="Job Name" required class="input-field">
+                <input type="text" name="job_name" placeholder="Group Name" required class="input-field">
                 <input type="text" name="new_target" placeholder="New Target" required class="input-field">
                 <input type="text" name="scrape_interval" placeholder="Scrape Interval" required class="input-field">
                 <br>
