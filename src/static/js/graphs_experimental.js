@@ -38,50 +38,9 @@ function fetchDataAndRenderCharts() {
 
 // Add event listener to refresh data when filter value changes
 document.getElementById('timeFilter').addEventListener('change', (event) => {
-    // Save the new filter value to local storage
     localStorage.setItem('filterValue', event.target.value);
-    // Fetch data with the new filter value
     fetchDataAndRenderCharts();
 });
-
-// Initial fetch when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    fetchDataAndRenderCharts();
-});
-
-// Add the refresh button to fetch the data
-document.getElementById('refreshData').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCpuTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshMemoryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshBatteryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshNetworkTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshDashboardMemoryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCpuFrequencyTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCurrentTempTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
 
 function formatDate(utcTime, timeZone) {
     const date = new Date(utcTime);
@@ -129,6 +88,24 @@ function createChart(ctx, labels, datasets, yLabel) {
         ctx.chart.destroy(); // Destroy the existing chart if it exists
     }
 
+    // Ensure the parent element is positioned relatively
+    ctx.canvas.parentNode.style.position = 'relative';
+
+    // Create or update download button
+    getOrCreateButton(ctx.canvas.parentNode, 'Download Chart', 'download-button', (e) => {
+        const fileName = `${yLabel.replace(/\s+/g, '_')}_chart.png`; // Dynamic filename
+        console.log('Download button clicked');
+        const link = document.createElement('a');
+        link.href = ctx.chart.toBase64Image();
+        link.download = fileName;
+        link.click();
+    }, { top: '10px', right: '10px' });
+
+    // Create or update refresh button
+    getOrCreateButton(ctx.canvas.parentNode, 'Refresh Data', 'refresh-button', () => {
+        fetchDataAndRenderCharts();
+    }, { top: '10px', right: '200px' });
+
     const allDataPoints = datasets.flatMap(dataset => dataset.data);
     const minY = Math.min(...allDataPoints.filter(value => typeof value === 'number'));
     const maxY = Math.max(...allDataPoints.filter(value => typeof value === 'number'));
@@ -152,20 +129,25 @@ function createChart(ctx, labels, datasets, yLabel) {
             responsive: true,
             scales: {
                 x: {
-                    type: 'category', 
-                    title: {
-                        display: true,
-                        text: 'Time'
-                    },
+                    type: 'category',
+                    // title: {
+                    //     display: true,
+                    //     text: 'Time',
+                    //     font: {
+                    //         size: 16,
+                    //         weight: 'bold'
+                    //     },
+                    //     padding: { top: 10, left: 0, right: 0, bottom: 0 }
+                    // },
                     ticks: {
-                        autoSkip: true,          
-                        maxTicksLimit: 6,       
-                        maxRotation: 0,         
+                        autoSkip: true,
+                        maxTicksLimit: 6,
+                        maxRotation: 0,
                         minRotation: 0,
                     }
                 },
                 y: {
-                    beginAtZero: minY < 0 ? false : true, // Adjust y-axis based on data
+                    beginAtZero: minY < 0 ? false : true,
                     title: {
                         display: true,
                         text: yLabel,
@@ -176,6 +158,21 @@ function createChart(ctx, labels, datasets, yLabel) {
     });
 }
 
+// Helper function to create or retrieve a button
+function getOrCreateButton(parent, text, className, onClick, position) {
+    let button = parent.querySelector(`.${className}`);
+    if (!button) {
+        button = document.createElement('button');
+        button.classList.add(className);
+        button.textContent = text;
+        button.style.position = 'absolute';
+        button.style.zIndex = '5';
+        Object.assign(button.style, position); // Apply positioning styles
+        parent.appendChild(button);
+    }
+    button.onclick = onClick; // Update the click handler
+    return button;
+}
 
 // Function to create charts with the fetched data
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {
