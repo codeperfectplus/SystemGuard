@@ -27,7 +27,7 @@ PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
 SCRAPING_INTERVAL="10s"
-JOB_NAME='systemguard-metrics'
+monitor='systemguard-metrics'
 
 # Logging function for better readability
 log() {
@@ -42,6 +42,12 @@ mkdir -p "$PROMETHEUS_DATA_DIR"
 # Create the prometheus.yml configuration file
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
+global:
+  external_labels:
+    system: $monitor
+    environment: 'production'
+    user: '$USER_NAME'
+    
 scrape_configs:
   - job_name: localhost
     scrape_interval: $SCRAPING_INTERVAL

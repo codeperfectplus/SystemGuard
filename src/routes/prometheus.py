@@ -2,6 +2,7 @@ from flask import Blueprint, Response, request, render_template, flash, redirect
 from prometheus_client import generate_latest
 import os
 import yaml
+from collections import OrderedDict
 
 from src.config import app, db
 from src.models import ExternalMonitornig
@@ -73,14 +74,13 @@ def delete_file_path(id):
 @app.route('/configure_targets')
 @admin_required
 def configure_targets():
-    # update_prometheus_config()
+    update_prometheus_config()
     targets_info = show_targets()
     return render_template('other/targets.html', targets_info=targets_info)
 
 @app.route('/targets/restart_prometheus')
 @admin_required
 def restart_prometheus():
-    update_prometheus_config
     update_prometheus_container()
     flash('Prometheus container restarted successfully!', 'success')
     return redirect(url_for('configure_targets'))
@@ -89,26 +89,63 @@ def restart_prometheus():
 def add_target():
     job_name = request.form.get('job_name')
     new_target = request.form.get('new_target')
+    username = request.form.get('username')
+    password = request.form.get('password')
     scrape_interval = request.form.get('scrape_interval', '15s') + 's'  # New scrape interval
     config = load_yaml(prometheus_yml_path)
 
-    # new target should be <ip>:<port> check if it is in the correct format
+    # Validate target format
     if ':' not in new_target:
         flash('Invalid target format. It should be in the format <ip>:<port>.', 'danger')
         return redirect(url_for('configure_targets'))
-    
+
+    job_found = False
+
     for scrape_config in config['scrape_configs']:
         if scrape_config['job_name'] == job_name:
+            # Append new target
             scrape_config['static_configs'][0]['targets'].append(new_target)
+            job_found = True
+            
+            # Update scrape interval
+            scrape_config['scrape_interval'] = scrape_interval
+            
+            # Prepare the updated job dictionary to maintain order
+            updated_job = OrderedDict()
+            updated_job['job_name'] = scrape_config['job_name']
+            updated_job['static_configs'] = scrape_config['static_configs']
+            updated_job['scrape_interval'] = scrape_config['scrape_interval']
+
+            # Update basic_auth if provided
+            if username and password:
+                updated_job['basic_auth'] = {
+                    'username': username,
+                    'password': password
+                }
+
+            # Replace the existing job with the updated one
+            index = config['scrape_configs'].index(scrape_config)
+            config['scrape_configs'][index] = updated_job
+            
             break
-    else:
-        new_job = {
-            'job_name': job_name,
-            'static_configs': [{'targets': [new_target]}],
-            'scrape_interval': scrape_interval  # Set the specific interval
-        }
-        config['scrape_configs'].append(new_job)
+
+    # if not job_found:
+    #     # Create new job entry
+    #     new_job = OrderedDict()
+    #     new_job['job_name'] = job_name
+    #     new_job['static_configs'] = [{'targets': [new_target]}]
+    #     new_job['scrape_interval'] = scrape_interval
         
+    #     # Add basic_auth if provided
+    #     if username and password:
+    #         new_job['basic_auth'] = {
+    #             'username': username,
+    #             'password': password
+    #         }
+    #     # Append the new job to scrape_configs
+    #     config['scrape_configs'].append(new_job)
+
+    # Save the updated config
     save_yaml(config, prometheus_yml_path)
     flash('Target added successfully!', 'success')
     # update_prometheus_container()
