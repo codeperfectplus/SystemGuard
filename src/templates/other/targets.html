@@ -68,7 +68,7 @@
     <div class="section">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
-            <input type="text" name="job_name" value="localhost" class="input-field" required>
+            <input type="text" name="job_name" placeholder="localhost" class="input-field" required>
             <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
             <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
             <input type="text" name="username" placeholder="Username" class="input-field">
@@ -79,10 +79,23 @@
             </button>
         </form>
     </div>
-
 </div>
-{% endblock %}
+<script>
+    // if user enter localhost in job_name, then hide the username and password fields
+    document.querySelector('.add-target-form input[name="job_name"]').addEventListener('input', function () {
+        const usernameField = document.querySelector('.add-target-form input[name="username"]');
+        const passwordField = document.querySelector('.add-target-form input[name="password"]');
+        if (this.value === 'localhost') {
+            usernameField.style.display = 'none';
+            passwordField.style.display = 'none';
+        } else {
+            usernameField.style.display = 'block';
+            passwordField.style.display = 'block';
+        }
+    });
 
+</script>
+{% endblock %}
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/targets.js') }}"></script>
 {% endblock %}

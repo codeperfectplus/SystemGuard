@@ -124,21 +124,24 @@ def add_target():
             
             break
 
-    # if not job_found:
-    #     # Create new job entry
-    #     new_job = OrderedDict()
-    #     new_job['job_name'] = job_name
-    #     new_job['static_configs'] = [{'targets': [new_target]}]
-    #     new_job['scrape_interval'] = scrape_interval
+    if not job_found:
+        # Create new job entry
+        new_job = OrderedDict()
+        new_job['job_name'] = job_name
+        new_job['static_configs'] = [{'targets': [new_target]}]
+        new_job['scrape_interval'] = scrape_interval
         
-    #     # Add basic_auth if provided
-    #     if username and password:
-    #         new_job['basic_auth'] = {
-    #             'username': username,
-    #             'password': password
-    #         }
-    #     # Append the new job to scrape_configs
-    #     config['scrape_configs'].append(new_job)
+        # Add basic_auth if provided
+        if username and password:
+            new_job['basic_auth'] = {
+                'username': username,
+                'password': password
+            }
+        # Append the new job to scrape_configs
+        config['scrape_configs'].append(new_job)
+
+    for index, j in enumerate(config['scrape_configs']):
+        config['scrape_configs'][index] = OrderedDict(j)
 
     # Save the updated config
     save_yaml(config, prometheus_yml_path)
@@ -167,6 +170,10 @@ def remove_target():
             else:
                 flash(f'Target {target_to_remove} not found in job {job_name}.', 'warning')
             break
+    
+    for index, j in enumerate(config['scrape_configs']):
+        config['scrape_configs'][index] = OrderedDict(j)
+
     else:
         flash(f'Job {job_name} not found.', 'warning')
 

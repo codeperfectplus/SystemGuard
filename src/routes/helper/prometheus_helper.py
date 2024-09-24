@@ -43,7 +43,9 @@ def update_prometheus_config():
     
     # Get the machine's IP address
     try:
-        ipv4_address = subprocess.run(['hostname', '-I'], capture_output=True, text=True, check=True).stdout.split()[0]
+        ipv4_address = subprocess.run(
+            ['hostname', '-I'], capture_output=True, text=True, check=True
+        ).stdout.split()[0]
     except subprocess.CalledProcessError as e:
         print(f"Error getting IP address: {e}")
         return False
@@ -54,29 +56,28 @@ def update_prometheus_config():
     except Exception as e:
         print(f"Error loading YAML config: {e}")
         return False
-
-    # Fetch the 'localhost' job
-    localhost_job = next((job for job in config.get('scrape_configs', []) if job.get('job_name') == 'localhost'), None)
     
-    if localhost_job:
-        # Update the IP address for the 'localhost' job target
-        localhost_job['static_configs'][0]['targets'][0] = f'{ipv4_address}:5050'
-        
-        # Create a new OrderedDict to maintain the correct order
-        updated_job = OrderedDict()
-        updated_job['job_name'] = localhost_job['job_name']
-        updated_job['scrape_interval'] = localhost_job.get('scrape_interval', '10s')
-        updated_job['static_configs'] = localhost_job['static_configs']
-        
-        # Add basic_auth last to maintain order
-        if 'basic_auth' in localhost_job:
-            updated_job['basic_auth'] = localhost_job['basic_auth']
+    for job in config.get('scrape_configs', []):
+        if job['job_name'] == 'localhost':
+            # Update the target for 'localhost' job
+            job['static_configs'][0]['targets'][0] = f'{ipv4_address}:5050'
+
+            # Create a new OrderedDict to ensure the correct order
+            updated_job = OrderedDict()
+            updated_job['job_name'] = job['job_name']
+            updated_job['scrape_interval'] = job.get('scrape_interval', '10s')
+            updated_job['static_configs'] = job['static_configs']
+
+            # Add basic_auth at the end if it exists
+            if 'basic_auth' in job:
+                updated_job['basic_auth'] = job['basic_auth']
 
         # Replace the old job with the updated one
-        for index, job in enumerate(config['scrape_configs']):
-            if job['job_name'] == 'localhost':
+        for index, j in enumerate(config['scrape_configs']):
+            if j['job_name'] == 'localhost':
                 config['scrape_configs'][index] = updated_job
-                break
+            else:
+                config['scrape_configs'][index] = OrderedDict(j)
 
         # Save the updated config
         try:
