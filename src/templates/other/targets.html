@@ -68,13 +68,11 @@
     <div class="section">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
-            <input type="text" name="job_name" placeholder="Group Name" required class="input-field">
-            <input type="text" name="new_target" placeholder="New Target" required class="input-field">
-            <input type="text" name="scrape_interval" placeholder="Scrape Interval" required class="input-field">
-            <input type="text" name="username" placeholder="Username" required class="input-field">
-            <!-- New Username field -->
-            <input type="password" name="password" placeholder="Password" required class="input-field">
-            <!-- New Password field -->
+            <input type="text" name="job_name" value="localhost" class="input-field" required>
+            <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
+            <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
+            <input type="text" name="username" placeholder="Username" class="input-field">
+            <input type="password" name="password" placeholder="Password" class="input-field">
             <br>
             <button type="submit" class="btn btn-primary btn-lg">
                 <i class="fas fa-plus"></i> Add Target

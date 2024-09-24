@@ -101,6 +101,7 @@ def add_target():
 
     job_found = False
 
+    # if job name already exists, add new target to the job
     for scrape_config in config['scrape_configs']:
         if scrape_config['job_name'] == job_name:
             # Append new target
@@ -115,13 +116,7 @@ def add_target():
             updated_job['job_name'] = scrape_config['job_name']
             updated_job['static_configs'] = scrape_config['static_configs']
             updated_job['scrape_interval'] = scrape_config['scrape_interval']
-
-            # Update basic_auth if provided
-            if username and password:
-                updated_job['basic_auth'] = {
-                    'username': username,
-                    'password': password
-                }
+            updated_job['basic_auth'] = scrape_config.get('basic_auth', None)
 
             # Replace the existing job with the updated one
             index = config['scrape_configs'].index(scrape_config)
