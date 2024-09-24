@@ -8,7 +8,8 @@
 {% block content %}
 <div class="container">
     <h1>SystemGuard/Prometheus Targets</h1>
-    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the scrape interval of the
+    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
+        scrape interval of the
         targets here.</p>
     {% include 'ext/message.html' %}
 
@@ -36,12 +37,12 @@
                             <li>
                                 {{ target }}
                                 {% if not system_ip_address in target %}
-                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form"></form>
-                                <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                                <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                <button type="submit" class="btn-danger">
-                                    <i class="fas fa-times"></i> Remove
-                                </button>
+                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
+                                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                    <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                    <button type="submit" class="btn-danger">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
                                 </form>
                                 {% endif %}
                             </li>
