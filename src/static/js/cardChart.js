@@ -1,4 +1,4 @@
-const maxDataPoints = 20;  // Number of data points to show on the chart
+const maxDataPoints = 500;  // Number of data points to show on the chart
 
 // Generalized function to create and update a line chart
 function createLineChart(canvasId, label, dataStorage, updateFunc) {
@@ -14,6 +14,7 @@ function createLineChart(canvasId, label, dataStorage, updateFunc) {
                 borderColor: 'red',
                 borderWidth: 2,
                 fill: true,
+                opacity: 0.5,
                 tension: 0.6,  // Smooth line
                 pointRadius: 0  // Removes the round tip (data points) on the line
             }]
@@ -58,5 +59,5 @@ function createLineChart(canvasId, label, dataStorage, updateFunc) {
         const newUsage = updateFunc();  // Call the update function to get the current usage
         console.log(`${label} Usage:`, newUsage);
         updateChart(newUsage);
-    }, 2000);
+    }, 300);
 }
