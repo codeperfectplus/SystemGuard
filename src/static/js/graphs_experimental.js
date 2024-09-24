@@ -91,15 +91,14 @@ function createChart(ctx, labels, datasets, yLabel) {
     // Ensure the parent element is positioned relatively
     ctx.canvas.parentNode.style.position = 'relative';
 
-    // // <h2><i class="fas fa-microchip"></i> CPU Usage </h2>
-    // // add h2 element to the parent node
-    // const h2 = document.createElement('h2');
-    // h2.innerHTML = `<i class="fas fa-microchip"></i> ${yLabel}`;
-    // //css top and left
-    // h2.style.position = 'absolute';
-    // h2.style.top = '10px';
-    // h2.style.left = '10px';
-    // ctx.canvas.parentNode.insertBefore(h2, ctx.canvas);
+    // add h2 element to the parent node
+    const h2 = document.createElement('h2');
+    h2.innerHTML = `<i class="fas fa-microchip"></i> ${yLabel}`;
+    //css top and left
+    h2.style.position = 'absolute';
+    h2.style.top = '25px';
+    h2.style.left = '30px';
+    ctx.canvas.parentNode.insertBefore(h2, ctx.canvas);
 
 
     // Create or update download button
@@ -250,7 +249,7 @@ function createCharts(cpuData, timeData, memoryData, batteryData, networkSentDat
         };
     });
 
-    createChart(ctxBattery, timeData, batteryDatasets, 'Battery Percentage (%)');
+    createChart(ctxBattery, timeData, batteryDatasets, 'Power Usage (%)');
 
     // Network Sent & Received Chart
     const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');

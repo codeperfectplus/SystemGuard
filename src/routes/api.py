@@ -59,9 +59,7 @@ def graph_data_api():
             '2 days': timedelta(days=2),
             '3 days': timedelta(days=3),
             '1 week': timedelta(weeks=1),
-            '1 month': timedelta(weeks=4),
-            '3 months': timedelta(weeks=12),
-
+            '15 days': timedelta(days=15),
         }
         if time_filter == 'all':
             start_time = datetime.min
@@ -164,8 +162,7 @@ def graph_data_api_v3():
             '2 days': 2 * 24 * 60 * 60,
             '3 days': 3 * 24 * 60 * 60,
             '1 week': 7 * 24 * 60 * 60,
-            '1 month': 30 * 24 * 60 * 60,
-            '3 months': 90 * 24 * 60 * 60,
+            '15 days': 15 * 24 * 60 * 60,
         }
 
         # Get the time range in seconds
