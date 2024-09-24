@@ -853,10 +853,12 @@ start_server() {
 
 # Install function
 install() {
-    message_box "$APP_NAME Installer $INSATLLER_VERSION" 0
-    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 3
-    check_dependencies
     create_dir "$EXTRACT_DIR"
+    # PROMETHEUS_INSTALL_SCRIPT
+    message_box "$APP_NAME Installer $INSATLLER_VERSION" 0
+    message_box "Welcome on board: $(echo "$USER_NAME" | sed 's/.*/\u&/')" 0
+    check_dependencies
+    
     message_box "Choose the installation method\nNote: Release is recommended for production use." 0
     message_box "1. Release (More Stable Version)\n2. Git Repository (Pre-Release Version)\n3. Source Code (Current Directory)" 0
 
@@ -878,6 +880,11 @@ install() {
         exit 1
         ;;
     esac
+        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name prometheus.sh) || {
+        log "ERROR" "Prometheus installation script not found."
+        exit 1
+    }
+    sudo -u "$USER_NAME" bash "$PROMETHEUS_INSTALL_SCRIPT"
     start_server
     message_box "The $APP_NAME server is running at $HOST_URL" 0
     # open_browser

@@ -1,11 +1,7 @@
 // Variables to store chart instances
 let cpuTimeChart, memoryTimeChart, batteryTimeChart, networkTimeChart, dashboardMemoryTimeChart, cpuFrequencyTimeChart, currentTempTimeChart;
 
-function stringToDate(dateString) {
-    const date = new Date(dateString);
-    return date;
-}
-
+// Function to fetch data and render charts
 function fetchDataAndRenderCharts() {
     // Retrieve stored filter value from local storage or set default value
     const storedFilterValue = localStorage.getItem('filterValue') || 5;
@@ -16,7 +12,7 @@ function fetchDataAndRenderCharts() {
     console.log('Stored Filter Value:', storedFilterValue);
 
     // Fetch data with the selected time filter
-    fetch(`/api/v1/graphs_data?filter=${storedFilterValue}`)
+    fetch(`/api/v1/prometheus/graphs_data?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
@@ -27,13 +23,14 @@ function fetchDataAndRenderCharts() {
             const dashboardMemoryUsageData = data.dashboard_memory_usage;
             const cpuFrequencyData = data.cpu_frequency;
             const currentTempData = data.current_temp;
+
+            // current time from backend to display
             const currentTime = data.current_time;
             const timeZoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            displayTimeAndTimeZone(currentTime, timeZoneName);
 
             // Format the time data using the currentTime from backend
-            const timeData = data.time.map(time => formatDate(time, currentTime));
-
-            displayTimeAndTimeZone(currentTime, timeZoneName);
+            const timeData = data.time.map(time => formatDate(time, timeZoneName)); // Use timeZoneName from displayTimeAndTimeZone function
 
             createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData);
         })
@@ -86,52 +83,25 @@ document.getElementById('refreshCurrentTempTime').addEventListener('click', () =
     fetchDataAndRenderCharts();
 });
 
+function formatDate(utcTime, timeZone) {
+    const date = new Date(utcTime);
+    
+    // Format options can be adjusted for your needs
+    const options = {
+        timeZone: timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false // Change to true if you prefer 12-hour format
+    };
 
-function formatDate(dateString, currentTime) {
-    const date = new Date(dateString);
-    const now = new Date(currentTime);  // Use currentTime from backend
+    // Generate formatted string
+    const formattedDate = date.toLocaleString('en-US', options);
 
-    // Helper function to format with leading zeros
-    const pad = (num) => String(num).padStart(2, '0');
-
-    // Manually extract UTC components
-    const day = pad(date.getUTCDate()); // e.g., 09
-    const month = pad(date.getUTCMonth() + 1); // e.g., 04
-    const year = date.getUTCFullYear(); // e.g., 2021
-    const hours = pad(date.getUTCHours()); // e.g., 11
-    const minutes = pad(date.getUTCMinutes()); // e.g., 33
-
-
-    // Calculate time differences
-    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-    const diffWeeks = Math.floor(diffDays / 7);
-    const diffMonths = now.getMonth() - date.getUTCMonth() + (12 * (now.getFullYear() - date.getUTCFullYear()));
-    const diffYears = now.getFullYear() - date.getUTCFullYear();
-
-    // Determine the label based on time differences
-    // // Reset the time to 12am for the date comparison
-    // date.setUTCHours(0, 0, 0, 0);
-    // now.setUTCHours(0, 0, 0, 0);
-
-    // if (diffDays === 0) {
-    //     return `Today ${hours}:${minutes}`;
-    // } else if (diffDays === 1) {
-    //     return `Yesterday ${hours}:${minutes}`;
-    // } else if (diffDays <= 3) {
-    //     return `${diffDays} Days Ago ${hours}:${minutes}`;
-    // } else if (diffDays <= 7) {
-    //     return `${Math.ceil(diffDays / 7)} Week${diffDays > 7 ? 's' : ''} Ago ${hours}:${minutes}`;
-    // } else if (diffDays <= 30) {
-    //     return `${Math.ceil(diffDays / 7)} Weeks Ago ${hours}:${minutes}`;
-    // } else if (diffMonths < 12) {
-    //     return `${diffMonths} Month${diffMonths > 1 ? 's' : ''} Ago ${hours}:${minutes}`;
-    // } else if (diffYears < 2) {
-    //     return `Last Year ${hours}:${minutes}`;
-    // } else {
-    //     return `${year}/${month}/${day} ${hours}:${minutes}`;
-    // }
-
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
+    // For better graph display, you might want just the date and hour
+    return formattedDate.replace(/, (\d{2}:\d{2})/, ' $1'); // Example: "09/22/2024 14:30"
 }
 
 function displayTimeAndTimeZone(currentTime, timeZoneName) {
@@ -159,34 +129,47 @@ function createChart(ctx, labels, datasets, yLabel) {
         ctx.chart.destroy(); // Destroy the existing chart if it exists
     }
 
+    const allDataPoints = datasets.flatMap(dataset => dataset.data);
+    const minY = Math.min(...allDataPoints.filter(value => typeof value === 'number'));
+    const maxY = Math.max(...allDataPoints.filter(value => typeof value === 'number'));
+
     ctx.chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,  // Use your timeData directly as labels
-            datasets: datasets
+            labels: labels,
+            datasets: datasets.map(dataset => ({
+                ...dataset,
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                backgroundColor: dataset.backgroundColor || 'rgba(75, 192, 192, 0.2)',
+                borderColor: dataset.borderColor || 'rgba(75, 192, 192, 1)',
+            })),
         },
         options: {
+            
             scales: {
                 x: {
-                    type: 'category', // Use 'category' scale to treat time as strings
+                    type: 'category', 
                     title: {
                         display: true,
                         text: 'Time'
                     },
                     ticks: {
-                        autoSkip: true,          // Automatically skip some labels to prevent overlap
-                        maxTicksLimit: 10,       // Maximum number of ticks to display
-                        maxRotation: 20,          // Prevent rotating the labels for better readability
+                        autoSkip: true,          
+                        maxTicksLimit: 6,       
+                        maxRotation: 0,         
                         minRotation: 0,
-                        
                     }
                 },
                 y: {
-                    beginAtZero: true,
+                    beginAtZero: minY < 0 ? false : true, // Adjust y-axis based on data
                     title: {
                         display: true,
-                        text: yLabel
-                    }
+                        text: yLabel,
+                    },
                 }
             }
         }

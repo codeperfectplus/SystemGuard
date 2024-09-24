@@ -8,6 +8,16 @@
             <div class="temp-indicator mt-2">
                 <div class="temp-bar" style="width: {{ system_info['current_temp'] }}%;"></div>
             </div>
+            <canvas id="cpuTempLineChart" height="30"></canvas>
         </div>
     </div>
 {% endif %}
+
+
+<script>
+    // Initialize CPU Usage Chart
+    const cpuTempData = [];
+    createLineChart('cpuTempLineChart', '', cpuTempData, () => {
+        return parseFloat(document.querySelector('.temp-value').textContent);
+    });
+</script>

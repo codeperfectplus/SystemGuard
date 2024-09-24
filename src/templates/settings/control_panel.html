@@ -19,6 +19,13 @@
                 <i class="fas fa-users"></i> Users
             </a>
         </li>
+        <!-- systemguard central -->
+        <li class="nav-item">
+            <a class="nav-link" id="systemguard-central-tab" data-bs-toggle="tab" href="#systemguard-central" role="tab"
+                aria-controls="systemguard-central" aria-selected="false">
+                <i class="fas fa-users"></i> SystemGuard Central
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link" id="utilities-tab" data-bs-toggle="tab" href="#utilities" role="tab"
                 aria-controls="utilities" aria-selected="false">
@@ -88,6 +95,22 @@
                 </div>
             </div>
         </div>
+        <!-- SystemGuard Central Section -->
+        <div class="tab-pane fade" id="systemguard-central" role="tabpanel" aria-labelledby="systemguard-central-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
+                        <div class="card-body">
+                            <!-- central dashboard for systemguard use dashboard icon -->
+                            <h5 class="card-title"><i class="fa-brands fa-centercode"></i> SystemGuard Central</h5>
+                            <a href="{{ url_for('configure_targets') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-cogs"></i> Configure Targets for SystemGuard
+                            </a>
+                        </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Settings Section -->
         <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
@@ -137,7 +160,9 @@
                             <a href="{{ url_for('monitor_websites') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-globe"></i> Ping Website
                             </a>
-
+                            <a href="{{ url_for('external_monitoring') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-globe"></i> External API Monitoring
+                            </a>
                         </div>
                     </div>
                 </div>

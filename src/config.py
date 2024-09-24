@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+import os
 
 from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address
@@ -27,6 +28,7 @@ os.makedirs(DB_DIR, exist_ok=True)
 
 # Configure the SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 

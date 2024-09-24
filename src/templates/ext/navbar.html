@@ -21,7 +21,7 @@
         <ul class="navbar-nav me-auto">
             {% if page_toggles_settings.is_dashboard_network_enabled %}
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
+                <a class="nav-link {% if request.endpoint == 'dashboard_network' %}active{% endif %}"
                     href="{{ url_for('dashboard_network') }}">
                     <i class="fa-solid fa-network-wired"></i> Dashboard Network
                 </a>

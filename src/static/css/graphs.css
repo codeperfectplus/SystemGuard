@@ -278,3 +278,11 @@ button i.fas {
 #refreshCpuFrequencyTime:hover, #refreshCurrentTempTime:hover {
     background-color: #2980b9;      /* Darker blue on hover for specific buttons */
 }
+
+
+.graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}

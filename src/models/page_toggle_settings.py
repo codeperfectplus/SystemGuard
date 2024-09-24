@@ -1,4 +1,3 @@
-import datetime
 from src.config import db
 
 class PageToggleSettings(db.Model):
@@ -26,4 +25,4 @@ class PageToggleSettings(db.Model):
     is_disk_info_enabled = db.Column(db.Boolean, default=True)
     is_network_info_enabled = db.Column(db.Boolean, default=True)
     is_process_info_enabled = db.Column(db.Boolean, default=True)
-    is_dashboard_network_enabled = db.Column(db.Boolean, default=False)
+    is_dashboard_network_enabled = db.Column(db.Boolean, default=True)

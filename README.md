@@ -2,6 +2,7 @@
 
 System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
+
 ## Features 🚀
 
 - Lightweight, open-source, and free to use with a straightforward installation process, out-of-the-box monitoring solution.
@@ -18,22 +19,15 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Update security updates with a single click or automatically update to the latest version to simplify maintenance.
 
-## Old Features 🚀
+## Architecture 🏗️
 
-- Administrators can manage user accounts by creating, updating, or deleting users.
-- Admin-level access is required for configuring settings, managing users, and adjusting security and notification - preferences.
-- Historical performance data can be viewed as charts, aiding in trend analysis.
-- Supports network speed testing directly from the server.
-- Provides the ability to terminate resource-heavy processes with a single command.
-- Real-time server metric monitoring keeps data consistently updated.
-- The interface is responsive and optimized for various devices including mobile, tablets, and desktops.
-- The system can automatically update to the latest version to simplify maintenance.
-- Installation can be done quickly via a bash script for easy setup.
-- Notifications are sent to users and admins when a process is manually terminated.
-- Offers website monitoring tasks that trigger email alerts when a website becomes unavailable.
-- Configurable email alerts for various actions across the server.
-- Option to download historical data in CSV format for detailed analysis (upcoming feature).
-- Server status monitoring with alerts for server downtime or recovery (upcoming feature).
+![SystemGuard-Architecture](/src/docs/images/SystemGuard-Architecture.jpg)
+
+## Tech Stack 🛠️
+
+- **Frontend**: JavaScript, Bootstrap, Chart.js, Grafana
+- **Backend**: Python, Flask, SQLAlchemy, SQLite, Prometheus, InfluxDB
+- **Monitoring**: psutil, speedtest-cli, nmap, netstat
 
 ## Get started 🛠️
 

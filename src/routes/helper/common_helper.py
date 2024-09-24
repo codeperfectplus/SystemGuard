@@ -4,6 +4,10 @@ from flask_login import current_user
 from functools import wraps
 from flask import flash, redirect, url_for, render_template, request, session
 import subprocess
+import os
+from src.utils import ROOT_DIR
+
+
 
 def get_email_addresses(user_level=None, receive_email_alerts=True, fetch_all_users=False):
     """ Retrieve email addresses of users based on filters."""
@@ -113,3 +117,4 @@ def handle_sudo_password(redirect_url):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+

@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+{% block title %}SystemGuard Targets{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/targets.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>SystemGuard/Prometheus Targets</h1>
+    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
+        scrape interval of the
+        targets here.</p>
+    {% include 'ext/message.html' %}
+
+    <div class="table-wrapper">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Group Name <i class="fas fa-info-circle"
+                            title="Job Name is the name of the service that is being monitored."></i></th>
+                    <th>Targets <i class="fas fa-info-circle"
+                            title="Targets are the IP addresses of the services that are being monitored."></i></th>
+                    <th>Scrape Interval <i class="fas fa-info-circle"
+                            title="Scrape Interval is the time interval between each scrape of the target."></i></th>
+                    <th>New Interval<i class="fas fa-info-circle" title="Change the scrape interval of the target."></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for info in targets_info %}
+                <tr>
+                    <td>{{ info.job_name }}</td>
+                    <td>
+                        <ul class="target-list">
+                            {% for target in info.targets %}
+                            <li>
+                                {{ target }}
+                                {% if not system_ip_address in target %}
+                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
+                                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                    <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                    <button type="submit" class="btn-danger">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ info.scrape_interval }}</td>
+                    <td>
+                        <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
+                            <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                            <input type="text" name="new_interval" placeholder="New Interval" required
+                                class="input-field">
+                            <input type="submit" value="Change Interval" class="btn-primary">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="section">
+        <h2>Add New Target</h2>
+        <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
+            <input type="text" name="job_name" placeholder="localhost" class="input-field" required>
+            <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
+            <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
+            <input type="text" name="username" placeholder="Username" class="input-field">
+            <input type="password" name="password" placeholder="Password" class="input-field">
+            <br>
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Add Target
+            </button>
+        </form>
+
+        <div class="section">
+            <form action="{{ url_for('restart_prometheus') }}">
+                <input type="submit" value="Update Prometheus" class="btn btn-lg btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    // if user enter localhost in job_name, then hide the username and password fields
+    document.querySelector('.add-target-form input[name="job_name"]').addEventListener('input', function () {
+        const usernameField = document.querySelector('.add-target-form input[name="username"]');
+        const passwordField = document.querySelector('.add-target-form input[name="password"]');
+        if (this.value === 'localhost') {
+            usernameField.style.display = 'none';
+            passwordField.style.display = 'none';
+        } else {
+            usernameField.style.display = 'block';
+            passwordField.style.display = 'block';
+        }
+    });
+
+</script>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/targets.js') }}"></script>
+{% endblock %}

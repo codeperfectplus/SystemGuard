@@ -24,3 +24,12 @@ requests==2.32.3
 
 # Speedtest CLI for testing internet speed
 speedtest-cli==2.1.3 
+
+# prometheus client for monitoring
+prometheus_client==0.20.0
+
+# influxdb-client, optional for writing metrics to InfluxDB
+# influxdb-client==1.46.0
+
+# pyyaml for parsing YAML configuration files
+pyyaml==6.0.2

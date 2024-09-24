@@ -1,101 +1,97 @@
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+
+
+h1 {
     text-align: center;
-    color: #fff;
+    color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
 }
 
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: white;
 }
 
-.card {
-    background-color: var(--color-username);
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    width: calc(33.333% - 40px); /* Adjust based on gaps */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-    color: #333;
-    transition: transform 0.2s;
+table th, table td {
+    padding: 15px;
+    border: 1px solid #e1e4e8;
+    text-align: left;
+    font-family: 'Arial', sans-serif;
 }
 
-.card:hover {
-    transform: translateX(-10px); /* Slight lift effect */
-    box-shadow: 0 10px 20px #378fe7;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-}
-
-.card h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    color: #fff;
-}
-
-.card p {
-    margin: 5px 0;
-    color: #fff;
-}
-
-.card a {
-    color: #fff;
-    text-decoration: none;
-}
-
-.add-server-link {
-    margin-top: 20px;
-}
-
-.add-server-link .btn {
-    font-size: 1.2em;
-    padding: 10px 20px;
-    border-radius: 5px;
+table th {
     background-color: #007bff;
     color: white;
-    text-decoration: none;
-    transition: background-color 0.3s;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
-.add-server-link .btn:hover {
-    background-color: #0056b3;
+table tr:hover {
+    background-color: #f1f1f1;
 }
 
-/* Responsive layout */
-@media (max-width: 992px) {
-    .card {
-        width: calc(50% - 30px); /* Two cards per line on medium screens */
-    }
+table td {
+    font-size: 14px;
+    color: #333;
 }
 
-@media (max-width: 768px) {
-    .card {
-        width: calc(100% - 40px); /* One card per line on small screens */
-    }
+table td.health-up {
+    color: green;
+    font-weight: bold;
 }
 
-.card-actions {
-    margin-top: 10px;
+table td.health-down {
+    color: red;
+    font-weight: bold;
 }
 
-.card-actions .btn {
-    margin-right: 5px;
-    padding: 5px 10px;
+.error-message {
+    color: red;
+    font-style: italic;
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.text-center h2 {
+    color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 20px;
+}
+
+form input[type="text"] {
+    padding: 10px;
+    margin: 5px;
+    width: 200px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
     font-size: 14px;
 }
 
-.card-actions .btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #fff;
+form input[type="submit"] {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.card-actions .btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    color: #fff;
+form input[type="submit"]:hover {
+    background-color: #218838;
 }
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 12px;
+}
+
