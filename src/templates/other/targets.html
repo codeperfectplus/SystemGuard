@@ -7,7 +7,9 @@
 
 {% block content %}
 <div class="container">
-    <h1>SystemGuard Targets</h1>
+    <h1>SystemGuard/Prometheus Targets</h1>
+    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the scrape interval of the
+        targets here.</p>
     {% include 'ext/message.html' %}
 
     <div class="table-wrapper">
@@ -33,13 +35,15 @@
                             {% for target in info.targets %}
                             <li>
                                 {{ target }}
-                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
-                                    <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                                    <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                    <button type="submit" class="btn-danger">
-                                        <i class="fas fa-times"></i> Remove
-                                    </button>
+                                {% if not system_ip_address in target %}
+                                <form action="{{ url_for('remove_target') }}" method="post" class="inline-form"></form>
+                                <input type="hidden" name="job_name" value="{{ info.job_name }}">
+                                <input type="hidden" name="target_to_remove" value="{{ target }}">
+                                <button type="submit" class="btn-danger">
+                                    <i class="fas fa-times"></i> Remove
+                                </button>
                                 </form>
+                                {% endif %}
                             </li>
                             {% endfor %}
                         </ul>
@@ -58,13 +62,6 @@
             </tbody>
         </table>
     </div>
-
-    <div class="section">
-        <h2>Restart Prometheus Docker Service</h2>
-        <form action="{{ url_for('restart_prometheus') }}">
-            <input type="submit" value="Restart Prometheus" class="btn-warning">
-        </form>
-    </div>
     <div class="section">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
@@ -78,6 +75,12 @@
                 <i class="fas fa-plus"></i> Add Target
             </button>
         </form>
+
+        <div class="section">
+            <form action="{{ url_for('restart_prometheus') }}">
+                <input type="submit" value="Update Prometheus" class="btn btn-lg btn-primary">
+            </form>
+        </div>
     </div>
 </div>
 <script>

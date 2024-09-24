@@ -193,6 +193,9 @@ def change_interval():
             scrape_config['scrape_interval'] = new_interval
             flash('Scrape interval updated successfully!', 'success')
             break
+
+    for index, j in enumerate(config['scrape_configs']):
+        config['scrape_configs'][index] = OrderedDict(j)
     
     save_yaml(config, prometheus_yml_path)
     # update_prometheus_container()
