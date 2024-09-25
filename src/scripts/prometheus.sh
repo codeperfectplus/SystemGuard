@@ -28,6 +28,9 @@ FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
 SCRAPING_INTERVAL="10s"
 monitor='systemguard-metrics'
+# fetch the prometheus username and password from the .env file
+prometheus_username='prometheus_admin'
+prometheus_password='prometheus_password'
 
 # Logging function for better readability
 log() {
@@ -55,8 +58,8 @@ scrape_configs:
     - targets:
       - '$FLASK_APP_IP:$FLASK_APP_PORT'
     basic_auth:
-      username: prometheus_admin
-      password: prometheus_password
+      username: $prometheus_username
+      password: $prometheus_password
 
 EOL
 

@@ -2,7 +2,7 @@
 
 ## Home Page
 
-![screenshot_002](/src/static/images/screenshot_002.png)
+![screenshot_002](/src/static/images/screenshot_009.png)
 
 ## Cpu Info
 

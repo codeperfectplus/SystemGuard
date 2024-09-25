@@ -1,13 +1,25 @@
 # Release Notes: SystemGuard
 
-## SystemGuard v1.0.5 Pre Release
+## SystemGuard v1.0.5 Stable Release
 
-- Version: v1.0.5-pre
-- Release Date: September 20, 2024
-- Status: In Development
+- Version: v1.0.5
+- Release Date: 
+- Status: Testing
 
 ### Key Features
 
+All the features of the previous pre-release version are included in this stable release with additional improvements and bug fixes.
+
+## SystemGuard v1.0.5 Pre Release
+
+- Version: v1.0.5-pre
+- Release Date: September 24, 2024
+- Status: Released
+
+### Key Features
+
+- **Prometheus Integration:** Added Prometheus support for advanced monitoring capabilities.
+- **Central Monitoring:** Centralized monitoring of multiple servers from a single dashboard.
 - **Admin Privileges:** Improved User/Admin roles for better access control.
 - **User Settings:** Added some basic user settings for user customization.
 - **UI Enhancements:** Improved control panel UI for better user experience.

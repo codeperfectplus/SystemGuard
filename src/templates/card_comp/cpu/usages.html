@@ -17,7 +17,7 @@
 <script>
 // Initialize CPU Usage Chart
 const cpuUsageData = [];
-createLineChart('cpuUsageLineChart', '', cpuUsageData, () => {
+createLineChart('cpuUsageLineChart', '', cpuUsageData, 'red', () => {
     return parseFloat(document.querySelector('.cpu-usage-value').textContent);
 });
 </script>

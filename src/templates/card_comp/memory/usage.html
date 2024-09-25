@@ -19,7 +19,7 @@
 <script>
     // Initialize CPU Usage Chart
     const memoryUsageData = [];
-    createLineChart('memoryUsageLineChart', '', memoryUsageData, () => {
+    createLineChart('memoryUsageLineChart', '', memoryUsageData, 'red', () => {
         return parseFloat(document.querySelector('.memory-usage-value').textContent);
     });
 </script>

@@ -1,8 +1,7 @@
 const maxDataPoints = 500;  // Number of data points to show on the chart
 
 // Generalized function to create and update a line chart
-function createLineChart(canvasId, label, dataStorage, updateFunc) {
-    console.log(dataStorage);
+function createLineChart(canvasId, label, dataStorage, borderColor, updateFunc) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     const chart = new Chart(ctx, {
         type: 'line',
@@ -11,7 +10,7 @@ function createLineChart(canvasId, label, dataStorage, updateFunc) {
             datasets: [{
                 label: label,
                 data: dataStorage,
-                borderColor: 'red',
+                borderColor: borderColor,
                 borderWidth: 2,
                 fill: true,
                 opacity: 0.5,
@@ -57,7 +56,7 @@ function createLineChart(canvasId, label, dataStorage, updateFunc) {
     // Set interval to fetch and update data every 2 seconds
     setInterval(() => {
         const newUsage = updateFunc();  // Call the update function to get the current usage
-        console.log(`${label} Usage:`, newUsage);
+        // console.log(`${label} Usage:`, newUsage);
         updateChart(newUsage);
     }, 300);
 }

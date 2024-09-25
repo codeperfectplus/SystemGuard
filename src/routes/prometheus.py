@@ -3,9 +3,10 @@ from prometheus_client import generate_latest
 import os
 import yaml
 from collections import OrderedDict
+from werkzeug.security import check_password_hash
 
 from src.config import app, db
-from src.models import ExternalMonitornig
+from src.models import ExternalMonitornig, UserProfile
 from src.utils import ROOT_DIR
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
@@ -21,15 +22,16 @@ from src.routes.helper.prometheus_helper import (
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint('prometheus', __name__)
 
-# todo, find a better way to store the username and password
-username = 'prometheus_admin'
-password = 'prometheus_password'
+def verify_user(username, password):
+    user = UserProfile.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        return True
 
 # Define a route to serve Prometheus metrics
 @app.route('/metrics')
 def metrics():
     auth = request.authorization
-    if not auth or not (auth.username == username and auth.password == password):
+    if not verify_user(auth.username, auth.password):
         return Response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
     output = generate_latest()
     output = '\n'.join([line for line in output.decode().split('\n') if not line.startswith('#') and line])

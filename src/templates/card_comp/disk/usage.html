@@ -17,7 +17,7 @@
 <script>
     // Initialize CPU Usage Chart
     const diskUsageData = [];
-    createLineChart('diskUsageLineChart', '', diskUsageData, () => {
+    createLineChart('diskUsageLineChart', '', diskUsageData, 'red', () => {
         return parseFloat(document.querySelector('.disk-usage-value').textContent);
     });
 </script>
