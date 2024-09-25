@@ -1,5 +1,5 @@
-Prometheus Setup
-================
+Prometheus Setup(optional)
+==========================
 
 Prometheus is a powerful monitoring and alerting toolkit designed for recording real-time metrics in a time-series database. It monitors server performance and can send alerts when issues arise.
 

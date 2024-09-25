@@ -6,25 +6,9 @@
 
 Before installing SystemGuard, ensure that the following dependency is installed:
 
-- **Anaconda3/Miniconda3**: This is required for the app to run properly.
-  
-To install Miniconda3, run the following commands:
+#### **Required Packages**
 
-```bash
-# Install Miniconda3
-wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
-chmod +x install_miniconda.sh && ./install_miniconda.sh
-```
-
-Install Docker as it is required by the prometheus and grafana services.
-
-```bash
-steps to install docker
-```
-
-### Installation Steps
-
-1. Install the required dependencies:
+The following packages are required for the SystemGuard app to function properly:
 
 ```bash
 # debian based distros
@@ -42,27 +26,44 @@ sudo yum update -y
 sudo yum install -y git curl wget unzip iptables jq nmap
 ```
 
-- curl: For downloading files from the internet.
-- wget: For downloading files from the internet.
-- unzip: For extracting zip files.
-- iptables: For managing firewall rules.
-- jq: For processing JSON data.
-- nmap: For network scanning and monitoring.
+#### **Anaconda3/Miniconda3**
 
-2. Download and set up the SystemGuard installer:
+This is required for the app to run properly.
+  
+To install Miniconda3, run the following commands:
+
+```bash
+# Install Miniconda3
+wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
+chmod +x install_miniconda.sh && ./install_miniconda.sh
+```
+
+Install Docker as it is required by the prometheus and grafana services. install docker using the following commands,
+based on your distro:
+
+```bash
+# debian / apt based distros
+wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker.sh
+chmod +x setup_docker.sh && ./setup_docker.sh
+
+# centos / yum based distros
+wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker_centos.sh
+chmod +x setup_docker_centos.sh && ./setup_docker_centos.sh
+```
+
+#### Installation Steps
+
+1. Download and set up the SystemGuard installer:
 
 ```bash
 wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/setup.sh
 chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 ```
 
-3. Run the following command to install the SystemGuard app:
+2. Run the following command to install the SystemGuard app:
 
 ```bash
 sudo systemguard-installer --install
-```
-
-```bash
 # if above command doesn't work, try full path
 sudo /usr/local/bin/systemguard-installer --install
 ```
