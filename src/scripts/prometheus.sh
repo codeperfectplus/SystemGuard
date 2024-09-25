@@ -28,7 +28,8 @@ FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
 SCRAPING_INTERVAL="10s"
 monitor='systemguard-metrics'
-# fetch the prometheus username and password from the .env file
+environment='production'
+job_name='localhost'
 prometheus_username='prometheus_admin'
 prometheus_password='prometheus_password'
 
@@ -48,15 +49,15 @@ cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
   external_labels:
     system: $monitor
-    environment: 'production'
-    user: '$USER_NAME'
+    environment: $environment
+    user: $USER_NAME
     
 scrape_configs:
-  - job_name: localhost
+  - job_name: $job_name
     scrape_interval: $SCRAPING_INTERVAL
     static_configs:
     - targets:
-      - '$FLASK_APP_IP:$FLASK_APP_PORT'
+      - $FLASK_APP_IP:$FLASK_APP_PORT
     basic_auth:
       username: $prometheus_username
       password: $prometheus_password
