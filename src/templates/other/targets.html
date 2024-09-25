@@ -8,23 +8,19 @@
 {% block content %}
 <div class="container">
     <h1>SystemGuard/Prometheus Targets</h1>
-    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the
-        scrape interval of the
-        targets here.</p>
+    <p class="text-center">SystemGuard uses Prometheus to monitor the services. You can add, remove, and change the scrape interval of the targets here.</p>
+    
     {% include 'ext/message.html' %}
 
+    <!-- Targets Table Section -->
     <div class="table-wrapper">
         <table class="modern-table">
             <thead>
                 <tr>
-                    <th>Group Name <i class="fas fa-info-circle"
-                            title="Job Name is the name of the service that is being monitored."></i></th>
-                    <th>Targets <i class="fas fa-info-circle"
-                            title="Targets are the IP addresses of the services that are being monitored."></i></th>
-                    <th>Scrape Interval <i class="fas fa-info-circle"
-                            title="Scrape Interval is the time interval between each scrape of the target."></i></th>
-                    <th>New Interval<i class="fas fa-info-circle" title="Change the scrape interval of the target."></i>
-                    </th>
+                    <th>Group Name <i class="fas fa-info-circle" title="Job Name is the name of the service that is being monitored."></i></th>
+                    <th>Targets <i class="fas fa-info-circle" title="Targets are the IP addresses of the services that are being monitored."></i></th>
+                    <th>Scrape Interval <i class="fas fa-info-circle" title="Scrape Interval is the time interval between each scrape of the target."></i></th>
+                    <th>New Interval <i class="fas fa-info-circle" title="Change the scrape interval of the target."></i></th>
                 </tr>
             </thead>
             <tbody>
@@ -40,7 +36,7 @@
                                 <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
                                     <input type="hidden" name="job_name" value="{{ info.job_name }}">
                                     <input type="hidden" name="target_to_remove" value="{{ target }}">
-                                    <button type="submit" class="btn-danger">
+                                    <button type="submit" class="btn-danger btn-sm">
                                         <i class="fas fa-times"></i> Remove
                                     </button>
                                 </form>
@@ -53,9 +49,8 @@
                     <td>
                         <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
                             <input type="hidden" name="job_name" value="{{ info.job_name }}">
-                            <input type="text" name="new_interval" placeholder="New Interval" required
-                                class="input-field">
-                            <input type="submit" value="Change Interval" class="btn-primary">
+                            <input type="text" name="new_interval" placeholder="New Interval" required class="input-field">
+                            <input type="submit" value="Change Interval" class="btn-primary btn-sm">
                         </form>
                     </td>
                 </tr>
@@ -63,29 +58,50 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Add New Target Section -->
     <div class="section">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
-            <input type="text" name="job_name" placeholder="localhost" class="input-field" required>
+            <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
             <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
             <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
             <input type="text" name="username" placeholder="Username" class="input-field">
             <input type="password" name="password" placeholder="Password" class="input-field">
             <br>
-            <button type="submit" class="btn btn-primary btn-lg">
+            <button type="submit" class="btn-primary btn-lg">
                 <i class="fas fa-plus"></i> Add Target
             </button>
         </form>
 
+        <!-- Change Auth Section -->
+        <h2>Change Basic Auth</h2>
+        <form action="{{ url_for('change_auth') }}" method="post" class="add-target" id="change-auth-form">
+            <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
+            <input type="text" name="username" placeholder="Username" class="input-field" required>
+            <input type="password" name="password" placeholder="Password" class="input-field" required>
+            <br>
+            <button type="submit" class="btn-primary btn-lg">
+                <i class="fas fa-edit"></i> Change Auth
+            </button>
+        </form>
+        
+        <!-- Update Prometheus Section -->
         <div class="section">
             <form action="{{ url_for('restart_prometheus') }}">
-                <input type="submit" value="Update Prometheus" class="btn btn-lg btn-primary">
+                <input type="submit" value="Update Prometheus" class="btn-lg btn-primary">
             </form>
         </div>
+
+        <p class="text-center text-note">Note: After adding a new target, it may take a few minutes for the target to be scraped by Prometheus.</p>
+        <p class="text-center text-note">Note: If you are adding a target that is not localhost, you need to provide the username and password for the target.</p>
+        <p class="text-center text-note">Note: If you are adding a target that is localhost, you do not need to provide the username and password.</p>
+        <p class="text-center text-note">Note: After making any changes, you need to update Prometheus to apply the changes.</p>
     </div>
 </div>
+
 <script>
-    // if user enter localhost in job_name, then hide the username and password fields
+    // Hide username/password if localhost is entered
     document.querySelector('.add-target-form input[name="job_name"]').addEventListener('input', function () {
         const usernameField = document.querySelector('.add-target-form input[name="username"]');
         const passwordField = document.querySelector('.add-target-form input[name="password"]');
@@ -97,9 +113,9 @@
             passwordField.style.display = 'block';
         }
     });
-
 </script>
 {% endblock %}
+
 {% block extra_scripts %}
 <script src="{{ url_for('static', filename='js/targets.js') }}"></script>
 {% endblock %}
