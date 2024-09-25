@@ -16,6 +16,12 @@ wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/in
 chmod +x install_miniconda.sh && ./install_miniconda.sh
 ```
 
+Install Docker as it is required by the prometheus and grafana services.
+
+```bash
+steps to install docker
+```
+
 ### Installation Steps
 
 1. Install the required dependencies:
@@ -60,8 +66,6 @@ sudo systemguard-installer --install
 # if above command doesn't work, try full path
 sudo /usr/local/bin/systemguard-installer --install
 ```
-
----
 
 ## Uninstallation
 

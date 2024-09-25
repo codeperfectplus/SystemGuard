@@ -8,11 +8,11 @@
         "receive_email_alerts": true
     },
     {
-        "username": "manager",
-        "email": "manager@gmail.com",
-        "password": "manager",
+        "username": "prometheus_admin",
+        "email": "prometheus_admin@mail.com",
+        "password": "prometheus_password",
         "user_level": "user",
-        "profession": "System Administrator",
-        "receive_email_alerts": true
+        "profession": "Database Administrator",
+        "receive_email_alerts": false
     }
 ]

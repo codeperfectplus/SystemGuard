@@ -15,7 +15,7 @@
         {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
         <li class="nav-item">
             <a class="nav-link active" id="user-management-tab" data-bs-toggle="tab" href="#user-management" role="tab"
-                aria-controls="user-management" aria-selected="true">
+                aria-controls="user-management" aria-selected="false">
                 <i class="fas fa-users"></i> Users
             </a>
         </li>
@@ -59,7 +59,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile"
-                aria-selected="false">
+                aria-selected="true">
                 <i class="fas fa-user"></i> Profile
             </a>
         </li>
@@ -68,7 +68,7 @@
     <!-- Tab Content -->
     <div class="tab-content mt-4" id="controlPanelTabContent">
         <!-- User Management Section -->
-        <div class="tab-pane fade show active" id="user-management" role="tabpanel"
+        <div class="tab-pane fade" id="user-management" role="tabpanel"
             aria-labelledby="user-management-tab">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-8 mb-4">
@@ -232,7 +232,7 @@
         </div>
 
         <!-- Profile Section -->
-        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm rounded-lg text-center">
