@@ -17,4 +17,4 @@ class GeneralSettings(db.Model):
     enable_alerts = db.Column(db.Boolean, default=True)
     timezone = db.Column(db.String(50), default='UTC')
     enable_cache = db.Column(db.Boolean, default=True)
-    is_logging_system_info = db.Column(db.Boolean, default=False)    
+    is_logging_system_info = db.Column(db.Boolean, default=True)    
