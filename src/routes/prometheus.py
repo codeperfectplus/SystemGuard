@@ -202,3 +202,33 @@ def change_interval():
     save_yaml(config, prometheus_yml_path)
     # update_prometheus_container()
     return redirect(url_for('configure_targets'))
+
+# change username and password
+@app.route('/targets/change_auth', methods=['POST'])
+@admin_required
+def change_auth():
+    job_name = request.form.get('job_name')
+    username = request.form.get('username')
+    password = request.form.get('password')
+    config = load_yaml(prometheus_yml_path)
+
+    found = False
+    for scrape_config in config['scrape_configs']:
+        if scrape_config['job_name'] == job_name:
+            found = True
+            scrape_config['basic_auth'] = {
+                'username': username,
+                'password': password
+            }
+            flash('Basic Auth updated successfully!', 'success')
+            break     
+    
+    if not found:
+        flash(f'Job {job_name} not found.', 'warning')
+
+    for index, j in enumerate(config['scrape_configs']):
+        config['scrape_configs'][index] = OrderedDict(j)
+    
+    save_yaml(config, prometheus_yml_path)
+    # update_prometheus_container()
+    return redirect(url_for('configure_targets'))
