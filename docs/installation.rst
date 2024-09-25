@@ -25,7 +25,8 @@ Install Docker as it is required by the prometheus and grafana services.
 
 .. code:: bash
 
-   steps to install docker
+   wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker.sh
+   chmod +x setup_docker.sh && ./setup_docker.sh
 
 Installation Steps
 ~~~~~~~~~~~~~~~~~~

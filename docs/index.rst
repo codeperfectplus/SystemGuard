@@ -1,6 +1,6 @@
 .. rst-class:: hide-header
 
-Welcome to Sanatio's documentation!
+Welcome to SystemGuard's documentation!
 =====================================
 
 
@@ -9,3 +9,5 @@ Welcome to Sanatio's documentation!
    
    introduction.rst
    installation.rst
+   prometheus.rst
+   screenshots.rst

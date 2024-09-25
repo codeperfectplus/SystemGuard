@@ -1,4 +1,4 @@
-SystemGuard 💂
+introduction
 ==============
 
 System Guard is a Flask app designed to monitor server stats such as
@@ -36,3 +36,6 @@ Features 🚀
    Manager roles (upcoming feature).
 -  Update security updates with a single click or automatically update
    to the latest version to simplify maintenance.
+-  Real-time monitoring capabilities to keep track of server performance
+
+By default, SystemGuard is running on 5050 port and prometheus is running on 9090 port.
