@@ -89,8 +89,8 @@ run_output=$(docker run -d \
   -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
   --restart always \
   -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
-  -v "PROMETHEUS_DATA_DIR:/prometheus" \
-  "$PROMETHEUS_IMAGE" 2>&1)  # Capture both stdout and stderr
+  -v "$PROMETHEUS_DATA_DIR:/prometheus" \
+  "$PROMETHEUS_IMAGE" 2>&1)
 
 # Check if Prometheus started successfully
 if [ $? -eq 0 ]; then

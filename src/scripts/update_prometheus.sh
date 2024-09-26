@@ -51,7 +51,7 @@ else
       -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
       --restart always \
       -v "$PROMETHEUS_CONFIG:/etc/prometheus/prometheus.yml" \
-      -v "PROMETHEUS_DATA_DIR:/prometheus" \
+      -v "$PROMETHEUS_DATA_DIR:/prometheus" \
       "$PROMETHEUS_IMAGE" &> /dev/null
 
     log "Prometheus container started successfully."

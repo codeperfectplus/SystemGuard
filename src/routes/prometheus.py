@@ -5,6 +5,8 @@ import yaml
 from collections import OrderedDict
 from werkzeug.security import check_password_hash
 
+from functools import lru_cache
+from flask import g  # 'g' is a request-specific object
 from src.config import app, db
 from src.models import ExternalMonitornig, UserProfile
 from src.utils import ROOT_DIR
@@ -18,14 +20,21 @@ from src.routes.helper.prometheus_helper import (
     update_prometheus_container,
     update_prometheus_config)
 
-
 # Define the Prometheus Blueprint
 prometheus_bp = Blueprint('prometheus', __name__)
 
+# Cache user queries with LRU cache (memory-based, not ideal for distributed apps)
+@lru_cache(maxsize=128)
+def get_user_by_username(username):
+    print('Querying the database...')
+    return UserProfile.query.filter_by(username=username).first()
+
+# Verify user login information
 def verify_user(username, password):
-    user = UserProfile.query.filter_by(username=username).first()
+    user = get_user_by_username(username)
     if user and check_password_hash(user.password, password):
         return True
+    return False
 
 # Define a route to serve Prometheus metrics
 @app.route('/metrics')
