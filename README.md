@@ -19,6 +19,10 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - Role-based dashboards tailored for Developer, Admin, IT Manager, and Manager roles (upcoming feature).
 - Update security updates with a single click or automatically update to the latest version to simplify maintenance.
 
+## Get started 🛠️
+
+- Check the [documentation](https://systemguard.readthedocs.io/en/latest/installation.html) for installation instructions.
+
 ## Architecture 🏗️
 
 ![SystemGuard-Architecture](/src/docs/images/SystemGuard-Architecture.jpg)
@@ -28,10 +32,6 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 - **Frontend**: JavaScript, Bootstrap, Chart.js, Grafana
 - **Backend**: Python, Flask, SQLAlchemy, SQLite, Prometheus, InfluxDB
 - **Monitoring**: psutil, speedtest-cli, nmap, netstat
-
-## Get started 🛠️
-
-- Check the [Installation.md](/src/docs/installation.md) file for installation instructions.
 
 ## Release Notes 📝
 
@@ -61,8 +61,3 @@ Contributions are always welcome! Please read the [contribution guidelines](/CON
 ## License 📝
 
 This project is licensed under the MIT License - see the [LICENSE](/LICENSE) file for details.
-
-
-<!-- ## Contact 📧
-
-- Please email me at deepak008@live.com to schedule a demo of the commercial version of the app. This version includes the latest features, a centralized control panel, role-based dashboards, support for multiple servers, and more. -->

@@ -1,18 +1,22 @@
-Congiure the Central Server
+Configure the Central Server
 ===========================
 
-To configure the central server, you have to configure the prometheus to access data/metrics from the 
-other servers on the node with systemguard installed.
+To configure the central server, you need to set up Prometheus to access data and metrics from other servers where SystemGuard is installed.
 
-1. Go to ``Systemguard Central`` and click on the ``configure targets for systemguard``.
-2. To add new target add the follwing details:
-   - Job Name: Enter the job name(eg: dev server)
-   - Target URL: Enter the target url(eg: dev-server-ip:8000)
-   - Scrap Interval: Enter the scrap interval(eg: 10s)
-   - Username: Enter the prometheus username of that server(any login of that server will work)
-    - Password: Enter the prometheus password of that server(any login of that server will work)
-3. After adding the target, click on the ``add target`` button to add the target.
-4. After this click on ``update prometheus`` to take the changes in effect on prometheus.
-5. check on changes on ``prometheus`` or ``dashboard_network``(in systemguard) to see the changes.
+Steps to Configure:
 
+1. Navigate to **SystemGuard Central** and click on **Configure Targets for SystemGuard**.
 
+2. To add a new target, provide the following details:
+
+   - **Job Name**: Enter a descriptive job name (e.g., `dev server`).
+   - **Target URL**: Specify the target URL (e.g., `dev-server-ip:8000`).
+   - **Scrape Interval**: Set the scrape interval (e.g., `10s`).
+   - **Username**: Enter the Prometheus username for that server (any valid login will work).
+   - **Password**: Enter the Prometheus password for that server (any valid login will work).
+
+3. After entering the target details, click on the **Add Target** button to save the target.
+
+4. Next, click on **Update Prometheus** to apply the changes in Prometheus.
+
+5. Verify the changes in **Prometheus** or the **Dashboard Network** (within SystemGuard) to ensure everything is functioning correctly.

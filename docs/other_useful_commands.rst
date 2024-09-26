@@ -14,7 +14,7 @@ command:
 This will remove SystemGuard and its related configurations from your
 system.
 
---------------
+----------
 
 Fix Errors
 ----------
@@ -114,6 +114,6 @@ For a list of all available commands and their descriptions, run:
 
 .. code:: bash
 
-   systemguard-installer --help
+   sudo systemguard-installer --help
 
 --------------
