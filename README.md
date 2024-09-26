@@ -1,5 +1,61 @@
 # SystemGuard 💂
 
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://systemguard.readthedocs.io/en/latest/?badge=latest">
+          <img src="https://readthedocs.org/projects/systemguard/badge/?version=latest" alt="Documentation Status"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/blob/main/LICENSE">
+          <img src="https://img.shields.io/github/license/codeperfectplus/SystemGuard" alt="GitHub license"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/releases">
+          <img src="https://img.shields.io/github/v/release/codeperfectplus/SystemGuard" alt="GitHub release"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/issues">
+          <img src="https://img.shields.io/github/issues/codeperfectplus/SystemGuard" alt="GitHub issues"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/pulls">
+          <img src="https://img.shields.io/github/issues-pr/codeperfectplus/SystemGuard" alt="GitHub pull requests"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/commits/dev">
+          <img src="https://img.shields.io/github/commit-activity/m/codeperfectplus/SystemGuard" alt="GitHub commit activity"/>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/network/members">
+          <img src="https://img.shields.io/github/forks/codeperfectplus/SystemGuard" alt="GitHub forks"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/stargazers">
+          <img src="https://img.shields.io/github/stars/codeperfectplus/SystemGuard" alt="GitHub stars"/>
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/codeperfectplus/SystemGuard/watchers">
+          <img src="https://img.shields.io/github/watchers/codeperfectplus/SystemGuard" alt="GitHub watchers"/>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
+
 System Guard is a Flask app designed to monitor server stats such as CPU, Memory, Disk, and Network. It also provides real-time monitoring capabilities which can be useful for system administrators, developers, and DevOps engineers to keep track of their server's performance and troubleshoot issues. The app uses the `psutil` library to retrieve system stats and the `speedtest-cli` library to perform a network speed test.
 
 
