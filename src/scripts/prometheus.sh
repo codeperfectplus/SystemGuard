@@ -20,9 +20,10 @@ USER_NAME=$(get_user_name)
 # Configuration
 NETWORK_NAME="flask-prometheus-net"
 CONTAINER_NAME="prometheus"
-PROMETHEUS_IMAGE="prom/prometheus"
+PROMETHEUS_IMAGE="prom/prometheus:v2.55.0-rc.0"
 PROMETHEUS_PORT="9090"
 PROMETHEUS_CONFIG_DIR="$(pwd)/prometheus_config"
+ALERT_RULES_FILE="$PROMETHEUS_CONFIG_DIR/alert_rules.yml"
 PROMETHEUS_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
 PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
@@ -62,7 +63,10 @@ global:
     system: $monitor
     environment: $environment
     user: $USER_NAME
-    
+
+rule_files:
+  - /etc/prometheus/alert_rules.yml
+
 scrape_configs:
   - job_name: $job_name
     scrape_interval: $SCRAPING_INTERVAL
@@ -99,6 +103,7 @@ run_output=$(docker run -d \
   -p "$PROMETHEUS_PORT:$PROMETHEUS_PORT" \
   --restart always \
   -v "$PROMETHEUS_CONFIG_FILE:/etc/prometheus/prometheus.yml" \
+  -v "$ALERT_RULES_FILE:/etc/prometheus/alert_rules.yml" \
   -v "$PROMETHEUS_DATA_DIR:/prometheus" \
   "$PROMETHEUS_IMAGE" 2>&1)
 
