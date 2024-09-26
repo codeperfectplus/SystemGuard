@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# function to get the user name
+# Function to get the user name
 get_user_name() {
     if [ "$(whoami)" = "root" ]; then
-        LOGNAME_USER=$(logname 2>/dev/null) # Redirect any error output to /dev/null
-        if [ $? -ne 0 ]; then               # Check if the exit status of the last command is not 0
-            USER_NAME=$(cat /etc/passwd | grep '/home' | cut -d: -f1 | tail -n 1)
+        LOGNAME_USER=$(logname 2>/dev/null)
+        if [ $? -ne 0 ]; then
+            USER_NAME=$(grep '/home' /etc/passwd | cut -d: -f1 | tail -n 1)
         else
             USER_NAME=$LOGNAME_USER
         fi
@@ -16,6 +16,7 @@ get_user_name() {
 }
 
 USER_NAME=$(get_user_name)
+
 # Configuration
 NETWORK_NAME="flask-prometheus-net"
 CONTAINER_NAME="prometheus"
@@ -27,23 +28,33 @@ PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
 SCRAPING_INTERVAL="10s"
-monitor='systemguard-metrics'
-environment='production'
-job_name='localhost'
-prometheus_username='prometheus_admin'
-prometheus_password='prometheus_password'
+monitor="systemguard-metrics"
+environment="production"
+job_name="localhost"
+prometheus_username="prometheus_admin"
+prometheus_password="prometheus_password"
 
 # Logging function for better readability
 log() {
     echo "[INFO] $1"
 }
 
-# Ensure the config directory exists
-log "Creating Prometheus config directory if it doesn't exist."
-mkdir -p "$PROMETHEUS_CONFIG_DIR"
-mkdir -p "$PROMETHEUS_DATA_DIR"
+# Error function for failed steps
+error_exit() {
+    echo "[ERROR] $1"
+    exit 1
+}
 
-# Create the prometheus.yml configuration file
+# Ensure config and data directories exist
+log "Creating necessary directories if they don't exist."
+mkdir -p "$PROMETHEUS_CONFIG_DIR" || error_exit "Failed to create $PROMETHEUS_CONFIG_DIR"
+mkdir -p "$PROMETHEUS_DATA_DIR" || error_exit "Failed to create $PROMETHEUS_DATA_DIR"
+
+# Ensure Prometheus data directory has correct permissions
+log "Setting permissions for Prometheus data directory."
+chmod 777 "$PROMETHEUS_DATA_DIR" || error_exit "Failed to set permissions on $PROMETHEUS_DATA_DIR"
+
+# Create prometheus.yml configuration file
 log "Generating prometheus.yml configuration file."
 cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
@@ -61,22 +72,21 @@ scrape_configs:
     basic_auth:
       username: $prometheus_username
       password: $prometheus_password
-
 EOL
 
 # Check if Docker network exists
 if ! docker network ls | grep -q "$NETWORK_NAME"; then
     log "Creating Docker network: $NETWORK_NAME"
-    docker network create "$NETWORK_NAME"
+    docker network create "$NETWORK_NAME" || error_exit "Failed to create Docker network."
 else
     log "Docker network $NETWORK_NAME already exists."
 fi
 
-# Check if Prometheus container is already running
+# Check if Prometheus container is running, stop and remove if necessary
 if docker ps -a --format '{{.Names}}' | grep -q "$CONTAINER_NAME"; then
-    log "Container $CONTAINER_NAME already exists. Stopping and removing it."
-    docker stop "$CONTAINER_NAME" &> /dev/null
-    docker rm "$CONTAINER_NAME" &> /dev/null
+    log "Stopping and removing existing container: $CONTAINER_NAME."
+    docker stop "$CONTAINER_NAME" &> /dev/null || error_exit "Failed to stop container."
+    docker rm "$CONTAINER_NAME" &> /dev/null || error_exit "Failed to remove container."
 else
     log "No existing container found. Proceeding to start a new one."
 fi
@@ -97,7 +107,5 @@ if [ $? -eq 0 ]; then
     log "Prometheus container $CONTAINER_NAME started successfully on port $PROMETHEUS_PORT."
     log "Prometheus config file located at $PROMETHEUS_CONFIG_FILE"
 else
-    echo "[ERROR] Failed to start Prometheus container: $run_output"
-    echo "[ERROR] Checking logs for container: $CONTAINER_NAME"
-    exit 1
+    error_exit "Failed to start Prometheus container: $run_output"
 fi
