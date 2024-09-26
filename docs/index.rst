@@ -1,7 +1,7 @@
 .. rst-class:: hide-header
 
 Welcome to SystemGuard's documentation!
-=====================================
+=======================================
 
 
 .. toctree::

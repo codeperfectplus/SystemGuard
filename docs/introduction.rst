@@ -38,4 +38,5 @@ Features 🚀
    to the latest version to simplify maintenance.
 -  Real-time monitoring capabilities to keep track of server performance
 
-By default, SystemGuard is running on 5050 port and prometheus is running on 9090 port.
+.. note::
+   By default, SystemGuard is running on 5050 port and prometheus is running on 9090 port.
