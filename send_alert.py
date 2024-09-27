@@ -1,18 +1,22 @@
 import requests
 import json
+import time
 from src.utils import get_ip_address
 
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
-    # Define the alert data
+    # Generate a unique alert name by appending the current timestamp
+    unique_alert_name = f"{alert_name}_{int(time.time())}"
+
+    # Define the alert data with the unique alert name
     alert_data = [
         {
             "labels": {
-                "alertname": alert_name,
+                "alertname": unique_alert_name,
                 "severity": severity,
                 "instance": instance
             },
             "annotations": {
-                "description": "This is a test alert",
+                "description": f"This is a test alert generated at {time.strftime('%Y-%m-%d %H:%M:%S')}",
                 "summary": "Test alert to check Slack notifications"
             }
         }
@@ -32,7 +36,7 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
 
         # Check the response
         if response.status_code == 202:
-            print("Test alert sent successfully!")
+            print(f"Test alert '{unique_alert_name}' sent successfully!")
         else:
             print(f"Failed to send alert. Status code: {response.status_code}, Response: {response.text}")
     
@@ -47,5 +51,5 @@ if __name__ == "__main__":
     alertmanager_port = "9093"
     alertmanager_url = f"http://{alertmanager_ip}:{alertmanager_port}"
 
-    # Send a test alert
+    # Send a test alert with a unique name
     send_test_alert(alertmanager_url, "ScriptAlert", "critical", "instance_name")
