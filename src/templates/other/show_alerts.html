@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+{% block title %}Update Email & Password{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/show_alert.css') }}">
+{% endblock %}
+{% block content %}
+    <h1>Alert Manager</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Alert Name</th>
+                <th>Instance</th>
+                <th>Severity</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Starts At</th>
+                <th>Ends At</th>
+                <th>Generator URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert.labels.alertname }}</td>
+                <td>{{ alert.labels.instance }}</td>
+                <td>{{ alert.labels.severity }}</td>
+                <td>{{ alert.annotations.description }}</td>
+                <td>{{ alert.status.state }}</td>
+                <td>{{ alert.startsAt }}</td>
+                <td>{{ alert.endsAt }}</td>
+                <td><a href="{{ alert.generatorURL }}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
