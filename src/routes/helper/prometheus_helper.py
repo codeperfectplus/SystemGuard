@@ -6,6 +6,7 @@ from src.utils import ROOT_DIR
 
 prometheus_yml_path = os.path.join(ROOT_DIR, 'prometheus_config/prometheus.yml')
 update_prometheus_path = os.path.join(ROOT_DIR, 'src/scripts/update_prometheus.sh')
+alert_rules_path = os.path.join(ROOT_DIR, 'prometheus_config/alert_rules.yml')
 
 def is_valid_file(file_path: str) -> bool:
     """Checks if a file is valid and has key-value pairs separated by a colon."""
@@ -27,6 +28,7 @@ def dict_representer(dumper, data):
 
 OrderedDumper.add_representer(OrderedDict, dict_representer)
 
+
 def load_yaml(file_path):
     """Load the YAML file and keep the order of dictionaries."""
     with open(file_path, 'r') as file:
@@ -36,6 +38,24 @@ def save_yaml(data, file_path):
     """Save the updated YAML data back to the file, preserving order."""
     with open(file_path, 'w') as file:
         yaml.dump(data, file, Dumper=OrderedDumper, default_flow_style=False)
+
+def load_prometheus_config():
+    """Load the Prometheus config file."""
+    yaml_data = OrderedDict(load_yaml(prometheus_yml_path))
+    return yaml_data
+
+def load_alert_rules():
+    """Load the Prometheus alert rules file."""
+    yaml_data = OrderedDict(load_yaml(alert_rules_path))
+    return yaml_data
+
+def save_alert_rules(rules):
+    """Save the updated alert rules file."""
+    save_yaml(rules, alert_rules_path)
+
+def save_prometheus_config(config):
+    """Save the updated Prometheus config file."""
+    save_yaml(config, prometheus_yml_path)
 
 def update_prometheus_config():
     """Update the first target with the machine's IP address."""

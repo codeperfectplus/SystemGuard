@@ -8,6 +8,7 @@
 {% block content %}
 <div class="rules-container">
     <h1><span class="text-danger">{{title}}</span> Alert Rules</h1>
+     <a href="{{ url_for('new_alert_rule') }}" class="btn btn-primary m-2">Create New Alert Rule</a>
     {% for group in rules %}
     <div class="group-section">
         <h2>Group: {{ group.name }}</h2>
