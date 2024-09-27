@@ -23,7 +23,7 @@
         <li class="nav-item">
             <a class="nav-link" id="systemguard-central-tab" data-bs-toggle="tab" href="#systemguard-central" role="tab"
                 aria-controls="systemguard-central" aria-selected="false">
-                <i class="fas fa-users"></i> SystemGuard Central
+                <i class="fa-brands fa-centercode"></i> SystemGuard Central
             </a>
         </li>
         <li class="nav-item">
@@ -106,7 +106,18 @@
                             <a href="{{ url_for('configure_targets') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-cogs"></i> Configure Targets for SystemGuard
                             </a>
-                        </div>  
+                            <a href="{{ url_for('active_alerts') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-exclamation-triangle"></i> Active Alerts
+                            </a>
+                            <!-- view rules -->
+                            <a href="{{ url_for('view_rules') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-exclamation-triangle"></i> View Rules
+                            </a>
+                            <!-- alertmanager_status -->
+                            <a href="{{ url_for('alertmanager_status') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-exclamation-triangle"></i> Alertmanager Status
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,7 +243,7 @@
         </div>
 
         <!-- Profile Section -->
-        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm rounded-lg text-center">

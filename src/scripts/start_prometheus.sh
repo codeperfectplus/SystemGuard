@@ -64,6 +64,13 @@ global:
     environment: $environment
     user: $USER_NAME
 
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - $FLASK_APP_IP:9093
+      timeout: 5m
+
 rule_files:
   - /etc/prometheus/alert_rules.yml
 
@@ -71,8 +78,8 @@ scrape_configs:
   - job_name: $job_name
     scrape_interval: $SCRAPING_INTERVAL
     static_configs:
-    - targets:
-      - $FLASK_APP_IP:$FLASK_APP_PORT
+      - targets:
+          - $FLASK_APP_IP:$FLASK_APP_PORT
     basic_auth:
       username: $prometheus_username
       password: $prometheus_password

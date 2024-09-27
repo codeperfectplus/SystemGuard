@@ -20,3 +20,4 @@ from src.routes.experimental import experimental_bp
 from src.routes.error_handlers import error_handlers_bp
 from src.routes.profile import profile_bp
 from src.routes.prometheus import prometheus_bp
+from src.routes.alert import alert_bp

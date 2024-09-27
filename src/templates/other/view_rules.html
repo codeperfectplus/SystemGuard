@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% block title %}Active Alerts{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/view_rules.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="rules-container">
+    <h1><span class="text-danger">{{title}}</span> Alert Rules</h1>
+    {% for group in rules %}
+    <div class="group-section">
+        <h2>Group: {{ group.name }}</h2>
+        <p><strong>File:</strong> {{ group.file }}</p>
+        <ul class="rule-list">
+            {% for rule in group.rules %}
+            <li class="rule-item">
+                <div class="rule-header">
+                    <span class="rule-name">{{ rule.name }}</span> 
+                    <span class="rule-state {{ rule.state }}">{{ rule.state }}</span>
+                </div>
+                <ul class="rule-details">
+                    <li><strong>Query:</strong> {{ rule.query }}</li>
+                    <li><strong>Duration:</strong> {{ rule.duration }} seconds</li>
+                    <li><strong>Labels:</strong> {{ rule.labels }}</li>
+                    <li><strong>Annotations:</strong> {{ rule.annotations }}</li>
+                    <li><strong>Alerts:</strong>
+                        <ul class="alert-list">
+                            {% for alert in rule.alerts %}
+                            <li class="alert-item">
+                                <strong>Alert Name:</strong> {{ alert.labels.alertname }} ({{ alert.state }})
+                                <br><strong>Instance:</strong> {{ alert.labels.instance }}
+                                <br><strong>Description:</strong> {{ alert.annotations.description }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

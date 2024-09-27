@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #0056b3;
+}
+
+.rules-container {
+    width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.group-section {
+    margin-bottom: 30px;
+}
+
+.group-section h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.group-section p {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.rule-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+.rule-item {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.rule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rule-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.rule-state {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.rule-state.firing {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.rule-state.inactive {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.rule-details {
+    margin-top: 10px;
+    list-style: none;
+    padding-left: 0;
+}
+
+.rule-details li {
+    margin-bottom: 8px;
+}
+
+.alert-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.alert-item {
+    background-color: #f1f3f5;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}

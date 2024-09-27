@@ -880,7 +880,7 @@ install() {
         exit 1
         ;;
     esac
-        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name prometheus.sh) || {
+        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name start_prometheus.sh) || {
         log "ERROR" "Prometheus installation script not found."
         exit 1
     }

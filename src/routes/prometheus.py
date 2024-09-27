@@ -1,7 +1,8 @@
-from flask import Blueprint, Response, request, render_template, flash, redirect, url_for
+from flask import Blueprint, Response, request, render_template, flash, redirect, url_for, jsonify
 from prometheus_client import generate_latest
 import os
 import yaml
+import requests
 from collections import OrderedDict
 from werkzeug.security import check_password_hash
 
@@ -241,3 +242,69 @@ def change_auth():
     save_yaml(config, prometheus_yml_path)
     # update_prometheus_container()
     return redirect(url_for('configure_targets'))
+
+@app.route('/active_alerts')
+def active_alerts():
+    try:
+        response = requests.get('http://localhost:9090/api/v1/alerts')
+        alerts_data = response.json()
+        alerts = alerts_data['data']['alerts']  # Extract the alerts
+    except Exception as e:
+        alerts = []
+        print(f"Error fetching alerts: {e}")
+    
+    # Render the alerts in the HTML page
+    return render_template('other/active_alerts.html', alerts=alerts)
+
+
+@app.route('/view_rules')
+def view_rules():
+    url = "http://localhost:9090/api/v1/rules"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        rules_data = response.json()
+        return render_template('other/view_rules.html', rules=rules_data['data']['groups'])
+    else:
+        return jsonify({"error": "Unable to fetch rules"}), 500
+    
+
+@app.route('/alertmanager/status')
+def alertmanager_status():
+    url = "http://localhost:9090/api/v1/alertmanagers"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        alertmanager_data = response.json()
+        print(alertmanager_data['data']['activeAlertmanagers'])
+        active_alertmanagers = alertmanager_data['data']['activeAlertmanagers']
+        return render_template('other/alertmanager_status.html', alertmanagers=active_alertmanagers)
+    else:
+        return jsonify({"error": "Unable to fetch Alertmanager status"}), 500
+    
+
+@app.route('/prometheus/reload')
+def reload_prometheus():
+    url = "http://localhost:9090/-/reload"  # Ensure this URL is correct
+    response = requests.post(url)
+    
+    # Log response details for debugging
+    print("Response Status Code:", response.status_code)
+    print("Response Body:", response.text)
+
+    if response.status_code == 200:
+        return jsonify({"status": "success", "message": "Prometheus configuration reloaded."}), 200
+    else:
+        return jsonify({"status": "error", "message": "Failed to reload Prometheus configuration.", "details": response.text}), response.status_code
+
+
+@app.route('/prometheus/ready')
+def ready_prometheus():
+    url = "http://localhost:9090/-/ready"  # Ensure this URL is correct
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        return jsonify({"status": "success", "message": response.text}), 200
+    else:
+        return jsonify({"status": "error", "message": "Prometheus is not ready.", "details": response.text}), response.status_code
+    

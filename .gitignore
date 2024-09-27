@@ -170,3 +170,4 @@ prometheus_config
 *.yml
 prometheus_config/prometheus.yml
 test.py
+.initialized
