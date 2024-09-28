@@ -10,6 +10,7 @@ from src.models.system_information import SystemInformation
 from src.models.user_profile import UserProfile
 from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
+from src.models.notification_settings import NotificationSettings
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash
@@ -48,10 +49,10 @@ def inject_settings():
     )
     return all_settings
 
-if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
+if os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
     with app.app_context():
         # Check if tables already exist
-        if not db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
+        if db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
             logger.info("Creating tables")
             db.create_all()
 

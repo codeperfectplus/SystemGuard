@@ -21,3 +21,4 @@ from src.routes.error_handlers import error_handlers_bp
 from src.routes.profile import profile_bp
 from src.routes.prometheus import prometheus_bp
 from src.routes.alert import alert_bp
+from src.routes.update_webhooks import webhooks_bp
