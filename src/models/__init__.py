@@ -49,10 +49,10 @@ def inject_settings():
     )
     return all_settings
 
-if os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
+if not os.path.exists(os.path.join(ROOT_DIR, "src/assets/.initialized")):
     with app.app_context():
         # Check if tables already exist
-        if db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
+        if not db.inspect(db.engine).has_table('users'):  # Use an important table to check existence
             logger.info("Creating tables")
             db.create_all()
 
