@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, blueprints, flash
 from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from src.scripts.email_me import send_smtp_email
+from src.alerts import send_smtp_email
 from src.config import app, db
 from src.models import (
     UserProfile,
@@ -77,21 +77,21 @@ def login():
                         is_html=True,
                     )
 
-            # log in alert to user
-            if receiver_email:
-                context = {
-                    "username": current_user.username,
-                    "login_time": datetime.datetime.now(),
-                }
+            # # log in alert to user
+            # if receiver_email:
+            #     context = {
+            #         "username": current_user.username,
+            #         "login_time": datetime.datetime.now(),
+            #     }
 
-                login_message_template = os.path.join(
-                    ROOT_DIR, "src/templates/email_templates/login.html"
-                )
-                email_body = render_template_from_file(
-                    login_message_template, **context
-                )
+            #     login_message_template = os.path.join(
+            #         ROOT_DIR, "src/templates/email_templates/login.html"
+            #     )
+            #     email_body = render_template_from_file(
+            #         login_message_template, **context
+            #     )
 
-                send_smtp_email(receiver_email, "Login Alert", email_body, is_html=True)
+            #     send_smtp_email(receiver_email, "Login Alert", email_body, is_html=True)
             return redirect(url_for("dashboard"))
         flash("Invalid username or password", "danger")
     return render_template("auths/login.html")
@@ -99,16 +99,16 @@ def login():
 
 @app.route("/logout")
 def logout():
-    receiver_email = current_user.email
-    if receiver_email:
-        context = {"username": current_user.username,
-                   "title": get_app_info()["title"]
-                   }
-        logout_message_template = os.path.join(
-            ROOT_DIR, "src/templates/email_templates/logout.html"
-        )
-        email_body = render_template_from_file(logout_message_template, **context)
-        send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
+    # receiver_email = current_user.email
+    # if receiver_email:
+    #     context = {"username": current_user.username,
+    #                "title": get_app_info()["title"]
+    #                }
+    #     logout_message_template = os.path.join(
+    #         ROOT_DIR, "src/templates/email_templates/logout.html"
+    #     )
+    #     email_body = render_template_from_file(logout_message_template, **context)
+    #     send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
     logout_user()
     return redirect(url_for("login"))
 

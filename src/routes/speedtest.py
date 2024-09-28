@@ -5,7 +5,7 @@ from flask_login import current_user
 from src.config import app, db
 from src.models import UserDashboardSettings, NetworkSpeedTestResult
 from src.utils import run_speedtest, render_template_from_file, ROOT_DIR
-from src.scripts.email_me import send_smtp_email
+from src.alerts import send_smtp_email
 from src.config import get_app_info
 from src.routes.helper.common_helper import admin_required
 

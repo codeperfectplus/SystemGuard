@@ -1,14 +1,12 @@
 import os
 import datetime
 from threading import Timer
-from flask import url_for
 from src.config import app, db
-from src.utils import _get_system_info
 from src.logger import logger
-from src.models import MonitoredWebsite, GeneralSettings, SystemInformation
+from src.models import MonitoredWebsite
 from sqlalchemy.exc import SQLAlchemyError
 import requests
-from src.scripts.email_me import send_smtp_email
+from src.alerts import send_smtp_email
 from src.logger import logger
 from src.utils import render_template_from_file, ROOT_DIR
 from src.config import get_app_info

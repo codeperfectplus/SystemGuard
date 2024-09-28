@@ -25,12 +25,8 @@ def get_system_node_name():
 
 def get_ip_address():
     try:
-        # Run the command `hostname -I` to get the IP addresses
         result = subprocess.run(['hostname', '-I'], capture_output=True, text=True, check=True)
-        
-        # Split the output by spaces and get the first IP address
         ip_address = result.stdout.split()[0]
-        
         return ip_address
     except (IndexError, subprocess.CalledProcessError) as e:
         return None
