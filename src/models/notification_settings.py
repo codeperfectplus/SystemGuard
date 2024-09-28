@@ -38,3 +38,17 @@ class NotificationSettings(db.Model):
     @staticmethod
     def get_by_id(notification_id):
         return NotificationSettings.query.get(notification_id)
+    
+    # get slack webhook url
+    @staticmethod
+    def get_slack_webhook_url():
+        return NotificationSettings.query.first().slack_webhook_url
+
+
+    @staticmethod
+    def get_discord_webhook_url():
+        return NotificationSettings.query.first().discord_webhook_url
+    
+    @staticmethod
+    def get_teams_webhook_url():
+        return NotificationSettings.query.first().teams_webhook_url

@@ -38,13 +38,13 @@ def send_teams_message(webhook_url, message_title="SystemGuard Alert", message_b
         print(f"Response: {response.text}")
 
 # Example usage:
-if __name__ == "__main__":
-    # Replace with your Microsoft Teams webhook URL
-    webhook_url = "https://outlook.office.com/webhook/YOUR_WEBHOOK_URL"
+# if __name__ == "__main__":
+#     # Replace with your Microsoft Teams webhook URL
+#     webhook_url = "https://outlook.office.com/webhook/YOUR_WEBHOOK_URL"
     
-    # Define the message content
-    message_title = "SystemGuard Alert"
-    message_body = "This is a notification about an important system event."
+#     # Define the message content
+#     message_title = "SystemGuard Alert"
+#     message_body = "This is a notification about an important system event."
 
-    # Send the message
-    send_teams_message(webhook_url, message_title, message_body)
+#     # Send the message
+#     send_teams_message(webhook_url, message_title, message_body)

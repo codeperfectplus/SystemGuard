@@ -142,14 +142,9 @@
                             <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
                                 <i class="fas fa-key"></i> SMTP Configuration
                             </a>
-                            <a href="#" class="btn btn-primary btn-block mb-2">
-                                <i class="fa-brands fa-slack"></i> Slack Configuration
-                            </a>
-                            <a href="#" class="btn btn-primary btn-block mb-2">
-                                <i class="fa-brands fa-telegram"></i> Telegram Configuration
-                            </a>
-                            <a href="#" class="btn btn-primary btn-block">
-                                <i class="fa-brands fa-discord"></i> Discord Configuration
+                            <!-- webhooks -->
+                            <a href="{{ url_for('update_webhooks') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-solid fa-bell"></i> Notification Webhooks
                             </a>
                         </div>
                     </div>

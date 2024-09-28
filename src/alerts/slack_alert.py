@@ -1,6 +1,7 @@
 import json
 import requests
 from datetime import datetime
+from src.logger import logger
 
 def send_slack_alert(webhook_url, message, title="System Alert", color="#36a64f", fields=None, username="System Metrics Bot", icon_emoji=":robot_face:"):
     """
@@ -40,21 +41,5 @@ def send_slack_alert(webhook_url, message, title="System Alert", color="#36a64f"
     if response.status_code != 200:
         raise Exception(f"Request to Slack failed with status code {response.status_code}, response: {response.text}")
     
-    print(f"Notification sent to Slack: {title}")
+    logger.info(f"Notification sent to Slack: {title}")
 
-# Example usage
-# webhook_url = ''
-# message = "High CPU usage detected. Usage is above 85%."
-# fields = [
-#     {"title": "Metric", "value": "CPU Usage", "short": True},
-#     {"title": "Threshold", "value": "85%", "short": True},
-#     {"title": "Current Usage", "value": "92%", "short": True}
-# ]
-
-# send_slack_notification(
-#     webhook_url,
-#     message=message,
-#     title="High CPU Usage Alert",
-#     color="#ff0000",
-#     fields=fields
-# )
