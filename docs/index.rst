@@ -9,6 +9,7 @@ Welcome to SystemGuard's documentation!
    
    introduction.rst
    installation.rst
+   architecture.rst
    other_useful_commands.rst
    prometheus_setup.rst
    configure_email.rst
@@ -22,4 +23,5 @@ Welcome to SystemGuard's documentation!
    user_management.rst
    profile_management.rst
    system_info.rst
+   alerts.rst
    screenshots.rst
