@@ -41,16 +41,16 @@ prometheus_password="prometheus_password"
 
 # call INIT_ALERT_MANAGER_SCRIPT
 # do you want to install alert manager?
-echo "Do you want to install Alert Manager? (y/n)"
-read install_alert_manager
-if [ "$install_alert_manager" = "y" ]; then
-    echo "Initializing Alert Manager $INIT_ALERT_MANAGER_SCRIPT"
-    bash $INIT_ALERT_MANAGER_SCRIPT
-    echo "Starting Alert Manager $ALERT_MANAGER_SCRIPT"
-    bash $ALERT_MANAGER_SCRIPT
-else
-    echo "Skipping Alert Manager installation"
-fi
+# echo "Do you want to install Alert Manager? (y/n)"
+# read install_alert_manager
+# if [ "$install_alert_manager" = "y" ]; then
+#     echo "Initializing Alert Manager $INIT_ALERT_MANAGER_SCRIPT"
+#     bash $INIT_ALERT_MANAGER_SCRIPT
+#     echo "Starting Alert Manager $ALERT_MANAGER_SCRIPT"
+#     bash $ALERT_MANAGER_SCRIPT
+# else
+#     echo "Skipping Alert Manager installation"
+# fi
 
 # Logging function for better readability
 log() {

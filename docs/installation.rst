@@ -21,24 +21,24 @@ system.
 
 For **Debian/Ubuntu** systems:
 
-.. code:: bash
+   .. code:: bash
 
-   sudo apt-get update
-   sudo apt-get install git curl wget unzip iptables jq nmap
+      sudo apt-get update
+      sudo apt-get install git curl wget unzip iptables jq nmap
 
 For **Fedora** systems:
 
-.. code:: bash
+   .. code:: bash
 
-   sudo dnf update -y
-   sudo dnf install -y git curl wget unzip iptables jq nmap
+      sudo dnf update -y
+      sudo dnf install -y git curl wget unzip iptables jq nmap
 
 For **CentOS/RHEL** systems:
 
-.. code:: bash
+   .. code:: bash
 
-   sudo yum update -y
-   sudo yum install -y git curl wget unzip iptables jq nmap
+      sudo yum update -y
+      sudo yum install -y git curl wget unzip iptables jq nmap
 
 **Anaconda3/Miniconda3**
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -46,11 +46,10 @@ For **CentOS/RHEL** systems:
 **Miniconda3** or **Anaconda3** is required for the application to run
 correctly. To install Miniconda3, execute the following commands:
 
-.. code:: bash
+   .. code:: bash
 
-   # Install Miniconda3
-   wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
-   chmod +x install_miniconda.sh && ./install_miniconda.sh
+      wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/main/setup/install_miniconda.sh
+      chmod +x install_miniconda.sh && ./install_miniconda.sh
 
 **Docker**
 ^^^^^^^^^^
@@ -61,19 +60,17 @@ the following commands based on your distribution.
 
 For **Debian/Ubuntu** systems:
 
-.. code:: bash
+   .. code:: bash
 
-   # Debian / apt based distros
-   wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker.sh
-   chmod +x setup_docker.sh && ./setup_docker.sh
+      wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker.sh
+      chmod +x setup_docker.sh && ./setup_docker.sh
 
 For **CentOS/RHEL** systems:
 
-.. code:: bash
+   .. code:: bash
 
-   # CentOS / yum based distros
-   wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker_centos.sh
-   chmod +x setup_docker_centos.sh && ./setup_docker_centos.sh
+      wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker_centos.sh
+      chmod +x setup_docker_centos.sh && ./setup_docker_centos.sh
 
 --------------
 
@@ -97,11 +94,12 @@ Installation Steps
 
       sudo systemguard-installer --install
 
-   If the above command doesn’t work, try specifying the full path:
+   Optionally, you can install the Alert Manager along with the SystemGuard. Recommended for centralized server monitoring.
 
    .. code:: bash
 
-      sudo /usr/local/bin/systemguard-installer --install
+      sudo systemguard-installer --install-alert-manager
+
 
 3. **Access SystemGuard:**
 
@@ -112,16 +110,16 @@ Installation Steps
 
       http://localhost:5050
 
-.. Note:: 
-   
-   Use the default credentials to log in for the first time:
+   .. Note:: 
+      
+      Use the default credentials to log in for the first time:
 
-   -  **Username**: ``admin``
-   -  **Password**: ``admin``
+      -  **Username**: ``admin``
+      -  **Password**: ``admin``
 
-.. caution::
-   It is recommended that you change the default password after the
-   initial login.
+   .. caution::
+      It is recommended that you change the default password after the
+      initial login.
 
 4. **Start Monitoring:**
 
@@ -132,3 +130,11 @@ Installation Steps
 
 By following these steps, SystemGuard will be installed and ready for
 use on your server.
+
+
+.. Note::
+   If the above command doesn’t work, try specifying the full path:
+
+.. code:: bash
+
+   sudo /usr/local/bin/systemguard-installer --install
