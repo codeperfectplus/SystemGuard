@@ -13,8 +13,8 @@ This is the architecture of the project.
    Click on the image to view it in full size.
 
 
-**Central Server**
-~~~~~~~~~~~~~~~~~~
+Central Server
+~~~~~~~~~~~~~~
 
 1. | **SystemGuard (Central)**:
    | This is the core of the **SystemGuard** system that aggregates and
@@ -54,8 +54,8 @@ This is the architecture of the project.
 
 --------------
 
-**Server Node**
-~~~~~~~~~~~~~~~
+Server Node
+~~~~~~~~~~~
 
 1. | **Server OS**:
    | The operating system running on the physical or virtual server.
@@ -88,8 +88,8 @@ This is the architecture of the project.
 
 --------------
 
-**Communication between Central Server and Server Nodes**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Communication between Central Server and Server Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  | **Pull Mechanism**:
    | The **Prometheus (Central)** instance **pulls** metrics from the
