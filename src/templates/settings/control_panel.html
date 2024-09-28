@@ -23,7 +23,14 @@
         <li class="nav-item">
             <a class="nav-link" id="systemguard-central-tab" data-bs-toggle="tab" href="#systemguard-central" role="tab"
                 aria-controls="systemguard-central" aria-selected="false">
-                <i class="fas fa-users"></i> SystemGuard Central
+                <i class="fa-brands fa-centercode"></i> SystemGuard Central
+            </a>
+        </li>
+        <!-- Alert tab -->
+        <li class="nav-item">
+            <a class="nav-link" id="alert-tab" data-bs-toggle="tab" href="#alert" role="tab"
+                aria-controls="alert" aria-selected="false">
+                <i class="fas fa-solid fa-bell"></i> Alerts & Notifications
             </a>
         </li>
         <li class="nav-item">
@@ -45,12 +52,6 @@
             </a>
         </li>
         {% endif %}
-        <li class="nav-item">
-            <a class="nav-link" id="toggles-tab" data-bs-toggle="tab" href="#feature-toggles" role="tab"
-                aria-controls="feature-toggles" aria-selected="false">
-                <i class="fas fa-toggle-on"></i> Feature
-            </a>
-        </li>
         <li class="nav-item">
             <a class="nav-link" id="system-info-tab" data-bs-toggle="tab" href="#system-info" role="tab"
                 aria-controls="system-info" aria-selected="false">
@@ -106,7 +107,51 @@
                             <a href="{{ url_for('configure_targets') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-cogs"></i> Configure Targets for SystemGuard
                             </a>
-                        </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div class="tab-pane fade" id="alert" role="tabpanel" aria-labelledby="alert-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-solid fa-bell"></i> Alerts</h5>
+                            <a href="{{ url_for('active_alerts') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-solid fa-bell"></i> Active Alerts
+                            </a>
+                            <!-- view rules -->
+                            <a href="{{ url_for('view_rules') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-solid fa-bell"></i> View Rules
+                            </a>
+                            <!-- alertmanager_status -->
+                            <a href="{{ url_for('alertmanager_status') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-solid fa-bell"></i> Alertmanager Status
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-solid fa-bell"></i> Notification Configuration</h5>
+                            <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-key"></i> SMTP Configuration
+                            </a>
+                            <a href="#" class="btn btn-primary btn-block mb-2">
+                                <i class="fa-brands fa-slack"></i> Slack Configuration
+                            </a>
+                            <a href="#" class="btn btn-primary btn-block mb-2">
+                                <i class="fa-brands fa-telegram"></i> Telegram Configuration
+                            </a>
+                            <a href="#" class="btn btn-primary btn-block">
+                                <i class="fa-brands fa-discord"></i> Discord Configuration
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,11 +164,21 @@
                     <div class="card h-100 shadow-sm rounded-lg text-center">
                         <div class="card-body">
                             <h5 class="card-title"><i class="fas fa-cogs"></i> Settings</h5>
-                            <a href="{{ url_for('smtp_config') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-key"></i> SMTP Configuration
-                            </a>
                             <a href="{{ url_for('general_settings') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-cogs"></i> General Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
+                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
+                                <i class="fas fa-toggle-on"></i> Page Toggles
+                            </a>
+                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
+                                <i class="fas fa-toggle-on"></i> Card Toggles
                             </a>
                         </div>
                     </div>
@@ -191,19 +246,7 @@
         <!-- Feature Toggles Section -->
         <div class="tab-pane fade" id="feature-toggles" role="tabpanel" aria-labelledby="toggles-tab">
             <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm rounded-lg text-center">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-toggle-on"></i> Feature Toggles</h5>
-                            <a href="{{ url_for('feature_toggles') }}" class="btn btn-primary btn-block mb-2">
-                                <i class="fas fa-toggle-on"></i> Page Toggles
-                            </a>
-                            <a href="{{ url_for('card_toggles') }}" class="btn btn-primary btn-block">
-                                <i class="fas fa-toggle-on"></i> Card Toggles
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
 
@@ -232,7 +275,7 @@
         </div>
 
         <!-- Profile Section -->
-        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm rounded-lg text-center">

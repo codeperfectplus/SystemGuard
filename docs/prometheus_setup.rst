@@ -14,8 +14,12 @@ This will display the Prometheus dashboard.
 
 To fetch data from the SystemGuard server, Prometheus requires a username and password for authentication. By default, these credentials are generated during the SystemGuard installation:
 
-- **Default Username**: ``systemguard_admin``
-- **Default Password**: ``systemguard_password``
+.. Note:: 
+      
+   The default username and password are provided for initial setup. It is recommended that you change these credentials after the first login.
+
+   - **Default Username**: ``prometheus_admin``
+   - **Default Password**: ``prometheus_password``
 
 Changing the Username and Password
 ----------------------------------
@@ -35,7 +39,7 @@ After changing the credentials, you need to update the Prometheus configuration 
 
 .. code-block:: bash
 
-   /configure_targets
+   <systemguard_ip>/configure_targets
 
 2. Enter the new username and password in the respective fields for the job name ``localhost`` (for the local server).
 3. Click **Update** to apply the changes.
@@ -48,6 +52,6 @@ You can verify the changes by visiting the SystemGuard network dashboard on your
 
 .. code-block:: bash
 
-   /dashboard_network
+   <systemguard_ip>/dashboard_network
 
 The SystemGuard dashboard will display the instance status as **UP** if everything is functioning correctly.

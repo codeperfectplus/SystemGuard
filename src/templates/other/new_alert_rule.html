@@ -1,0 +1,91 @@
+{% extends 'base/base.html' %}
+{% block title %}Update Email & Password{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/new_alert_rules.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Submit Alert Rule</h1>
+
+<form id="alertRuleForm">
+    <label for="name">Rule Name:</label>
+    <input type="text" id="name" placeholder="Rule Name. Eg: HighCPUUsage" required>
+
+    <label for="alert">Alert:</label>
+    <input type="text" id="alert" placeholder="Alert Name. Eg: HighCPUUsageAlert" required>
+
+    <label for="expr">Expression:</label>
+    <textarea id="expr" placeholder="PromQL Expression. Eg: sum(rate(node_cpu_seconds_total{mode='idle'}[5m])) by (instance) < 0.5" required></textarea>
+
+    <label for="for">For:</label>
+    <input type="text" id="for" placeholder="For Duration. Eg: 5m" required>
+
+    <label for="severity">Severity:</label>
+    <input type="text" id="severity" placeholder="Severity. Eg: critical" required>
+
+    <label for="description">Description:</label>
+    <textarea id="description" placeholder="Description of the alert rule" required></textarea>
+
+    <label for="summary">Summary:</label>
+    <textarea id="summary" placeholder="Summary of the alert rule" required></textarea>
+
+    <button type="submit">Submit Alert Rule</button>
+</form>
+
+<div id="response"></div>
+
+<script>
+document.getElementById('alertRuleForm').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Gather input values
+    const name = document.getElementById('name').value;
+    const alert = document.getElementById('alert').value;
+    const expr = document.getElementById('expr').value;
+    const forField = document.getElementById('for').value;
+    const severity = document.getElementById('severity').value;
+    const description = document.getElementById('description').value;
+    const summary = document.getElementById('summary').value;
+
+    // Prepare the data for the POST request
+    const alertRule = {
+        name: name,
+        rules: [
+            {
+                alert: alert,
+                expr: expr,
+                for: forField,
+                labels: {
+                    severity: severity
+                },
+                annotations: {
+                    description: description,
+                    summary: summary
+                }
+            }
+        ]
+    };
+
+    try {
+        const response = await fetch('http://localhost:5001/api/v1/alert_rules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(alertRule)
+        });
+
+        const result = await response.json();
+        const responseDiv = document.getElementById('response');
+
+        if (response.ok) {
+            responseDiv.innerHTML = `<p style="color: green;">Alert rule added successfully!</p>`;
+        } else {
+            responseDiv.innerHTML = `<p style="color: red;">Failed to add alert rule: ${result.message}</p>`;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('response').innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+    }
+});
+</script>
+{% endblock %}

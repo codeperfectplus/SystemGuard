@@ -1,0 +1,39 @@
+{% extends 'base/base.html' %}
+{% block title %}Active Alerts{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/active_alerts.css') }}">
+{% endblock %}
+{% block content %}
+    <h1>Active Alerts</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Alert Name</th>
+                <th>Instance</th>
+                <th>Severity</th>
+                <th>Description</th>
+                <th>Summary</th>
+                <th>Status</th>
+                <th>Active Since</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in alerts %}
+            <tr class="{{ alert.labels.severity | lower }}">
+                <td>{{ alert.labels.alertname }}</td>
+                <td>{{ alert.labels.instance }}</td>
+                <td>{{ alert.labels.severity }}</td>
+                <td>{{ alert.annotations.description }}</td>
+                <td>{{ alert.annotations.summary }}</td>
+                <td>{{ alert.state }}</td>
+                <td>{{ alert.activeAt }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">No active alerts</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

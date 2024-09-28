@@ -15,5 +15,3 @@ def start_background_tasks():
         start_website_monitoring()
         fetch_file_metrics_task()
         monitor_settings()
-    else:
-        logger.info("Background tasks are not started in development environment.")

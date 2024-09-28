@@ -1,0 +1,33 @@
+{% extends 'base/base.html' %}
+{% block title %}Alertmanager Status{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/alertmanager_status.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="status-container">
+    <h1>Alertmanager Status</h1>
+    
+    {% if alertmanagers %}
+    <table class="alertmanager-table">
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Cluster</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alertmanager in alertmanagers %}
+            <tr>
+                <td>{{ alertmanager.url }}</td>
+                <td>{{ alertmanager.cluster }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No active Alertmanagers found.</p>
+    {% endif %}
+</div>
+{% endblock %}

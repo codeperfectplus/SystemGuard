@@ -166,6 +166,7 @@ predefine_user.json
 src/assets/predefine_user.json
 
 influxdb_data
-prometheus_config
-*.yml
 prometheus_config/prometheus.yml
+prometheus_config/alertmanager.yml
+test.py
+.initialized

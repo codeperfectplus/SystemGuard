@@ -81,7 +81,7 @@ System Guard is a Flask app designed to monitor server stats such as CPU, Memory
 
 ## Architecture 🏗️
 
-![SystemGuard-Architecture](/src/docs/images/SystemGuard-Architecture.jpg)
+![SystemGuard-Architecture](docs/assets/images/architecture.jpg)
 
 ## Tech Stack 🛠️
 

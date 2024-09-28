@@ -880,7 +880,7 @@ install() {
         exit 1
         ;;
     esac
-        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name prometheus.sh) || {
+        PROMETHEUS_INSTALL_SCRIPT=$(find "$EXTRACT_DIR" -name start_prometheus.sh) || {
         log "ERROR" "Prometheus installation script not found."
         exit 1
     }
@@ -1037,6 +1037,15 @@ fix() {
     open_browser
 }
 
+function install_alert_manager() {
+    INIT_ALERT_MANAGER_SCRIPT=$(find "$EXTRACT_DIR" -name init_alertmanager.sh)
+    ALERT_MANAGER_SCRIPT=$(find "$EXTRACT_DIR" -name start_alertmanager.sh)
+    echo "Initializing Alert Manager $INIT_ALERT_MANAGER_SCRIPT"
+    echo "Starting Alert Manager $ALERT_MANAGER_SCRIPT"
+    bash $INIT_ALERT_MANAGER_SCRIPT
+    bash $ALERT_MANAGER_SCRIPT
+}
+
 # update the code to the latest version
 install_latest() {
     cd $EXTRACT_DIR/$APP_NAME-*/
@@ -1117,6 +1126,9 @@ show_help() {
     echo " --update-executable         Update the installer to the latest version."
     echo "                             This will download the latest version of the installer."
     echo ""
+    echo " --install-alert-manager     Install the Alert Manager."
+    echo "                             This will install the Alert Manager."
+    echo ""
     echo "  --help                     Display this help message."
     echo "                             Shows information about all available options and how to use them."
 }
@@ -1158,6 +1170,10 @@ for arg in "$@"; do
         ;;
     --update-executable)
         update_executable
+        exit 0
+        ;;
+    --install-alert-manager)
+        install_alert_manager
         exit 0
         ;;
     --help)

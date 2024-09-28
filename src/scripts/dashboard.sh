@@ -75,8 +75,6 @@ export FLASK_ENV=production
 export FLASK_RUN_PORT="$FLASK_PORT"
 export FLASK_RUN_HOST="0.0.0.0"
 
-
-
 # Function to fetch the value of an environment variable from a file
 fetch_env_variable() {
     var_name=$1 # The name of the environment variable to fetch
