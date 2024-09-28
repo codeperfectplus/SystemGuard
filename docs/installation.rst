@@ -1,10 +1,5 @@
 SystemGuard Installation Guide
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
---------------
-
-Installation
-------------
+==============================
 
 Prerequisites
 ~~~~~~~~~~~~~

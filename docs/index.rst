@@ -12,7 +12,7 @@ Welcome to SystemGuard's documentation!
    architecture.rst
    other_useful_commands.rst
    prometheus_setup.rst
-   configure_email.rst
+   configure_alert.rst
    configure_central_server.rst
    systemguard_process_manager.rst
    general_settings.rst

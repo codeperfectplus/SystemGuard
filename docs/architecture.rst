@@ -105,11 +105,9 @@ This is the architecture of the project.
 
 --------------
 
-Summary:
-~~~~~~~~
 
 -  **Central Server** collects and aggregates data from multiple
-   **Server Nodes**, provides visualizations via **Grafana UI**, and
+   **Server Nodes**, provides visualizations via **Grafana UI** or **SystemGuard UI**,
    handles alerts through the **AlertManager**.
 -  **Server Node** collects and stores data locally using
    **SystemGuard** and **Prometheus**. The central instance periodically
