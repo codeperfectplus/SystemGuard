@@ -44,7 +44,6 @@ class NotificationSettings(db.Model):
     def get_slack_webhook_url():
         return NotificationSettings.query.first().slack_webhook_url
 
-
     @staticmethod
     def get_discord_webhook_url():
         return NotificationSettings.query.first().discord_webhook_url

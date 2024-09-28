@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.config import app
 from src.logger import logger
-from src.alerts import slack_alert, send_smtp_email
+from src.alerts import slack_alert, send_smtp_email, send_alert_to_discord
 from src.models import NotificationSettings
 from src.routes.helper.common_helper import get_email_addresses
 
@@ -117,3 +117,9 @@ def send_alert_notifications(alert_name, instance, severity, description, summar
         is_html=False,
         bypass_alerts=False
     )
+
+    # send_alert_to_discord test remaning
+    discord_webhook_url = NotificationSettings.get_discord_webhook_url()
+    send_alert_to_discord(discord_webhook_url, alert_name, instance, severity, description, summary)
+
+    # team alert
