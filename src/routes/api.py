@@ -1,14 +1,11 @@
-from flask import jsonify, blueprints, request
 import requests
-from flask_login import login_required, current_user
-from src.config import app, db
-from src.models import SystemInformation, UserDashboardSettings
-from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
-from datetime import datetime, timedelta
-from flask import request, jsonify
-import gc
 from datetime import datetime, timezone
+from flask import jsonify, blueprints, request
+from flask_login import login_required, current_user
 
+from src.config import app, db
+from src.models import UserDashboardSettings
+from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
     load_prometheus_config, 
@@ -43,10 +40,13 @@ def system_api():
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching the system information", "details": str(e)}), 500
 
-@app.route('/api/v1/prometheus/graphs_data/targets', methods=['GET'])
+@app.route('/api/v1/prometheus/graphs_data', methods=['GET'])
 @login_required
-def graph_data_api_v3_():
+def graph_data_api():
     try:
+        # Initialize lists for the data
+        time_data = []
+        metric_data = {}
         current_time = datetime.now()
 
         # Get the time filter from query parameters
@@ -75,12 +75,19 @@ def graph_data_api_v3_():
         # Prepare time parameters for the Prometheus query
         end_time = int(current_time.timestamp())
         start_time = end_time - time_range_seconds
-        step = '10s'
 
-        # Initialize lists for the data
-        time_data = []
-        metric_data = {}
-
+        # Determine the step based on the time range
+        if time_range_seconds <= 900:  # 15 minutes
+            step = '10s'
+        elif time_range_seconds <= 3600:  # 1 hour
+            step = '30s'
+        elif time_range_seconds <= 86400:  # 1 day
+            step = '1m'
+        elif time_range_seconds <= 604800:  # 1 week
+            step = '10m'
+        else:  # More than 1 week
+            step = '1h'
+        
         # Fetch data for each metric from Prometheus
         for metric, prometheus_query in PROMETHEUS_METRICS.items():
             # Prepare Prometheus API query parameters
@@ -230,8 +237,8 @@ def get_os_info_api():
 
 
 # Endpoint to view the current configuration
-@app.route("/api/v1/config", methods=["GET", "POST"])
-def get_config():
+@app.route("/api/v1/prometheus/config", methods=["GET", "POST"])
+def manage_prometheus_config():
     config = load_prometheus_config()
     if request.method == "POST":
         new_config = request.json
@@ -242,8 +249,8 @@ def get_config():
 
 
 # Endpoint to get the current alert rules
-@app.route("/api/v1/alert_rules", methods=["GET", "POST"])
-def get_alert_rules():
+@app.route("/api/v1/prometheus/rules", methods=["GET", "POST"])
+def manage_alert_rules():
     if request.method == "POST":
         new_rule = request.json
         rules = load_alert_rules()
@@ -256,30 +263,18 @@ def get_alert_rules():
     rules = load_alert_rules()
     return jsonify(rules)
 
-# create a function of it to reuse
-@app.route("/api/v1/prometheus/reload")
+# Reload Prometheus configuration
 def reload_prometheus():
     url = f"{PROMETHEUS_BASE_URL}/-/reload"
     response = requests.post(url)
-
     if response.status_code == 200:
-        return (
-            jsonify(
-                {"status": "success", "message": "Prometheus configuration reloaded."}
-            ),
-            200,
-        )
+        return jsonify({"status": "success", "message": "Prometheus configuration reloaded"}), 200
     else:
-        return (
-            jsonify(
-                {
-                    "status": "error",
-                    "message": "Failed to reload Prometheus configuration.",
-                    "details": response.text,
-                }
-            ),
-            response.status_code,
-        )
+        return jsonify({"status": "error", "message": "Failed to reload Prometheus config", "details": response.text}), response.status_code
+
+@app.route("/api/v1/prometheus/reload", methods=["POST"])
+def reload_prometheus_config():
+    return reload_prometheus()
 
 
 @app.route("/api/v1/prometheus/ready")
