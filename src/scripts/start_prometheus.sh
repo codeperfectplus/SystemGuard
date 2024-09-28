@@ -61,8 +61,6 @@ cat > "$PROMETHEUS_CONFIG_FILE" <<EOL
 global:
   external_labels:
     system: $monitor
-    environment: $environment
-    user: $USER_NAME
 
 alerting:
   alertmanagers:

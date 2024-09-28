@@ -1,16 +1,3 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #0056b3;
-}
-
 .rules-container {
     width: 90%;
     margin: 0 auto;
@@ -24,20 +11,9 @@ h1 {
     margin-bottom: 30px;
 }
 
-.group-section h2 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.group-section p {
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-}
-
 .rule-list {
     list-style: none;
     padding-left: 0;
-    margin-bottom: 20px;
 }
 
 .rule-item {
@@ -45,6 +21,7 @@ h1 {
     padding: 15px;
     border-radius: 6px;
     margin-bottom: 10px;
+    transition: all 0.3s ease;
 }
 
 .rule-header {
@@ -75,14 +52,35 @@ h1 {
     color: #fff;
 }
 
-.rule-details {
-    margin-top: 10px;
-    list-style: none;
-    padding-left: 0;
+.rule-state.pending {
+    background-color: #ffc107;
+    color: #333;
 }
 
-.rule-details li {
-    margin-bottom: 8px;
+.rule-details-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.rule-details {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.toggle-details-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.toggle-details-btn:hover {
+    background-color: #0056b3;
 }
 
 .alert-list {

@@ -26,6 +26,13 @@
                 <i class="fa-brands fa-centercode"></i> SystemGuard Central
             </a>
         </li>
+        <!-- Alert tab -->
+        <li class="nav-item">
+            <a class="nav-link" id="alert-tab" data-bs-toggle="tab" href="#alert" role="tab"
+                aria-controls="alert" aria-selected="false">
+                <i class="fas fa-solid fa-bell"></i> Alerts
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link" id="utilities-tab" data-bs-toggle="tab" href="#utilities" role="tab"
                 aria-controls="utilities" aria-selected="false">
@@ -106,6 +113,19 @@
                             <a href="{{ url_for('configure_targets') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-cogs"></i> Configure Targets for SystemGuard
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div class="tab-pane fade" id="alert" role="tabpanel" aria-labelledby="alert-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm rounded-lg text-center">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-solid fa-bell"></i> Alerts</h5>
                             <a href="{{ url_for('active_alerts') }}" class="btn btn-primary btn-block">
                                 <i class="fas fa-solid fa-bell"></i> Active Alerts
                             </a>

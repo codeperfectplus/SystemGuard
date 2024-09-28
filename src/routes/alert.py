@@ -26,8 +26,15 @@ def receive_alerts():
 
             print(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
 
-            logger.info(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
-
+            if severity == 'critical':
+                logger.error(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
+            elif severity == 'warning':
+                logger.warning(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
+            elif severity == 'info':
+                logger.info(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
+            else:
+                logger.info(f"Alert received: {alert_name} - {instance} - {severity} - {description} - {summary}")
+            
         return jsonify({"status": "success"}), 200
 
     except Exception as e:
