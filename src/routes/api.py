@@ -1,8 +1,10 @@
 import requests
+import asyncio
+import aiohttp
 from datetime import datetime, timezone
 from flask import jsonify, blueprints, request
 from flask_login import login_required, current_user
-
+from flask_compress import Compress
 from src.config import app, db
 from src.models import UserDashboardSettings
 from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
@@ -15,6 +17,9 @@ from src.routes.helper.prometheus_helper import (
 )
 
 api_bp = blueprints.Blueprint("api", __name__)
+
+cache = {}
+compress = Compress(app)
 
 PROMETHEUS_BASE_URL = "http://localhost:9090"
 QUERY_API_URL = f'{PROMETHEUS_BASE_URL}/api/v1/query_range'
@@ -39,6 +44,29 @@ def system_api():
         return jsonify(system_info), 200
     except Exception as e:
         return jsonify({"error": "An error occurred while fetching the system information", "details": str(e)}), 500
+
+async def fetch_metric(session, metric_query, start_time, end_time, step):
+    params = {
+        'query': metric_query,
+        'start': start_time,
+        'end': end_time,
+        'step': step
+    }
+    async with session.get(QUERY_API_URL, params=params) as response:
+        return await response.json()
+
+async def fetch_all_metrics(metrics, start_time, end_time, step):
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_metric(session, query, start_time, end_time, step) for query in metrics]
+        results = await asyncio.gather(*tasks)
+        return results
+
+def get_cached_data(cache_key):
+    return cache.get(cache_key)
+
+def set_cached_data(cache_key, data, timeout=60):
+    cache[cache_key] = data
+
 
 @app.route('/api/v1/prometheus/graphs_data', methods=['GET'])
 @login_required
@@ -82,78 +110,65 @@ def graph_data_api():
         elif time_range_seconds <= 3600:  # 1 hour
             step = '30s'
         elif time_range_seconds <= 86400:  # 1 day
-            step = '1m'
-        elif time_range_seconds <= 604800:  # 1 week
+            step = '5m'
+        elif time_range_seconds <= 259200:  # 3 days
             step = '10m'
-        else:  # More than 1 week
+        elif time_range_seconds <= 604800:  # 1 week
+            step = '30m'
+        else:
             step = '1h'
-        
-        # Fetch data for each metric from Prometheus
-        for metric, prometheus_query in PROMETHEUS_METRICS.items():
-            # Prepare Prometheus API query parameters
-            params = {
-                'query': prometheus_query,
-                'start': start_time,
-                'end': end_time,
-                'step': step
-            }
 
-            # Send the query to Prometheus
-            response = requests.get(QUERY_API_URL, params=params)
-            
-            # Check if the request was successful
-            if response.status_code == 200:
-                result = response.json().get('data', {}).get('result', [])
-                
-                if result:
-                    # Initialize a dictionary to hold time series data for this metric
-                    metric_data[metric] = []
-                    
-                    for series in result:
-                        # Create a new list for the time series data of this particular series
-                        series_data = {
-                            "metric": series.get("metric"),
-                            "values": {}
-                        }
-                        
-                        # Iterate over the values for this series
-                        for value in series.get("values", []):
-                            timestamp = datetime.fromtimestamp(float(value[0]), tz=timezone.utc).isoformat()
-                            if timestamp not in time_data:
-                                time_data.append(timestamp)
-                            series_data["values"][timestamp] = value[1]
-                        
-                        # Append the series data to the metric
-                        metric_data[metric].append(series_data)
-                else:
-                    print(f"No data for metric: {metric}")
-            else:
-                raise Exception(f"Failed to fetch data for {metric} from Prometheus: {response.text}")
+        # Cache key generation
+        cache_key = f"{time_filter}_{start_time}_{end_time}_{step}"
+        cached_data = get_cached_data(cache_key)
+        if cached_data:
+            return jsonify(cached_data), 200
+
+        # Fetch all metrics asynchronously
+        results = asyncio.run(fetch_all_metrics(PROMETHEUS_METRICS.values(), start_time, end_time, step))
+
+        # Process the results and populate time_data and metric_data
+        for idx, metric in enumerate(PROMETHEUS_METRICS.keys()):
+            result = results[idx].get('data', {}).get('result', [])
+            if result:
+                metric_data[metric] = []
+                for series in result:
+                    series_data = {
+                        "metric": series.get("metric"),
+                        "values": {}
+                    }
+                    for value in series.get("values", []):
+                        timestamp = datetime.fromtimestamp(float(value[0]), tz=timezone.utc).isoformat()
+                        if timestamp not in time_data:
+                            time_data.append(timestamp)
+                        series_data["values"][timestamp] = value[1]
+                    metric_data[metric].append(series_data)
 
         # Sort the time data for proper alignment
         time_data.sort()
 
-        # Ensure all metric data aligns with time_data
+        # Align data for each metric
         for metric, series_list in metric_data.items():
             for series in series_list:
-                aligned_values = []
-                for timestamp in time_data:
-                    aligned_values.append(series["values"].get(timestamp, None))
+                aligned_values = [series["values"].get(timestamp, None) for timestamp in time_data]
                 series["values"] = aligned_values
 
-        # Return the data as JSON
+        # Prepare the final response
         response_data = {
             "time": time_data,
             **{metric: [{"metric": s["metric"], "values": s["values"]} for s in series_list] for metric, series_list in metric_data.items()},
             "current_time": current_time
         }
 
+        # Cache the response
+        set_cached_data(cache_key, response_data)
+
+        # Return the data as JSON
         return jsonify(response_data), 200
 
     except Exception as e:
         # Handle and log the error for debugging purposes
         return jsonify({'error': 'An error occurred while fetching the graph data', 'details': str(e)}), 500
-
 
 @app.route('/api/v1/targets', methods=['GET'])
 @admin_required

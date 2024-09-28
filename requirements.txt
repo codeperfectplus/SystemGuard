@@ -33,3 +33,9 @@ prometheus_client==0.20.0
 
 # pyyaml for parsing YAML configuration files
 pyyaml==6.0.2
+
+# aiohttp for async HTTP requests
+aiohttp==3.10.7
+
+# flask compress for compressing responses
+Flask-Compress==1.15
