@@ -310,3 +310,23 @@ def ready_prometheus():
             ),
             response.status_code,
         )
+
+# Route to get the current retention time
+@app.route('/api/v1/get-retention', methods=['GET'])
+def get_retention():
+    try:
+        # Fetch current flags from Prometheus
+        response = requests.get(f"{PROMETHEUS_BASE_URL}/api/v1/status/flags")
+        flags = response.json().get('data', {})
+
+        # Get the current value of "storage.tsdb.retention.time"
+        retention_time = flags.get("storage.tsdb.retention.time", "unknown")
+        if retention_time == "0s":
+            retention_time = "Forever"  
+
+        return jsonify({'retention_time': retention_time}), 200
+
+    except requests.RequestException as e:
+        return jsonify({'error': 'Failed to fetch retention time from Prometheus', 'details': str(e)}), 500
+    except Exception as e:
+        return jsonify({'error': 'Failed to retrieve retention time', 'details': str(e)}), 500

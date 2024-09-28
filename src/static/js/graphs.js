@@ -324,7 +324,20 @@ function createCharts(cpuData, timeData, memoryData, batteryData, networkSentDat
     createChart(ctxCurrentTemp, timeData, currentTempDatasets, 'Current Temperature (°C)');
 }
 
+// get data retention days and update the retention days
+
+function getRetentionDays() {
+    fetch('/api/v1/get-retention')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('dataretation').textContent = "Data Retention Days: " + data.retention_time;
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+
 // Fetch initial data when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     fetchDataAndRenderCharts();
+    getRetentionDays(); // Call the function to fetch and display retention days
 });
