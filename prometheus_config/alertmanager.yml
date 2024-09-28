@@ -12,7 +12,7 @@ route:
     - receiver: 'systemguard-webhook'
 
 receivers:
-  
+
   - name: 'systemguard-webhook'
     webhook_configs:
       - send_resolved: true

@@ -25,7 +25,7 @@ groups:
         annotations:
           description: Battery percentage is below 20%.
           summary: Instance {{ $labels.instance }} low battery. Current battery percentage is {{ $value }}%. Charge the device.
-        expr: avg by (instance) (battery_percentage) < 80
+        expr: avg by (instance) (battery_percentage) < 40
         for: 2m
         labels:
           severity: warning

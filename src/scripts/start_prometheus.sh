@@ -22,10 +22,14 @@ NETWORK_NAME="flask-prometheus-net"
 CONTAINER_NAME="prometheus"
 PROMETHEUS_IMAGE="prom/prometheus:v2.55.0-rc.0"
 PROMETHEUS_PORT="9090"
+# SCRIPT_DIR and PWD are different
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROMETHEUS_CONFIG_DIR="$(pwd)/prometheus_config"
 ALERT_RULES_FILE="$PROMETHEUS_CONFIG_DIR/alert_rules.yml"
 PROMETHEUS_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
 PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
+INIT_ALERT_MANAGER_SCRIPT="$SCRIPT_DIR/initialization/init_alertmanager.sh"
+ALERT_MANAGER_SCRIPT="$SCRIPT_DIR/start_alertmanager.sh"
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)
 FLASK_APP_PORT="5050"
 SCRAPING_INTERVAL="10s"
@@ -34,6 +38,14 @@ environment="production"
 job_name="localhost"
 prometheus_username="prometheus_admin"
 prometheus_password="prometheus_password"
+
+# call INIT_ALERT_MANAGER_SCRIPT
+echo "Initializing Alert Manager $INIT_ALERT_MANAGER_SCRIPT"
+bash $INIT_ALERT_MANAGER_SCRIPT
+
+# starting alert manager container
+echo "Starting Alert Manager $ALERT_MANAGER_SCRIPT"
+bash $ALERT_MANAGER_SCRIPT
 
 # Logging function for better readability
 log() {
@@ -111,6 +123,7 @@ run_output=$(docker run -d \
   -v "$ALERT_RULES_FILE:/etc/prometheus/alert_rules.yml" \
   -v "$PROMETHEUS_DATA_DIR:/prometheus" \
   "$PROMETHEUS_IMAGE" 2>&1)
+
 
 # Check if Prometheus started successfully
 if [ $? -eq 0 ]; then
