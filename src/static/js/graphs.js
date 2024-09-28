@@ -12,7 +12,7 @@ function fetchDataAndRenderCharts() {
     console.log('Stored Filter Value:', storedFilterValue);
 
     // Fetch data with the selected time filter
-    fetch(`/api/v1/prometheus/graphs_data?filter=${storedFilterValue}`)
+    fetch(`/api/v1/prometheus/graphs_data/targets?filter=${storedFilterValue}`)
         .then(response => response.json())
         .then(data => {
             const cpuData = data.cpu;
@@ -23,14 +23,13 @@ function fetchDataAndRenderCharts() {
             const dashboardMemoryUsageData = data.dashboard_memory_usage;
             const cpuFrequencyData = data.cpu_frequency;
             const currentTempData = data.current_temp;
-
-            // current time from backend to display
             const currentTime = data.current_time;
             const timeZoneName = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            displayTimeAndTimeZone(currentTime, timeZoneName);
 
             // Format the time data using the currentTime from backend
             const timeData = data.time.map(time => formatDate(time, timeZoneName)); // Use timeZoneName from displayTimeAndTimeZone function
+
+            displayTimeAndTimeZone(currentTime, timeZoneName);
 
             createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData);
         })
@@ -39,47 +38,7 @@ function fetchDataAndRenderCharts() {
 
 // Add event listener to refresh data when filter value changes
 document.getElementById('timeFilter').addEventListener('change', (event) => {
-    // Save the new filter value to local storage
     localStorage.setItem('filterValue', event.target.value);
-    // Fetch data with the new filter value
-    fetchDataAndRenderCharts();
-});
-
-// Initial fetch when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    fetchDataAndRenderCharts();
-});
-
-// Add the refresh button to fetch the data
-document.getElementById('refreshData').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCpuTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshMemoryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshBatteryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshNetworkTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshDashboardMemoryTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCpuFrequencyTime').addEventListener('click', () => {
-    fetchDataAndRenderCharts();
-});
-
-document.getElementById('refreshCurrentTempTime').addEventListener('click', () => {
     fetchDataAndRenderCharts();
 });
 
@@ -129,6 +88,34 @@ function createChart(ctx, labels, datasets, yLabel) {
         ctx.chart.destroy(); // Destroy the existing chart if it exists
     }
 
+    // Ensure the parent element is positioned relatively
+    ctx.canvas.parentNode.style.position = 'relative';
+
+    // add h2 element to the parent node
+    const h2 = document.createElement('h2');
+    h2.innerHTML = `<i class="fas fa-microchip"></i> ${yLabel}`;
+    //css top and left
+    h2.style.position = 'absolute';
+    h2.style.top = '25px';
+    h2.style.left = '30px';
+    ctx.canvas.parentNode.insertBefore(h2, ctx.canvas);
+
+
+    // Create or update download button
+    getOrCreateButton(ctx.canvas.parentNode, 'Download Chart', 'download-button', (e) => {
+        const fileName = `${yLabel.replace(/\s+/g, '_')}_chart.png`; // Dynamic filename
+        console.log('Download button clicked');
+        const link = document.createElement('a');
+        link.href = ctx.chart.toBase64Image();
+        link.download = fileName;
+        link.click();
+    }, { top: '10px', right: '10px' });
+
+    // Create or update refresh button
+    getOrCreateButton(ctx.canvas.parentNode, 'Refresh Data', 'refresh-button', () => {
+        fetchDataAndRenderCharts();
+    }, { top: '10px', right: '200px' });
+
     const allDataPoints = datasets.flatMap(dataset => dataset.data);
     const minY = Math.min(...allDataPoints.filter(value => typeof value === 'number'));
     const maxY = Math.max(...allDataPoints.filter(value => typeof value === 'number'));
@@ -149,26 +136,41 @@ function createChart(ctx, labels, datasets, yLabel) {
             })),
         },
         options: {
-            
+            responsive: true,
             scales: {
                 x: {
-                    type: 'category', 
-                    title: {
-                        display: true,
-                        text: 'Time'
-                    },
+                    type: 'category',
+                    // title: {
+                    //     display: true,
+                    //     text: 'Time',
+                    //     font: {
+                    //         size: 16,
+                    //         weight: 'bold'
+                    //     },
+                    //     padding: { top: 10, left: 0, right: 0, bottom: 0 }
+                    // },
                     ticks: {
-                        autoSkip: true,          
-                        maxTicksLimit: 6,       
-                        maxRotation: 0,         
+                        autoSkip: true,
+                        maxTicksLimit: 6,
+                        maxRotation: 0,
                         minRotation: 0,
+                        padding: 10,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                        
                     }
                 },
                 y: {
-                    beginAtZero: minY < 0 ? false : true, // Adjust y-axis based on data
+                    beginAtZero: minY < 0 ? false : true,
                     title: {
                         display: true,
                         text: yLabel,
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },                        
                     },
                 }
             }
@@ -176,95 +178,150 @@ function createChart(ctx, labels, datasets, yLabel) {
     });
 }
 
+// Helper function to create or retrieve a button
+function getOrCreateButton(parent, text, className, onClick, position) {
+    let button = parent.querySelector(`.${className}`);
+    if (!button) {
+        button = document.createElement('button');
+        button.classList.add(className);
+        button.textContent = text;
+        button.style.position = 'absolute';
+        button.style.zIndex = '5';
+        Object.assign(button.style, position); // Apply positioning styles
+        parent.appendChild(button);
+    }
+    button.onclick = onClick; // Update the click handler
+    return button;
+}
 
 // Function to create charts with the fetched data
 function createCharts(cpuData, timeData, memoryData, batteryData, networkSentData, networkReceivedData, dashboardMemoryUsageData, cpuFrequencyData, currentTempData) {
+
+    // Function to generate dynamic colors based on index
+    function generateColor(index) {
+        const hue = (index * 40) % 360;  // Adjust hue for unique colors
+        return {
+            borderColor: `hsl(${hue}, 70%, 50%)`, // Border color
+            backgroundColor: `hsl(${hue}, 70%, 80%)` // Background color
+        };
+    }
+
     // CPU Usage Chart
     const ctxCpu = document.getElementById('cpuTimeChart').getContext('2d');
-    createChart(ctxCpu, timeData, [{
-        label: 'CPU Usage (%)',
-        data: cpuData,
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'CPU Usage (%)');
+    const cpuDatasets = cpuData.map((cpu, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `CPU Usage (%) ${cpu.metric.instance}`,
+            data: cpu.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxCpu, timeData, cpuDatasets, 'CPU Usage (%)');
 
     // Memory Usage Chart
     const ctxMemory = document.getElementById('memoryTimeChart').getContext('2d');
-    createChart(ctxMemory, timeData, [{
-        label: 'Memory Usage (%)',
-        data: memoryData,
-        borderColor: 'rgba(153, 102, 255, 1)',
-        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'Memory Usage (%)');
+    const memoryDatasets = memoryData.map((memory, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Memory Usage (%) ${memory.metric.instance}`,
+            data: memory.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxMemory, timeData, memoryDatasets, 'Memory Usage (%)');
 
     // Battery Percentage Chart
     const ctxBattery = document.getElementById('batteryTimeChart').getContext('2d');
-    createChart(ctxBattery, timeData, [{
-        label: 'Battery Percentage (%)',
-        data: batteryData,
-        borderColor: 'rgba(255, 159, 64, 1)',
-        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'Battery Percentage (%)');
+    const batteryDatasets = batteryData.map((battery, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Battery Usage (%) ${battery.metric.instance}`,
+            data: battery.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxBattery, timeData, batteryDatasets, 'Power Usage (%)');
 
     // Network Sent & Received Chart
     const ctxNetwork = document.getElementById('networkTimeChart').getContext('2d');
-    createChart(ctxNetwork, timeData, [
-        {
-            label: 'Network Sent (MB)',
-            data: networkSentData,
-            borderColor: 'rgba(255, 99, 132, 1)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            fill: true,
-            tension: 0.4
-        },
-        {
-            label: 'Network Received (MB)',
-            data: networkReceivedData,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            fill: true,
-            tension: 0.4
-        }
-    ], 'Data Transferred (MB)');
+    const networkDatasets = [
+        ...networkSentData.map((networkSent, index) => {
+            const { borderColor, backgroundColor } = generateColor(index);
+            return {
+                label: `Network Sent (MB) ${networkSent.metric.instance}`,
+                data: networkSent.values,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                tension: 0.4
+            };
+        }),
+        ...networkReceivedData.map((networkReceived, index) => {
+            const { borderColor, backgroundColor } = generateColor(index + networkSentData.length);
+            return {
+                label: `Network Received (MB) ${networkReceived.metric.instance}`,
+                data: networkReceived.values,
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                tension: 0.4
+            };
+        })
+    ];
+
+    createChart(ctxNetwork, timeData, networkDatasets, 'Data Transferred (MB)');
 
     // Dashboard Memory Usage Chart
     const ctxDashboardMemory = document.getElementById('dashboardMemoryTimeChart').getContext('2d');
-    createChart(ctxDashboardMemory, timeData, [{
-        label: 'Dashboard Memory Usage (%)',
-        data: dashboardMemoryUsageData,
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'Dashboard Memory Usage (%)');
+    const dashboardMemoryDatasets = dashboardMemoryUsageData.map((dashboardMemory, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Dashboard Memory Usage (%) ${dashboardMemory.metric.instance}`,
+            data: dashboardMemory.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxDashboardMemory, timeData, dashboardMemoryDatasets, 'Dashboard Memory Usage (%)');
 
     // CPU Frequency Chart
     const ctxCpuFrequency = document.getElementById('cpuFrequencyTimeChart').getContext('2d');
-    createChart(ctxCpuFrequency, timeData, [{
-        label: 'CPU Frequency (GHz)',
-        data: cpuFrequencyData,
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'CPU Frequency (GHz)');
+    const cpuFrequencyDatasets = cpuFrequencyData.map((cpuFrequency, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `CPU Frequency (GHz) ${cpuFrequency.metric.instance}`,
+            data: cpuFrequency.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxCpuFrequency, timeData, cpuFrequencyDatasets, 'CPU Frequency (GHz)');
 
     // Current Temperature Chart
     const ctxCurrentTemp = document.getElementById('currentTempTimeChart').getContext('2d');
-    createChart(ctxCurrentTemp, timeData, [{
-        label: 'Current Temperature (°C)',
-        data: currentTempData,
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        fill: true,
-        tension: 0.4
-    }], 'Current Temperature (°C)');
+    const currentTempDatasets = currentTempData.map((currentTemp, index) => {
+        const { borderColor, backgroundColor } = generateColor(index);
+        return {
+            label: `Current Temperature (°C) ${currentTemp.metric.instance}`,
+            data: currentTemp.values,
+            borderColor: borderColor,
+            backgroundColor: backgroundColor,
+            tension: 0.4
+        };
+    });
+
+    createChart(ctxCurrentTemp, timeData, currentTempDatasets, 'Current Temperature (°C)');
 }
 
 // Fetch initial data when the page loads

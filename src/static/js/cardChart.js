@@ -1,3 +1,4 @@
+// show line in the chart
 const maxDataPoints = 500;  // Number of data points to show on the chart
 
 // Generalized function to create and update a line chart

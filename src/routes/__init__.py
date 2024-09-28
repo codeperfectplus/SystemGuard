@@ -20,5 +20,32 @@ from src.routes.experimental import experimental_bp
 from src.routes.error_handlers import error_handlers_bp
 from src.routes.profile import profile_bp
 from src.routes.prometheus import prometheus_bp
-from src.routes.alert import alert_bp
+from src.routes.alert_route import alert_bp
 from src.routes.update_webhooks import webhooks_bp
+
+__all__ = [
+    "cpu_info_bp",
+    "disk_info_bp",
+    "dashboard_bp",
+    "memory_info_bp",
+    "network_info_bp",
+    "settings_bp",
+    "speedtest_bp",
+    "process_bp",
+    "auth_bp",
+    "network_bp",
+    "other_bp",
+    "smtp_email_config_bp",
+    "user_management_bp",
+    "graphs_bp",
+    "ping_bp",
+    "firewall_bp",
+    "health_bp",
+    "api_bp",
+    "experimental_bp",
+    "error_handlers_bp",
+    "profile_bp",
+    "prometheus_bp",
+    "alert_bp",
+    "webhooks_bp",
+]
