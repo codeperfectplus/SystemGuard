@@ -58,39 +58,6 @@ def process_alert(alert):
     log_alert(severity, alert_name, instance, description, summary)
     notify_alert(alert_name, instance, severity, description, summary)
 
-@app.route('/process_alert', methods=['GET'])
-def process_alert():
-    """
-    Handles an individual alert by extracting necessary details and 
-    triggering logging and notification mechanisms.
-
-    Args:
-        alert (dict): The alert payload containing labels and annotations.
-    """
-    alert = {
-        "labels": {
-            "alertname": "Test Alert",
-            "instance": "Test Instance",
-            "severity": "info"
-        },
-        "annotations": {
-            "description": "Test description",
-            "summary": "Test summary"
-        }
-
-    }
-    alert_name = alert['labels'].get('alertname', 'Unknown Alert')
-    instance = alert['labels'].get('instance', 'Unknown Instance')
-    severity = alert['labels'].get('severity', 'info')
-    description = alert['annotations'].get('description', 'No description provided')
-    summary = alert['annotations'].get('summary', 'No summary provided')
-
-    log_alert(severity, alert_name, instance, description, summary)
-    notify_alert(alert_name, instance, severity, description, summary)
-
-    return jsonify({"status": "success"}), 200
-
-
 def log_alert(severity, alert_name, instance, description, summary):
     """
     Logs the alert message with the appropriate log level based on its severity.
@@ -136,7 +103,6 @@ def notify_alert(alert_name, instance, severity, description, summary):
     notification_settings_instance = NotificationSettings()
     notification_config = notification_settings_instance.to_dict()
 
-    logger.info(notification_config)    
     slack_webhook = notification_config.get('slack_webhook_url')
     is_slack_alert_enabled = notification_config.get('is_slack_alert_enabled')
     if slack_webhook and is_slack_alert_enabled:

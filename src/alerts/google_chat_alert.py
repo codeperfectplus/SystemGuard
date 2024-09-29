@@ -1,5 +1,6 @@
 import requests
 import json
+from src.logger import logger
 
 def send_google_chat_alert(webhook_url, alert_name, instance, severity, description, summary="Prometheus Alert"):
     """
@@ -60,10 +61,10 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
 
     # Check if the request was successful
     if response.status_code == 200:
-        print("Message sent successfully to Google Chat!")
+        logger.info(f"Alert sent to Google Chat - {alert_name} - {instance}")
     else:
-        print(f"Failed to send message. Status code: {response.status_code}")
-        print(f"Response: {response.text}")
+        logger.error(f"Failed to send message. Status code: {response.status_code}")
+        logger.error(f"Response: {response.text}")
 
 # Example usage:
 # webhook_url = "https://chat.googleapis.com/v1/spaces/XXXXXX/messages?key=XXXXX&token=XXXXX"

@@ -51,8 +51,6 @@ def send_smtp_email(receiver_email, subject, body, attachment_paths=None,
     SMTP_SERVER = smtp_settings.smtp_server
     SMTP_PORT = smtp_settings.smtp_port
     EMAIL_FROM = smtp_settings.email_from
-
-    logger.info(f"Sending email to {receiver_email}")
     
     for email in receiver_email:
         try:
@@ -96,6 +94,6 @@ def send_smtp_email(receiver_email, subject, body, attachment_paths=None,
                 server.login(USERNAME, EMAIL_PASSWORD)
                 server.sendmail(EMAIL_FROM, email, msg.as_string())
 
-            logger.info(f"Email sent successfully to {email}")
+            logger.info(f"Alert sent to {email} via SMTP email.")
         except Exception as e:
             logger.error(f"Failed to send email to {email}. Error: {str(e)}")

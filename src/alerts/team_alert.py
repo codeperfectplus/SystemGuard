@@ -1,5 +1,7 @@
 import requests
 import json
+from src.logger import logger
+
 
 def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary="Prometheus Alert"):
     """
@@ -41,21 +43,7 @@ def send_teams_alert(webhook_url, alert_name, instance, severity, description, s
 
     # Check if the request was successful
     if response.status_code == 200:
-        print("Alert sent successfully to Microsoft Teams!")
+        logger.info(f"Alert sent successfully to Microsoft Teams! Alert: {alert_name}, Instance: {instance}, Severity: {severity}")
     else:
-        print(f"Failed to send alert. Status code: {response.status_code}")
-        print(f"Response: {response.text}")
-
-# Example usage:
-# if __name__ == "__main__":
-#     # Replace with your Microsoft Teams webhook URL
-#     webhook_url = "https://outlook.office.com/webhook/YOUR_WEBHOOK_URL"
-    
-#     # Define the alert details
-#     alert_name = "CPU Usage High"
-#     instance = "server-01"
-#     severity = "critical"
-#     description = "CPU usage is over 90% for more than 5 minutes."
-
-#     # Send the alert
-#     send_teams_alert(webhook_url, alert_name, instance, severity, description)
+        logger.error(f"Failed to send alert. Status code: {response.status_code}")
+        logger.error(f"Response: {response.text}")

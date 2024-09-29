@@ -27,7 +27,7 @@ DB_DIR = os.path.join(HOME_DIR, ".database")
 os.makedirs(DB_DIR, exist_ok=True)
 
 # Configure the SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 # app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
