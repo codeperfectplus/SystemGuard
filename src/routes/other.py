@@ -6,7 +6,7 @@ from flask_login import login_required
 from src.models import GeneralSettings
 from src.config import app
 from src.routes.helper.common_helper import get_email_addresses
-from src.alerts import send_smtp_email
+from src.alert_manager import send_smtp_email
 from src.utils import get_os_release_info, get_os_info
 from src.helper import check_installation_information
 from src.routes.helper.common_helper import admin_required

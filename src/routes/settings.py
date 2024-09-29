@@ -8,7 +8,7 @@ from src.config import app, db
 from src.models import UserCardSettings, UserDashboardSettings, GeneralSettings, PageToggleSettings
 from flask_login import login_required, current_user
 from src.utils import render_template_from_file, ROOT_DIR
-from src.alerts import send_smtp_email
+from src.alert_manager import send_smtp_email
 from src.routes.helper.common_helper import (
     get_email_addresses, 
     admin_required, 
