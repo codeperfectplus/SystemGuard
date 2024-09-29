@@ -1,4 +1,5 @@
 import requests
+from src.logger import logger
 
 def send_telegram_message(bot_token, chat_id, message):
     """
@@ -23,17 +24,6 @@ def send_telegram_message(bot_token, chat_id, message):
     
     # Check if the request was successful
     if response.status_code == 200:
-        print("Message sent successfully!")
+        logger("Alert sent to Telegram.")
     else:
-        print(f"Failed to send message. Error code: {response.status_code}")
-        print("Response:", response.json())
-
-# Example usage:
-# if __name__ == "__main__":
-#     # Replace these with your bot's token and chat ID
-#     bot_token = "YOUR_BOT_TOKEN_HERE"
-#     chat_id = "YOUR_CHAT_ID_HERE"
-#     message = "Hello! This is a test message from my Python script."
-
-#     # Call the function to send the message
-#     send_telegram_message(bot_token, chat_id, message)
+        logger.error(f"Failed to send message. Error code: {response.status_code}")

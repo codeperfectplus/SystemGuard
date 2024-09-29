@@ -34,8 +34,9 @@ def login():
         remember_me = request.form.get("remember_me") == "on"  # TODO: Implement remember me
         
 
-        user = UserProfile.query.filter_by(username=username).first()
-    
+        user = UserProfile.query.filter(
+            (UserProfile.username == username) | (UserProfile.email == username)
+        ).first()
         if user and check_password_hash(user.password, password):
             login_user(user, remember=remember_me)
 

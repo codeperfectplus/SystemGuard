@@ -139,17 +139,8 @@ def send_slack_alert_wrapper(config, alert_name, instance, severity, description
     """
     slack_webhook = config.get("slack_webhook_url")
     if slack_webhook:
-        send_slack_alert(
-            slack_webhook,
-            title=alert_name,
-            message=summary,
-            fields=[
-                {"title": "Instance", "value": instance, "short": True},
-                {"title": "Severity", "value": severity, "short": True},
-                {"title": "Description", "value": description, "short": False},
-            ],
-        )
-
+        send_slack_alert(slack_webhook, alert_name, instance, severity, description, summary)
+          
 
 def send_email_alert_wrapper(alert_name, instance, severity, description, summary):
     """
@@ -232,14 +223,14 @@ def notify_alert(alert_name, instance, severity, description, summary):
     if is_enabled(notification_config, "is_email_alert_enabled"):
         send_email_alert_wrapper(alert_name, instance, severity, description, summary)
 
-    # if is_enabled(notification_config, "is_slack_alert_enabled"):
-    #     send_slack_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+    if is_enabled(notification_config, "is_slack_alert_enabled"):
+        send_slack_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
 
-    # if is_enabled(notification_config, "is_discord_alert_enabled"):
-    #     send_discord_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+    if is_enabled(notification_config, "is_discord_alert_enabled"):
+        send_discord_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
 
-    # if is_enabled(notification_config, "is_teams_alert_enabled"):
-    #     send_teams_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+    if is_enabled(notification_config, "is_teams_alert_enabled"):
+        send_teams_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
 
-    # if is_enabled(notification_config, "is_google_chat_alert_enabled"):
-    #     send_google_chat_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)
+    if is_enabled(notification_config, "is_google_chat_alert_enabled"):
+        send_google_chat_alert_wrapper(notification_config, alert_name, instance, severity, description, summary)

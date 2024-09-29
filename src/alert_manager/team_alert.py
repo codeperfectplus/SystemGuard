@@ -3,7 +3,7 @@ import json
 from src.logger import logger
 
 
-def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary="Prometheus Alert"):
+def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary):
     """
     Sends a Prometheus alert to a Microsoft Teams channel using a webhook.
 
@@ -43,7 +43,7 @@ def send_teams_alert(webhook_url, alert_name, instance, severity, description, s
 
     # Check if the request was successful
     if response.status_code == 200:
-        logger.info(f"Alert sent successfully to Microsoft Teams! Alert: {alert_name}, Instance: {instance}, Severity: {severity}")
+        logger.info(f"Alert sent successfully to Microsoft Teams!")
     else:
         logger.error(f"Failed to send alert. Status code: {response.status_code}")
         logger.error(f"Response: {response.text}")

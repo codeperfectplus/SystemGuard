@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 from src.logger import logger
 
@@ -18,40 +19,37 @@ def send_discord_alert(webhook_url, alert_name, instance, severity, description,
     """
     
     # Constructing the message to send to Discord
-    message = {
-        "content": f"**{alert_name}**\n"
-                   f"**Instance:** {instance}\n"
-                   f"**Severity:** {severity}\n"
-                   f"**Summary:** {summary}\n"
-                   f"**Description:** {description}"
+    color_dict = {
+        "critical": 16711680,  # Red
+        "warning": 16776960,  # Yellow
+        "info": 65280  # Green
     }
-
-    # Sending the message to Discord
-    try:
-        response = requests.post(webhook_url, json=message)
-        response.raise_for_status()  # Raise an error for bad responses
-        logger.info(f"Alert sent to Discord: {alert_name} - {instance}")
-        return True
-    except requests.exceptions.HTTPError as http_err:
-        logger.error(f"HTTP error occurred while sending alert: {http_err}")
-    except Exception as err:
-        logger.error(f"An error occurred while sending alert: {err}")
-
-    return False
-
-# # Example usage
-# if __name__ == "__main__":
-#     webhook_url = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
+    message = {
+        "embeds": [
+            {
+                "title": f"🚨 **{alert_name}** 🚨",
+                "color": color_dict.get(severity, 0),
+                "fields": [
+                    {"name": "Instance", "value": instance, "inline": True},
+                    {"name": "Severity", "value": severity, "inline": True},
+                    {"name": "Description", "value": description, "inline": False},
+                    {"name": "Summary", "value": summary, "inline": False}
+                ],
+                "footer": {
+                    "text": "System Guard Alert"
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        ]
+    }
     
-#     # Sample alert data
-#     alert_name = "High CPU Usage"
-#     instance = "server1"
-#     severity = "critical"
-#     description = "CPU usage has exceeded 90%"
-#     summary = "High CPU usage detected"
-    
-#     success = send_alert_to_discord(webhook_url, alert_name, instance, severity, description, summary)
-#     if success:
-#         logger.info("Alert sent successfully.")
-#     else:
-#         logger.error("Failed to send alert.")
+    # Send the POST request to the Discord webhook URL
+    response = requests.post(webhook_url, json=message)
+
+    # Check the response status
+    if response.status_code != 204:
+        logger.error(f"Failed to send alert to Discord: {response.status_code}, {response.text}")
+        return False
+
+    logger.info(f"Alert sent to Discord: {alert_name}")
+    return True
