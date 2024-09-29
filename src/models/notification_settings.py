@@ -14,6 +14,12 @@ class NotificationSettings(BaseModel):
     telegram_webhook_url = db.Column(db.String(150), nullable=False)
     telegram_chat_id = db.Column(db.String(150), nullable=False)
 
+    is_email_alert_enabled = db.Column(db.Boolean, default=False)
+    is_slack_alert_enabled = db.Column(db.Boolean, default=False)
+    is_discord_alert_enabled = db.Column(db.Boolean, default=False)
+    is_teams_alert_enabled = db.Column(db.Boolean, default=False)
+    is_google_chat_alert_enabled = db.Column(db.Boolean, default=False)
+    is_telegram_alert_enabled = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<NotificationSettings (Slack: {self.slack_webhook_url})>"

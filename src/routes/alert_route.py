@@ -4,6 +4,8 @@ from src.logger import logger
 from src.alerts import send_slack_alert, send_smtp_email, send_discord_alert, send_teams_alert
 from src.models import NotificationSettings
 from src.routes.helper.common_helper import get_email_addresses
+from src.routes.helper.notification_helper import send_test_alert
+from src.utils import get_ip_address
 
 alert_bp = Blueprint('alert', __name__)
 
@@ -78,6 +80,15 @@ def log_alert(severity, alert_name, instance, description, summary):
     }.get(severity, logger.info)
     log_method(message)
 
+@app.route('/alerts/test', methods=['GET'])
+def test_alert():
+    alertmanager_ip = get_ip_address()
+    alertmanager_port = "9093"
+    alertmanager_url = f"http://{alertmanager_ip}:{alertmanager_port}"
+
+    # Send a test alert with a unique name
+    response = send_test_alert(alertmanager_url, "Test Alert", "info", "Test Instance")
+    return jsonify(response), response.get("status", 500)
 
 def notify_alert(alert_name, instance, severity, description, summary):
     """
@@ -90,8 +101,12 @@ def notify_alert(alert_name, instance, severity, description, summary):
         description (str): Detailed description of the alert.
         summary (str): Brief summary of the alert.
     """
-    slack_webhook = NotificationSettings.get_slack_webhook_url()
-    if slack_webhook:
+    notification_settings_instance = NotificationSettings()
+    notification_config = notification_settings_instance.to_dict()
+    
+    slack_webhook = notification_config.get('slack_webhook_url')
+    is_slack_alert_enabled = notification_config.get('enable_slack')
+    if slack_webhook and is_slack_alert_enabled:
         send_slack_alert(
             slack_webhook,
             title=alert_name,
@@ -104,7 +119,9 @@ def notify_alert(alert_name, instance, severity, description, summary):
         )
 
     admin_emails = get_email_addresses(user_level="admin", receive_email_alerts=True)
-    if admin_emails:
+    is_email_alert_enabled = notification_config.get('is_email_alert_enabled')
+    # todo: add option to bypass email alerts for specific alerts
+    if admin_emails and is_email_alert_enabled:
         send_smtp_email(
             receiver_email=admin_emails,
             subject=f"{alert_name} Alert",
@@ -112,10 +129,13 @@ def notify_alert(alert_name, instance, severity, description, summary):
             is_html=False
         )
 
-    discord_webhook = NotificationSettings.get_discord_webhook_url()
-    if discord_webhook:
+    discord_webhook = notification_config.get('discord_webhook_url')
+    is_discord_alert_enabled = notification_config.get('is_discord_alert_enabled')
+    if discord_webhook and is_discord_alert_enabled:
         send_discord_alert(discord_webhook, alert_name, instance, severity, description, summary)
 
-    teams_webhook_url = NotificationSettings.get_teams_webhook_url()
-    if teams_webhook_url:
+
+    teams_webhook_url = notification_config.get('teams_webhook_url')
+    is_teams_alert_enabled = notification_config.get('is_teams_alert_enabled')
+    if teams_webhook_url and is_teams_alert_enabled:
         send_teams_alert(teams_webhook_url, alert_name, instance, severity, description, summary)

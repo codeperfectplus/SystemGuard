@@ -35,6 +35,31 @@
                 <label for="telegram_chat_id">Telegram Chat ID:</label>
                 <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" value="{{ webhook_settings.telegram_chat_id }}">
             </div>
+            <div class="form-group">
+                <label for="email_alert_enabled">Enable Email Alerts:</label>
+                <input type="checkbox" id="is_email_alert_enabled" name="is_email_alert_enabled" {% if webhook_settings.is_email_alert_enabled %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="slack_alert_enabled">Enable Slack Alerts:</label>
+                <input type="checkbox" id="is_slack_alert_enabled" name="is_slack_alert_enabled" {% if webhook_settings.is_slack_alert_enabled %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="discord_alert_enabled">Enable Discord Alerts:</label>
+                <input type="checkbox" id="is_discord_alert_enabled" name="is_discord_alert_enabled" {% if webhook_settings.is_discord_alert_enabled %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="teams_alert_enabled">Enable Microsoft Teams Alerts:</label>
+                <input type="checkbox" id="is_teams_alert_enabled" name="is_teams_alert_enabled" {% if webhook_settings.is_teams_alert_enabled %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="google_chat_alert_enabled">Enable Google Chat Alerts:</label>
+                <input type="checkbox" id="is_google_chat_alert_enabled" name="is_google_chat_alert_enabled" {% if webhook_settings.is_google_chat_alert_enabled %}checked{% endif %}>
+            </div>
+            <div class="form-group">
+                <label for="telegram_alert_enabled">Enable Telegram Alerts:</label>
+                <input type="checkbox" id="is_telegram_alert_enabled" name="is_telegram_alert_enabled" {% if webhook_settings.is_telegram_alert_enabled %}checked{% endif %}>
+            </div>
+           
             <button type="submit" class="btn btn-primary">Update Webhooks</button>
         </form>
     </div>
