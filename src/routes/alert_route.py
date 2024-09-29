@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.config import app
 from src.logger import logger
-from src.alerts import send_slack_alert, send_smtp_email, send_discord_alert, send_teams_alert
+from src.alerts import send_slack_alert, send_smtp_email, send_discord_alert, send_teams_alert, send_google_chat_alert
 from src.models import NotificationSettings
 from src.routes.helper.common_helper import get_email_addresses
 from src.routes.helper.notification_helper import send_test_alert
@@ -138,3 +138,9 @@ def notify_alert(alert_name, instance, severity, description, summary):
     is_teams_alert_enabled = notification_config.get('is_teams_alert_enabled')
     if teams_webhook_url and is_teams_alert_enabled:
         send_teams_alert(teams_webhook_url, alert_name, instance, severity, description, summary)
+
+    # send_google_chat_alert(webhook_url, alert_name, instance, severity, description, summary="Prometheus Alert"):
+    google_chat_webhook_url = notification_config.get('google_chat_webhook_url')
+    is_google_chat_alert_enabled = notification_config.get('is_google_chat_alert_enabled')
+    if google_chat_webhook_url and is_google_chat_alert_enabled:
+        send_google_chat_alert(google_chat_webhook_url, alert_name, instance, severity, description, summary)
