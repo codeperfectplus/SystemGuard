@@ -19,9 +19,10 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
         "cards": [
             {
                 "header": {
-                    "title": summary,
+                    "title": "SystemGuard Alert",
                     "subtitle": f"Alert: {alert_name}",
-                    "imageUrl": "https://example.com/icon.png" # systemguru icon
+                    "imageUrl": "https://developers.google.com/chat/images/chat-product-icon.png",
+                    "imageStyle": "IMAGE"
                 },
                 "sections": [
                     {
@@ -29,20 +30,23 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
                             {
                                 "keyValue": {
                                     "topLabel": "Instance",
-                                    "content": instance
+                                    "content": instance,
                                 }
                             },
                             {
                                 "keyValue": {
                                     "topLabel": "Severity",
                                     "content": severity,
-                                    "icon": None
                                 }
                             },
                             {
-                                "keyValue": {
-                                    "topLabel": "Description",
-                                    "content": description
+                                "textParagraph": {
+                                    "text": f"<b>Description:</b> {description}"
+                                }
+                            },
+                            {
+                                "textParagraph": {
+                                    "text": f"<b>Summary:</b> {summary}"
                                 }
                             }
                         ]
