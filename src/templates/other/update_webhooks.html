@@ -59,6 +59,10 @@
                 <label for="telegram_alert_enabled">Enable Telegram Alerts:</label>
                 <input type="checkbox" id="is_telegram_alert_enabled" name="is_telegram_alert_enabled" {% if webhook_settings.is_telegram_alert_enabled %}checked{% endif %}>
             </div>
+            <div class="form-group">
+                <label for="enable_all_alerts">Enable Alerts(Master Alert)</label>
+                <input type="checkbox" id="enable_all_alerts" name="enable_all_alerts" {% if enable_all_alerts %}checked{% endif %}>
+            </div>
            
             <button type="submit" class="btn btn-primary">Update Webhooks</button>
         </form>
