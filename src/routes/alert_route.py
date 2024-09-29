@@ -105,7 +105,7 @@ def notify_alert(alert_name, instance, severity, description, summary):
     notification_config = notification_settings_instance.to_dict()
     
     slack_webhook = notification_config.get('slack_webhook_url')
-    is_slack_alert_enabled = notification_config.get('enable_slack')
+    is_slack_alert_enabled = notification_config.get('is_slack_alert_enabled')
     if slack_webhook and is_slack_alert_enabled:
         send_slack_alert(
             slack_webhook,
