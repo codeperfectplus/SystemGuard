@@ -17,7 +17,7 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
             },
             "annotations": {
                 "description": f"This is a test alert generated at {time.strftime('%Y-%m-%d %H:%M:%S')}",
-                "summary": "Test alert to check Slack notifications",
+                "summary": "SystemGuards Test Alert Verification",
             },
         }
     ]

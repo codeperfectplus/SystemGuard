@@ -21,7 +21,7 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
                 "header": {
                     "title": summary,
                     "subtitle": f"Alert: {alert_name}",
-                    "imageUrl": "https://example.com/icon.png"  # Optionally, replace with a relevant icon
+                    "imageUrl": "https://example.com/icon.png" # systemguru icon
                 },
                 "sections": [
                     {
@@ -36,7 +36,7 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
                                 "keyValue": {
                                     "topLabel": "Severity",
                                     "content": severity,
-                                    "icon": "ALERT"
+                                    "icon": None
                                 }
                             },
                             {
@@ -63,9 +63,5 @@ def send_google_chat_alert(webhook_url, alert_name, instance, severity, descript
     if response.status_code == 200:
         logger.info(f"Alert sent to Google Chat - {alert_name} - {instance}")
     else:
-        logger.error(f"Failed to send message. Status code: {response.status_code}")
+        logger.error(f"Failed to send message to Google Chat. Status code: {response.status_code}")
         logger.error(f"Response: {response.text}")
-
-# Example usage:
-# webhook_url = "https://chat.googleapis.com/v1/spaces/XXXXXX/messages?key=XXXXX&token=XXXXX"
-# send_google_chat_alert(webhook_url, "CPU High Usage", "server-01", "critical", "The CPU usage is above 90% for 5 minutes.", "Prometheus Alert")
