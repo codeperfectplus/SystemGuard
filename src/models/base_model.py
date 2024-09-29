@@ -12,9 +12,6 @@ class BaseModel(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def to_dict(self):
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
-
     @classmethod
     def get_all(cls):
         return cls.query.all()
