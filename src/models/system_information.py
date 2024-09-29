@@ -1,9 +1,10 @@
 import datetime
 
 from src.config import db
+from src.models.base_model import BaseModel
 
 
-class SystemInformation(db.Model):
+class SystemInformation(BaseModel):
     """
     System information model for the application
     ---

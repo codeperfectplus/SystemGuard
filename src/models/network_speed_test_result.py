@@ -1,8 +1,10 @@
 import datetime
 
 from src.config import db
+from src.models.base_model import BaseModel
 
-class NetworkSpeedTestResult(db.Model):
+
+class NetworkSpeedTestResult(BaseModel):
     """
     Network speed test result model for the application
     ---

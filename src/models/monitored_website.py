@@ -1,7 +1,8 @@
 from src.config import db
+from src.models.base_model import BaseModel
 
 
-class MonitoredWebsite(db.Model):
+class MonitoredWebsite(BaseModel):
     """
     Monitored website model for the application
     ---

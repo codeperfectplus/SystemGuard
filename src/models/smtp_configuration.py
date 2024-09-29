@@ -1,6 +1,8 @@
 from src.config import db
+from src.models.base_model import BaseModel
 
-class SMTPSettings(db.Model):
+
+class SMTPSettings(BaseModel):
     """
     SMTP settings model for the application
     ---

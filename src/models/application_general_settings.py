@@ -1,6 +1,7 @@
 from src.config import db
+from src.models.base_model import BaseModel
 
-class GeneralSettings(db.Model):
+class GeneralSettings(BaseModel):
     """
     General settings model for the application
     ---

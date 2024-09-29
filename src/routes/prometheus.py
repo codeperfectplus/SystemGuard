@@ -41,7 +41,8 @@ ALERTMANAGER_BASE_URL = "http://localhost:9093"
 @lru_cache(maxsize=128)
 def get_user_by_username(username):
     print("Querying the database...")
-    return UserProfile.query.filter_by(username=username).first()
+    # return UserProfile.query.filter_by(username=username).first()
+    return UserProfile.get_by_username(username)
 
 
 # Verify user login information

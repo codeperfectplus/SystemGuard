@@ -1,10 +1,9 @@
+from src.models.base_model import BaseModel
 from src.config import db
 
-class NotificationSettings(db.Model):
+class NotificationSettings(BaseModel):
     """
-    slack_webhook_url: the webhook URL for the Slack channel
-    discord_webhook_url: the webhook URL for the Discord channel
-    teams_webhook_url: the webhook URL for the Microsoft Teams channel
+    Notification settings for Slack, Discord, and Teams.
     """
 
     id = db.Column(db.Integer, primary_key=True)
@@ -14,32 +13,7 @@ class NotificationSettings(db.Model):
 
     def __repr__(self):
         return f"<NotificationSettings (Slack: {self.slack_webhook_url})>"
-    
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "slack_webhook_url": self.slack_webhook_url,
-            "discord_webhook_url": self.discord_webhook_url,
-            "teams_webhook_url": self.teams_webhook_url
-        }
-    
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    @staticmethod
-    def get_all():
-        return NotificationSettings.query.all()
-    
-    @staticmethod
-    def get_by_id(notification_id):
-        return NotificationSettings.query.get(notification_id)
-    
-    # get slack webhook url
     @staticmethod
     def get_slack_webhook_url():
         return NotificationSettings.query.first().slack_webhook_url
@@ -47,7 +21,7 @@ class NotificationSettings(db.Model):
     @staticmethod
     def get_discord_webhook_url():
         return NotificationSettings.query.first().discord_webhook_url
-    
+
     @staticmethod
     def get_teams_webhook_url():
         return NotificationSettings.query.first().teams_webhook_url

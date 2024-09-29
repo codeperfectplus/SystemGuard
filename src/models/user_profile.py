@@ -1,8 +1,12 @@
 from flask_login import UserMixin
+from werkzeug.security import check_password_hash
+
 
 from src.config import db
+from src.models.base_model import BaseModel
 
-class UserProfile(db.Model, UserMixin):
+
+class UserProfile(BaseModel, UserMixin):
     """
     User profile model for the application
     ---
@@ -29,3 +33,25 @@ class UserProfile(db.Model, UserMixin):
     dashboard_settings = db.relationship('UserDashboardSettings', backref='user', uselist=False)
     card_settings = db.relationship('UserCardSettings', backref='user', uselist=False)
 
+    def __repr__(self):
+        return f"<UserProfile {self.username}>"
+    
+    @staticmethod
+    def get_by_username(username):
+        return UserProfile.query.filter_by(username=username).first()
+    
+    @staticmethod
+    def get_by_email(email):
+        return UserProfile.query.filter_by(email=email).first()
+    
+    @staticmethod
+    def get_by_id(id):
+        return UserProfile.query.get(id)
+    
+    @staticmethod
+    def get_all():
+        return UserProfile.query.all()
+    
+    # check_hashed_password
+    def check_password(self, password):
+        return check_password_hash(self.password, password)

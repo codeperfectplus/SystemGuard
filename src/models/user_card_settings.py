@@ -1,7 +1,7 @@
 from src.config import db
+from src.models.base_model import BaseModel
 
-
-class UserCardSettings(db.Model):
+class UserCardSettings(BaseModel):
     """
     User card settings model for the application
     ---

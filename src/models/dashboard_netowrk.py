@@ -1,7 +1,8 @@
 from src.config import db
+from src.models.base_model import BaseModel
 
 
-class DashboardNetworkSettings(db.Model):
+class DashboardNetworkSettings(BaseModel):
     """
     Dashboard network settings model for the application
     ---

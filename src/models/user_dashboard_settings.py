@@ -1,7 +1,9 @@
 
 from src.config import db
+from src.models.base_model import BaseModel
 
-class UserDashboardSettings(db.Model):
+
+class UserDashboardSettings(BaseModel):
     """
     User dashboard settings model for the application
     ---
