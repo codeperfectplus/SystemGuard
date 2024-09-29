@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+            font-size: 24px;
+        }
+        p {
+            font-size: 16px;
+            color: #555;
+        }
+        .alert-details {
+            background-color: #f9f9f9;
+            border-left: 4px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .alert-item {
+            margin: 10px 0;
+        }
+        .alert-item strong {
+            color: #333;
+        }
+        .severity {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .footer {
+            font-size: 12px;
+            color: #aaa;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h2>⚠️ Alert Notification: {{ alert_name }}</h2>
+
+        <p>Hello,</p>
+        <p>An alert has been triggered with the following details:</p>
+
+        <div class="alert-details">
+            <div class="alert-item">
+                <strong>Instance:</strong> {{ instance }}
+            </div>
+            <div class="alert-item">
+                <strong>Severity:</strong> <span class="severity">{{ severity }}</span>
+            </div>
+            <div class="alert-item">
+                <strong>Description:</strong> {{ description }}
+            </div>
+            <div class="alert-item">
+                <strong>Summary:</strong> {{ summary }}
+            </div>
+            
+        </div>
+
+        <p>Please take the necessary action as soon as possible.</p>
+
+        <p>Best regards,<br>SystemGuard Team</p>
+
+        <div class="footer">
+            <p>If you have any questions, feel free to contact our support team.</p>
+        </div>
+    </div>
+</body>
+</html>

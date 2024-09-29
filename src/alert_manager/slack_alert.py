@@ -41,4 +41,4 @@ def send_slack_alert(webhook_url, message, title="System Alert", color="#36a64f"
     if response.status_code != 200:
         raise Exception(f"Request to Slack failed with status code {response.status_code}, response: {response.text}")
     
-    logger.info(f"Notification sent to Slack - {title} - {message}") 
+    logger.info(f"Alert sent to Slack - {title} - {message}") 
