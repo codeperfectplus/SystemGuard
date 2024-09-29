@@ -10,6 +10,10 @@ class NotificationSettings(BaseModel):
     slack_webhook_url = db.Column(db.String(150), nullable=False)
     discord_webhook_url = db.Column(db.String(150), nullable=False)
     teams_webhook_url = db.Column(db.String(150), nullable=False)
+    google_chat_webhook_url = db.Column(db.String(150), nullable=False)
+    telegram_webhook_url = db.Column(db.String(150), nullable=False)
+    telegram_chat_id = db.Column(db.String(150), nullable=False)
+
 
     def __repr__(self):
         return f"<NotificationSettings (Slack: {self.slack_webhook_url})>"
@@ -25,3 +29,15 @@ class NotificationSettings(BaseModel):
     @staticmethod
     def get_teams_webhook_url():
         return NotificationSettings.query.first().teams_webhook_url
+    
+    @staticmethod
+    def get_google_chat_webhook_url():
+        return NotificationSettings.query.first().google_chat_webhook_url
+    
+    @staticmethod
+    def get_telegram_webhook_url():
+        return NotificationSettings.query.first().telegram_webhook_url
+    
+    @staticmethod
+    def get_telegram_chat_id():
+        return NotificationSettings.query.first().telegram_chat_id

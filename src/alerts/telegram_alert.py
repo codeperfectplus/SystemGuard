@@ -29,11 +29,11 @@ def send_telegram_message(bot_token, chat_id, message):
         print("Response:", response.json())
 
 # Example usage:
-if __name__ == "__main__":
-    # Replace these with your bot's token and chat ID
-    bot_token = "YOUR_BOT_TOKEN_HERE"
-    chat_id = "YOUR_CHAT_ID_HERE"
-    message = "Hello! This is a test message from my Python script."
+# if __name__ == "__main__":
+#     # Replace these with your bot's token and chat ID
+#     bot_token = "YOUR_BOT_TOKEN_HERE"
+#     chat_id = "YOUR_CHAT_ID_HERE"
+#     message = "Hello! This is a test message from my Python script."
 
-    # Call the function to send the message
-    send_telegram_message(bot_token, chat_id, message)
+#     # Call the function to send the message
+#     send_telegram_message(bot_token, chat_id, message)

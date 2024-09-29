@@ -3,6 +3,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/update_webhooks.css') }}">
+
 {% endblock %}
 
 {% block content %}
@@ -21,6 +22,18 @@
             <div class="form-group">
                 <label for="teams_webhook_url">Microsoft Teams Webhook URL:</label>
                 <input type="url" class="form-control" id="teams_webhook_url" name="teams_webhook_url" value="{{ webhook_settings.teams_webhook_url }}">
+            </div>
+            <div class="form-group">
+                <label for="google_chat_webhook_url">Google Chat Webhook URL:</label>
+                <input type="url" class="form-control" id="google_chat_webhook_url" name="google_chat_webhook_url" value="{{ webhook_settings.google_chat_webhook_url }}">
+            </div>
+            <div class="form-group">
+                <label for="telegram_webhook_url">Telegram Webhook URL:</label>
+                <input type="url" class="form-control" id="telegram_webhook_url" name="telegram_webhook_url" value="{{ webhook_settings.telegram_webhook_url }}">
+            </div>
+            <div class="form-group">
+                <label for="telegram_chat_id">Telegram Chat ID:</label>
+                <input type="text" class="form-control" id="telegram_chat_id" name="telegram_chat_id" value="{{ webhook_settings.telegram_chat_id }}">
             </div>
             <button type="submit" class="btn btn-primary">Update Webhooks</button>
         </form>

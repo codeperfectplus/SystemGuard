@@ -1,25 +1,34 @@
 import requests
 import json
 
-def send_teams_message(webhook_url, message_title="SystemGuard Alert", message_body=""):
+def send_teams_alert(webhook_url, alert_name, instance, severity, description, summary="Prometheus Alert"):
     """
-    Sends a message to a Microsoft Teams channel using a webhook.
+    Sends a Prometheus alert to a Microsoft Teams channel using a webhook.
 
     Parameters:
     webhook_url (str): The webhook URL of the Teams channel.
-    message_title (str): The title of the message (appears bold).
-    message_body (str): The content/body of the message.
+    alert_name (str): The name of the alert (e.g., CPU usage high).
+    instance (str): The instance where the alert occurred (e.g., the hostname or IP).
+    severity (str): The severity level of the alert (e.g., critical, warning).
+    description (str): Detailed description of the alert.
+    summary (str): A brief summary of the alert (default is 'Prometheus Alert').
     """
 
     # Define the message payload
     message_payload = {
         "@type": "MessageCard",
         "@context": "https://schema.org/extensions",
-        "summary": message_title,
-        "themeColor": "0076D7",  # Can change the theme color of the card
+        "summary": summary,
+        "themeColor": "FF0000" if severity.lower() == "critical" else "FFD700",  # Red for critical, Yellow for others
         "sections": [{
-            "activityTitle": message_title,
-            "text": message_body
+            "activityTitle": f"**Alert: {alert_name}**",
+            "facts": [
+                {"name": "Instance:", "value": instance},
+                {"name": "Severity:", "value": severity},
+                {"name": "Description:", "value": description}
+            ],
+            "text": description,
+            "markdown": True
         }]
     }
 
@@ -32,9 +41,9 @@ def send_teams_message(webhook_url, message_title="SystemGuard Alert", message_b
 
     # Check if the request was successful
     if response.status_code == 200:
-        print("Message sent successfully to Microsoft Teams!")
+        print("Alert sent successfully to Microsoft Teams!")
     else:
-        print(f"Failed to send message. Status code: {response.status_code}")
+        print(f"Failed to send alert. Status code: {response.status_code}")
         print(f"Response: {response.text}")
 
 # Example usage:
@@ -42,9 +51,11 @@ def send_teams_message(webhook_url, message_title="SystemGuard Alert", message_b
 #     # Replace with your Microsoft Teams webhook URL
 #     webhook_url = "https://outlook.office.com/webhook/YOUR_WEBHOOK_URL"
     
-#     # Define the message content
-#     message_title = "SystemGuard Alert"
-#     message_body = "This is a notification about an important system event."
+#     # Define the alert details
+#     alert_name = "CPU Usage High"
+#     instance = "server-01"
+#     severity = "critical"
+#     description = "CPU usage is over 90% for more than 5 minutes."
 
-#     # Send the message
-#     send_teams_message(webhook_url, message_title, message_body)
+#     # Send the alert
+#     send_teams_alert(webhook_url, alert_name, instance, severity, description)

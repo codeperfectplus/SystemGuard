@@ -1,7 +1,7 @@
 import requests
 from src.logger import logger
 
-def send_alert_to_discord(webhook_url, alert_name, instance, severity, description, summary):
+def send_discord_alert(webhook_url, alert_name, instance, severity, description, summary):
     """
     Sends an alert to a Discord channel via a webhook.
 
