@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.config import app
 from src.logger import logger
-from src.alerts import send_slack_alert, send_smtp_email, send_discord_alert, send_teams_alert, send_google_chat_alert
+from src.alert_manager import send_slack_alert, send_smtp_email, send_discord_alert, send_teams_alert, send_google_chat_alert
 from src.models import NotificationSettings
 from src.routes.helper.common_helper import get_email_addresses
 from src.routes.helper.notification_helper import send_test_alert
