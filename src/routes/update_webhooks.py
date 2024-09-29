@@ -12,7 +12,7 @@ def update_webhooks():
     general_settings = GeneralSettings.query.first()
 
     # Default to enabling all alerts if the general settings are missing
-    enable_all_alerts = general_settings.enable_alerts if general_settings else False
+    enable_alerts = general_settings.enable_alerts
 
     if request.method == "POST":
         # Fetch the submitted webhook URLs and alert enable states from the form
@@ -30,10 +30,10 @@ def update_webhooks():
         is_google_chat_alert_enabled = request.form.get("is_google_chat_alert_enabled") == "on"
         is_telegram_alert_enabled = request.form.get("is_telegram_alert_enabled") == "on"
         
-        enable_all_alerts = request.form.get("enable_all_alerts") == "on"
+        enable_alerts = request.form.get("enable_alerts") == "on"
 
         # If "Enable All Alerts" is turned off, disable all individual alerts
-        if not enable_all_alerts:
+        if not enable_alerts:
             is_email_alert_enabled = False
             is_slack_alert_enabled = False
             is_discord_alert_enabled = False
@@ -43,10 +43,10 @@ def update_webhooks():
 
         # Update and save the general settings
         if not general_settings:
-            general_settings = GeneralSettings(enable_alerts=enable_all_alerts)
+            general_settings = GeneralSettings(enable_alerts=enable_alerts)
             db.session.add(general_settings)
         else:
-            general_settings.enable_alerts = enable_all_alerts
+            general_settings.enable_alerts = enable_alerts
         general_settings.save()
 
         # Update or create new webhook settings
@@ -89,5 +89,5 @@ def update_webhooks():
     return render_template(
         "other/update_webhooks.html",
         webhook_settings=webhook_settings,
-        enable_all_alerts=enable_all_alerts
+        enable_alerts=enable_alerts
     )
