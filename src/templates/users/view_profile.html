@@ -9,13 +9,18 @@
         <div class="profile-avatar">
             <i class="fas fa-user-circle"></i>
         </div>
-        <h2>{{ user.username }}</h2>
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
         <p class="profile-email">{{ user.email }}</p>
     </div>
 
     {% include 'ext/message.html' %}
 
     <div class="profile-details">
+        <div class="detail-item">
+            <i class="fas fa-user detail-icon"></i>
+            <span>Full Name:</span> {{ user.first_name }} {{ user.last_name }}
+        </div>
+        
         <div class="detail-item">
             <i class="fas fa-user-tag detail-icon"></i>
             <span>User Level:</span> {{ user.user_level }}

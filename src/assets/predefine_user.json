@@ -1,5 +1,7 @@
 [
-    {
+    {   
+        "first_name": "John",
+        "last_name": "Doe",
         "username": "admin",
         "email": "admin@gmail.com",
         "password": "admin",
@@ -7,7 +9,9 @@
         "profession": "Software Developer",
         "receive_email_alerts": true
     },
-    {
+    {   
+        "first_name": "Db Admin",
+        "last_name": "Admin",
         "username": "prometheus_admin",
         "email": "prometheus_admin@mail.com",
         "password": "prometheus_password",

@@ -56,12 +56,16 @@ def edit_profile():
     user = current_user  # Get the currently logged-in user
 
     if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
         new_username = request.form['username']
         new_email = request.form['email']
         profession = request.form['profession']
         receive_email_alerts = 'receive_email_alerts' in request.form
 
         # Update user information
+        user.first_name = first_name
+        user.last_name = last_name
         user.username = new_username
         user.email = new_email
         user.profession = profession

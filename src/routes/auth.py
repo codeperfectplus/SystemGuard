@@ -112,9 +112,22 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+id = db.Column(db.Integer, primary_key=True)
+first_name = db.Column(db.String(50), nullable=False)
+last_name = db.Column(db.String(50), nullable=False)
+profile_picture = db.Column(db.String(100), nullable=True)
+username = db.Column(db.String(50), index=True, unique=True, nullable=False)
+email = db.Column(db.String(100), unique=True, nullable=False)
+password = db.Column(db.String(100), nullable=False)
+user_level = db.Column(db.String(10), nullable=False, default='user')
+receive_email_alerts = db.Column(db.Boolean, default=False)
+profession = db.Column(db.String(50), nullable=True)
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
         username = request.form["username"]
         email = request.form["email"]
         password = request.form["password"]
@@ -138,6 +151,8 @@ def signup():
 
         hashed_password = generate_password_hash(password)
         new_user = UserProfile(
+            first_name=first_name,
+            last_name=last_name,
             username=username,
             email=email,
             password=hashed_password,
