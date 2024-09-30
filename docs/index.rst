@@ -25,3 +25,4 @@ Welcome to SystemGuard's documentation!
    system_info.rst
    alerts.rst
    screenshots.rst
+   api_endpoints.rst
