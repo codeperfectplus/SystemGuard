@@ -58,14 +58,14 @@ For **Debian/Ubuntu** systems:
    .. code:: bash
 
       wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker.sh
-      chmod +x setup_docker.sh && ./setup_docker.sh
+      chmod +x setup_docker.sh && sudo ./setup_docker.sh
 
 For **CentOS/RHEL** systems:
 
    .. code:: bash
 
       wget https://raw.githubusercontent.com/codeperfectplus/HackScripts/refs/heads/main/setup/setup_docker_centos.sh
-      chmod +x setup_docker_centos.sh && ./setup_docker_centos.sh
+      chmod +x setup_docker_centos.sh && sudo ./setup_docker_centos.sh
 
 --------------
 
