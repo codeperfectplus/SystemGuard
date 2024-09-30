@@ -36,7 +36,7 @@
         });
 
         const instances = Object.keys(instanceSeverityCount);
-        const severityLevels = ['info', 'warning']; // Define the severity levels
+        const severityLevels = [...new Set(alertData.map(alert => alert.severity))]; // Extract unique severity levels dynamically
         const datasets = severityLevels.map(severity => {
             return {
                 label: severity,

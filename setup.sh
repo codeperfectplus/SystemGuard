@@ -1042,8 +1042,8 @@ function install_alert_manager() {
     ALERT_MANAGER_SCRIPT=$(find "$EXTRACT_DIR" -name start_alertmanager.sh)
     echo "Initializing Alert Manager $INIT_ALERT_MANAGER_SCRIPT"
     echo "Starting Alert Manager $ALERT_MANAGER_SCRIPT"
-    bash $INIT_ALERT_MANAGER_SCRIPT
-    bash $ALERT_MANAGER_SCRIPT
+    sudo -u "$USER_NAME" bash "$INIT_ALERT_MANAGER_SCRIPT"
+    sudo -u "$USER_NAME" bash "$ALERT_MANAGER_SCRIPT"
 }
 
 # update the code to the latest version

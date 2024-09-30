@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the path for the Alertmanager configuration file
-ALERTMANAGER_CONFIG_FILE="prometheus_config/alertmanager.yml"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PROMETHEUS_CONFIG_DIR="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")/prometheus_config"
+ALERTMANAGER_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/alertmanager.yml"
 IP_ADDRESS=$(hostname -I | awk '{print $1}')
-# take slack_webhook from .env file
-SLACK_WEBHOOK_URL=$(grep SLACK_WEBHOOK_URL .env | cut -d '=' -f2)
 
 # Create the Alertmanager configuration
 cat > "$ALERTMANAGER_CONFIG_FILE" <<EOL

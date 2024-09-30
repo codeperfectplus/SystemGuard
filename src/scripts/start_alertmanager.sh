@@ -11,18 +11,31 @@ error_exit() {
     exit 1
 }
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+# 2 directories up
+CONFIG_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"/prometheus_config
 # Configuration variables
 ALERTMANAGER_CONTAINER_NAME="alertmanager"
 ALERTMANAGER_IMAGE="prom/alertmanager:latest"
 ALERTMANAGER_PORT="9093"
-ALERTMANAGER_CONFIG_DIR="$(pwd)/prometheus_config"
-ALERTMANAGER_CONFIG_FILE="$ALERTMANAGER_CONFIG_DIR/alertmanager.yml"
+ALERTMANAGER_CONFIG_FILE="$CONFIG_DIR/alertmanager.yml"
+echo $ALERTMANAGER_CONFIG_FILE
 ALERTMANAGER_DATA_DIR="/home/$(whoami)/.database/alertmanager"
 NETWORK_NAME="flask-prometheus-net"
+INIT_ALERTMANAGER_SH="$SCRIPT_DIR/initialization/init_alertmanager.sh"
 
-# Ensure config and data directories exist
+# Verify the script exists
+if [ ! -f "$INIT_ALERTMANAGER_SH" ]; then
+  echo "Script $INIT_ALERTMANAGER_SH does not exist."
+  exit 1
+fi
+
+call INIT_ALERTMANAGER_SH
+bash $INIT_ALERTMANAGER_SH
+
+Ensure config and data directories exist
 log "Creating necessary directories if they don't exist."
-mkdir -p "$ALERTMANAGER_CONFIG_DIR" || error_exit "Failed to create $ALERTMANAGER_CONFIG_DIR"
+mkdir -p "$CONFIG_DIR" || error_exit "Failed to create $CONFIG_DIR"
 mkdir -p "$ALERTMANAGER_DATA_DIR" || error_exit "Failed to create $ALERTMANAGER_DATA_DIR"
 
 # Sample configuration for alertmanager.yml
