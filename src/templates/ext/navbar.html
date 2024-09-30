@@ -62,7 +62,7 @@
             {% if current_user.is_authenticated and current_user.user_level == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link {% if request.endpoint == 'graphs' %}active{% endif %}"
-                    href="{{ url_for('graphs') }}">
+                    href="{{ url_for('historical_system_metrics') }}">
                     <i class="fas fa-chart-line me-1"></i>Graphs
                 </a>
             </li>
