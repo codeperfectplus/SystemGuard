@@ -11,9 +11,17 @@ from src.alert_manager import (
     send_teams_alert,
     send_google_chat_alert,
 )
-from src.models import NotificationSettings
+from src.models import NotificationSettings, AlertDataModel
 from src.routes.helper.common_helper import get_email_addresses
 from src.utils import render_template_from_file, ROOT_DIR
+
+# AlertDataModel
+#     id = db.Column(db.Integer, primary_key=True)
+#     alert_name = db.Column(db.String(255), nullable=False)
+#     instance = db.Column(db.String(255), nullable=False)
+#     severity = db.Column(db.String(255), nullable=False)
+#     description = db.Column(db.String(255), nullable=False)
+#     summary = db.Column(db.String(255), nullable=False)
 
 
 def send_test_alert(alertmanager_url, alert_name, severity, instance):
@@ -63,9 +71,6 @@ def send_test_alert(alertmanager_url, alert_name, severity, instance):
         return {"message": f"An error occurred: {e}", "status": 500}
 
 
-
-
-
 def process_alert(alert):
     """
     Handles an individual alert by extracting necessary details and
@@ -74,15 +79,42 @@ def process_alert(alert):
     Args:
         alert (dict): The alert payload containing labels and annotations.
     """
+    
     alert_name = alert["labels"].get("alertname", "Unknown Alert")
     instance = alert["labels"].get("instance", "Unknown Instance")
     severity = alert["labels"].get("severity", "info")
     description = alert["annotations"].get("description", "No description provided")
     summary = alert["annotations"].get("summary", "No summary provided")
+    status = alert.get("status", "firing")
+    start_time = alert.get("startsAt", "No start time provided")
 
     log_alert(severity, alert_name, instance, description, summary)
     notify_alert(alert_name, instance, severity, description, summary)
+    save_alert_data(alert_name, instance, severity, description, summary, status, start_time)
 
+
+def save_alert_data(alert_name, instance, severity, description, summary, status, start_time):
+    """
+    Saves the alert data to the database.
+
+    Args:
+        alert_name (str): Name of the alert.
+        instance (str): Instance generating the alert.
+        severity (str): Severity level of the alert.
+        description (str): Detailed alert description.
+        summary (str): Brief alert summary.
+    """
+    alert_data = AlertDataModel(
+        alert_name=alert_name,
+        instance=instance,
+        severity=severity,
+        description=description,
+        summary=summary,
+        status=status,
+        start_time=start_time,
+    )
+    logger.info(f"Saving alert data: {alert_data}")
+    alert_data.save()
 
 def log_alert(severity, alert_name, instance, description, summary):
     """

@@ -11,6 +11,7 @@ from src.models.user_profile import UserProfile
 from src.models.monitored_website import MonitoredWebsite
 from src.models.prometheus_model import ExternalMonitornig
 from src.models.notification_settings import NotificationSettings
+from src.models.alert_data_models import AlertDataModel
 from flask_login import current_user
 from src.logger import logger
 from werkzeug.security import generate_password_hash

@@ -1,0 +1,57 @@
+/* alert_history.css */
+
+/* Basic resets and styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+.container {
+    margin: auto;
+    max-width: 1200px;
+}
+
+/* Header styles */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+/* Table styles */
+.table {
+    background-color: #ffffff;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.table th {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.table tbody tr {
+    transition: background-color 0.3s;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Font Awesome icon styles */
+.icon {
+    margin-right: 5px;
+}
