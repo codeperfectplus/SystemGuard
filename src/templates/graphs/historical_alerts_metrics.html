@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+{% block title %} historical Alert Analysis{% endblock %}
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+{% endblock %}
+{% block content %}
+<h1>Alerts Bar Graph</h1>
+<canvas id="alertChart" width="600" height="200"></canvas>
+
+<script>
+    function fetchDatafromAPI() {
+        fetch('/api/v1/alerts/history')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Log the fetched data
+                createBarGraph(data); // Call the function to create the bar graph
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function createBarGraph(alertData) {
+        const instanceSeverityCount = {};
+
+        // Count alerts per instance and severity
+        alertData.forEach(alert => {
+            const instance = alert.instance;
+            const severity = alert.severity;
+
+            if (!instanceSeverityCount[instance]) {
+                instanceSeverityCount[instance] = {};
+            }
+            if (!instanceSeverityCount[instance][severity]) {
+                instanceSeverityCount[instance][severity] = 0;
+            }
+            instanceSeverityCount[instance][severity]++;
+        });
+
+        const instances = Object.keys(instanceSeverityCount);
+        const severityLevels = ['info', 'warning']; // Define the severity levels
+        const datasets = severityLevels.map(severity => {
+            return {
+                label: severity,
+                data: instances.map(instance => instanceSeverityCount[instance][severity] || 0),
+                backgroundColor: severity === 'info' ? 'rgba(54, 162, 235, 0.5)' : 'rgba(255, 206, 86, 0.5)'
+            };
+        });
+
+        // Create the chart
+        const ctx = document.getElementById('alertChart').getContext('2d');
+        const alertChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: instances,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true, // Display the legend
+                        position: 'top', // Position of the legend
+                    },
+                    title: {
+                        display: true,
+                        text: 'Alert Counts by Instance and Severity', // Title of the chart
+                        font: {
+                            size: 20, // Font size for the title
+                            weight: 'bold' // Font weight for the title
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Alerts', // Label for the y-axis
+                            font: {
+                                size: 16 // Font size for y-axis label
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Instances', // Label for the x-axis
+                            font: {
+                                size: 16 // Font size for x-axis label
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest', // Tooltip interaction mode
+                    axis: 'x', // Tooltip interaction axis
+                    intersect: false // Allow tooltips to show on hover
+                }
+            }
+        });
+
+    }
+
+    fetchDatafromAPI(); // Fetch data when the page loads
+</script>
+{% endblock %}

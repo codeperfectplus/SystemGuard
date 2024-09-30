@@ -6,7 +6,7 @@ from flask import jsonify, blueprints, request
 from flask_login import login_required, current_user
 from flask_compress import Compress
 from src.config import app, db
-from src.models import UserDashboardSettings
+from src.models import UserDashboardSettings, AlertDataModel
 from src.utils import _get_system_info, get_os_release_info, get_os_info, get_cached_value
 from src.routes.helper.common_helper import admin_required
 from src.routes.helper.prometheus_helper import (
@@ -330,3 +330,16 @@ def get_retention():
         return jsonify({'error': 'Failed to fetch retention time from Prometheus', 'details': str(e)}), 500
     except Exception as e:
         return jsonify({'error': 'Failed to retrieve retention time', 'details': str(e)}), 500
+
+
+# alert history api
+@app.route('/api/v1/alerts/history', methods=['GET'])
+def alert_history_api():
+    try:
+        alert_data = AlertDataModel.query.all()
+        if not alert_data:
+            return jsonify({"message": "No alert history found."}), 404
+        
+        return jsonify([alert.serialize() for alert in alert_data]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

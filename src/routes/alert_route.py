@@ -65,7 +65,7 @@ def test_alert():
     alertmanager_url = f"http://{alertmanager_ip}:{alertmanager_port}"
 
     # Send a test alert with a unique name
-    response = send_test_alert(alertmanager_url, "Test Alert", "info", "Test Instance")
+    response = send_test_alert(alertmanager_url, "Test Alert", "warning", "Test Instance")
     return jsonify(response), response.get("status", 500)
 
 @app.route('/alerts/history', methods=['GET', 'POST'])

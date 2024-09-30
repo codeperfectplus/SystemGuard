@@ -18,4 +18,14 @@ class AlertDataModel(BaseModel):
     def __repr__(self):
         return f"<AlertData {self.alert_name}>"
     
-    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'alert_name': self.alert_name,
+            'instance': self.instance,
+            'severity': self.severity,
+            'description': self.description,
+            'summary': self.summary,
+            'status': self.status,
+            'start_time': self.start_time
+        }
