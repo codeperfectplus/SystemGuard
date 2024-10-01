@@ -27,12 +27,12 @@ PROMETHEUS_PORT="9090"
 
 # Paths and directories
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-PROMETHEUS_CONFIG_DIR="$(pwd)/prometheus_config"
+# 2 levels up from the script directory to configuration directory
+PROMETHEUS_CONFIG_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")/prometheus_config"
+echo "$PROMETHEUS_CONFIG_DIR"
 ALERT_RULES_FILE="$PROMETHEUS_CONFIG_DIR/alert_rules.yml"
 PROMETHEUS_CONFIG_FILE="$PROMETHEUS_CONFIG_DIR/prometheus.yml"
 PROMETHEUS_DATA_DIR="/home/$USER_NAME/.database/prometheus"
-INIT_ALERTMANAGER_SCRIPT="$SCRIPT_DIR/initialization/init_alertmanager.sh"
-START_ALERTMANAGER_SCRIPT="$SCRIPT_DIR/start_alertmanager.sh"
 
 # App configuration
 FLASK_APP_IP=$(hostname -I | cut -d' ' -f1)

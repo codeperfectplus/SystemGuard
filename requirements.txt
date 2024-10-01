@@ -1,41 +1,41 @@
 # Flask web framework
 Flask==3.0.3
 
-# Library for retrieving system information
-psutil==6.0.0
+# System information and performance monitoring
+psutil==6.0.0               # Retrieves system metrics (CPU, memory, etc.)
 
-# For managing environment variables
-python-dotenv==1.0.1
+# Environment variable management
+python-dotenv==1.0.1        # Loads environment variables from .env file
 
-# WSGI HTTP server for running the application in production
-gunicorn==23.0.0
+# WSGI HTTP server for production
+gunicorn==23.0.0            # Production server for running Flask applications
 
-# Flask extensions for database and user session management
-flask-sqlalchemy==3.1.1  # SQLAlchemy integration for Flask
-flask-login==0.6.3       # User session management for Flask
-flask-session==0.8.0     # Server-side session handling for Flask
-flask-migrate==4.0.7     # Database migrations for Flask
+# Flask extensions for database and session management
+flask-sqlalchemy==3.1.1     # SQLAlchemy ORM integration with Flask
+flask-login==0.6.3          # User session management (authentication)
+flask-session==0.8.0        # Server-side session storage
+flask-migrate==4.0.7        # Handles database migrations for Flask apps
 
-# File system monitoring and watching
-watchdog==5.0.2
+# File system monitoring
+watchdog==5.0.2             # Monitors filesystem events and changes
 
-# python requests library for making HTTP requests
-requests==2.32.3
+# HTTP requests library
+requests==2.32.3            # Simplified HTTP requests for Python
 
-# Speedtest CLI for testing internet speed
-speedtest-cli==2.1.3 
+# Internet speed testing
+speedtest-cli==2.1.3        # CLI for testing internet speed
 
-# prometheus client for monitoring
-prometheus_client==0.20.0
+# Prometheus client for monitoring and exposing metrics
+prometheus_client==0.20.0   # Exposes metrics for Prometheus to scrape
 
-# influxdb-client, optional for writing metrics to InfluxDB
-# influxdb-client==1.46.0
+# (Optional) InfluxDB client for writing metrics to InfluxDB
+# influxdb-client==1.46.0   # InfluxDB client for time-series data
 
-# pyyaml for parsing YAML configuration files
-pyyaml==6.0.2
+# YAML parsing and configuration handling
+pyyaml==6.0.2               # Reads and writes YAML configuration files
 
-# aiohttp for async HTTP requests
-aiohttp==3.10.7
+# Asynchronous HTTP client/server framework
+aiohttp==3.10.7             # Async HTTP client for non-blocking requests
 
-# flask compress for compressing responses
-Flask-Compress==1.15
+# Flask response compression
+Flask-Compress==1.15        # Compresses Flask HTTP responses (e.g., gzip)
