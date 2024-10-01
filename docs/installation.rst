@@ -89,7 +89,7 @@ Installation Steps
 
       sudo systemguard-installer --install
 
-   Optionally, you can install the Alert Manager along with the SystemGuard. Recommended for centralized server monitoring.
+   Optionally, you can install the Alert Manager along with the SystemGuard. Recommended for centralized server monitoring and alerting capabilities:
 
    .. code:: bash
 

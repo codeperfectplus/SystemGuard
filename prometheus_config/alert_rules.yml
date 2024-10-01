@@ -48,3 +48,15 @@ groups:
         for: 2m
         labels:
           severity: warning
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance Down"
+          description: "Instance {{ $labels.instance }} is down for more than 5 minutes."
+
+      
+

@@ -20,6 +20,7 @@ ALERTMANAGER_CONTAINER="alertmanager"
 ALERTMANAGER_IMAGE="prom/alertmanager:latest"
 ALERTMANAGER_PORT="9093"
 ALERTMANAGER_CONFIG="$CONFIG_DIR/alertmanager.yml"
+UPDATE_PROMETHEUS="$SCRIPT_DIR/update_prometheus.sh"
 PROMETHEUS_CONFIG="$CONFIG_DIR/prometheus.yml"
 SYSTEMGUARD_APP_IP=$(hostname -I | cut -d' ' -f1)
 SYSTEMGUARD_APP_PORT="5050"
@@ -124,6 +125,8 @@ run_output=$(docker run -d \
     -v "$ALERTMANAGER_CONFIG:/etc/alertmanager/alertmanager.yml" \
     -v "$ALERTMANAGER_DATA_DIR:/alertmanager" \
     "$ALERTMANAGER_IMAGE" 2>&1)
+
+bash $UPDATE_PROMETHEUS
 
 # Verify if the container started successfully
 if [ $? -eq 0 ]; then
