@@ -120,12 +120,12 @@ def delete_file_path(id):
 def configure_targets():
     update_prometheus_config()
     targets_info = show_targets()
-    return render_template("other/targets.html", targets_info=targets_info)
+    return render_template("prometheus/targets.html", targets_info=targets_info)
 
 
 @app.route("/new_alert_rule")
 def new_alert_rule():
-    return render_template("other/new_alert_rule.html")
+    return render_template("alerts/new_alert_rule.html")
 
 
 @app.route("/targets/restart_prometheus")
@@ -299,7 +299,7 @@ def active_alerts():
     except Exception as e:
         alerts = []
         print(f"Error fetching alerts: {e}")
-    return render_template("other/active_alerts.html", alerts=alerts)
+    return render_template("alerts/active_alerts.html", alerts=alerts)
 
 
 # alertmanager alerts
@@ -310,7 +310,7 @@ def show_alerts():
         response.raise_for_status()  # Raise an error for bad responses
         alerts = response.json()  # Parse JSON response
 
-        return render_template("other/show_alerts.html", alerts=alerts)
+        return render_template("alerts/show_alerts.html", alerts=alerts)
     except requests.exceptions.RequestException as e:
         return f"Error fetching alerts: {str(e)}", 500
 
@@ -339,7 +339,7 @@ def alertmanager_status():
         print(alertmanager_data["data"]["activeAlertmanagers"])
         active_alertmanagers = alertmanager_data["data"]["activeAlertmanagers"]
         return render_template(
-            "other/alertmanager_status.html", alertmanagers=active_alertmanagers
+            "alerts/alertmanager_status.html", alertmanagers=active_alertmanagers
         )
     else:
         return jsonify({"error": "Unable to fetch Alertmanager status"}), 500

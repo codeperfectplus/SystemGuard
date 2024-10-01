@@ -99,4 +99,4 @@ def alert_history():
     else:
         alert_data = AlertDataModel.query.paginate(page=page, per_page=per_page, error_out=False)
 
-    return render_template('other/alert_history.html', alerts=alert_data.items, pagination=alert_data)
+    return render_template('alerts/alert_history.html', alerts=alert_data.items, pagination=alert_data)

@@ -57,7 +57,7 @@ def dashboard():
         }
     
     return render_template(
-            "dashboard/developer.html",
+            "dashboard/homepage.html",
             system_info=system_info,
             speedtest_result=speedtest_result,
             last_timestamp=last_speedtest_timestamp,
