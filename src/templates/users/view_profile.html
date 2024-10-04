@@ -1,38 +1,63 @@
 {% extends "base/base.html" %}
 {% block extra_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/view_profile.css') }}">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <div class="profile-container">
     <div class="profile-header">
         <div class="profile-avatar">
-            <i class="fas fa-user-circle"></i>
+            <img src="{{ user.profile_picture_url }}" alt="Profile Image" class="avatar">
         </div>
         <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <div class="quote" id="quote">Loading quote...</div>
         <p class="profile-email">{{ user.email }}</p>
     </div>
 
     {% include 'ext/message.html' %}
 
     <div class="profile-details">
-        <div class="detail-item">
+        <div class="detail-item" title="Full Name">
             <i class="fas fa-user detail-icon"></i>
-            <span>Full Name:</span> {{ user.first_name }} {{ user.last_name }}
+            <span><strong>Full Name:</strong></span> {{ user.first_name }} {{ user.last_name }}
         </div>
-        
-        <div class="detail-item">
+        <div class="detail-item" title="Username">
+            <i class="fas fa-user detail-icon"></i>
+            <span><strong>Username:</strong></span> {{ user.username }}
+        </div>
+        <div class="detail-item" title="User Level">
             <i class="fas fa-user-tag detail-icon"></i>
-            <span>User Level:</span> {{ user.user_level }}
+            <span><strong>User Level:</strong></span> {{ user.user_level }}
         </div>
-        <div class="detail-item">
+        <div class="detail-item" title="Email Alerts">
             <i class="fas fa-envelope detail-icon"></i>
-            <span>Email Alerts:</span> {{ user.receive_email_alerts }}
+            <span><strong>Email Alerts:</strong></span> {{ user.receive_email_alerts }}
         </div>
-        <div class="detail-item">
+        <div class="detail-item" title="Role">
             <i class="fas fa-briefcase detail-icon"></i>
-            <span>Role:</span> {{ user.profession }}
+            <span><strong>Role:</strong></span> {{ user.profession }}
         </div>
+        <div class="detail-item" title="Last Updated">
+            <i class="fas fa-calendar-minus detail-icon"></i>
+            <span><strong>Last Updated:</strong></span> {{ user.last_updated.strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+        <div class="detail-item" title="Last Login">
+            <i class="fas fa-calendar-alt detail-icon"></i>
+            <span><strong>Last Login:</strong></span> 
+            {% if user.last_login %}
+                {{ user.last_login.strftime('%Y-%m-%d %H:%M:%S') }}
+            {% else %}
+                N/A
+            {% endif %}
+        </div>
+        <div class="detail-item" title="Joined">
+            <i class="fas fa-calendar-plus detail-icon"></i>
+            <span><strong>Joined:</strong></span> {{ user.date_joined.strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+        <div class="detail-item" title="Last Password Change">
+            <i class="fas fa-calendar-times detail-icon"></i>
+            <span><strong>Last Password Change:</strong></span> {{ user.password_last_changed.strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+
     </div>
 
     <div class="profile-actions">
@@ -50,11 +75,24 @@
             <div class="form-group">
                 <label for="sudo_password">Enter Sudo Password</label>
                 <input type="password" class="form-control" id="sudo_password" name="sudo_password" required>
-                <button type="submit" name="action" value="authenticate" class="btn-action btn-primary">Enable Super Admin</button>
+                <button type="submit" name="action" value="authenticate" class="btn-action btn-primary">Enable Super
+                    Admin</button>
             </div>
             {% endif %}
         </form>
         {% endif %}
     </div>
 </div>
+
+<script>
+    const quotes = [
+        "The only way to do great work is to love what you do.",
+        "Success is not the key to happiness. Happiness is the key to success.",
+        "The only limit to our realization of tomorrow will be our doubts of today.",
+        "The only thing we have to fear is fear itself.",
+        "The only source of knowledge is experience.",
+        "The only true wisdom is in knowing you know nothing."
+    ]
+    document.getElementById('quote').innerHTML = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
 {% endblock %}

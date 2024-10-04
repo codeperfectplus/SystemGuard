@@ -32,7 +32,10 @@ class UserProfile(BaseModel, UserMixin):
     receive_email_alerts = db.Column(db.Boolean, default=False)
     profession = db.Column(db.String(50), nullable=True)
     password_last_changed = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # New field
-    
+    last_login = db.Column(db.DateTime, nullable=True)
+    date_joined = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
     # Backref renamed to avoid conflict
     dashboard_settings = db.relationship('UserDashboardSettings', backref='user', uselist=False)
     card_settings = db.relationship('UserCardSettings', backref='user', uselist=False)

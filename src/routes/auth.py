@@ -26,15 +26,6 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return UserProfile.query.get(int(user_id))
 
-def is_password_expired(user):
-    if user.password_last_changed + datetime.timedelta(days=60) < datetime.datetime.now():
-        return True
-    return False
-
-def days_until_password_expiry(user):
-    return (user.password_last_changed + datetime.timedelta(days=60) - datetime.datetime.now()).days
-
-
 @app.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute")
 def login():
@@ -48,20 +39,11 @@ def login():
             (UserProfile.username == username) | (UserProfile.email == username)
         ).first()
         if user and user.check_password(password):
+            login_user(user, remember=remember_me)
+ 
+            user.last_login = datetime.datetime.utcnow()
+            user.save()
 
-            # check for expire password
-            days_left = days_until_password_expiry(user)
-            if days_left <= 0:
-                flash("Your password has expired. Please change it.", 'danger')
-                return redirect(url_for('change_password'))
-            elif days_left <= 70:
-                flash(f"Your password will expire in {days_left} days. Please consider changing it.", 'warning')
-                login_user(user, remember=remember_me)
-            else:
-                flash("You have successfully logged in", "success")
-                login_user(user, remember=remember_me)
-
-            # Remember me cookie duration logic
             if remember_me:
                 login_manager.remember_cookie_duration = datetime.timedelta(days=7)
             else:
@@ -129,17 +111,6 @@ def logout():
     #     send_smtp_email(receiver_email, "Logout Alert", email_body, is_html=True)
     logout_user()
     return redirect(url_for("login"))
-
-id = db.Column(db.Integer, primary_key=True)
-first_name = db.Column(db.String(50), nullable=False)
-last_name = db.Column(db.String(50), nullable=False)
-profile_picture = db.Column(db.String(100), nullable=True)
-username = db.Column(db.String(50), index=True, unique=True, nullable=False)
-email = db.Column(db.String(100), unique=True, nullable=False)
-password = db.Column(db.String(100), nullable=False)
-user_level = db.Column(db.String(10), nullable=False, default='user')
-receive_email_alerts = db.Column(db.Boolean, default=False)
-profession = db.Column(db.String(50), nullable=True)
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():

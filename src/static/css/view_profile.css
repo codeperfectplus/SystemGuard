@@ -1,17 +1,18 @@
 /* Container styling */
 .profile-container {
-    max-width: 700px;
+    max-width: 900px;
     margin: 50px auto;
     padding: 30px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border: 1px solid #e1e1e1;
 }
 
 .profile-container:hover {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
 
 /* Header section styling */
@@ -29,7 +30,7 @@
     font-size: 32px;
     color: #343a40;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .profile-email {
@@ -41,6 +42,8 @@
 /* Profile details */
 .profile-details {
     margin: 40px 0;
+    text-align: left;
+    padding-left: 10px;
 }
 
 .detail-item {
@@ -49,24 +52,22 @@
     font-size: 18px;
     margin-bottom: 15px;
     color: #495057;
-    padding-left: 20px;
     position: relative;
 }
 
-.detail-item::before {
-    content: '';
-    width: 5px;
-    height: 100%;
-    background-color: #007bff;
-    position: absolute;
-    left: 0;
-    top: 0;
+.detail-item strong {
+    margin-right: 5px;
+    color: #333;
 }
 
-.detail-icon {
-    font-size: 22px;
-    margin-right: 10px;
+.detail-item i {
+    margin-right: 15px;
     color: #007bff;
+    font-size: 22px;
+}
+
+.detail-item span {
+    margin-left: 5px;
 }
 
 /* Button styles */
@@ -122,4 +123,20 @@
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.avatar {
+    border-radius: 50%;
+    margin-bottom: 20px;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
 }

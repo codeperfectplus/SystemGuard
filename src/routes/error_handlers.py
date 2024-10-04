@@ -75,7 +75,7 @@ def check_password_expiry():
     # Perform checks only for authenticated users
     if current_user.is_authenticated:
         remaining_days = days_until_password_expiry(current_user)
-
+        print("Remaining days:", remaining_days)
         # Redirect if the password has expired
         if remaining_days <= 0:
             flash("Your password has expired. Please change it to continue.", "danger")

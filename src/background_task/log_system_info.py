@@ -123,8 +123,7 @@ def store_system_info_in_db(system_info):
         current_temp=system_info["current_temp"],
         timestamp=datetime.datetime.now(),
     )
-    db.session.add(system_log)
-    db.session.commit()
+    system_log.save()
 
 # def store_system_info_in_influxdb(system_info):
 #     """

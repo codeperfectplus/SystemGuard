@@ -1,5 +1,7 @@
 import random
 import string
+import hashlib
+from datetime import datetime
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,6 +9,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from src.config import app, db
 
 profile_bp = blueprints.Blueprint('profile', __name__)
+
+def get_gravatar_url(email, size=200):
+    # Create an MD5 hash of the email address
+    email_hash = hashlib.md5(email.strip().lower().encode('utf-8')).hexdigest()
+    return f"https://www.gravatar.com/avatar/{email_hash}?s={size}&d=identicon"
+
 
 # View Profile Route
 @app.route('/profile', methods=['GET'])
@@ -16,6 +24,7 @@ def view_profile():
     This route displays the user's profile information.
     """
     user = current_user  # Get the currently logged-in user
+    user.profile_picture_url = get_gravatar_url(user.email)
     return render_template('users/view_profile.html', user=user)
 
 def generate_random_password():
@@ -50,7 +59,9 @@ def change_password():
 
         # Update the user's password
         current_user.password = generate_password_hash(new_password)
-        db.session.commit()
+        current_user.last_updated = datetime.utcnow()
+        current_user.password_last_changed = datetime.utcnow()
+        current_user.save()
 
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))
@@ -81,6 +92,7 @@ def edit_profile():
         user.email = new_email
         user.profession = profession
         user.receive_email_alerts = receive_email_alerts
+        user.last_updated = datetime.utcnow()
 
         db.session.commit()
 
