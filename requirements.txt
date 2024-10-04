@@ -16,6 +16,8 @@ flask-login==0.6.3          # User session management (authentication)
 flask-session==0.8.0        # Server-side session storage
 flask-migrate==4.0.7        # Handles database migrations for Flask apps
 Flask-WTF==1.2.1            # Flask integration with WTForms
+Flask-Caching==2.3.0        # Caching extension for Flask
+Flask-Compress==1.15        # Compresses Flask HTTP responses (e.g., gzip)
 
 # File system monitoring
 watchdog==5.0.2             # Monitors filesystem events and changes
@@ -37,6 +39,3 @@ pyyaml==6.0.2               # Reads and writes YAML configuration files
 
 # Asynchronous HTTP client/server framework
 aiohttp==3.10.7             # Async HTTP client for non-blocking requests
-
-# Flask response compression
-Flask-Compress==1.15        # Compresses Flask HTTP responses (e.g., gzip)
