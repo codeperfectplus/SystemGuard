@@ -1,3 +1,5 @@
+import random
+import string
 from flask import render_template, redirect, url_for, request, blueprints, flash, blueprints
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,6 +17,14 @@ def view_profile():
     """
     user = current_user  # Get the currently logged-in user
     return render_template('users/view_profile.html', user=user)
+
+def generate_random_password():
+    """
+    Generate a random password for the user.
+    """
+    password_length = 12
+    password_characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(password_characters) for i in range(password_length))
 
 # Change Password Route
 @app.route('/change_password', methods=['GET', 'POST'])
@@ -45,7 +55,8 @@ def change_password():
         flash('Password changed successfully!', 'success')
         return redirect(url_for('view_profile'))
 
-    return render_template('users/change_password.html', user=current_user)
+    return render_template('users/change_password.html', user=current_user,
+                            random_password=generate_random_password())
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

@@ -1,4 +1,7 @@
-from flask import render_template, blueprints
+import datetime
+from flask import render_template, blueprints, request, redirect, url_for, flash
+from flask_login import current_user
+
 from src.config import app, logger
 
 error_handlers_bp = blueprints.Blueprint("error_handlers", __name__)
@@ -58,3 +61,31 @@ class CustomError(Exception):
 #     """Function to run after each request."""
 #     logger.info("This function runs after each request.")
 #     return response
+
+def days_until_password_expiry(user):
+    return (user.password_last_changed + datetime.timedelta(days=60) - datetime.datetime.now()).days
+
+
+@app.before_request
+def check_password_expiry():
+    # Allow access to login, password change, and static files routes without restriction
+    if request.endpoint in ['login', 'change_password', 'static']:
+        return
+
+    # Perform checks only for authenticated users
+    if current_user.is_authenticated:
+        remaining_days = days_until_password_expiry(current_user)
+
+        # Redirect if the password has expired
+        if remaining_days <= 0:
+            flash("Your password has expired. Please change it to continue.", "danger")
+            return redirect(url_for('change_password'))
+
+        # Warn the user if the password will expire soon
+        if remaining_days <= 10:
+            flash(f"Your password will expire in {remaining_days} days. Please change it soon.", "warning")
+
+        # Check if the user is still using the default password (e.g., 'admin')
+        if current_user.check_password("admin"):
+            flash("Security Alert: Please change the default password for your security.", "danger")
+            return redirect(url_for('change_password'))

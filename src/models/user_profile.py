@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash
 
@@ -30,6 +31,7 @@ class UserProfile(BaseModel, UserMixin):
     user_level = db.Column(db.String(10), nullable=False, default='user')
     receive_email_alerts = db.Column(db.Boolean, default=False)
     profession = db.Column(db.String(50), nullable=True)
+    password_last_changed = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # New field
     
     # Backref renamed to avoid conflict
     dashboard_settings = db.relationship('UserDashboardSettings', backref='user', uselist=False)

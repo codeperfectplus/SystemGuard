@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from src.alert_manager import send_smtp_email
-from src.config import app, db
+from src.config import app, db, limiter
 from src.models import (
     UserProfile,
     UserCardSettings,
@@ -26,7 +26,17 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return UserProfile.query.get(int(user_id))
 
+def is_password_expired(user):
+    if user.password_last_changed + datetime.timedelta(days=60) < datetime.datetime.now():
+        return True
+    return False
+
+def days_until_password_expiry(user):
+    return (user.password_last_changed + datetime.timedelta(days=60) - datetime.datetime.now()).days
+
+
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -37,8 +47,19 @@ def login():
         user = UserProfile.query.filter(
             (UserProfile.username == username) | (UserProfile.email == username)
         ).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user, remember=remember_me)
+        if user and user.check_password(password):
+
+            # check for expire password
+            days_left = days_until_password_expiry(user)
+            if days_left <= 0:
+                flash("Your password has expired. Please change it.", 'danger')
+                return redirect(url_for('change_password'))
+            elif days_left <= 70:
+                flash(f"Your password will expire in {days_left} days. Please consider changing it.", 'warning')
+                login_user(user, remember=remember_me)
+            else:
+                flash("You have successfully logged in", "success")
+                login_user(user, remember=remember_me)
 
             # Remember me cookie duration logic
             if remember_me:
@@ -46,10 +67,6 @@ def login():
             else:
                 login_manager.remember_cookie_duration = datetime.timedelta(0)
 
-            # Check if the user has changed the default password
-            if check_password_hash(user.password, "admin"):
-                flash("Security Alert: Please change the default password", "danger")
-                return redirect(url_for("change_password"))
             receiver_email = current_user.email
             admin_emails_with_alerts = get_email_addresses(
                 user_level="admin", receive_email_alerts=True

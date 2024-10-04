@@ -3,6 +3,8 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from src.logger import logger
 from src.helper import get_system_node_name, get_ip_address, load_secret_key
@@ -31,11 +33,20 @@ os.makedirs(DB_DIR, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_DIR}/systemguard.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = secret_key
+app.config['WTF_CSRF_SECRET_KEY'] = secret_key
+app.config['WTF_CSRF_TIME_LIMIT'] = 3600
+app.config['WTF_CSRF_HEADER_NAME'] = "X-CSRFToken"
+app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookies over HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent access to cookies via JavaScript
+app.config['SESSION_COOKIE_SAMESITE'] = "Lax"  # Prevent CSRF attacks via cross-site requests
 
 # Initialize the database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 csrf = CSRFProtect(app)
+
+limiter = Limiter(key_func=get_remote_address)
+limiter.init_app(app)
 
 # Define global variables for templates
 app.jinja_env.globals.update(
