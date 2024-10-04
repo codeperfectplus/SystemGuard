@@ -6,6 +6,7 @@
 {% block content %}
     <div id="terminal"></div>
     <form id="terminal-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" id="command" placeholder="Enter command" autocomplete="off" autofocus>
     </form>
 

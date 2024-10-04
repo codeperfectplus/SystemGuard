@@ -15,6 +15,7 @@ flask-sqlalchemy==3.1.1     # SQLAlchemy ORM integration with Flask
 flask-login==0.6.3          # User session management (authentication)
 flask-session==0.8.0        # Server-side session storage
 flask-migrate==4.0.7        # Handles database migrations for Flask apps
+Flask-WTF==1.2.1            # Flask integration with WTForms
 
 # File system monitoring
 watchdog==5.0.2             # Monitors filesystem events and changes

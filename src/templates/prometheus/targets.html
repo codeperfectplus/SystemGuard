@@ -34,6 +34,7 @@
                                 {{ target }}
                                 {% if not system_ip_address in target %}
                                 <form action="{{ url_for('remove_target') }}" method="post" class="inline-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="job_name" value="{{ info.job_name }}">
                                     <input type="hidden" name="target_to_remove" value="{{ target }}">
                                     <button type="submit" class="btn-danger btn-sm">
@@ -48,6 +49,7 @@
                     <td>{{ info.scrape_interval }}</td>
                     <td>
                         <form action="{{ url_for('change_interval') }}" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="hidden" name="job_name" value="{{ info.job_name }}">
                             <input type="text" name="new_interval" placeholder="New Interval" required class="input-field">
                             <input type="submit" value="Change Interval" class="btn-primary btn-sm">
@@ -63,6 +65,7 @@
     <div class="section">
         <h2>Add New Target</h2>
         <form action="{{ url_for('add_target') }}" method="post" class="add-target-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
             <input type="text" name="new_target" placeholder="New Target" class="input-field" required>
             <input type="text" name="scrape_interval" placeholder="Scrape Interval" class="input-field" required>
@@ -77,6 +80,7 @@
         <!-- Change Auth Section -->
         <h2>Change Basic Auth</h2>
         <form action="{{ url_for('change_auth') }}" method="post" class="add-target" id="change-auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="job_name" placeholder="Job Name" class="input-field" required>
             <input type="text" name="username" placeholder="Username" class="input-field" required>
             <input type="password" name="password" placeholder="Password" class="input-field" required>
@@ -89,6 +93,7 @@
         <!-- Update Prometheus Section -->
         <div class="section">
             <form action="{{ url_for('restart_prometheus') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="submit" value="Update Prometheus" class="btn-lg btn-primary">
             </form>
         </div>

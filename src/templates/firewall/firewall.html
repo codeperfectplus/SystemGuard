@@ -10,6 +10,7 @@
     {% include 'ext/message.html' %}
     <!-- Form to enable/disable port -->
     <form method="POST" class="manage-port-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="port">Port:</label>
         <input type="text" id="port" name="port" required>
 
@@ -37,6 +38,7 @@
     <!-- Form to enter sudo password to get open ports -->
     {% if not session.get('sudo_password') %}
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="sudo_password">Enter Sudo Password to see open ports:</label>
         <input type="password" id="sudo_password" name="sudo_password" required>
 
@@ -47,6 +49,7 @@
     <!-- Form to clear session data -->
     {% if session.get('sudo_password') %}
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" name="clear_session">Clear Session</button>
     </form>
     <!-- Open ports table -->

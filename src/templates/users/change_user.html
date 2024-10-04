@@ -7,6 +7,7 @@
 <div class="change-user-container">
     <h2 class="page-title bg-primary text-white p-3">Change User Settings</h2>
     <form method="post" class="change-user-form shadow-lg p-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
         
         <div class="form-group">

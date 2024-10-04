@@ -9,6 +9,7 @@
 
     <form method="POST">
         {% include 'ext/message.html' %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="is_dashboard_network_enabled">Enable Dashboard Network:</label>
             <input type="checkbox" id="is_dashboard_network_enabled" name="is_dashboard_network_enabled" {% if page_toggles_settings.is_dashboard_network_enabled %}checked{% endif %}>

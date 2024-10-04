@@ -12,12 +12,14 @@
     {% include 'ext/message.html' %}
 
     <form method="post" class="form-control">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label for="number">Number of Processes:</label>
         <input type="number" id="number" name="number" min="1" value="{{ number }}">
         <button type="submit">Show</button>
     </form>
 
     <form method="post" class="form-control">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% if session.get('sudo_password') %}
         <button type="clear" name="clear_session">Deauthenticate</button>
         {% else %}
@@ -46,6 +48,7 @@
                 <td>{{ process[3] }}</td>
                 <td>
                     <form method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="kill_pid" value="{{ process[3] }}">
                         <input type="hidden" name="process_name" value="{{ process[0] }}">
                         <button type="submit">Kill</button>

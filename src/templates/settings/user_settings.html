@@ -8,8 +8,8 @@
     <h1 class="settings-title">User Settings</h1>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
-        
         <div class="form-group">
             <label for="speedtest_cooldown">Speedtest Cooldown (minutes):</label>
             <input type="number" id="speedtest_cooldown" name="speedtest_cooldown" value="{{ user_dashboard_settings.speedtest_cooldown }}" min="1" required>

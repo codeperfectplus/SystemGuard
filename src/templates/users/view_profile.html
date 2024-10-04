@@ -43,6 +43,7 @@
 
         {% if current_user.user_level == 'admin' %}
         <form action="/superadmin" method="POST" class="control-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if session.get('sudo_password') %}
             <button type="submit" name="clear_session" class="btn-action btn-secondary">Exit SuperAdmin</button>
             {% else %}

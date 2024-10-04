@@ -11,6 +11,7 @@
 <!-- Form to add a new website -->
 <div class="container">
     <form action="/add_monitored_website" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" name="name" placeholder="Website URL" required>
         <input type="number" name="ping_interval" placeholder="Ping Period (seconds)" required>
         <input type="email" name="email_address" placeholder="Email Address" required>
@@ -57,6 +58,7 @@
                 <div class="remove-btn">
                     <form action="/delete_monitored_website/{{ website.id }}" method="POST"
                         onsubmit="return confirm('Are you sure?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn-danger">Remove</button>
                     </form>
                 </div>

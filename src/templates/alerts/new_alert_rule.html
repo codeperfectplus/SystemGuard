@@ -7,6 +7,7 @@
 <h1>Submit Alert Rule</h1>
 
 <form id="alertRuleForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label for="name">Rule Name:</label>
     <input type="text" id="name" placeholder="Rule Name. Eg: HighCPUUsage" required>
 

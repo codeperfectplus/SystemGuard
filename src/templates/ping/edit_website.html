@@ -12,6 +12,7 @@
     <div class="bg-white p-4 rounded shadow-sm">
         <!-- Form to edit the website -->
         <form action="/edit_monitored_website/{{ website.id }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group mb-3">
                 <label for="name" class="form-label">Website URL:</label>
                 <input type="text" id="name" name="name" class="form-control" value="{{ website.name }}" required>

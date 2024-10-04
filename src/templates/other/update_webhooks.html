@@ -13,6 +13,7 @@
         <hr>
         {% include 'ext/message.html' %}
         <form method="POST" action="{{ url_for('update_webhooks') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">

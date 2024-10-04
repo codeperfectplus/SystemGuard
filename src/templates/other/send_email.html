@@ -14,6 +14,7 @@
             <i class="fas fa-info-circle"></i> Alerts are currently disabled.
         </div>
         <form method="POST" enctype="multipart/form-data" style="pointer-events: none; opacity: 0.5;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="subject">Subject:</label>
                 <input type="text" id="subject" name="subject" placeholder="Enter the email subject" required>
@@ -46,6 +47,7 @@
         </form>
     {% else %}
         <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="subject">Subject:</label>
                 <input type="text" id="subject" name="subject" placeholder="Enter the email subject" required>

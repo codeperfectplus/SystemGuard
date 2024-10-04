@@ -8,6 +8,7 @@
     <h1 class="settings-title">General Settings</h1>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
         
         <div class="form-group">

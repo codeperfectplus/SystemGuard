@@ -12,6 +12,7 @@
             <div class="card-body">
                 <form method="POST" action="{{ url_for('external_monitoring') }}">
                     <div class="mb-3">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <label for="file-path" class="form-label">Enter File Path for Monitoring</label>
                         <input type="text" id="file-path" name="file_path" class="form-control" placeholder="Enter file path" required>
                     </div>
@@ -29,6 +30,7 @@
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             <span>{{ item.file_path }}</span>
                             <form method="POST" action="{{ url_for('delete_file_path', id=item.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </div>

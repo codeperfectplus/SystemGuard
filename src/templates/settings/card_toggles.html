@@ -8,6 +8,7 @@
     <h1 class="settings-title">Card Toggles</h1>
 
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         {% include 'ext/message.html' %}
         
         <div class="form-row">

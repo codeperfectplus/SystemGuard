@@ -13,6 +13,7 @@
     {% include 'ext/message.html' %}
 
     <form method="POST" action="{{ url_for('edit_profile') }}" class="edit-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="first_name"><i class="fas fa-user"></i> First Name</label>
             <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required class="form-control" placeholder="Enter your first name">

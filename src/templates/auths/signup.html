@@ -8,6 +8,7 @@
     <h2 class="signup-title"><span class="text-primary">{{title}}</span> Signup Form</h2>
     <p class="signup-desc">Please fill in this form to create an account.</p>
     <form method="post" class="signup-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label for="first_name">First Name</label>
             <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>

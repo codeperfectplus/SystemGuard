@@ -1,5 +1,6 @@
 import os
 import subprocess
+from dotenv import load_dotenv
 
 def get_system_username():
     """
@@ -81,3 +82,21 @@ def check_installation_information():
         pass
 
     return output
+
+
+
+def load_secret_key():
+    """Load the secret key for the application."""
+    load_dotenv()
+    secret_key = os.getenv('SYSTEMGUARD_KEY')    
+    if secret_key:
+        return secret_key
+    else:
+        try:
+            with open('secret.key', 'rb') as key_file:
+                secret_key = key_file.read()
+                return secret_key
+        except FileNotFoundError:
+            raise FileNotFoundError("The secret key file 'secret.key' was not found.")
+        except Exception as e:
+            raise RuntimeError(f"An error occurred while reading the secret key: {e}")

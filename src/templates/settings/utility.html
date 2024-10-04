@@ -22,6 +22,7 @@
 
     <div class="control-form-wrapper mt-5">
         <form action="/utility" method="POST" class="control-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% if session.get('sudo_password') %}
             <button type="submit" name="clear_session" class="btn btn-secondary btn-lg btn-block mb-2">Exit SuperAdmin</button>
             {% else %}
