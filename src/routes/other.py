@@ -10,6 +10,7 @@ from src.alert_manager import send_smtp_email
 from src.utils import get_os_release_info, get_os_info
 from src.helper import check_installation_information
 from src.routes.helper.common_helper import admin_required
+from src.routes.helper.unique_id_helper import calculate_unique_system_id
 
 other_bp = blueprints.Blueprint('other', __name__)
 
@@ -111,8 +112,14 @@ def about():
     # fetch sg_installation_method from .bashrc file
     sg_installation_method = fetch_bashrc_variable("sg_installation_method")
     installation_info["sg_installation_method"] = sg_installation_method
+    sudo_password = session.get('sudo_password', '')
+    systemguard_unique_id = calculate_unique_system_id(sudo_password)
+    # store the unique id in session
+    session['systemguard_unique_id'] = systemguard_unique_id
+    
     return render_template("other/about.html", 
-                            installation_info=installation_info)
+                            installation_info=installation_info,
+                            systemguard_unique_id=systemguard_unique_id)
 
 
 @app.route('/os_info', methods=['GET'])

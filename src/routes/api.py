@@ -82,6 +82,7 @@ def graph_data_api():
 
         # Determine the start time based on the filter
         time_deltas = {
+            '1 minute': 1 * 60,
             '5 minutes': 5 * 60,
             '15 minutes': 15 * 60,
             '30 minutes': 30 * 60,
@@ -105,7 +106,9 @@ def graph_data_api():
         start_time = end_time - time_range_seconds
 
         # Determine the step based on the time range
-        if time_range_seconds <= 900:  # 15 minutes
+        if time_range_seconds <= 60:  # 15 minutes
+            step = '2s'
+        elif time_range_seconds <= 900:  # 15 minutes
             step = '10s'
         elif time_range_seconds <= 3600:  # 1 hour
             step = '30s'

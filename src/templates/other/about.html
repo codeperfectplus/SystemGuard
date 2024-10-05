@@ -29,6 +29,11 @@
                         <h5 class="card-title">Year</h5>
                         <p class="card-text mb-0">{{ year }}</p>
                     </div>
+                    <!-- systemguard_unique_id -->
+                    <div class="info-section">
+                        <h5 class="card-title">SystemGuard Unique ID</h5>
+                        <p class="card-text mb-0">{{ systemguard_unique_id }}</p>
+                    </div>
                     <div class="info-section">
                         <h5 class="card-title">Installation Method</h5>
                         {% if installation_info["sg_installation_method"] == "git" %}

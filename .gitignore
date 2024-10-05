@@ -170,3 +170,5 @@ prometheus_config/prometheus.yml
 prometheus_config/alertmanager.yml
 test.py
 .initialized
+
+*.conf
