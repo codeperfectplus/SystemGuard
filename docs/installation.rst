@@ -19,21 +19,21 @@ For **Debian/Ubuntu** systems:
    .. code:: bash
 
       sudo apt-get update
-      sudo apt-get install git curl wget unzip iptables jq nmap
+      sudo apt-get install git curl wget unzip iptables nmap
 
 For **Fedora** systems:
 
    .. code:: bash
 
       sudo dnf update -y
-      sudo dnf install -y git curl wget unzip iptables jq nmap
+      sudo dnf install -y git curl wget unzip iptables nmap
 
 For **CentOS/RHEL** systems:
 
    .. code:: bash
 
       sudo yum update -y
-      sudo yum install -y git curl wget unzip iptables jq nmap
+      sudo yum install -y git curl wget unzip iptables nmap
 
 **Anaconda3/Miniconda3**
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -78,7 +78,7 @@ Installation Steps
 
    .. code:: bash
 
-      wget https://raw.githubusercontent.com/codeperfectplus/SystemGuard/production/setup.sh
+      wget https://raw.githubusercontent.com/SystemGuard-official/SystemGuard/production/setup.sh
       chmod +x setup.sh && sudo mv setup.sh /usr/local/bin/systemguard-installer
 
 2. **Install the SystemGuard App:**
@@ -87,13 +87,13 @@ Installation Steps
 
    .. code:: bash
 
-      sudo systemguard-installer --install
+      systemguard-installer --install
 
    Optionally, you can install the Alert Manager along with the SystemGuard. Recommended for centralized server monitoring and alerting capabilities:
 
    .. code:: bash
 
-      sudo systemguard-installer --install-alert-manager
+      systemguard-installer --install-alert-manager
 
 
 3. **Access SystemGuard:**

@@ -24,5 +24,4 @@ Welcome to SystemGuard's documentation!
    profile_management.rst
    system_info.rst
    alerts.rst
-   screenshots.rst
    api_endpoints.rst

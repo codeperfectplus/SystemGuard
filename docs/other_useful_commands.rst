@@ -9,7 +9,7 @@ command:
 
 .. code:: bash
 
-   sudo systemguard-installer --uninstall
+   systemguard-installer --uninstall
 
 This will remove SystemGuard and its related configurations from your
 system.
@@ -24,7 +24,7 @@ can attempt to fix them by running:
 
 .. code:: bash
 
-   sudo systemguard-installer --fix
+   systemguard-installer --fix
 
 This command will attempt to automatically fix any issues with the app.
 
@@ -38,7 +38,7 @@ shutdown or system crash), you can run:
 
 .. code:: bash
 
-   sudo systemguard-installer --restore
+   systemguard-installer --restore
 
 This will restore the app to its previous functional state without
 affecting its configurations.
@@ -53,7 +53,7 @@ its services, use the command:
 
 .. code:: bash
 
-   sudo systemguard-installer --status
+   systemguard-installer --status
 
 --------------
 
@@ -65,7 +65,7 @@ you can perform a system health check by running:
 
 .. code:: bash
 
-   sudo systemguard-installer --health
+   systemguard-installer --health
 
 This will check various system resources and provide insights into the
 overall health of your system.
@@ -80,7 +80,7 @@ space, use the following command:
 
 .. code:: bash
 
-   sudo systemguard-installer --clean-backups
+   systemguard-installer --clean-backups
 
 --------------
 
@@ -92,7 +92,7 @@ troubleshooting or monitoring purposes, run:
 
 .. code:: bash
 
-   sudo systemguard-installer --logs
+   systemguard-installer --logs
 
 --------------
 
@@ -103,7 +103,7 @@ If you need to stop the SystemGuard server, you can do so by running:
 
 .. code:: bash
 
-   sudo systemguard-installer --stop
+   systemguard-installer --stop
 
 --------------
 
@@ -114,6 +114,6 @@ For a list of all available commands and their descriptions, run:
 
 .. code:: bash
 
-   sudo systemguard-installer --help
+   systemguard-installer --help
 
 --------------
